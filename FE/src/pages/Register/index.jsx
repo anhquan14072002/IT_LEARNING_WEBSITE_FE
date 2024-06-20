@@ -8,10 +8,8 @@ const index = () => {
     control,
     handleSubmit,
     formState: { errors },
-    watch,
     getValues
   } = useForm(); // Initialize useForm hook
-  const password = watch("password", "");
   const onSubmit = (data) => {
     console.log(data); // Handle form submission
   };
@@ -49,6 +47,7 @@ const index = () => {
                 }}
                 render={({ field }) => (
                   <input
+                  id="firstname"
                     type="text"
                     className="w-full h-10 text-black-800 border border-solid border-gray-600  pb-2 pl-1 rounded-md"
                     placeholder="Nhập họ"
@@ -78,6 +77,7 @@ const index = () => {
                 }}
                 render={({ field }) => (
                   <input
+                  id="lastname"
                     type="text"
                     className="w-full h-10 text-black-800 border border-solid border-gray-600  pb-2 pl-1 rounded-md"
                     placeholder="Nhập Tên"
@@ -111,6 +111,7 @@ const index = () => {
                 }}
                 render={({ field }) => (
                   <input
+                  id="email"
                     type="text"
                     className="w-full h-10 text-black-800 border border-solid border-gray-600  pb-2 pl-1 rounded-md"
                     placeholder="Nhập email"
@@ -146,6 +147,7 @@ const index = () => {
                 }}
                 render={({ field }) => (
                   <input
+                  id="password"
                     type="password"
                     className=" w-full h-10 text-black-800 border border-solid border-gray-600  pb-2 pl-1 rounded-md"
                     placeholder="Nhập mật khẩu"
@@ -161,7 +163,7 @@ const index = () => {
               )}
             </div>
             <div className="mb-4">
-              <label htmlFor="password" className="cursor-pointer">
+              <label htmlFor="passwordAgain" className="cursor-pointer">
                 <h4 className=" text-xl text-black font-medium">
                   Nhập lại mật khẩu <span className="text-red-500">*</span>
                 </h4>
@@ -178,6 +180,7 @@ const index = () => {
                 }}
                 render={({ field }) => (
                   <input
+                  id="passwordAgain"
                     type="password"
                     className=" w-full h-10 text-black-800 border border-solid border-gray-600  pb-2 pl-1 rounded-md"
                     placeholder="Nhập mật khẩu"
