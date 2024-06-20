@@ -6,6 +6,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import Search from './pages/Search';
+import Document from './pages/Document';
 
 
 function App() {
@@ -18,6 +19,7 @@ function App() {
         <Route path="/search" element={<Search />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/document" element={<Document />} />
         <Route path="/forgotpassword" element={<ForgotPassword />} />
       </Routes>
     </Router>
