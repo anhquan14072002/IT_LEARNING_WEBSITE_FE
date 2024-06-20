@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Header from "../../components/Header";
 import Menu from "../../components/Menu";
 import arrowDown from "../../assets/img/icons8-arrow-down-50.png";
@@ -7,20 +7,30 @@ import DocumentCard from "../../components/DocumentCard";
 import Footer from "../../components/Footer";
 
 export default function Home() {
+  const fixedDivRef = useRef(null);
+  const [fixedDivHeight, setFixedDivHeight] = useState(0);
+  
+
+  useEffect(() => {
+    if (fixedDivRef.current) {
+      setFixedDivHeight(fixedDivRef.current.offsetHeight);
+    }
+  }, [fixedDivRef]);
+
   return (
     <div className="min-h-screen flex flex-col">
-      <div className="fixed top-0 w-full z-10">
+      <div ref={fixedDivRef} className="fixed top-0 w-full z-10">
         <Header />
         <Menu />
       </div>
-      <div className="px-20 mt-32">
+      <div className="px-20" style={{ paddingTop: `${fixedDivHeight}px` }}>
         <h1 className="mt-10 text-2xl font-bold">
           Danh mục bài tập và soạn bài
         </h1>
         <div>
           {[...Array(10).keys()].map((_, i) => {
             const index = i + 3;
-            return <Class classNumber={index} />;
+            return <Class classNumber={index} key={index} />;
           })}
         </div>
       </div>

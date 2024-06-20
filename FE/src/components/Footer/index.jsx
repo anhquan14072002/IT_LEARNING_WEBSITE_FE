@@ -1,9 +1,9 @@
-import React from "react";
-import './index.css'
+import React, { forwardRef } from "react";
+import "./index.css";
 
-export default function Footer() {
+const Footer = forwardRef((props, ref) => {
   return (
-    <div className="bg-[#F0FCFF] text-[#1976D2] p-12 mt-auto">
+    <div ref={ref} className="bg-[#F0FCFF] text-[#1976D2] p-12 h-auto mt-auto">
       <h1 className="font-semibold text-xl text-center mb-10">Liên hệ</h1>
       <div className="flex items-center justify-center flex-wrap gap-20">
         <div className="flex items-center gap-2">
@@ -44,4 +44,6 @@ export default function Footer() {
       </div>
     </div>
   );
-}
+});
+
+export default Footer;

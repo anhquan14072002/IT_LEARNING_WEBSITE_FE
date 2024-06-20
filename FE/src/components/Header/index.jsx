@@ -4,17 +4,19 @@ import avatar from "../../assets/img/icons8-male-user-50.png";
 import arrowDown from "../../assets/img/icons8-sort-down-50.png";
 import "./index.css";
 import { Tooltip } from "primereact/tooltip";
+import { useNavigate } from "react-router-dom";
 
 export default function Header() {
+  const navigate = useNavigate();
   return (
     <div className="w-full">
       <div className="bg-[#1976D2] flex justify-between py-4 px-16">
         <div className="flex items-center">
-          <img className="h-[30px] w-[30px]" src={avatar} />
+          <img className="h-[30px] w-[30px]" src={avatar} onClick={()=>navigate('/')}/>
         </div>
         <div className="flex">
           {/* search */}
-          <div className="border border-white rounded-3xl flex items-center px-2.5 py-2 gap-2.5">
+          <div className="border border-white rounded-3xl flex items-center px-2.5 py-2 gap-2.5" onClick={()=>navigate('/search')}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               x="0px"
@@ -53,8 +55,8 @@ export default function Header() {
 
           {/* not login */}
           <div className="ml-10 px-5 flex gap-5">
-            <Button label="Đăng nhập" text raised className="text-white px-3" />
-            <Button label="Đăng kí" severity="warning" style={{backgroundColor:'#FAA500'}} className="text-white px-5"/>
+            <Button label="Đăng nhập" text raised className="text-white px-3" onClick={()=>navigate('/login')}/>
+            <Button label="Đăng kí" severity="warning" style={{backgroundColor:'#FAA500'}} className="text-white px-5" onClick={()=>navigate('/register')}/>
           </div>
 
           {/* login */}
