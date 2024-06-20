@@ -3,30 +3,20 @@ import React from "react";
 import avatar from "../../assets/img/icons8-male-user-50.png";
 import arrowDown from "../../assets/img/icons8-sort-down-50.png";
 import "./index.css";
+import { Tooltip } from "primereact/tooltip";
+import { useNavigate } from "react-router-dom";
 
 export default function Header() {
+  const navigate = useNavigate();
   return (
-    <div>
-      <div
-        className="w-full flex justify-center"
-        style={{ backgroundColor: "#1976D2" }}
-      >
-       
-        <div className="flex">
-        <img height={30} width={30} src={avatar} />
+    <div className="w-full">
+      <div className="bg-[#1976D2] flex justify-between py-4 px-16">
+        <div className="flex items-center">
+          <img className="h-[30px] w-[30px]" src={avatar} onClick={()=>navigate('/')}/>
         </div>
-           
         <div className="flex">
           {/* search */}
-          <div
-            className="border-1 border-white flex align-items-center"
-            style={{
-              gap: "10px",
-              height: "30px",
-              marginTop: "auto",
-              marginBottom: "auto",
-            }}
-          >
+          <div className="border border-white rounded-3xl flex items-center px-2.5 py-2 gap-2.5" onClick={()=>navigate('/search')}>
             <svg
               xmlns="http://www.w3.org/2000/svg"
               x="0px"
@@ -34,10 +24,9 @@ export default function Header() {
               width="22"
               height="22"
               viewBox="0,0,256,256"
-              style={{ fill: "#FFFFFF" }}
+              className="fill-white"
             >
               <g
-                fill="#ffffff"
                 fillRule="nonzero"
                 stroke="none"
                 strokeWidth="1"
@@ -60,26 +49,18 @@ export default function Header() {
             <input
               id="search"
               placeholder="Tìm kiếm"
-              style={{
-                backgroundColor: "transparent",
-                border: "none",
-                color: "#fffff",
-                outline: "none",
-              }}
+              className="bg-transparent border-none text-white focus:outline-none placeholder:text-white"
             />
           </div>
 
-          {/* login */}
-          <div className="p-5 flex" style={{ gap: "20px" }}>
-            <Button label="Đăng nhập" text raised className="text-white" />
-            <Button label="Đăng kí" severity="warning" />
+          {/* not login */}
+          <div className="ml-10 px-5 flex gap-5">
+            <Button label="Đăng nhập" text raised className="text-white px-3" onClick={()=>navigate('/login')}/>
+            <Button label="Đăng kí" severity="warning" style={{backgroundColor:'#FAA500'}} className="text-white px-5" onClick={()=>navigate('/checkmail')}/>
           </div>
 
-          {/* not login */}
-          <div
-            className="flex align-content-center h-auto"
-            style={{ gap: "20px", marginTop: "auto", marginBottom: "auto" }}
-          >
+          {/* login */}
+          {/* <div className="ml-10 flex items-center gap-5 my-auto">
             <div>
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -88,10 +69,9 @@ export default function Header() {
                 width="30"
                 height="30"
                 viewBox="0, 0, 300, 150"
-                style={{ fill: "#FFFFFF" }}
+                className="fill-white"
               >
                 <g
-                  fill="#ffffff"
                   fillRule="nonzero"
                   stroke="none"
                   strokeWidth="1"
@@ -113,12 +93,12 @@ export default function Header() {
               </svg>
             </div>
             <div>
-              <div className="flex align-items-center">
-                <img height={30} width={30} src={avatar} />
-                <img height={15} width={15} src={arrowDown} />
+              <div className="ml-2 flex items-center">
+                <img className="h-[30px] w-[30px]" src={avatar} />
+                <img className="h-[15px] w-[15px]" src={arrowDown} />
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
     </div>

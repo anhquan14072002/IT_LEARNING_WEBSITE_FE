@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Button } from "primereact/button";
 import { useForm, Controller } from "react-hook-form";
 import LoginComponent from "../../components/LoginComponent";
-
+import Header from "../../components/Header";
 const index = () => {
   const {
     control,
@@ -15,7 +15,9 @@ const index = () => {
   };
 
   return (
-    <div className="flex h-screen">
+    <div>
+      <Header/>
+    <div className="flex h-screen ">
       <div className="w-1/2">
         <div className="w-auto h-full">
           <img
@@ -27,12 +29,13 @@ const index = () => {
       </div>
 
       <div className="w-1/2  flex items-center justify-center ">
-        <div className="w-1/2 h-min  ">
+        <div className="w-8/12   ">
           <h1 className="text-left mb-4 font-bold text-black text-3xl">
             Tạo tài khoản
           </h1>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <div className="mb-4">
+            <div className="flex">
+            <div className="mb-4 mr-8">
               <label htmlFor="firstname" className="cursor-pointer">
                 <h4 className=" text-xl text-black font-medium">
                   Họ <span className="text-red-500">*</span>
@@ -49,7 +52,7 @@ const index = () => {
                   <input
                   id="firstname"
                     type="text"
-                    className="w-full h-10 text-black-800 border border-solid border-gray-600  pb-2 pl-1 rounded-md"
+                    className="w-full h- text-black-800 border border-solid border-gray-600  pb-2 pl-1 rounded-md"
                     placeholder="Nhập họ"
                     {...field}
                   />
@@ -92,6 +95,8 @@ const index = () => {
                 </span>
               )}
             </div>
+            </div>
+           
             <div className="mb-4">
               <label htmlFor="email" className="cursor-pointer">
                 <h4 className=" text-xl text-black font-medium">
@@ -149,7 +154,7 @@ const index = () => {
                   <input
                   id="password"
                     type="password"
-                    className=" w-full h-10 text-black-800 border border-solid border-gray-600  pb-2 pl-1 rounded-md"
+                    className=" w-full h-10 text-black-800 border border-solid border-gray-600  pb-1 pl-1 rounded-md"
                     placeholder="Nhập mật khẩu"
                     {...field}
                   />
@@ -214,6 +219,8 @@ const index = () => {
         </div>
       </div>
     </div>
+    </div>
+
   );
 };
 
