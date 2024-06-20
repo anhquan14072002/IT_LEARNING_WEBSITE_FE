@@ -30,17 +30,8 @@ export default function Comment() {
   return (
     <div className="py-20">
       <h1 className="font-bold text-center">Phần đánh giá</h1>
-      <div className="flex justify-center mt-4">
-        <Avatar
-          image={avatar}
-          size="xlarge"
-          shape="circle"
-          className="border border-gray-300"
-        />
-      </div>
-
       {/* Comment Editor */}
-      <div className="mt-10 border border-solid border-gray-300 p-4 rounded-xl">
+      <div className="mt-2 border border-solid border-gray-300 p-4 rounded-xl">
         <h2 className="font-bold mb-4">
           Nhập đánh giá của bạn về bộ tài liệu này
         </h2>
