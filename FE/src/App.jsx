@@ -7,6 +7,7 @@ import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import Search from './pages/Search';
 import Document from './pages/Document';
+import Lesson from './pages/Lesson';
 
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/document" element={<Document />} />
+        <Route path="/document/lesson/:id" element={<Lesson />} />
         <Route path="/forgotpassword" element={<ForgotPassword />} />
       </Routes>
     </Router>
