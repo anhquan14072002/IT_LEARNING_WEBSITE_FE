@@ -14,7 +14,8 @@ import { Dropdown } from "primereact/dropdown";
 export default function Search() {
   const footerRef = useRef(null);
   const fixedDivRef = useRef(null);
-  const dropDownRef = useRef(null);
+  const dropDownRef1 = useRef(null);
+  const dropDownRef2 = useRef(null);
   const [fixedDivHeight, setFixedDivHeight] = useState(0);
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(10);
@@ -59,10 +60,13 @@ export default function Search() {
   };
 
   useEffect(() => {
-    if (dropDownRef.current) {
-      setFixedDivHeight(dropDownRef.current.offsetHeight);
+    if (dropDownRef1.current) {
+      setFixedDivHeight(dropDownRef1.current.offsetHeight);
     }
-  }, [dropDownRef]);
+    if (dropDownRef2.current) {
+      setFixedDivHeight(dropDownRef2.current.offsetHeight);
+    }
+  }, [dropDownRef1, dropDownRef2]);
 
   useEffect(() => {
     if (fixedDivRef.current) {
@@ -84,10 +88,10 @@ export default function Search() {
           <CategoryOfClass display={isFooterVisible} />
           <div className="flex-1 w-[98%] pt-5">
             <div className="m-4 mb-10 flex flex-wrap items-center">
-              <div className="border-2 rounded-md p-2" style={{height:`${dropDownRef}px`}}>
+              <div className="border-2 rounded-md p-2">
                 <InputText
                   placeholder="Search"
-                  className="flex-1 focus:outline-none w-36  focus:ring-0"
+                  className="flex-1 focus:outline-none w-36 focus:ring-0"
                 />
                 <Button
                   icon="pi pi-search"
@@ -98,7 +102,8 @@ export default function Search() {
               <div className="flex-1 flex gap-3 justify-end">
                 <div className="border-2 rounded-md mt-4">
                   <Dropdown
-                    ref={dropDownRef}
+                    filter
+                    ref={dropDownRef1}
                     value={selectedCity}
                     onChange={(e) => setSelectedCity(e.value)}
                     options={cities}
@@ -110,7 +115,8 @@ export default function Search() {
                 </div>
                 <div className="border-2 rounded-md mt-4">
                   <Dropdown
-                    ref={dropDownRef}
+                    filter
+                    ref={dropDownRef2}
                     value={selectedCity}
                     onChange={(e) => setSelectedCity(e.value)}
                     options={cities}
