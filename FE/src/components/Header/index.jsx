@@ -56,7 +56,7 @@ export default function Header() {
           {/* not login */}
           <div className="ml-10 px-5 flex gap-5">
             <Button label="Đăng nhập" text raised className="text-white px-3" onClick={()=>navigate('/login')}/>
-            <Button label="Đăng kí" severity="warning" style={{backgroundColor:'#FAA500'}} className="text-white px-5" onClick={()=>navigate('/register')}/>
+            <Button label="Đăng kí" severity="warning" style={{backgroundColor:'#FAA500'}} className="text-white px-5" onClick={()=>navigate('/checkmail')}/>
           </div>
 
           {/* login */}
