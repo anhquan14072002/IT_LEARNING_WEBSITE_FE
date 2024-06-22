@@ -11,7 +11,7 @@ const CustomEditor = ({ label, ...props }) => {
 
   return (
     <div className="mb-2">
-      <label htmlFor={props.id || props.name}>{label}</label>
+      {label && (<label htmlFor={props.id || props.name}>{label}</label>)}
       <div className={classNames(
         "w-full shadow-none border",
         { "border-red-500": meta.touched && meta.error },
