@@ -11,19 +11,45 @@ import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import "./index.css";
 import Document from "../Document";
+import classNames from "classnames";
+import Topic from "../Topic";
+import Lesson from "../Lesson";
 
 export default function ManageDocument() {
+  const [navIndex, setNavIndex] = useState(1);
+
   return (
     <div>
       {/* menubar */}
       <div className="flex justify-center border-b-2 border-[#D1F7FF]">
-        <h1 className="p-5 cursor-pointer hover:bg-[#D1F7FF] bg-[#D1F7FF]">
+        <h1
+          className={classNames("p-5 cursor-pointer hover:bg-[#D1F7FF]", {
+            "bg-[#D1F7FF]": navIndex === 1,
+          })}
+          onClick={() => setNavIndex(1)}
+        >
           Tài liệu
         </h1>
-        <h1 className="p-5 cursor-pointer hover:bg-[#D1F7FF]">Chủ đề</h1>
-        <h1 className="p-5 cursor-pointer hover:bg-[#D1F7FF]">Bài học</h1>
+        <h1
+          className={classNames("p-5 cursor-pointer hover:bg-[#D1F7FF]", {
+            "bg-[#D1F7FF]": navIndex === 2,
+          })}
+          onClick={() => setNavIndex(2)}
+        >
+          Chủ đề
+        </h1>
+        <h1
+          className={classNames("p-5 cursor-pointer hover:bg-[#D1F7FF]", {
+            "bg-[#D1F7FF]": navIndex === 3,
+          })}
+          onClick={() => setNavIndex(3)}
+        >
+          Bài học
+        </h1>
       </div>
-      <Document />
+      {navIndex === 1 && <Document />}
+      {navIndex === 2 && <Topic />}
+      {navIndex === 3 && <Lesson />}
     </div>
   );
 }

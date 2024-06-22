@@ -13,7 +13,6 @@ import { ACCEPT, SUCCESS } from "../../utils";
 const validationSchema = Yup.object({
   title: Yup.string().required("Tiêu đề không được bỏ trống"),
   class: Yup.string().required("Lớp không được bỏ trống"),
-  level: Yup.string().required("Cấp học không được bỏ trống"),
   description: Yup.string().required("Mô tả không được bỏ trống"),
 });
 
@@ -21,7 +20,6 @@ export default function UpdateDocumentDialog({ visibleUpdate, setVisibleUpdate, 
   const initialValues = {
     title: "",
     class: "",
-    level: "",
     description: "fff",
   };
 
@@ -54,20 +52,7 @@ export default function UpdateDocumentDialog({ visibleUpdate, setVisibleUpdate, 
               id="title"
             />
 
-            <div className="flex justify-center gap-2">
-              <CustomSelectInput
-                label="Cấp học"
-                name="level"
-                id="level"
-                flexStyle="flex-1"
-              >
-                <option value="">Select a level</option>
-                <option value="Level 1">Level 1</option>
-                <option value="Level 2">Level 2</option>
-                <option value="Level 3">Level 3</option>
-                <ErrorMessage name="level" component="div" />
-              </CustomSelectInput>
-              <CustomSelectInput
+                <CustomSelectInput
                 label="Lớp"
                 name="class"
                 id="class"
@@ -79,7 +64,6 @@ export default function UpdateDocumentDialog({ visibleUpdate, setVisibleUpdate, 
                 <option value="Class 3">Class 3</option>
                 <ErrorMessage name="class" component="div" />
               </CustomSelectInput>
-            </div>
 
             <div>
               <CustomEditor
