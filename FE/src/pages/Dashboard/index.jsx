@@ -2,6 +2,7 @@ import { useState } from "react";
 import Header from "../../components/Header";
 import Footer from "../../components/Footer";
 import ManageDocument from "../../components/ManageDocument";
+import TopicList from "../../components/ManagementTopic/TopicList";
 
 const Dashboard = () => {
   const [open, setOpen] = useState(true);
@@ -10,6 +11,12 @@ const Dashboard = () => {
     { title: "Thống kê", src: "Chart_fill", index: 0 },
     { title: "Quản lí tài khoản", src: "User", index: 1 },
     { title: "Quản lí tài liệu/chủ đề/bài học ", src: "Folder", index: 2 },
+    {
+      title: "Quản lí chủ đề ",
+      src: "Folder",
+      index: 3,
+      component: <TopicList />,
+    },
   ];
 
   return (
@@ -19,7 +26,7 @@ const Dashboard = () => {
         <div
           className={` ${
             open ? "w-72" : "w-20 "
-          } bg-dark-purple h-screen p-5  pt-8 relative duration-300`}
+          } bg-[#00A9FF] h-screen p-5  pt-8 relative duration-300`}
         >
           <img
             src="./src/assets/control.png"
@@ -41,7 +48,7 @@ const Dashboard = () => {
                 key={index}
                 className={`flex  rounded-md p-2 cursor-pointer hover:bg-light-white text-gray-300 text-sm items-center gap-x-4 mt-2
               ${index === indexMenu && "bg-light-white"} `}
-              onClick={()=>setIndexMenu(index)}
+                onClick={() => setIndexMenu(index)}
               >
                 <img src={`./src/assets/${Menu.src}.png`} />
                 <span
@@ -53,8 +60,9 @@ const Dashboard = () => {
             ))}
           </ul>
         </div>
-        <div className="h-screen flex-1 p-7">
-          {indexMenu === 2 ? <ManageDocument /> : null}
+        <div className="h-screen flex-1 p-7 bg-[#EEEFF1]">
+          {/* {indexMenu === 2 ? <ManageDocument /> : Men} */}
+          <TopicList />
         </div>
       </div>
     </>

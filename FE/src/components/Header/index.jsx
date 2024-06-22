@@ -8,7 +8,7 @@ import { Tooltip } from "primereact/tooltip";
 export default function Header() {
   return (
     <div className="w-full">
-      <div className="bg-[#1976D2] flex justify-between py-4 px-16">
+      <div className="bg-[#00A9FF] flex justify-between py-4 px-16">
         <div className="flex items-center">
           <img className="h-[30px] w-[30px]" src={avatar} />
         </div>
@@ -53,8 +53,17 @@ export default function Header() {
 
           {/* not login */}
           <div className="ml-10 px-5 flex gap-5">
-            <Button label="Đăng nhập" text raised className="text-white px-3" />
-            <Button label="Đăng kí" severity="warning" style={{backgroundColor:'#FAA500'}} className="text-white px-5"/>
+            <Button
+              label="Đăng nhập"
+              text
+              raised
+              className="text-stone-700 px-3 bg-[#89CFF3] "
+            />
+            <Button
+              label="Đăng kí"
+              style={{ backgroundColor: "#  " }}
+              className="text-stone-800 px-5"
+            />
           </div>
 
           {/* login */}

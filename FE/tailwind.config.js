@@ -10,6 +10,12 @@ export default {
         "dark-purple": "#081A51",
         "light-white": "rgba(255,255,255,0.17)",
       },
+      boxShadow: {
+        'custom-focus': '0 0 0 0.2rem #a5f3fc',
+      },
+      colors: {
+        'border-focus': '#a5f3fc',
+      }
     },
   },
   plugins: [],
