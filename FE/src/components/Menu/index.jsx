@@ -3,7 +3,7 @@ import React from "react";
 function Menu() {
   return (
     <div className="flex justify-around border-b-2 z-10 bg-white">
-      <div className="p-2 cursor-pointer hover:bg-[#D1F7FF] flex-1 flex justify-center">
+      <div className="p-2 cursor-pointer bg-[#D1F7FF] hover:bg-[#D1F7FF] flex-1 flex justify-center">
         <svg
           viewBox="0 0 576 512"
           xmlns="http://www.w3.org/2000/svg"
