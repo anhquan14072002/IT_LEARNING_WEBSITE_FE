@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Button } from "primereact/button";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, set } from "react-hook-form";
 import LoginComponent from "../../components/LoginComponent";
 import Header from "../../components/Header";
 import { useNavigate } from "react-router-dom";
@@ -13,9 +13,20 @@ const Index = () => {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm(); // Initialize useForm hook
+  } = useForm(); 
+
+  const saveLoginInfo = (data) => {
+    if (checked) {
+        localStorage.setItem('email', data.email);
+        localStorage.setItem('password', data.password);
+    } else {
+        localStorage.removeItem('email');
+        localStorage.removeItem('password');
+    }
+};
 
   const onSubmit = (data) => {
+   saveLoginInfo(data)
     console.log(data); // Handle form submission
     if (currState === "Login") {
       console.log("call api login");
@@ -26,7 +37,7 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen overflow-hidden">
+    <div className="min-h-screen ">
       <Header />
       <div className="flex h-screen  ">
         <div className="w-1/2">
@@ -162,19 +173,24 @@ const Index = () => {
               )}
             </form>
             <div className="w-full flex justify-between">
-              {currState === "Login" && (
+              {currState === "Login" ?(
                 <span
                   onClick={() => setCurrState("ForgotPassword")}
                   className="text-blue-600 cursor-pointer"
                 >
                   Quên mật khẩu
                 </span>
-              )}
-
+              ):( <span
+                onClick={() => setCurrState("Login")}
+                className="text-blue-600 cursor-pointer"
+              >
+                Đăng nhập
+              </span>)}
+            
               <span
                 onClick={() => navigate("/checkmail")}
                 className="text-blue-600 cursor-pointer"
-              > 
+              >
                 Tạo tài khoản
               </span>
             </div>

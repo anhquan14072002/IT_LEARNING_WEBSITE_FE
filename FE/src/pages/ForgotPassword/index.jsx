@@ -4,6 +4,7 @@ import { useForm, Controller } from "react-hook-form";
 import LoginComponent from "../../components/LoginComponent";
 
 const index = () => {
+  const {id} = useParams();
   const {
     control,
     handleSubmit,

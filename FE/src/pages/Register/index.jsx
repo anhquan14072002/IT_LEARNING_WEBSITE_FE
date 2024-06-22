@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React from "react";
 import { Button } from "primereact/button";
 import { useForm, Controller } from "react-hook-form";
 import LoginComponent from "../../components/LoginComponent";
 import Header from "../../components/Header";
 const index = () => {
+  const {id} = useParams();
   const {
     control,
     handleSubmit,
