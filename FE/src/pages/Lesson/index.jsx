@@ -25,7 +25,7 @@ export default function Lesson() {
         });
       },
       {
-        threshold: 0.5,
+        threshold: 0,
       }
     );
 
