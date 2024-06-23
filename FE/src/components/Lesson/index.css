@@ -2,3 +2,8 @@
     border: 2px solid rgb(216, 216, 216) !important;
     box-shadow: none;
   }
+/* Custom styles for the paginator dropdown */
+.p-paginator .p-dropdown {
+  border: 2px solid #a5e6f7 !important;
+  box-shadow: none;
+}

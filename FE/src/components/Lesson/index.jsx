@@ -14,13 +14,14 @@ import UpdateLessonDialog from "../UpdateLessonDialog";
 import UpdateDocumentDialog from "../UpdateDocumentDialog";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { ACCEPT, REJECT } from "../../utils";
+import Loading from "../Loading";
+import restClient from "../../services/restClient";
+import { Link } from "react-router-dom";
 
 export default function Lesson() {
   const toast = useRef(null);
   const dropDownRef1 = useRef(null);
   const dropDownRef2 = useRef(null);
-  const [first, setFirst] = useState(0);
-  const [rows, setRows] = useState(10);
   const [selectedCity, setSelectedCity] = useState(null);
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -28,10 +29,42 @@ export default function Lesson() {
   const [visible, setVisible] = useState(false);
   const [visibleUpdate, setVisibleUpdate] = useState(false);
   const [visibleDelete, setVisibleDelete] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [modelUpdate, setModelUpdate] = useState({});
+
+  //pagination
+  const [first, setFirst] = useState(0);
+  const [page, setPage] = useState(1);
+  const [rows, setRows] = useState(10);
+  const [totalPage, setTotalPage] = useState(0);
 
   useEffect(() => {
-    ProductService.getProductsMini().then((data) => setProducts(data));
-  }, []);
+    fetchData(page, rows);
+  }, [page, rows]);
+
+  const getData = () => {
+    fetchData(page, rows);
+  };
+
+  const fetchData = (page, rows) => {
+    setLoading(true);
+
+    restClient({
+      url: `api/lesson/getalllessonpagination?PageIndex=${page}&PageSize=${rows}`,
+      method: "GET",
+    })
+      .then((res) => {
+        const paginationData = JSON.parse(res.headers["x-pagination"]);
+        setTotalPage(paginationData.TotalPages);
+        setProducts(Array.isArray(res.data.data) ? res.data.data : []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching data:", err);
+        setProducts([]);
+        setLoading(false);
+      });
+  };
 
   const actionBodyTemplate = (rowData) => {
     return (
@@ -39,14 +72,17 @@ export default function Lesson() {
         <Button
           icon="pi pi-pencil"
           className="text-blue-600 p-mr-2 shadow-none"
-          onClick={() => setVisibleUpdate(true)}
+          onClick={() => {
+            setModelUpdate(rowData);
+            setVisibleUpdate(true);
+          }}
         />
         <Button
           icon="pi pi-trash"
           className="text-red-600 shadow-none"
           onClick={() => {
             setVisibleDelete(true);
-            confirm()
+            confirm(rowData.id);
           }}
         />
       </div>
@@ -62,17 +98,23 @@ export default function Lesson() {
   ];
 
   const onPageChange = (event) => {
-    setFirst(event.first);
-    setRows(event.rows);
+    const { page, rows, first } = event;
+    setPage(page + 1);
+    setRows(rows);
+    setFirst(first);
   };
 
   const indexBodyTemplate = (rowData, { rowIndex }) => {
-    const index = rowIndex + 1; // Calculate the index based on pagination
+    const index = (page - 1) * rows + (rowIndex + 1);
     return <span>{index}</span>;
   };
 
+  const file = (rowData, { rowIndex }) => {
+    return <Link className="p-2 bg-blue-500 text-white rounded-md" to={`${rowData.urlDownload}`}>Tải về</Link>;
+  };
+
   // modal delete
-  const confirm = () => {
+  const confirm = (id) => {
     setVisibleDelete(true);
     confirmDialog({
       message: "Do you want to delete this record?",
@@ -96,13 +138,26 @@ export default function Lesson() {
             icon="pi pi-check"
             className="p-2 bg-blue-500 text-white"
             onClick={() => {
-              setVisibleDelete(false);
-              ACCEPT(toast);
+              deleteLesson(id);
             }}
           />
         </>
       ),
     });
+  };
+
+  const deleteLesson = (id) => {
+    restClient({ url: `api/lesson/deletelesson/${id}`, method: "DELETE" })
+      .then((res) => {
+        getData();
+        ACCEPT(toast, "Xóa thành công");
+      })
+      .catch((err) => {
+        REJECT(toast, "Xảy ra lỗi khi xóa tài liệu này");
+      })
+      .finally(() => {
+        setVisibleDelete(false);
+      });
   };
 
   return (
@@ -113,11 +168,14 @@ export default function Lesson() {
         visible={visible}
         setVisible={setVisible}
         toast={toast}
+        getData={getData}
       />
       <UpdateLessonDialog
         visibleUpdate={visibleUpdate}
         setVisibleUpdate={setVisibleUpdate}
         toast={toast}
+        getData={getData}
+        modelUpdate={modelUpdate}
       />
       <div>
         <div className="flex justify-between pt-1">
@@ -174,26 +232,36 @@ export default function Lesson() {
               </div>
             </div>
           </div>
-          <DataTable
-            value={products}
-            onContextMenu={(e) => cm.current.show(e.originalEvent)}
-            contextMenuSelection={selectedProduct}
-            onContextMenuSelectionChange={(e) => setSelectedProduct(e.value)}
-            tableStyle={{ minWidth: "50rem" }}
-            className="border-t-2"
-          >
-            <Column
-              field="#"
-              header="#"
-              body={indexBodyTemplate} 
-              className="border-b-2 border-t-2"
-            />
-            <Column
-              field="code"
-              header="Tiêu đề"
-              className="border-b-2 border-t-2"
-            ></Column>
-            <Column
+          {loading ? (
+            <Loading />
+          ) : (
+            <DataTable
+              value={products}
+              onContextMenu={(e) => cm.current.show(e.originalEvent)}
+              contextMenuSelection={selectedProduct}
+              onContextMenuSelectionChange={(e) => setSelectedProduct(e.value)}
+              className="border-t-2"
+              tableStyle={{ minHeight: "30rem" }}
+              scrollable
+              scrollHeight="30rem"
+            >
+              <Column
+                field="#"
+                header="#"
+                body={indexBodyTemplate}
+                className="border-b-2 border-t-2"
+              />
+              <Column
+                field="title"
+                header="Tiêu đề"
+                className="border-b-2 border-t-2"
+              ></Column>
+              <Column
+                header="File tài liệu"
+                className="border-b-2 border-t-2"
+                body={file}
+              ></Column>
+              {/* <Column
               field="name"
               header="Chủ đề"
               className="border-b-2 border-t-2"
@@ -212,16 +280,18 @@ export default function Lesson() {
               field="category"
               header="Ngày cập nhật"
               className="border-b-2 border-t-2"
-            ></Column>
-            <Column
-              className="border-b-2 border-t-2"
-              body={actionBodyTemplate}
-            />
-          </DataTable>
+            ></Column> */}
+              <Column
+                className="border-b-2 border-t-2"
+                body={actionBodyTemplate}
+              />
+            </DataTable>
+          )}
           <Paginator
             first={first}
             rows={rows}
-            totalRecords={120}
+            rowsPerPageOptions={[10, 20, 30]}
+            totalRecords={totalPage * rows}
             onPageChange={onPageChange}
             className="custom-paginator mx-auto"
           />
