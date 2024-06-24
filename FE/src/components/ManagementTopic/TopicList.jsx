@@ -28,41 +28,16 @@ export function TopicsDemo() {
     onPageChange,
     data: topics,
     editTopic,
+    deleteData,
   } = useContext(TopicContext);
-  // const [topics, setTopics] = useState(null);
   const [topic, setTopic] = useState(null);
   const [deleteTopicsDialog, setDeleteTopicsDialog] = useState(false);
   const [selectedTopics, setSelectedTopics] = useState(null);
-  const [submitted, setSubmitted] = useState(false);
-  const [globalFilter, setGlobalFilter] = useState(null);
   const [deleteTopicDialog, setDeleteTopicDialog] = useState(null);
   const toast = useRef(null);
   const dt = useRef(null);
   const [first, setFirst] = useState(0);
   const [rows, setRows] = useState(5);
-
-  const openNew = () => {
-    try {
-      setTopic(emptyTopic);
-      setSubmitted(false);
-      setTopicDialog(true);
-    } catch (err) {
-      // handle the error
-      if (err instanceof Error) {
-        console.error(`Error: ${err.name}`); // the type of error
-        console.error(err.message); // the description of the error
-      } else {
-        // handle other errors
-        console.error("Error Unknown:");
-        console.error(err);
-      }
-    }
-  };
-
-  const hideDialog = () => {
-    setSubmitted(false);
-    setTopicDialog(false);
-  };
 
   /* function name: hide dialog delete topic 
   parameter: 
@@ -279,25 +254,11 @@ created by: Đặng Đình Quốc Khánh */
     /* solution: Where is the origin of action from ? 
           -  */
   }
-  /* function name: delete topic from icon 
+  /* function name: delete topic from button agree 
   parameter: 
   created by: Đặng Đình Quốc Khánh */
   function deleteTopic() {
-    try {
-      /* solution: Where is the origin of action from ? 
-          -  */
-      console.log(topic);
-    } catch (err) {
-      // handle the error
-      if (err instanceof Error) {
-        console.error(`Error: ${err.name}`); // the type of error
-        console.error(err.message); // the description of the error
-      } else {
-        // handle other errors
-        console.error("Error Unknown:");
-        console.error(err);
-      }
-    }
+    deleteData(topic);
   }
   const deleteTopicDialogFooter = (
     <React.Fragment>
@@ -331,7 +292,6 @@ created by: Đặng Đình Quốc Khánh */
       />
     </React.Fragment>
   );
-  console.log(topicId);
 
   return (
     <React.Fragment>
@@ -355,12 +315,13 @@ created by: Đặng Đình Quốc Khánh */
             dataKey="Id"
             paginator
             scrollable
-            scrollHeight="28rem"
+            scrollHeight="26rem"
             first={first}
             rows={5}
             onPage={onPageChange}
             rowsPerPageOptions={[5, 10, 25]}
-            globalFilter={globalFilter}
+            className="shadow-2xl"
+            // globalFilter={globalFilter}
             header={header}
             lazy
             totalRecords={10} // Explicitly setting totalRecords

@@ -1,9 +1,10 @@
-import React from 'react'
-
+import React from "react";
+import TopicList from "../ManagementTopic/TopicList";
+import { Provider } from "use-http";
 export default function Topic() {
   return (
-    <div>
-      Topic
-    </div>
-  )
+    <Provider url="https://localhost:7000/api">
+      <TopicList />
+    </Provider>
+  );
 }

@@ -11,18 +11,20 @@ const CustomEditor = ({ label, ...props }) => {
 
   return (
     <div className="mb-2">
-      {label && (<label htmlFor={props.id || props.name}>{label}</label>)}
-      <div className={classNames(
-        "w-full shadow-none border",
-        { "border-red-500": meta.touched && meta.error },
-        { "border-gray-300": !(meta.touched && meta.error) }
-      )}>
+      {label && <label htmlFor={props.id || props.name}>{label}</label>}
+      <div
+        className={classNames(
+          "w-full shadow-none border",
+          { "border-red-500": meta.touched && meta.error },
+          { "border-gray-300": !(meta.touched && meta.error) }
+        )}
+      >
         <Editor
           id={props.id || props.name}
           value={field.value}
           onTextChange={handleChange}
           className="w-full"
-          style={{ height: '300px' }}
+          style={{ height: "300px" }}
           {...props}
         />
       </div>
@@ -33,4 +35,4 @@ const CustomEditor = ({ label, ...props }) => {
   );
 };
 
-export default CustomEditor  
+export default CustomEditor;

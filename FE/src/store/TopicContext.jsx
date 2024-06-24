@@ -1,13 +1,20 @@
-import { createContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useEffect,
+  useReducer,
+  useState,
+} from "react";
+import { useFetch } from "use-http";
 
 export const TopicContext = createContext({
   data: [],
   idSelected: 0,
   isShow: false,
   onShow: () => {},
-  offShow: () => {},
   onPageChange: () => {},
   editTopic: () => {},
+  deleteData: () => {},
 });
 const topicFake = [
   {
@@ -55,15 +62,70 @@ const topicFake = [
     Document: { id: 5, title: "Sách giáo khoa Công nghệ thông tin lớp 7" },
   },
 ];
+const actionMethod = {
+  add: "Add_Item",
+  remove: "Remove_Item",
+  update: "Update_Item",
+  deleteMany: "Delete_Many_Item",
+  replaceItem: "replace_topic",
+};
 
 export default function TopicContextProvider({ children }) {
   const [isShow, setIsShow] = useState(false);
   const [topicId, setTopicId] = useState(0);
   const [data, setData] = useState(null);
+  const [dataTest, setDataTest] = useState(null);
+  const { get, post, response, loading, error } = useFetch("/topic"); //
+  async function loadInitialTopic() {
+    const initialTopic = await get("/getalltopic");
+    console.log(initialTopic);
+    if (response.ok) {
+      setDataTest(initialTopic.data);
+    }
+  }
+  useEffect(() => {
+    loadInitialTopic();
+  }, []);
+  console.log(dataTest);
+  /* function name: delete topic from button agree 
+  parameter: 
+  created by: Đặng Đình Quốc Khánh */
+  async function deleteData(topic) {
+    try {
+      // test add topic
+      const response = await post("/createtopic", {
+        title: "string",
+        description: "string",
+        objectives: "string",
+        documentId: 1,
+        isActive: true,
+      });
+      console.log(1234);
+      console.log(response);
+      if (response.isSucceeded) {
+        // setDataTest([response, ...dataTest]);
+        await loadInitialTopic();
+      }
+      /* solution: Where is the origin of action from ? 
+          -  */
+      let updatedArray = data.filter((obj) => obj.Id !== topic.Id);
+      setData(updatedArray);
+    } catch (err) {
+      // handle the error
+      if (err instanceof Error) {
+        console.error(`Error: ${err.name}`); // the type of error
+        console.error(err.message); // the description of the error
+      } else {
+        // handle other errors
+        console.error("Error Unknown:");
+        console.error(err);
+      }
+    }
+  }
+
   useEffect(() => {
     // TopicService.getTopics().then((data) => setTopics(data));
     if (topicFake) {
-      // setTopics(topicFake);
       setData(topicFake);
     }
   }, []);
@@ -74,7 +136,7 @@ export default function TopicContextProvider({ children }) {
     try {
       /* solution: Where is the origin of action from ?
           -  */
-      setIsShow(true);
+      setIsShow(!isShow);
     } catch (err) {
       // handle the error
       if (err instanceof Error) {
@@ -88,25 +150,6 @@ export default function TopicContextProvider({ children }) {
     }
   }
 
-  /* function name: turn of show dialog
-  parameter:
-  created by: Đặng Đình Quốc Khánh */
-  function offShow() {
-    try {
-      setTopicId(0);
-      setIsShow(false);
-    } catch (err) {
-      // handle the error
-      if (err instanceof Error) {
-        console.error(`Error: ${err.name}`); // the type of error
-        console.error(err.message); // the description of the error
-      } else {
-        // handle other errors
-        console.error("Error Unknown:");
-        console.error(err);
-      }
-    }
-  }
   /* function name: handle page change when i click change page 
   parameter: event is default of s 
   created by: Đặng Đình Quốc Khánh */
@@ -121,6 +164,7 @@ export default function TopicContextProvider({ children }) {
           "Giới thiệu về ngôn ngữ lập trình Python và các khái niệm cơ bản.",
         Objectives:
           "Viết các chương trình đơn giản và hiểu về biến, vòng lặp và hàm.",
+        status: active,
         Document: { id: 6, title: "Sách giáo khoa Công nghệ thông tin lớp 8" },
       },
       {
@@ -173,7 +217,6 @@ parameter: topic is send object
 created by: Đặng Đình Quốc Khánh */
   const editTopic = (topic) => {
     try {
-      console.log(1234, topic);
       setTopicId(topic.Id);
       setIsShow(true);
     } catch (err) {
@@ -191,15 +234,14 @@ created by: Đặng Đình Quốc Khánh */
 
   return (
     <TopicContext.Provider
-      key={data}
       value={{
         isShow,
         onShow,
         data,
         idSelected: topicId,
-        offShow,
         onPageChange,
         editTopic,
+        deleteData,
       }}
     >
       {children}

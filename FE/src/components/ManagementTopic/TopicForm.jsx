@@ -54,12 +54,7 @@ const errorsInput = {
   objectives: "Mục tiêu yêu cầu phải nhập",
 };
 export default function TopicForm() {
-  const {
-    isShow,
-    idSelected,
-    data: topics,
-    offShow,
-  } = useContext(TopicContext);
+  const { isShow, idSelected, data: topics, onShow } = useContext(TopicContext);
   const [selectedDocument, setSelectedDocument] = useState(null);
   const [errorsTopicDialog, setErrorsTopicDialog] = useState(false);
   const [topic, setTopic] = useState(null);
@@ -213,7 +208,7 @@ created by: Đặng Đình Quốc Khánh */
         visible={isShow}
         style={{ width: "50vw" }}
         onHide={() => {
-          offShow();
+          onShow();
         }}
       >
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -274,7 +269,6 @@ created by: Đặng Đình Quốc Khánh */
                     />
                   )}
                 />
-                {console.log(errors)}
                 {errors.documentName && (
                   <span className="text-red-500">
                     {errorsInput.documentName}
@@ -341,7 +335,7 @@ created by: Đặng Đình Quốc Khánh */
               label="Cancel"
               // icon="pi pi-times"
               type="reset"
-              onClick={offShow}
+              onClick={onShow}
               className="p-button-text px-3 h-10"
             />
             <Button
