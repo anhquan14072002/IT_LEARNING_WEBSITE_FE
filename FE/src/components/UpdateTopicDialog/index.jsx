@@ -11,60 +11,100 @@ import CustomEditor from "../../shared/CustomEditor";
 import { ACCEPT, REJECT, SUCCESS } from "../../utils";
 import restClient from "../../services/restClient";
 import Loading from "../Loading";
+import { Dropdown } from "primereact/dropdown";
+import CustomDropdown from "../../shared/CustomDropdown";
 
 const validationSchema = Yup.object({
   title: Yup.string().required("Tiêu đề không được bỏ trống"),
-  gradeId: Yup.string().required("Lớp không được bỏ trống"),
+  objectives: Yup.string().required("Mục tiêu chủ đề không được bỏ trống"),
   description: Yup.string().required("Mô tả không được bỏ trống"),
+  document: Yup.object()
+    .test("is-not-empty", "Không được để trống trường này", (value) => {
+      return Object.keys(value).length !== 0; // Check if object is not empty
+    })
+    .required("Không bỏ trống trường này"),
 });
 
-export default function UpdateDocumentDialog({
+export default function UpdateTopicDialog({
   visibleUpdate,
   setVisibleUpdate,
   toast,
   updateValue,
-  fetchData
+  fetchData,
 }) {
-  const initialValues = {
-    title: updateValue.title || "",
-    gradeId: updateValue.gradeId || "",
-    description: updateValue.description || "",
-  };
   const [gradeList, setGradeList] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [initialValues, setInitialValues] = useState({
+    title: "",
+    objectives: "",
+    description: "",
+    document: {},
+  });
 
   useEffect(() => {
-    restClient({ url: "api/grade/getallgrade", method: "GET" })
-      .then((res) => {
-        setGradeList(Array.isArray(res.data.data) ? res.data.data : []);
-      })
-      .catch((err) => {
+    const fetchDocuments = async () => {
+      setLoading(true);
+      try {
+        const res = await restClient({
+          url: "api/document/getalldocument",
+          method: "GET",
+        });
+        if (Array.isArray(res.data.data)) {
+          setGradeList(res.data.data);
+          const selectedDocument = res.data.data.find(
+            (item) => Number(item.id) === Number(updateValue.documentId)
+          );
+          // Set initial values with selected document
+          setInitialValues({
+            title: updateValue.title,
+            objectives: updateValue.objectives,
+            description: updateValue.description,
+            document: selectedDocument || { id: "", title: "" },
+          });
+        }
+      } catch (err) {
+        console.error("Error fetching documents:", err);
         setGradeList([]);
-      });
-  }, []);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (visibleUpdate) {
+      fetchDocuments();
+    }
+  }, [visibleUpdate, updateValue.documentId]);
 
   const onSubmit = (values) => {
-    const model = { ...values, isActive: true, id: updateValue.id };
+    const model = {
+      id: updateValue.id,
+      title: values.title,
+      objectives: values.objectives,
+      description: values.description,
+      documentId: values.document.id,
+      isActive: true,
+    };
     restClient({
-      url: "api/document/updatedocument",
+      url: "api/topic/updatetopic",
       method: "PUT",
       data: model,
     })
       .then((res) => {
-        SUCCESS(toast, "Cập nhật tài liệu thành công");
-        fetchData()
+        SUCCESS(toast, "Cập nhật chủ đề thành công");
+        fetchData();
       })
       .catch((err) => {
         REJECT(toast, err.message);
         setLoading(false);
-      }).finally(()=>{
-        setVisibleUpdate(false)
+      })
+      .finally(() => {
+        setVisibleUpdate(false);
       });
   };
 
   return (
     <Dialog
-      header="Cập nhật tài liệu"
+      header="Cập nhật chủ đề"
       visible={visibleUpdate}
       style={{ width: "50vw" }}
       onHide={() => {
@@ -89,21 +129,20 @@ export default function UpdateDocumentDialog({
                 id="title"
               />
 
-              <CustomSelectInput
-                label="Lớp"
-                name="gradeId"
-                id="gradeId"
-                flexStyle="flex-1"
+              <CustomDropdown
+                label="Tài liệu"
+                name="document"
+                id="document"
+                options={gradeList}
+              />
+
+              <CustomTextarea
+                label="Mục tiêu chủ đề"
+                name="objectives"
+                id="objectives"
               >
-                <option value="">Chọn lớp</option>
-                {gradeList &&
-                  gradeList.map((grade) => (
-                    <option key={grade.id} value={grade.id}>
-                      {grade.title}
-                    </option>
-                  ))}
-                <ErrorMessage name="gradeId" component="div" />
-              </CustomSelectInput>
+                <ErrorMessage name="objectives" component="div" />
+              </CustomTextarea>
 
               <div>
                 <CustomEditor

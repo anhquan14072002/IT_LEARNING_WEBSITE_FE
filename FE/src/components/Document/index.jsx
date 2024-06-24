@@ -6,31 +6,74 @@ import { Column } from "primereact/column";
 import { ContextMenu } from "primereact/contextmenu";
 import { Paginator } from "primereact/paginator";
 import { Toast } from "primereact/toast";
-import { ProductService } from "../../services/ProductService";
 import { Button } from "primereact/button";
-import "./index.css";
+import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
+import { ProgressSpinner } from "primereact/progressspinner";
 import AddDocumentDialog from "../AddDocumentDialog";
 import UpdateDocumentDialog from "../UpdateDocumentDialog";
-import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
-import { ACCEPT, REJECT } from "../../utils";
+import { ACCEPT, REJECT, formatDate } from "../../utils";
+import restClient from "../../services/restClient";
+import Loading from "../Loading";
+import "./index.css";
 
 export default function Document() {
   const toast = useRef(null);
   const dropDownRef1 = useRef(null);
   const dropDownRef2 = useRef(null);
-  const [first, setFirst] = useState(0);
-  const [rows, setRows] = useState(10);
   const [selectedCity, setSelectedCity] = useState(null);
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const cm = useRef(null);
   const [visible, setVisible] = useState(false);
+  const [updateValue, setUpdateValue] = useState({});
   const [visibleUpdate, setVisibleUpdate] = useState(false);
   const [visibleDelete, setVisibleDelete] = useState(false);
+  const [loading, setLoading] = useState(false);
+  //pagination
+  const [first, setFirst] = useState(0);
+  const [page, setPage] = useState(1);
+  const [rows, setRows] = useState(10);
+  const [totalPage, setTotalPage] = useState(0);
 
   useEffect(() => {
-    ProductService.getProductsMini().then((data) => setProducts(data));
-  }, []);
+    fetchData();
+  }, [page, first, rows]);
+
+  const pagination = (page, rows) => {
+    setLoading(true);
+
+    restClient({
+      url: `api/document/getalldocumentpagination?PageIndex=${page}&PageSize=${rows}`,
+      method: "GET",
+    })
+      .then((res) => {
+        const paginationData = JSON.parse(res.headers["x-pagination"]);
+        setTotalPage(paginationData.TotalPages);
+        setProducts(Array.isArray(res.data.data) ? res.data.data : []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching data:", err);
+        setProducts([]);
+        setLoading(false);
+      });
+  };
+
+  const fetchData = () => {
+    pagination(page, rows);
+  };
+
+  const onPageChange = (event) => {
+    const { page, rows, first } = event;
+    setRows(rows);
+    setPage(page + 1);
+    setFirst(first);
+  };
+
+  const indexBodyTemplate = (rowData, { rowIndex }) => {
+    const index = (page - 1) * rows + (rowIndex + 1);
+    return <span>{index}</span>;
+  };
 
   const actionBodyTemplate = (rowData) => {
     return (
@@ -38,43 +81,26 @@ export default function Document() {
         <Button
           icon="pi pi-pencil"
           className="text-blue-600 p-mr-2 shadow-none"
-          onClick={() => setVisibleUpdate(true)}
+          onClick={() => {
+            setUpdateValue(rowData);
+            setVisibleUpdate(true);
+          }}
         />
         <Button
           icon="pi pi-trash"
           className="text-red-600 shadow-none"
           onClick={() => {
-            setVisibleDelete(true);
-            confirm()
+            confirmDelete(rowData.id);
           }}
         />
       </div>
     );
   };
 
-  const cities = [
-    { name: "New York", code: "NY" },
-    { name: "Rome", code: "RM" },
-    { name: "London", code: "LDN" },
-    { name: "Istanbul", code: "IST" },
-    { name: "Paris", code: "PRS" },
-  ];
-
-  const onPageChange = (event) => {
-    setFirst(event.first);
-    setRows(event.rows);
-  };
-
-  const indexBodyTemplate = (rowData, { rowIndex }) => {
-    const index = rowIndex + 1; // Calculate the index based on pagination
-    return <span>{index}</span>;
-  };
-
-  // modal delete
-  const confirm = () => {
+  const confirmDelete = (id) => {
     setVisibleDelete(true);
     confirmDialog({
-      message: "Do you want to delete this record?",
+      message: "Bạn có chắc chắn muốn tài liệu này?",
       header: "Delete Confirmation",
       icon: "pi pi-info-circle",
       defaultFocus: "reject",
@@ -87,7 +113,6 @@ export default function Document() {
             className="p-2 bg-red-500 text-white mr-2"
             onClick={() => {
               setVisibleDelete(false);
-              REJECT(toast);
             }}
           />
           <Button
@@ -95,13 +120,26 @@ export default function Document() {
             icon="pi pi-check"
             className="p-2 bg-blue-500 text-white"
             onClick={() => {
-              setVisibleDelete(false);
-              ACCEPT(toast);
+              deleteDocument(id);
             }}
           />
         </>
       ),
     });
+  };
+
+  const deleteDocument = (id) => {
+    restClient({ url: `api/document/deletedocument/${id}`, method: "DELETE" })
+      .then((res) => {
+        fetchData();
+        ACCEPT(toast, "Xóa thành công");
+      })
+      .catch((err) => {
+        REJECT(toast, "Xảy ra lỗi khi xóa tài liệu này");
+      })
+      .finally(() => {
+        setVisibleDelete(false);
+      });
   };
 
   return (
@@ -112,25 +150,39 @@ export default function Document() {
         visible={visible}
         setVisible={setVisible}
         toast={toast}
+        fetchData={fetchData}
       />
       <UpdateDocumentDialog
         visibleUpdate={visibleUpdate}
         setVisibleUpdate={setVisibleUpdate}
+        updateValue={updateValue}
         toast={toast}
+        fetchData={fetchData}
       />
       <div>
         <div className="flex justify-between pt-1">
           <h1 className="font-bold text-3xl">Tài liệu</h1>
-          <Button
-            label="Thêm mới"
-            icon="pi pi-plus-circle"
-            severity="info"
-            className="bg-blue-600 text-white p-2 text-sm font-normal"
-            onClick={() => setVisible(true)}
-          />
+          <div>
+            <Button
+              label="Thêm mới"
+              icon="pi pi-plus-circle"
+              severity="info"
+              className="bg-blue-600 text-white p-2 text-sm font-normal"
+              onClick={() => setVisible(true)}
+            />
+            <Button
+              label="Xóa"
+              icon="pi pi-trash"
+              disabled={!selectedProduct || selectedProduct.length === 0}
+              severity="danger"
+              className="bg-red-600 text-white p-2 text-sm font-normal ml-3"
+              onClick={() => {
+                console.log("product list ::", selectedProduct);
+              }}
+            />
+          </div>
         </div>
 
-        {/* data */}
         <div className="border-2 rounded-md mt-2">
           <div className="mb-10 flex flex-wrap items-center p-2">
             <div className="border-2 rounded-md p-2">
@@ -146,84 +198,75 @@ export default function Document() {
 
             <div className="flex-1 flex gap-3 justify-end">
               <div className="border-2 rounded-md mt-4">
-                <Dropdown
-                  filter
-                  ref={dropDownRef1}
-                  value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.value)}
-                  options={cities}
-                  optionLabel="name"
-                  showClear
-                  placeholder="Cấp học"
-                  className="w-full md:w-14rem shadow-none h-full"
-                />
+                {/* Dropdown for filters */}
               </div>
               <div className="border-2 rounded-md mt-4">
-                <Dropdown
-                  filter
-                  ref={dropDownRef2}
-                  value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.value)}
-                  options={cities}
-                  optionLabel="name"
-                  showClear
-                  placeholder="Lớp"
-                  className="w-full md:w-14rem shadow-none h-full"
-                />
+                {/* Another dropdown for filters */}
               </div>
             </div>
           </div>
-          <DataTable
-            value={products}
-            onContextMenu={(e) => cm.current.show(e.originalEvent)}
-            contextMenuSelection={selectedProduct}
-            onContextMenuSelectionChange={(e) => setSelectedProduct(e.value)}
-            tableStyle={{ minWidth: "50rem" }}
-            className="border-t-2"
-          >
-            <Column
-              field="#"
-              header="#"
-              body={indexBodyTemplate} 
-              className="border-b-2 border-t-2"
-            />
-            <Column
-              field="code"
-              header="Tiêu đề"
-              className="border-b-2 border-t-2"
-            ></Column>
-            <Column
-              field="name"
-              header="Cấp học"
-              className="border-b-2 border-t-2"
-            ></Column>
-            <Column
-              field="category"
-              header="Lớp"
-              className="border-b-2 border-t-2"
-            ></Column>
-            <Column
-              field="category"
-              header="Ngày tạo"
-              className="border-b-2 border-t-2"
-            ></Column>
-            <Column
-              field="category"
-              header="Ngày cập nhật"
-              className="border-b-2 border-t-2"
-            ></Column>
-            <Column
-              className="border-b-2 border-t-2"
-              body={actionBodyTemplate}
-            />
-          </DataTable>
-          <Paginator
-            first={first}
-            rows={rows}
-            totalRecords={120}
-            onPageChange={onPageChange}
-            className="custom-paginator mx-auto"
-          />
+          {loading ? (
+            <Loading />
+          ) : (
+            <>
+              <DataTable
+                value={products}
+                loading={loading}
+                className="border-t-2"
+                tableStyle={{ minHeight: "30rem" }}
+                selection={selectedProduct}
+                onSelectionChange={(e) => setSelectedProduct(e.value)}
+                scrollable
+                scrollHeight="30rem"
+              >
+                <Column
+                  selectionMode="multiple"
+                  headerStyle={{ width: "3rem" }}
+                  className="border-b-2 border-t-2 custom-checkbox-column"
+                ></Column>
+                <Column
+                  field="#"
+                  header="#"
+                  body={indexBodyTemplate}
+                  className="border-b-2 border-t-2"
+                />
+                <Column
+                  field="title"
+                  header="Tiêu đề"
+                  className="border-b-2 border-t-2"
+                />
+                <Column
+                  field="gradeTitle"
+                  header="Lớp"
+                  className="border-b-2 border-t-2"
+                />
+                <Column
+                  field="createdDate"
+                  header="Ngày tạo"
+                  className="border-b-2 border-t-2"
+                  body={(rowData) => formatDate(rowData.createdDate)}
+                />
+                <Column
+                  field="lastModifiedDate"
+                  header="Ngày cập nhật"
+                  className="border-b-2 border-t-2"
+                  body={(rowData) => formatDate(rowData.lastModifiedDate)}
+                />
+                <Column
+                  className="border-b-2 border-t-2"
+                  body={actionBodyTemplate}
+                />
+              </DataTable>
+              <Paginator
+                first={first}
+                rows={rows}
+                rowsPerPageOptions={[10, 20, 30]}
+                totalRecords={totalPage * rows} // Total records should be calculated based on total pages and rows per page
+                onPageChange={onPageChange}
+                className="custom-paginator mx-auto"
+              />
+            </>
+          )}
         </div>
       </div>
     </div>

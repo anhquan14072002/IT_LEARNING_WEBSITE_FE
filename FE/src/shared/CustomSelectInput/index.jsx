@@ -4,7 +4,7 @@ import { useField } from "formik";
 const CustomSelectInput = ({ label,flexStyle, ...props }) => {
   const [field, meta] = useField(props);
   return (
-    <div className={classNames("mb-2",flexStyle)}>
+    <div className={classNames("mb-5",flexStyle)}>
       <label htmlFor={props.id || props.name}>{label}</label>
       <select
         className={classNames(

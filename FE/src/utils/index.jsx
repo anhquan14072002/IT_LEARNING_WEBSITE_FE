@@ -1,3 +1,23 @@
+export const formatDate = (value) => {
+  if (!value) return '';
+
+  const options = {
+    weekday: 'long', 
+    year: 'numeric', 
+    month: 'long', 
+    day: 'numeric', 
+    hour: 'numeric',
+    minute: 'numeric',
+    second: 'numeric'
+  };
+
+  const date = new Date(value);
+  const formattedDate = date.toLocaleString('vi-VN', options);
+
+  return formattedDate.replace('lúc ', '');
+};
+
+
 export const SUCCESS = (toast, msg = "") => {
     toast.current.show({
       severity: 'success',

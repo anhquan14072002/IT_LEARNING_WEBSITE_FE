@@ -2,74 +2,90 @@ import React, { useEffect, useState } from "react";
 import { Dialog } from "primereact/dialog";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import classNames from "classnames";
 import CustomTextInput from "../../shared/CustomTextInput";
 import CustomSelectInput from "../../shared/CustomSelectInput";
 import CustomTextarea from "../../shared/CustomTextarea";
+import "./index.css";
 import { Button } from "primereact/button";
 import CustomEditor from "../../shared/CustomEditor";
-import { ACCEPT, REJECT, SUCCESS } from "../../utils";
+import { REJECT, SUCCESS } from "../../utils";
 import restClient from "../../services/restClient";
 import Loading from "../Loading";
+import { Dropdown } from "primereact/dropdown";
+import CustomDropdown from "../../shared/CustomDropdown";
 
 const validationSchema = Yup.object({
   title: Yup.string().required("Tiêu đề không được bỏ trống"),
-  gradeId: Yup.string().required("Lớp không được bỏ trống"),
+  objectives: Yup.string().required("Mục tiêu chủ đề không được bỏ trống"),
   description: Yup.string().required("Mô tả không được bỏ trống"),
+  document: Yup.object()
+    .test("is-not-empty", "Không được để trống trường này", (value) => {
+      return Object.keys(value).length !== 0; // Check if object is not empty
+    })
+    .required("Không bỏ trống trường này"),
 });
 
-export default function UpdateDocumentDialog({
-  visibleUpdate,
-  setVisibleUpdate,
+export default function AddTopicDialog({
+  visible,
+  setVisible,
   toast,
-  updateValue,
-  fetchData
+  fetchData,
 }) {
   const initialValues = {
-    title: updateValue.title || "",
-    gradeId: updateValue.gradeId || "",
-    description: updateValue.description || "",
+    title: "",
+    objectives: "",
+    description: "",
+    document: {},
   };
-  const [gradeList, setGradeList] = useState([]);
+  const [documentList, setDocumentList] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    restClient({ url: "api/grade/getallgrade", method: "GET" })
+    restClient({ url: "api/document/getalldocument", method: "GET" })
       .then((res) => {
-        setGradeList(Array.isArray(res.data.data) ? res.data.data : []);
+        setDocumentList(Array.isArray(res.data.data) ? res.data.data : []);
       })
       .catch((err) => {
-        setGradeList([]);
+        setDocumentList([]);
       });
   }, []);
 
   const onSubmit = (values) => {
-    const model = { ...values, isActive: true, id: updateValue.id };
+    setLoading(true);
+    const model = {
+      title: values.title,
+      objectives: values.objectives,
+      description: values.description,
+      documentId: values.document.id,
+      isActive: true,
+    };
     restClient({
-      url: "api/document/updatedocument",
-      method: "PUT",
+      url: "api/topic/createtopic",
+      method: "POST",
       data: model,
     })
       .then((res) => {
-        SUCCESS(toast, "Cập nhật tài liệu thành công");
-        fetchData()
+        SUCCESS(toast, "Thêm chủ đề thành công");
+        fetchData();
+        setLoading(false);
       })
       .catch((err) => {
         REJECT(toast, err.message);
         setLoading(false);
-      }).finally(()=>{
-        setVisibleUpdate(false)
+      })
+      .finally(() => {
+        setVisible(false);
       });
   };
 
   return (
     <Dialog
-      header="Cập nhật tài liệu"
-      visible={visibleUpdate}
+      header="Thêm chủ đề"
+      visible={visible}
       style={{ width: "50vw" }}
       onHide={() => {
-        if (!visibleUpdate) return;
-        setVisibleUpdate(false);
+        if (!visible) return;
+        setVisible(false);
       }}
     >
       {loading === true ? (
@@ -89,21 +105,20 @@ export default function UpdateDocumentDialog({
                 id="title"
               />
 
-              <CustomSelectInput
-                label="Lớp"
-                name="gradeId"
-                id="gradeId"
-                flexStyle="flex-1"
+              <CustomDropdown
+                label="Tài liệu"
+                name="document"
+                id="document"
+                options={documentList}
+              />
+
+              <CustomTextarea
+                label="Mục tiêu chủ đề"
+                name="objectives"
+                id="objectives"
               >
-                <option value="">Chọn lớp</option>
-                {gradeList &&
-                  gradeList.map((grade) => (
-                    <option key={grade.id} value={grade.id}>
-                      {grade.title}
-                    </option>
-                  ))}
-                <ErrorMessage name="gradeId" component="div" />
-              </CustomSelectInput>
+                <ErrorMessage name="objectives" component="div" />
+              </CustomTextarea>
 
               <div>
                 <CustomEditor
@@ -120,12 +135,12 @@ export default function UpdateDocumentDialog({
                   className="p-2 bg-red-500 text-white"
                   type="button"
                   severity="danger"
-                  onClick={() => setVisibleUpdate(false)}
+                  onClick={() => setVisible(false)}
                 >
                   Hủy
                 </Button>
                 <Button className="p-2 bg-blue-500 text-white" type="submit">
-                  Cập nhật
+                  Thêm
                 </Button>
               </div>
             </Form>
