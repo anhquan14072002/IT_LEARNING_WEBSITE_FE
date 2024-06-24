@@ -110,7 +110,14 @@ export default function Lesson() {
   };
 
   const file = (rowData, { rowIndex }) => {
-    return <Link className="p-2 bg-blue-500 text-white rounded-md" to={`${rowData.urlDownload}`}>Tải về</Link>;
+    return (
+      <Link
+        className="p-2 bg-blue-500 text-white rounded-md"
+        to={`${rowData.urlDownload}`}
+      >
+        Tải về
+      </Link>
+    );
   };
 
   // modal delete
@@ -180,13 +187,25 @@ export default function Lesson() {
       <div>
         <div className="flex justify-between pt-1">
           <h1 className="font-bold text-3xl">Bài học</h1>
-          <Button
-            label="Thêm mới"
-            icon="pi pi-plus-circle"
-            severity="info"
-            className="bg-blue-600 text-white p-2 text-sm font-normal"
-            onClick={() => setVisible(true)}
-          />
+          <div>
+            <Button
+              label="Thêm mới"
+              icon="pi pi-plus-circle"
+              severity="info"
+              className="bg-blue-600 text-white p-2 text-sm font-normal"
+              onClick={() => setVisible(true)}
+            />
+            <Button
+              label="Xóa"
+              icon="pi pi-trash"
+              severity="danger"
+              disabled={!selectedProduct || selectedProduct.length === 0}
+              className="bg-red-600 text-white p-2 text-sm font-normal ml-3"
+              onClick={() => {
+                console.log("product list ::", selectedProduct);
+              }}
+            />
+          </div>
         </div>
 
         {/* data */}
@@ -238,13 +257,18 @@ export default function Lesson() {
             <DataTable
               value={products}
               onContextMenu={(e) => cm.current.show(e.originalEvent)}
-              contextMenuSelection={selectedProduct}
-              onContextMenuSelectionChange={(e) => setSelectedProduct(e.value)}
+              selection={selectedProduct}
+              onSelectionChange={(e) => setSelectedProduct(e.value)}
               className="border-t-2"
               tableStyle={{ minHeight: "30rem" }}
               scrollable
               scrollHeight="30rem"
             >
+              <Column
+                selectionMode="multiple"
+                headerStyle={{ width: "3rem" }}
+                className="border-b-2 border-t-2 custom-checkbox-column"
+              ></Column>
               <Column
                 field="#"
                 header="#"
