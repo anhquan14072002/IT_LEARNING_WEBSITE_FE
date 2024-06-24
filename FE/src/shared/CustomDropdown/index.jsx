@@ -3,7 +3,7 @@ import { useField } from "formik";
 import { Dropdown } from "primereact/dropdown";
 import classNames from "classnames";
 
-const CustomDropdown = ({ label, options, ...props }) => {
+const CustomDropdown = ({ label, options, title, ...props }) => {
   const [field, meta, helpers] = useField(props);
   const [touchedState, setTouchedState] = useState(false); // State to manage touched state manually
 
@@ -38,7 +38,7 @@ const CustomDropdown = ({ label, options, ...props }) => {
         optionLabel="title"
         filter
         showClear
-        placeholder="Chọn tài liệu"
+        placeholder={title}
         className={classNames("w-full shadow-none p-1 border", {
           "border-red-500": meta.error && (meta.touched || touchedState), // Check if meta.error and touchedState are true
           "border-gray-300": !meta.error || !(meta.touched || touchedState), // Check if meta.error or touchedState are false

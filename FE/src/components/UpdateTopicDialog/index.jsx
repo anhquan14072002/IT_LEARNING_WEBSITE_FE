@@ -59,7 +59,7 @@ export default function UpdateTopicDialog({
             title: updateValue.title,
             objectives: updateValue.objectives,
             description: updateValue.description,
-            document: selectedDocument || { id: "", title: "" },
+            document: selectedDocument || {},
           });
         }
       } catch (err) {
@@ -130,6 +130,7 @@ export default function UpdateTopicDialog({
               />
 
               <CustomDropdown
+                title="Chọn tài liệu"
                 label="Tài liệu"
                 name="document"
                 id="document"

@@ -8,7 +8,7 @@ const CustomSelectInput = ({ label,flexStyle, ...props }) => {
       <label htmlFor={props.id || props.name}>{label}</label>
       <select
         className={classNames(
-          "w-full shadow-none p-1 border",
+          "w-full shadow-none p-1 border rounded-md",
           { "border-red-500": meta.touched && meta.error },
           { "border-gray-300": !(meta.touched && meta.error) }
         )}

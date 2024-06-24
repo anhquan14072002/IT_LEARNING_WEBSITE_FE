@@ -40,7 +40,7 @@ const CustomTextarea = ({ label, ...props }) => {
         value={field.value || ""} 
         onChange={field.onChange} 
         onBlur={field.onBlur}
-        className={classNames("w-full shadow-none p-1 border", {
+        className={classNames("w-full shadow-none p-1 border rounded-md", {
           "border-red-500": meta.touched && meta.error,
           "border-gray-300": !(meta.touched && meta.error),
         })}
