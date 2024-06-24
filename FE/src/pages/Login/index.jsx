@@ -1,10 +1,14 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button } from "primereact/button";
-import { useForm, Controller } from "react-hook-form";
+import { useForm, Controller, set } from "react-hook-form";
 import LoginComponent from "../../components/LoginComponent";
 import Header from "../../components/Header";
 import { useNavigate } from "react-router-dom";
+import { forgotPassword, login} from "../../services/authenService";
+import { CHECKMAIL, REJECT } from "../../utils";
+import { Toast } from "primereact/toast";
 const Index = () => {
+  const toast= useRef(null)
   const [checked, setChecked] = useState(false);
   const [currState, setCurrState] = useState("Login");
   const navigate = useNavigate();
@@ -13,20 +17,53 @@ const Index = () => {
     control,
     handleSubmit,
     formState: { errors },
-  } = useForm(); // Initialize useForm hook
+  } = useForm(); 
 
-  const onSubmit = (data) => {
+  const saveLoginInfo = (data) => {
+    if (checked) {
+        localStorage.setItem('email', data.email);
+        localStorage.setItem('password', data.password);
+    } else {
+        localStorage.removeItem('email');
+        localStorage.removeItem('password');
+    }
+};
+
+  const onSubmit = async (data,e) => {
+    e.preventDefault()
+   saveLoginInfo(data)
+   const {email, password} = data
     console.log(data); // Handle form submission
     if (currState === "Login") {
-      console.log("call api login");
+
+     try {
+      const response = await login({email,password})
+    
+      localStorage.setItem("accessToken",response.data.data.accessToken)
+      localStorage.setItem("refreshToken",response.data.data.refreshToken)
+      localStorage.setItem("userId",response.data.data.userDto.id)
+      localStorage.setItem("userEmail",response.data.data.userDto.email)
+      console.log(response.data.data.userDto.id);
+        navigate("/")
+     } catch (error) {
+     REJECT(toast,"Tài khoản hoặc mật khẩu sai")
+     }
+    
+      
     }
     if (currState === "ForgotPassword") {
-      console.log("call api forgotpassword");
+      console.log(email);
+      try {
+        await forgotPassword(email)
+        CHECKMAIL(toast,"Vui lòng kiểm tra mail để xác thực")
+      } catch (error) {
+        alert("Reject")
+      }
     }
   };
 
   return (
-    <div className="min-h-screen overflow-hidden">
+    <div className="min-h-screen ">
       <Header />
       <div className="flex h-screen  ">
         <div className="w-1/2">
@@ -51,17 +88,13 @@ const Index = () => {
                 Quên mật khẩu
               </h1>
             )}
-            {currState === "Register" && (
-              <h1 className="text-left mb-4 font-bold text-black text-3xl">
-                Đăng kí
-              </h1>
-            )}
+          
 
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="mb-4">
                 <label htmlFor="email" className="cursor-pointer">
                   <h4 className="text-xl text-black font-medium">
-                    Email <span className="text-red-500">*</span>
+                    Tài khoản <span className="text-red-500">*</span>
                   </h4>
                 </label>
                 <Controller
@@ -69,18 +102,15 @@ const Index = () => {
                   control={control}
                   defaultValue=""
                   rules={{
-                    required: "Email không được để trống",
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Email không hợp lệ",
-                    },
+                    required: "Tài khoản không được để trống",
+                   
                   }}
                   render={({ field }) => (
                     <input
                       id="email"
                       type="text"
                       className="w-full h-10 text-black-800 border border-solid border-gray-600 pb-2 pl-1 rounded-md"
-                      placeholder="Nhập email"
+                      placeholder="Nhập email hoặc tài khoản"
                       {...field}
                     />
                   )}
@@ -162,19 +192,24 @@ const Index = () => {
               )}
             </form>
             <div className="w-full flex justify-between">
-              {currState === "Login" && (
+              {currState === "Login" ?(
                 <span
                   onClick={() => setCurrState("ForgotPassword")}
                   className="text-blue-600 cursor-pointer"
                 >
                   Quên mật khẩu
                 </span>
-              )}
-
+              ):( <span
+                onClick={() => setCurrState("Login")}
+                className="text-blue-600 cursor-pointer"
+              >
+                Đăng nhập
+              </span>)}
+            
               <span
                 onClick={() => navigate("/checkmail")}
                 className="text-blue-600 cursor-pointer"
-              > 
+              >
                 Tạo tài khoản
               </span>
             </div>
@@ -187,6 +222,7 @@ const Index = () => {
           </div>
         </div>
       </div>
+      <Toast ref={toast}/>
     </div>
   );
 };

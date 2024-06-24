@@ -5,16 +5,18 @@ import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
-// import Profile from './pages/Profile';
+import Profile from './pages/Profile';
 import Search from './pages/Search';
-
-// import CheckMail from './pages/CheckMail';
+import CheckMail from './pages/CheckMail';
 import Document from './pages/Document';
 import Lesson from './pages/Lesson';
+import ChangePassword from './pages/ChangePassword';
+import Footer from './components/Footer';
 
 
 function App() {
   return (
+   
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
@@ -26,9 +28,11 @@ function App() {
         <Route path="/document" element={<Document />} />
         <Route path="/document/lesson/:id" element={<Lesson />} />
         <Route path="/forgotpassword" element={<ForgotPassword />} />
-        {/* <Route path="/profile" element={<Profile />} /> */}
-        {/* <Route path="/checkmail" element={<CheckMail />} /> */}
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/checkmail" element={<CheckMail />} />
+        <Route path="/changepassword" element={<ChangePassword />} />
       </Routes>
+      <Footer/>
     </Router>
   );
 }

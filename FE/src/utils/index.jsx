@@ -44,4 +44,13 @@ export const SUCCESS = (toast, msg = "") => {
       life: 3000
     });
   }
+
+  export const CHECKMAIL = (toast, msg = "") => {
+    toast.current.show({
+      severity: 'success',
+      summary: 'Success',
+      detail: msg || 'You should check mail to verify account',
+      life: 4000
+    });
+  }
   
