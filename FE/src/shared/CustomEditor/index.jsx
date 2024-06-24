@@ -13,7 +13,7 @@ const CustomEditor = ({ label, ...props }) => {
     <div className="mb-5">
       {label && (<label htmlFor={props.id || props.name}>{label}</label>)}
       <div className={classNames(
-        "w-full shadow-none border",
+        "w-full shadow-none border rounded-md",
         { "border-red-500": meta.touched && meta.error },
         { "border-gray-300": !(meta.touched && meta.error) }
       )}>

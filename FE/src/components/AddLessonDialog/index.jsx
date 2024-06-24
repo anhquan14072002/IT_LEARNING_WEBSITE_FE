@@ -13,6 +13,7 @@ import CustomEditor from "../../shared/CustomEditor";
 import { REJECT, SUCCESS } from "../../utils";
 import { FileUpload } from "primereact/fileupload";
 import restClient from "../../services/restClient";
+import CustomDropdown from "../../shared/CustomDropdown";
 
 export default function AddLessonDialog({
   visible,
@@ -24,17 +25,21 @@ export default function AddLessonDialog({
   const [topicList, setListTopic] = useState([]);
   const [isLoadingAddLesson, setIsLoadingAddLesson] = useState(false);
 
-  const initialValues = {
-    title: "",
-    topicId: "",
-    content: "",
-  };
-
   const validationSchema = Yup.object({
     title: Yup.string().required("Tiêu đề không được bỏ trống"),
     content: Yup.string().required("Mô tả không được bỏ trống"),
-    topicId: Yup.string().required("Chủ đề không được bỏ trống"),
+    topic: Yup.object()
+      .test("is-not-empty", "Không được để trống trường này", (value) => {
+        return Object.keys(value).length !== 0; // Check if object is not empty
+      })
+      .required("Không bỏ trống trường này"),
   });
+
+  const initialValues = {
+    title: "",
+    topic: {},
+    content: "",
+  };
 
   const onSubmit = (values) => {
     console.log("====================================");
@@ -44,15 +49,15 @@ export default function AddLessonDialog({
       REJECT(toast, "Vui lòng chọn file để tải lên");
       return;
     }
-    if (files.some((file) => file.size > 52428800)) {
-      REJECT(toast, "Vui lòng chọn file nhỏ hơn hoặc bằng 50mb");
+    if (files.some((file) => file.size > 10485760)) {
+      REJECT(toast, "Vui lòng chọn file nhỏ hơn hoặc bằng 10mb");
       return;
     }
     setIsLoadingAddLesson(true);
 
     const formData = new FormData();
     formData.append("Title", values.title);
-    formData.append("TopicId", values.topicId);
+    formData.append("TopicId", values.topic.id);
     formData.append("Content", values.content);
     formData.append("IsActive", true);
 
@@ -123,21 +128,13 @@ export default function AddLessonDialog({
                 id="title"
               />
 
-              <CustomSelectInput
+              <CustomDropdown
+                title="Chọn chủ đề"
                 label="Chủ đề"
-                name="topicId"
-                id="topicId"
-                flexStyle="flex-1"
-              >
-                <option value="">Select a topic</option>
-                {topicList &&
-                  topicList.map((topic) => (
-                    <option key={topic.id} value={topic.id}>
-                      {topic.title}
-                    </option>
-                  ))}
-                <ErrorMessage name="topicId" component="div" />
-              </CustomSelectInput>
+                name="topic"
+                id="topic"
+                options={topicList}
+              />
 
               <div>
                 <label htmlFor="content">Nội dung bài học</label>
@@ -154,7 +151,7 @@ export default function AddLessonDialog({
                   name="demo[]"
                   url={"/api/upload"}
                   accept=".docx, application/vnd.openxmlformats-officedocument.wordprocessingml.document, .pdf, application/pdf"
-                  maxFileSize={52428800} // 50MB
+                  maxFileSize={10485760} // 10MB
                   emptyTemplate={
                     <p className="m-0">Drag and drop files here to upload.</p>
                   }

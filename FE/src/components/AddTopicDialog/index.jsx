@@ -106,6 +106,7 @@ export default function AddTopicDialog({
               />
 
               <CustomDropdown
+                title="Chọn tài liệu"
                 label="Tài liệu"
                 name="document"
                 id="document"

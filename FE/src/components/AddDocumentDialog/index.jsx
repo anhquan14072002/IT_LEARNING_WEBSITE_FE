@@ -11,10 +11,15 @@ import CustomEditor from "../../shared/CustomEditor";
 import { REJECT, SUCCESS } from "../../utils";
 import restClient from "../../services/restClient";
 import Loading from "../Loading";
+import CustomDropdown from "../../shared/CustomDropdown";
 
 const validationSchema = Yup.object({
   title: Yup.string().required("Tiêu đề không được bỏ trống"),
-  gradeId: Yup.string().required("Lớp không được bỏ trống"),
+  grade: Yup.object()
+    .test("is-not-empty", "Không được để trống trường này", (value) => {
+      return Object.keys(value).length !== 0; // Check if object is not empty
+    })
+    .required("Không bỏ trống trường này"),
   description: Yup.string().required("Mô tả không được bỏ trống"),
 });
 
@@ -26,7 +31,7 @@ export default function AddDocumentDialog({
 }) {
   const initialValues = {
     title: "",
-    gradeId: "",
+    grade: {},
     description: "",
   };
   const [gradeList, setGradeList] = useState([]);
@@ -44,7 +49,13 @@ export default function AddDocumentDialog({
 
   const onSubmit = (values) => {
     setLoading(true);
-    const model = { ...values, isActive: true };
+    // const model = { ...values, isActive: true };
+    const model = {
+      title: values.title,
+      gradeId: values.grade.id,
+      description: values.description,
+      isActive: true
+    }
     restClient({
       url: "api/document/createdocument",
       method: "POST",
@@ -91,21 +102,13 @@ export default function AddDocumentDialog({
                 id="title"
               />
 
-              <CustomSelectInput
+              <CustomDropdown
+                title="Chọn lớp"
                 label="Lớp"
-                name="gradeId"
-                id="gradeId"
-                flexStyle="flex-1"
-              >
-                <option value="">Chọn lớp</option>
-                {gradeList &&
-                  gradeList.map((grade) => (
-                    <option key={grade.id} value={grade.id}>
-                      {grade.title}
-                    </option>
-                  ))}
-                <ErrorMessage name="gradeId" component="div" />
-              </CustomSelectInput>
+                name="grade"
+                id="grade"
+                options={gradeList}
+              />
 
               <div>
                 <CustomEditor
