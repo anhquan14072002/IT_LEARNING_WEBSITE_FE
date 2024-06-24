@@ -5,14 +5,14 @@ import { loginByFacebook, loginByGoogle } from "../../services/authenService";
 import "primeicons/primeicons.css";
 import { useNavigate } from "react-router-dom";
 
-const clientId =
-  "1064675960403-r511aufechb2vs1enui9asqmv5npno05.apps.googleusercontent.com";
+const clientId ="1064675960403-r511aufechb2vs1enui9asqmv5npno05.apps.googleusercontent.com";
 
 const Index = () => {
   const token = (response) => {
     localStorage.setItem("accessToken", response.data.data.accessToken);
     localStorage.setItem("refreshToken", response.data.data.refreshToken);
     localStorage.setItem("userId", response.data.data.userDto.id);
+    localStorage.setItem("userEmail", response.data.data.userDto.email);
   };
   const navigate = useNavigate();
   const onSuccess = async (response) => {
@@ -21,7 +21,6 @@ const Index = () => {
       console.log(response);
      const responses = await loginByGoogle(idToken);
       token(responses);
-     
       navigate("/");
     } catch (error) {
       alert("Login không thành công ");
@@ -30,15 +29,14 @@ const Index = () => {
 
   const onFailure = (error) => {
     console.error("[Google Login Failed] Error:", error);
-    // Handle login failure logic here (e.g., display error message)
   };
 
   const onResolve = async (response) => {
     const accessToken = response.data.accessToken;
     console.log(accessToken);
     try {
-      await loginByFacebook(accessToken);
-      
+      const response = await loginByFacebook(accessToken);
+      token(response)
       navigate("/");
     } catch (error) {
       alert("Đ login đc");
