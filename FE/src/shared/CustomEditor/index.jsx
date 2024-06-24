@@ -10,7 +10,7 @@ const CustomEditor = ({ label, ...props }) => {
   };
 
   return (
-    <div className="mb-2">
+    <div className="mb-5">
       {label && <label htmlFor={props.id || props.name}>{label}</label>}
       <div
         className={classNames(
