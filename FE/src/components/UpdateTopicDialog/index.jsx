@@ -137,14 +137,20 @@ export default function UpdateTopicDialog({
                 options={gradeList}
               />
 
-              <CustomTextarea
+              {/* <CustomTextarea
                 label="Mục tiêu chủ đề"
                 name="objectives"
                 id="objectives"
               >
                 <ErrorMessage name="objectives" component="div" />
-              </CustomTextarea>
-
+              </CustomTextarea> */}
+              <CustomEditor
+                label="Thông tin chi tiết"
+                name="objectives"
+                id="objectives"
+              >
+                <ErrorMessage name="objectives" component="div" />
+              </CustomEditor>
               <div>
                 <CustomEditor
                   label="Thông tin chi tiết"

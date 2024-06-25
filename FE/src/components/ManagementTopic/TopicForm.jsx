@@ -52,6 +52,7 @@ export default function TopicForm({ fetchData, toast }) {
       method: "GET",
     })
       .then((res) => {
+        console.log(res.data.data);
         setTopic(res.data.data);
         setLoading(false);
       })
@@ -60,7 +61,7 @@ export default function TopicForm({ fetchData, toast }) {
 
         setLoading(false);
       });
-  }, []);
+  }, [idSelected]);
   useEffect(() => {
     try {
       if (idSelected != 0) {
@@ -171,7 +172,7 @@ created by: Đặng Đình Quốc Khánh */
   const onSubmit = async (data) => {
     setLoading(true);
     const output = {
-      title: data.topicName,
+      title: data.title,
       description: data.description,
       objectives: data.objectives,
       documentId: data.documentName.id,
@@ -249,7 +250,7 @@ created by: Đặng Đình Quốc Khánh */
 
   let header = idSelected != 0 ? "Sửa Chủ Đề" : "Thêm Mới Chủ Đề";
   let buttonForm = idSelected != 0 ? "Cập Nhât" : "Thêm Mới";
-
+  console.log(topic);
   return (
     <>
       {loading === true ? (
@@ -279,18 +280,16 @@ created by: Đặng Đình Quốc Khánh */
                     type="text"
                     name="Topic Name"
                     value={topic.title}
-                    id="topicName"
+                    id="title"
                     autoComplete="given-name"
                     className={`${input} ${
-                      errors.topicName ? errorInput : successInput
+                      errors.title ? errorInput : successInput
                     }`}
-                    {...register("topicName", { required: true })}
+                    {...register("title", { required: true })}
                     onChange={() => changeInputTitle(event, "title")}
                   />
-                  {errors.topicName && (
-                    <span className="text-red-500">
-                      {errorsInput?.topicName}
-                    </span>
+                  {errors.title && (
+                    <span className="text-red-500">{errorsInput?.title}</span>
                   )}
                 </div>
               </div>
@@ -341,10 +340,10 @@ created by: Đặng Đình Quốc Khánh */
                 </label>
                 <div class="mt-2">
                   <textarea
-                    id="Description"
-                    name="Description"
+                    id="description"
+                    name="description"
                     rows="3"
-                    value={topic?.description}
+                    value={topic.description}
                     className={`${input} ${
                       errors.description ? errorInput : successInput
                     }`}
@@ -368,9 +367,9 @@ created by: Đặng Đình Quốc Khánh */
                 </label>
                 <div class="mt-2">
                   <textarea
-                    id="Objectives"
-                    name="Objectives"
-                    value={topic?.objectives}
+                    id="objectives"
+                    name="objectives"
+                    value={topic.objectives}
                     rows="3"
                     className={`${input} ${
                       errors.objectives ? errorInput : successInput

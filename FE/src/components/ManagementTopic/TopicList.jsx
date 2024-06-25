@@ -15,8 +15,6 @@ import { Button } from "primereact/button";
 import { Toolbar } from "primereact/toolbar";
 import { Dialog } from "primereact/dialog";
 import questionPng from "../../assets/img/question.png";
-import { useFetch } from "use-http";
-import axios from "axios";
 import restClient from "../../services/restClient";
 import { ACCEPT } from "../../utils";
 import Loading from "../Loading";
@@ -198,7 +196,7 @@ created by: Đặng Đình Quốc Khánh */
   };
 
   const header = (
-    <div className="flex justify-between px-3 ">
+    <div className="flex justify-between px-3  ">
       <div className="flex gap-7">
         <div class="relative w-96">
           <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -351,7 +349,7 @@ created by: Đặng Đình Quốc Khánh */
               paginator
               scrollable
               scrollHeight="26rem"
-              className="shadow-2xl"
+              className="shadow-2xl "
               // globalFilter={globalFilter}
               paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
               currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
@@ -366,6 +364,7 @@ created by: Đặng Đình Quốc Khánh */
               <Column
                 selectionMode="multiple"
                 exportable={false}
+                className="border-b-2 border-t-2 custom-checkbox-column"
                 frozen
               ></Column>
               <Column
@@ -373,12 +372,14 @@ created by: Đặng Đình Quốc Khánh */
                 header="Tiêu đề"
                 sortable
                 style={{ minWidth: "12rem" }}
+                className="border-b-2 border-t-2 custom-checkbox-column"
               ></Column>
               <Column
                 field="documentTitle"
                 header="Tên tài liệu"
                 sortable
                 style={{ minWidth: "16rem" }}
+                className="border-b-2 border-t-2 custom-checkbox-column"
               ></Column>
 
               <Column
@@ -386,24 +387,28 @@ created by: Đặng Đình Quốc Khánh */
                 header="Mô tả chủ đề"
                 sortable
                 style={{ minWidth: "8rem" }}
+                className="border-b-2 border-t-2 custom-checkbox-column"
               ></Column>
               <Column
                 field="objectives"
                 header="Mục tiêu chủ đề"
                 sortable
                 style={{ minWidth: "10rem" }}
+                className="border-b-2 border-t-2 custom-checkbox-column"
               ></Column>
               <Column
                 field="isActive"
                 header="Hoạt Động"
                 sortable
                 style={{ minWidth: "10rem" }}
+                className="border-b-2 border-t-2 custom-checkbox-column"
               ></Column>
 
               <Column
                 body={actionBodyTemplate}
                 exportable={false}
                 style={{ minWidth: "12rem" }}
+                className="border-b-2 border-t-2 custom-checkbox-column"
               ></Column>
             </DataTable>
           )}
