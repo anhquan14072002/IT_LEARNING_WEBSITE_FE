@@ -11,19 +11,21 @@ import CustomEditor from "../../shared/CustomEditor";
 import { REJECT, SUCCESS } from "../../utils";
 import restClient from "../../services/restClient";
 import Loading from "../Loading";
+import { Dropdown } from "primereact/dropdown";
 import CustomDropdown from "../../shared/CustomDropdown";
 
 const validationSchema = Yup.object({
   title: Yup.string().required("Tiêu đề không được bỏ trống"),
-  grade: Yup.object()
+  objectives: Yup.string().required("Mục tiêu chủ đề không được bỏ trống"),
+  description: Yup.string().required("Mô tả không được bỏ trống"),
+  document: Yup.object()
     .test("is-not-empty", "Không được để trống trường này", (value) => {
       return Object.keys(value).length !== 0; // Check if object is not empty
     })
     .required("Không bỏ trống trường này"),
-  description: Yup.string().required("Mô tả không được bỏ trống"),
 });
 
-export default function AddDocumentDialog({
+export default function AddTopicDialog({
   visible,
   setVisible,
   toast,
@@ -31,38 +33,39 @@ export default function AddDocumentDialog({
 }) {
   const initialValues = {
     title: "",
-    grade: {},
+    objectives: "",
     description: "",
+    document: {},
   };
-  const [gradeList, setGradeList] = useState([]);
+  const [documentList, setDocumentList] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    restClient({ url: "api/grade/getallgrade", method: "GET" })
+    restClient({ url: "api/document/getalldocument", method: "GET" })
       .then((res) => {
-        setGradeList(Array.isArray(res.data.data) ? res.data.data : []);
+        setDocumentList(Array.isArray(res.data.data) ? res.data.data : []);
       })
       .catch((err) => {
-        setGradeList([]);
+        setDocumentList([]);
       });
   }, []);
 
   const onSubmit = (values) => {
     setLoading(true);
-    // const model = { ...values, isActive: true };
     const model = {
       title: values.title,
-      gradeId: values.grade.id,
+      objectives: values.objectives,
       description: values.description,
-      isActive: true
-    }
+      documentId: values.document.id,
+      isActive: true,
+    };
     restClient({
-      url: "api/document/createdocument",
+      url: "api/topic/createtopic",
       method: "POST",
       data: model,
     })
       .then((res) => {
-        SUCCESS(toast, "Thêm tài liệu thành công");
+        SUCCESS(toast, "Thêm chủ đề thành công");
         fetchData();
         setLoading(false);
       })
@@ -77,7 +80,7 @@ export default function AddDocumentDialog({
 
   return (
     <Dialog
-      header="Thêm tài liệu"
+      header="Thêm chủ đề"
       visible={visible}
       style={{ width: "50vw" }}
       onHide={() => {
@@ -103,12 +106,20 @@ export default function AddDocumentDialog({
               />
 
               <CustomDropdown
-                title="Chọn lớp"
-                label="Lớp"
-                name="grade"
-                id="grade"
-                options={gradeList}
+                title="Chọn tài liệu"
+                label="Tài liệu"
+                name="document"
+                id="document"
+                options={documentList}
               />
+
+              <CustomTextarea
+                label="Mục tiêu chủ đề"
+                name="objectives"
+                id="objectives"
+              >
+                <ErrorMessage name="objectives" component="div" />
+              </CustomTextarea>
 
               <div>
                 <CustomEditor

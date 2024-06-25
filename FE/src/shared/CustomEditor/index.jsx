@@ -11,6 +11,7 @@ const CustomEditor = ({ label, ...props }) => {
 
   return (
     <div className="mb-5">
+<<<<<<< HEAD
       {label && <label htmlFor={props.id || props.name}>{label}</label>}
       <div
         className={classNames(
@@ -19,6 +20,14 @@ const CustomEditor = ({ label, ...props }) => {
           { "border-gray-300": !(meta.touched && meta.error) }
         )}
       >
+=======
+      {label && (<label htmlFor={props.id || props.name}>{label}</label>)}
+      <div className={classNames(
+        "w-full shadow-none border rounded-md",
+        { "border-red-500": meta.touched && meta.error },
+        { "border-gray-300": !(meta.touched && meta.error) }
+      )}>
+>>>>>>> 0f99a5838d5fba649ce3b9950cd514ff077cb671
         <Editor
           id={props.id || props.name}
           value={field.value}

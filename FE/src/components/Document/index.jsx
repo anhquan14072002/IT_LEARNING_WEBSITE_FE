@@ -162,13 +162,25 @@ export default function Document() {
       <div>
         <div className="flex justify-between pt-1">
           <h1 className="font-bold text-3xl">Tài liệu</h1>
-          <Button
-            label="Thêm mới"
-            icon="pi pi-plus-circle"
-            severity="info"
-            className="bg-blue-600 text-white p-2 text-sm font-normal"
-            onClick={() => setVisible(true)}
-          />
+          <div>
+            <Button
+              label="Thêm mới"
+              icon="pi pi-plus-circle"
+              severity="info"
+              className="bg-blue-600 text-white p-2 text-sm font-normal"
+              onClick={() => setVisible(true)}
+            />
+            <Button
+              label="Xóa"
+              icon="pi pi-trash"
+              disabled={!selectedProduct || selectedProduct.length === 0}
+              severity="danger"
+              className="bg-red-600 text-white p-2 text-sm font-normal ml-3"
+              onClick={() => {
+                console.log("product list ::", selectedProduct);
+              }}
+            />
+          </div>
         </div>
 
         <div className="border-2 rounded-md mt-2">
@@ -201,10 +213,17 @@ export default function Document() {
                 value={products}
                 loading={loading}
                 className="border-t-2"
-                tableStyle={{minHeight: "30rem"}}
+                tableStyle={{ minHeight: "30rem" }}
+                selection={selectedProduct}
+                onSelectionChange={(e) => setSelectedProduct(e.value)}
                 scrollable
                 scrollHeight="30rem"
               >
+                <Column
+                  selectionMode="multiple"
+                  headerStyle={{ width: "3rem" }}
+                  className="border-b-2 border-t-2 custom-checkbox-column"
+                ></Column>
                 <Column
                   field="#"
                   header="#"

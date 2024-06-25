@@ -1,20 +1,22 @@
 import React, { useEffect, useState } from "react";
 import { Dialog } from "primereact/dialog";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import classNames from "classnames";
 import CustomTextInput from "../../shared/CustomTextInput";
-import CustomSelectInput from "../../shared/CustomSelectInput";
-import CustomTextarea from "../../shared/CustomTextarea";
-import { Button } from "primereact/button";
+import CustomDropdown from "../../shared/CustomDropdown";
 import CustomEditor from "../../shared/CustomEditor";
-import { ACCEPT, REJECT, SUCCESS } from "../../utils";
-import restClient from "../../services/restClient";
+import { Button } from "primereact/button";
 import Loading from "../Loading";
+import restClient from "../../services/restClient";
+import { ACCEPT, REJECT, SUCCESS } from "../../utils";
 
 const validationSchema = Yup.object({
   title: Yup.string().required("Tiêu đề không được bỏ trống"),
-  gradeId: Yup.string().required("Lớp không được bỏ trống"),
+  grade: Yup.object()
+    .test("is-not-empty", "Lớp không được bỏ trống", (value) => {
+      return Object.keys(value).length !== 0; // Check if object is not empty
+    })
+    .required("Lớp không được bỏ trống"),
   description: Yup.string().required("Mô tả không được bỏ trống"),
 });
 
@@ -23,43 +25,70 @@ export default function UpdateDocumentDialog({
   setVisibleUpdate,
   toast,
   updateValue,
-  fetchData
+  fetchData,
 }) {
-  const initialValues = {
-    title: updateValue.title || "",
-    gradeId: updateValue.gradeId || "",
-    description: updateValue.description || "",
-  };
+  const [initialValues, setInitialValues] = useState({
+    title: "",
+    grade: {},
+    description: "",
+  });
   const [gradeList, setGradeList] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [initialValuesReady, setInitialValuesReady] = useState(false);
 
   useEffect(() => {
-    restClient({ url: "api/grade/getallgrade", method: "GET" })
-      .then((res) => {
-        setGradeList(Array.isArray(res.data.data) ? res.data.data : []);
-      })
-      .catch((err) => {
+    const fetchGrades = async () => {
+      try {
+        const res = await restClient({
+          url: "api/grade/getallgrade",
+          method: "GET",
+        });
+        if (Array.isArray(res.data.data)) {
+          setGradeList(res.data.data);
+          const selectedDocument = res.data.data.find(
+            (item) => Number(item.id) === Number(updateValue.gradeId)
+          );
+          setInitialValues({
+            title: updateValue.title,
+            description: updateValue.description,
+            grade: selectedDocument || {},
+          });
+          setInitialValuesReady(true); // Data has been fetched and initial values are set
+        }
+      } catch (err) {
         setGradeList([]);
-      });
-  }, []);
+      }
+    };
 
-  const onSubmit = (values) => {
-    const model = { ...values, isActive: true, id: updateValue.id };
-    restClient({
-      url: "api/document/updatedocument",
-      method: "PUT",
-      data: model,
-    })
-      .then((res) => {
-        SUCCESS(toast, "Cập nhật tài liệu thành công");
-        fetchData()
-      })
-      .catch((err) => {
-        REJECT(toast, err.message);
-        setLoading(false);
-      }).finally(()=>{
-        setVisibleUpdate(false)
+    if (visibleUpdate) {
+      fetchGrades();
+    }
+  }, [visibleUpdate, updateValue]);
+
+  const onSubmit = async (values, { setSubmitting }) => {
+    setLoading(true);
+    try {
+      const model = {
+        id: updateValue.id,
+        title: values.title,
+        gradeId: values.grade.id,
+        description: values.description,
+        isActive: true,
+      };
+      await restClient({
+        url: "api/document/updatedocument",
+        method: "PUT",
+        data: model,
       });
+      SUCCESS(toast, "Cập nhật tài liệu thành công");
+      fetchData();
+    } catch (err) {
+      REJECT(toast, err.message);
+    } finally {
+      setLoading(false);
+      setVisibleUpdate(false);
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -67,70 +96,63 @@ export default function UpdateDocumentDialog({
       header="Cập nhật tài liệu"
       visible={visibleUpdate}
       style={{ width: "50vw" }}
-      onHide={() => {
-        if (!visibleUpdate) return;
-        setVisibleUpdate(false);
-      }}
+      onHide={() => setVisibleUpdate(false)}
     >
-      {loading === true ? (
+      {loading ? (
         <Loading />
       ) : (
-        <Formik
-          initialValues={initialValues}
-          validationSchema={validationSchema}
-          onSubmit={onSubmit}
-        >
-          {(formik) => (
-            <Form>
-              <CustomTextInput
-                label="Tiêu đề"
-                name="title"
-                type="text"
-                id="title"
-              />
-
-              <CustomSelectInput
-                label="Lớp"
-                name="gradeId"
-                id="gradeId"
-                flexStyle="flex-1"
-              >
-                <option value="">Chọn lớp</option>
-                {gradeList &&
-                  gradeList.map((grade) => (
-                    <option key={grade.id} value={grade.id}>
-                      {grade.title}
-                    </option>
-                  ))}
-                <ErrorMessage name="gradeId" component="div" />
-              </CustomSelectInput>
-
-              <div>
-                <CustomEditor
-                  label="Thông tin chi tiết"
-                  name="description"
-                  id="description"
-                >
-                  <ErrorMessage name="description" component="div" />
-                </CustomEditor>
-              </div>
-
-              <div className="flex justify-end gap-2">
-                <Button
-                  className="p-2 bg-red-500 text-white"
-                  type="button"
-                  severity="danger"
-                  onClick={() => setVisibleUpdate(false)}
-                >
-                  Hủy
-                </Button>
-                <Button className="p-2 bg-blue-500 text-white" type="submit">
-                  Cập nhật
-                </Button>
-              </div>
-            </Form>
-          )}
-        </Formik>
+        initialValuesReady && (
+          <Formik
+            initialValues={initialValues}
+            validationSchema={validationSchema}
+            onSubmit={onSubmit}
+            enableReinitialize={true}
+          >
+            {(formik) => (
+              <Form>
+                <CustomTextInput
+                  label="Tiêu đề"
+                  name="title"
+                  type="text"
+                  id="title"
+                />
+                <CustomDropdown
+                  title="Chọn lớp"
+                  label="Lớp"
+                  name="grade"
+                  id="grade"
+                  options={gradeList}
+                />
+                <div>
+                  <CustomEditor
+                    label="Thông tin chi tiết"
+                    name="description"
+                    id="description"
+                  >
+                    <ErrorMessage name="description" component="div" />
+                  </CustomEditor>
+                </div>
+                <div className="flex justify-end gap-2">
+                  <Button
+                    className="p-2 bg-red-500 text-white"
+                    type="button"
+                    severity="danger"
+                    onClick={() => setVisibleUpdate(false)}
+                  >
+                    Hủy
+                  </Button>
+                  <Button
+                    className="p-2 bg-blue-500 text-white"
+                    type="submit"
+                    disabled={formik.isSubmitting}
+                  >
+                    Cập nhật
+                  </Button>
+                </div>
+              </Form>
+            )}
+          </Formik>
+        )
       )}
     </Dialog>
   );
