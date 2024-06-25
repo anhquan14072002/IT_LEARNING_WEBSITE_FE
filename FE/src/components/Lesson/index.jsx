@@ -110,7 +110,14 @@ export default function Lesson() {
   };
 
   const file = (rowData, { rowIndex }) => {
-    return <Link className="p-2 bg-blue-500 text-white rounded-md" to={`${rowData.urlDownload}`}>Tải về</Link>;
+    return (
+      <Link
+        className="p-2 bg-blue-500 text-white rounded-md"
+        to={`${rowData.urlDownload}`}
+      >
+        Tải về
+      </Link>
+    );
   };
 
   // modal delete

@@ -1,7 +1,13 @@
 import reload from "../../assets/img/icons8-reload-50.png";
 import TopicContextProvider, { TopicContext } from "../../store/TopicContext";
 import TopicForm from "./TopicForm";
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useContext,
+  useCallback,
+} from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Toast } from "primereact/toast";
@@ -9,27 +15,14 @@ import { Button } from "primereact/button";
 import { Toolbar } from "primereact/toolbar";
 import { Dialog } from "primereact/dialog";
 import questionPng from "../../assets/img/question.png";
+import { useFetch } from "use-http";
+import axios from "axios";
+import restClient from "../../services/restClient";
+import { ACCEPT } from "../../utils";
+import Loading from "../Loading";
 
 export function TopicsDemo() {
-  let emptyTopic = {
-    id: null,
-    name: "",
-    image: null,
-    description: "",
-    category: null,
-    price: 0,
-    quantity: 0,
-    rating: 0,
-    inventoryStatus: "INSTOCK",
-  };
-  const {
-    idSelected: topicId,
-    onShow,
-    onPageChange,
-    data: topics,
-    editTopic,
-    deleteData,
-  } = useContext(TopicContext);
+  const { idSelected: topicId, onShow } = useContext(TopicContext);
   const [topic, setTopic] = useState(null);
   const [deleteTopicsDialog, setDeleteTopicsDialog] = useState(false);
   const [selectedTopics, setSelectedTopics] = useState(null);
@@ -37,7 +30,36 @@ export function TopicsDemo() {
   const toast = useRef(null);
   const dt = useRef(null);
   const [first, setFirst] = useState(0);
+  const [page, setPage] = useState(1);
   const [rows, setRows] = useState(5);
+  const [totalPage, setTotalPage] = useState(0);
+  const [topics, setTopics] = useState([]);
+  const [loading, setLoading] = useState(false);
+  useEffect(() => {
+    fetchData(page, rows);
+  }, [page, rows]);
+
+  const getData = () => {
+    fetchData(page, rows);
+  };
+
+  const fetchData = (page = 1, rows = 5) => {
+    restClient({
+      url: `api/topic/getalltopicpagination?PageIndex=${page}&PageSize=${rows}`,
+      method: "GET",
+    })
+      .then((res) => {
+        const paginationData = JSON.parse(res.headers["x-pagination"]);
+        setTotalPage(paginationData.TotalPages);
+        setTopics(Array.isArray(res.data.data) ? res.data.data : []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error("Error fetching data:", err);
+        setTopics([]);
+        setLoading(false);
+      });
+  };
 
   /* function name: hide dialog delete topic 
   parameter: 
@@ -144,12 +166,16 @@ created by: Đặng Đình Quốc Khánh */
         text
         icon="pi pi-plus"
         raised
-        onClick={onShow}
+        onClick={() => onShow(0)}
         className="text-white p-2  bg-[#89CFF3] hover:bg-[#5ab7e6]"
       />
     );
   };
-
+  function editTopicFnc(topic) {
+    /* solution: Where is the origin of action from ? 
+        -  */
+    onShow(topic?.id);
+  }
   const actionBodyTemplate = (rowData) => {
     return (
       <React.Fragment>
@@ -170,25 +196,7 @@ created by: Đặng Đình Quốc Khánh */
       </React.Fragment>
     );
   };
-  /* function name: handle edit topic 
-parameter: topic is send object 
-created by: Đặng Đình Quốc Khánh */
-  const editTopicFnc = (topic) => {
-    try {
-      console.log(topic);
-      editTopic(topic);
-    } catch (err) {
-      // handle the error
-      if (err instanceof Error) {
-        console.error(`Error: ${err.name}`); // the type of error
-        console.error(err.message); // the description of the error
-      } else {
-        // handle other errors
-        console.error("Error Unknown:");
-        console.error(err);
-      }
-    }
-  };
+
   const header = (
     <div className="flex justify-between px-3 ">
       <div className="flex gap-7">
@@ -242,7 +250,12 @@ created by: Đặng Đình Quốc Khánh */
         <div className="flex justify-between h-10 "></div>
       </div>
 
-      <Button text raised className=" px-3  bg-gray-50 ">
+      <Button
+        text
+        raised
+        className=" px-3  bg-gray-50 "
+        onClick={() => fetchData()}
+      >
         <img src={reload} width="20" height="20" />
       </Button>
     </div>
@@ -257,8 +270,18 @@ created by: Đặng Đình Quốc Khánh */
   /* function name: delete topic from button agree 
   parameter: 
   created by: Đặng Đình Quốc Khánh */
-  function deleteTopic() {
-    deleteData(topic);
+  async function deleteTopic() {
+    restClient({ url: `api/topic/deletetopic/${topic.id}`, method: "DELETE" })
+      .then((res) => {
+        getData();
+        ACCEPT(toast, "Xóa thành công");
+      })
+      .catch((err) => {
+        REJECT(toast, "Xảy ra lỗi khi xóa tài liệu này");
+      })
+      .finally(() => {
+        setDeleteTopicDialog(false);
+      });
   }
   const deleteTopicDialogFooter = (
     <React.Fragment>
@@ -292,10 +315,19 @@ created by: Đặng Đình Quốc Khánh */
       />
     </React.Fragment>
   );
+  /* function name: handle page change when i click change page 
+  parameter: event is default of s 
+  created by: Đặng Đình Quốc Khánh */
+  const onPageChange = (event) => {
+    const { page, rows, first } = event;
+    setPage(page + 1);
+    setRows(rows);
+    setFirst(first);
+  };
 
   return (
     <React.Fragment>
-      <TopicForm key={topicId} />
+      <TopicForm key={topicId} fetchData={fetchData} toast={toast} />
       <div>
         <Toast ref={toast} />
         <div className="card">
@@ -305,61 +337,76 @@ created by: Đặng Đình Quốc Khánh */
             right={rightToolbarTemplate}
           ></Toolbar>
 
-          <DataTable
-            ref={dt}
-            value={topics}
-            selection={selectedTopics}
-            onSelectionChange={(e) => {
-              setSelectedTopics(e.value);
-            }}
-            dataKey="Id"
-            paginator
-            scrollable
-            scrollHeight="26rem"
-            first={first}
-            rows={5}
-            onPage={onPageChange}
-            rowsPerPageOptions={[5, 10, 25]}
-            className="shadow-2xl"
-            // globalFilter={globalFilter}
-            header={header}
-            lazy
-            totalRecords={10} // Explicitly setting totalRecords
-          >
-            <Column selectionMode="multiple" exportable={false} frozen></Column>
-            <Column
-              field="Title"
-              header="Tiêu đề"
-              sortable
-              style={{ minWidth: "12rem" }}
-            ></Column>
-            <Column
-              field="Document.title"
-              header="Tên tài liệu"
-              sortable
-              style={{ minWidth: "16rem" }}
-            ></Column>
+          {loading ? (
+            <Loading />
+          ) : (
+            <DataTable
+              ref={dt}
+              value={topics}
+              selection={selectedTopics}
+              onSelectionChange={(e) => {
+                setSelectedTopics(e.value);
+              }}
+              dataKey="id"
+              paginator
+              scrollable
+              scrollHeight="26rem"
+              className="shadow-2xl"
+              // globalFilter={globalFilter}
+              paginatorTemplate="FirstPageLink PrevPageLink PageLinks NextPageLink LastPageLink CurrentPageReport RowsPerPageDropdown"
+              currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+              header={header}
+              lazy
+              first={first}
+              rows={rows}
+              onPage={onPageChange}
+              rowsPerPageOptions={[5, 10, 25]}
+              totalRecords={totalPage * rows} // Explicitly setting totalRecords
+            >
+              <Column
+                selectionMode="multiple"
+                exportable={false}
+                frozen
+              ></Column>
+              <Column
+                field="title"
+                header="Tiêu đề"
+                sortable
+                style={{ minWidth: "12rem" }}
+              ></Column>
+              <Column
+                field="documentTitle"
+                header="Tên tài liệu"
+                sortable
+                style={{ minWidth: "16rem" }}
+              ></Column>
 
-            <Column
-              field="Description"
-              header="Mô tả chủ đề"
-              // body={priceBodyTemplate}
-              sortable
-              style={{ minWidth: "8rem" }}
-            ></Column>
-            <Column
-              field="Objectives"
-              header="Mục tiêu chủ đề"
-              sortable
-              style={{ minWidth: "10rem" }}
-            ></Column>
+              <Column
+                field="description"
+                header="Mô tả chủ đề"
+                sortable
+                style={{ minWidth: "8rem" }}
+              ></Column>
+              <Column
+                field="objectives"
+                header="Mục tiêu chủ đề"
+                sortable
+                style={{ minWidth: "10rem" }}
+              ></Column>
+              <Column
+                field="isActive"
+                header="Hoạt Động"
+                sortable
+                style={{ minWidth: "10rem" }}
+              ></Column>
 
-            <Column
-              body={actionBodyTemplate}
-              exportable={false}
-              style={{ minWidth: "12rem" }}
-            ></Column>
-          </DataTable>
+              <Column
+                body={actionBodyTemplate}
+                exportable={false}
+                style={{ minWidth: "12rem" }}
+              ></Column>
+            </DataTable>
+          )}
         </div>
 
         <Dialog
@@ -372,11 +419,11 @@ created by: Đặng Đình Quốc Khánh */
           onHide={hideDeleteTopicDialog}
         >
           <div className="confirmation-content">
-            <div className="flex gap-4 justify-center items-center">
+            <div className="flex gap-4 justify-start items-center">
               <img src={questionPng} width="35" height="35" alt="" srcset="" />
               {topic && (
                 <span>
-                  Bạn chắc chắn muốn xóa <b>Chủ Đề {topic.Title}</b>?
+                  Bạn chắc chắn muốn xóa <b>Chủ Đề {topic.title}</b>?
                 </span>
               )}
             </div>
