@@ -16,7 +16,7 @@ export default function Home() {
     if (fixedDivRef.current) {
       setFixedDivHeight(fixedDivRef.current.offsetHeight);
     }
-  }, [fixedDivRef,loading]);
+  }, [fixedDivRef, loading]);
 
   return (
     <>
@@ -57,10 +57,15 @@ export default function Home() {
                   &gt;&gt; Xem tất cả khóa học
                 </h1>
               </div>
-              <div className="flex flex-wrap justify-between gap-3">
-                <DocumentCard />
-                <DocumentCard />
-                <DocumentCard />
+              <div className="flex flex-wrap justify-between gap-4 md:gap-3">
+                <DocumentCard
+                  title={
+                    "Tài liệu tin học JavaJavaJavaJavaJavaJavaJava0avaJavaJJavaJJavaJJavaJJavaJJavaJJavaJJavaJJavaJJavaJJavaJJavaJ"
+                  }
+                />
+                <DocumentCard title={"Tài liệu tin học Java"} />
+                <DocumentCard title={"Tài liệu tin học Java"} />
+                <DocumentCard title={"Tài liệu tin học Java"} />
               </div>
             </div>
           </LazyComponent>

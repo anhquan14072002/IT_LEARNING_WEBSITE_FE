@@ -13,10 +13,11 @@ import AddLessonDialog from "../AddLessonDialog";
 import UpdateLessonDialog from "../UpdateLessonDialog";
 import UpdateDocumentDialog from "../UpdateDocumentDialog";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
-import { ACCEPT, REJECT } from "../../utils";
+import { ACCEPT, REJECT, formatDate, removeVietnameseTones } from "../../utils";
 import Loading from "../Loading";
 import restClient from "../../services/restClient";
 import { Link } from "react-router-dom";
+import debounce from "lodash.debounce";
 
 export default function Lesson() {
   const toast = useRef(null);
@@ -31,6 +32,7 @@ export default function Lesson() {
   const [visibleDelete, setVisibleDelete] = useState(false);
   const [loading, setLoading] = useState(false);
   const [modelUpdate, setModelUpdate] = useState({});
+  const [textSearch, setTextSearch] = useState("");
 
   //pagination
   const [first, setFirst] = useState(0);
@@ -40,13 +42,32 @@ export default function Lesson() {
 
   useEffect(() => {
     fetchData(page, rows);
-  }, [page, rows]);
+  }, [page, rows, textSearch]);
 
   const getData = () => {
     fetchData(page, rows);
   };
 
   const fetchData = (page, rows) => {
+
+    if (textSearch.trim()) {
+      setLoading(true);
+      restClient({
+        url: `api/lesson/searchbylessonpagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}`,
+        method: "GET",
+      })
+        .then((res) => {
+          const paginationData = JSON.parse(res.headers["x-pagination"]);
+          setTotalPage(paginationData.TotalPages);
+          setProducts(Array.isArray(res.data.data) ? res.data.data : []);
+        })
+        .catch((err) => {
+          console.error("Error fetching data:", err);
+          setProducts([]);
+        })
+        .finally(() => setLoading(false));
+    } else {
+
     setLoading(true);
 
     restClient({
@@ -64,6 +85,7 @@ export default function Lesson() {
         setProducts([]);
         setLoading(false);
       });
+    }
   };
 
   const actionBodyTemplate = (rowData) => {
@@ -167,6 +189,10 @@ export default function Lesson() {
       });
   };
 
+  const handleSearchInput = debounce((text) => {
+    setTextSearch(text);
+  }, 300);
+
   return (
     <div>
       <Toast ref={toast} />
@@ -213,6 +239,9 @@ export default function Lesson() {
           <div className="mb-10 flex flex-wrap items-center p-2">
             <div className="border-2 rounded-md p-2">
               <InputText
+                onChange={(e) => {
+                  handleSearchInput(removeVietnameseTones(e.target.value));
+                }}
                 placeholder="Search"
                 className="flex-1 focus:outline-none w-36 focus:ring-0"
               />
@@ -223,19 +252,6 @@ export default function Lesson() {
             </div>
 
             <div className="flex-1 flex flex-wrap gap-3 justify-end">
-              <div className="border-2 rounded-md mt-4">
-                <Dropdown
-                  filter
-                  ref={dropDownRef1}
-                  value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.value)}
-                  options={cities}
-                  optionLabel="name"
-                  showClear
-                  placeholder="Lớp"
-                  className="w-full md:w-14rem shadow-none h-full"
-                />
-              </div>
               <div className="border-2 rounded-md mt-4">
                 <Dropdown
                   filter
@@ -281,30 +297,27 @@ export default function Lesson() {
                 className="border-b-2 border-t-2"
               ></Column>
               <Column
+                field="topicTitle"
+                header="Chủ đề"
+                className="border-b-2 border-t-2"
+              ></Column>
+              <Column
                 header="File tài liệu"
                 className="border-b-2 border-t-2"
                 body={file}
               ></Column>
-              {/* <Column
-              field="name"
-              header="Chủ đề"
-              className="border-b-2 border-t-2"
-            ></Column>
-            <Column
-              field="category"
-              header="Lớp"
-              className="border-b-2 border-t-2"
-            ></Column>
-            <Column
-              field="category"
-              header="Ngày tạo"
-              className="border-b-2 border-t-2"
-            ></Column>
-            <Column
-              field="category"
-              header="Ngày cập nhật"
-              className="border-b-2 border-t-2"
-            ></Column> */}
+              <Column
+                field="createdDate"
+                header="Ngày tạo"
+                body={(rowData) => formatDate(rowData.createdDate)}
+                className="border-b-2 border-t-2"
+              ></Column>
+              <Column
+                field="lastModifiedDate"
+                header="Ngày cập nhật"
+                body={(rowData) => formatDate(rowData.lastModifiedDate)}
+                className="border-b-2 border-t-2"
+              ></Column>
               <Column
                 className="border-b-2 border-t-2"
                 body={actionBodyTemplate}
