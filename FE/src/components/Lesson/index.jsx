@@ -6,7 +6,6 @@ import { Column } from "primereact/column";
 import { ContextMenu } from "primereact/contextmenu";
 import { Paginator } from "primereact/paginator";
 import { Toast } from "primereact/toast";
-import { ProductService } from "../../services/ProductService";
 import { Button } from "primereact/button";
 import "./index.css";
 import AddLessonDialog from "../AddLessonDialog";
@@ -17,21 +16,22 @@ import { ACCEPT, REJECT } from "../../utils";
 import Loading from "../Loading";
 import restClient from "../../services/restClient";
 import { Link } from "react-router-dom";
+import { Dialog } from "primereact/dialog";
 
 export default function Lesson() {
   const toast = useRef(null);
   const dropDownRef1 = useRef(null);
   const dropDownRef2 = useRef(null);
   const [selectedCity, setSelectedCity] = useState(null);
-  const [products, setProducts] = useState([]);
-  const [selectedProduct, setSelectedProduct] = useState(null);
+  const [products, setLessons] = useState([]);
+  const [selectedLesson, setSelectedLesson] = useState(null);
   const cm = useRef(null);
   const [visible, setVisible] = useState(false);
   const [visibleUpdate, setVisibleUpdate] = useState(false);
   const [visibleDelete, setVisibleDelete] = useState(false);
+  const [deleteLessonsDialog, setDeleteLessonsDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   const [modelUpdate, setModelUpdate] = useState({});
-
   //pagination
   const [first, setFirst] = useState(0);
   const [page, setPage] = useState(1);
@@ -41,6 +41,13 @@ export default function Lesson() {
   useEffect(() => {
     fetchData(page, rows);
   }, [page, rows]);
+
+  const hideDeleteLessonsDialog = () => {
+    setDeleteLessonsDialog(false);
+  };
+  const confirmDeleteSelected = () => {
+    setDeleteLessonsDialog(true);
+  };
 
   const getData = () => {
     fetchData(page, rows);
@@ -56,12 +63,12 @@ export default function Lesson() {
       .then((res) => {
         const paginationData = JSON.parse(res.headers["x-pagination"]);
         setTotalPage(paginationData.TotalPages);
-        setProducts(Array.isArray(res.data.data) ? res.data.data : []);
+        setLessons(Array.isArray(res.data.data) ? res.data.data : []);
         setLoading(false);
       })
       .catch((err) => {
         console.error("Error fetching data:", err);
-        setProducts([]);
+        setLessons([]);
         setLoading(false);
       });
   };
@@ -81,7 +88,7 @@ export default function Lesson() {
           icon="pi pi-trash"
           className="text-red-600 shadow-none"
           onClick={() => {
-            setVisibleDelete(true);
+            // setVisibleDelete(true);
             confirm(rowData.id);
           }}
         />
@@ -124,8 +131,8 @@ export default function Lesson() {
   const confirm = (id) => {
     setVisibleDelete(true);
     confirmDialog({
-      message: "Do you want to delete this record?",
-      header: "Delete Confirmation",
+      message: "Bạn có chắc chắn muốn chủ đề này?",
+      header: "Thông báo",
       icon: "pi pi-info-circle",
       defaultFocus: "reject",
       acceptClassName: "p-button-danger",
@@ -137,7 +144,6 @@ export default function Lesson() {
             className="p-2 bg-red-500 text-white mr-2"
             onClick={() => {
               setVisibleDelete(false);
-              REJECT(toast);
             }}
           />
           <Button
@@ -167,10 +173,62 @@ export default function Lesson() {
       });
   };
 
+  const deleteRange = () => {
+    const newBody = selectedLesson.map((e) => {
+      return e.id;
+    });
+    restClient({
+      url: `api/lesson/deleterangelesson`,
+      method: "DELETE",
+      data: newBody,
+    })
+      .then((res) => {
+        getData();
+        ACCEPT(toast, "Xóa thành công");
+      })
+      .catch((err) => {
+        REJECT(toast, "Xảy ra lỗi khi xóa tài liệu này");
+      })
+      .finally(() => {
+        setDeleteLessonsDialog(false);
+        setSelectedLesson(null);
+      });
+  };
+  const deleteLessonsDialogFooter = (
+    <>
+      <Button
+        label="Hủy"
+        icon="pi pi-times"
+        className="p-2 bg-red-500 text-white mr-2"
+        onClick={hideDeleteLessonsDialog}
+      />
+      <Button
+        label="Xóa"
+        icon="pi pi-check"
+        className="p-2 bg-blue-500 text-white"
+        onClick={deleteRange}
+      />
+    </>
+  );
   return (
     <div>
       <Toast ref={toast} />
       <ConfirmDialog visible={visibleDelete} />
+      <Dialog
+        visible={deleteLessonsDialog}
+        style={{ width: "27rem" }}
+        breakpoints={{ "960px": "75vw", "641px": "90vw" }}
+        header="Thông báo"
+        modal
+        footer={deleteLessonsDialogFooter}
+        onHide={hideDeleteLessonsDialog}
+      >
+        <div className="confirmation-content flex items-center justify-start gap-2">
+          <i className="pi pi-info-circle" style={{ fontSize: "2rem" }} />
+
+          <span>Bạn có chắc chắn muốn xóa những bài học đã chọn ? </span>
+        </div>
+      </Dialog>
       <AddLessonDialog
         visible={visible}
         setVisible={setVisible}
@@ -199,10 +257,11 @@ export default function Lesson() {
               label="Xóa"
               icon="pi pi-trash"
               severity="danger"
-              disabled={!selectedProduct || selectedProduct.length === 0}
+              disabled={!selectedLesson || selectedLesson.length === 0}
               className="bg-red-600 text-white p-2 text-sm font-normal ml-3"
               onClick={() => {
-                console.log("product list ::", selectedProduct);
+                console.log("Lesson list ::", selectedLesson);
+                confirmDeleteSelected();
               }}
             />
           </div>
@@ -257,8 +316,8 @@ export default function Lesson() {
             <DataTable
               value={products}
               onContextMenu={(e) => cm.current.show(e.originalEvent)}
-              selection={selectedProduct}
-              onSelectionChange={(e) => setSelectedProduct(e.value)}
+              selection={selectedLesson}
+              onSelectionChange={(e) => setSelectedLesson(e.value)}
               className="border-t-2"
               tableStyle={{ minHeight: "30rem" }}
               scrollable

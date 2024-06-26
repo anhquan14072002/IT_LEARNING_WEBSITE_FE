@@ -98,7 +98,7 @@ export default function Topic() {
     setVisibleDelete(true);
     confirmDialog({
       message: "Bạn có chắc chắn muốn chủ đề này?",
-      header: "Delete Confirmation",
+      header: "Thông báo",
       icon: "pi pi-info-circle",
       defaultFocus: "reject",
       acceptClassName: "p-button-danger",
@@ -137,6 +137,7 @@ export default function Topic() {
         setVisibleDelete(false);
       });
   };
+
   return (
     <div>
       <Toast ref={toast} />
