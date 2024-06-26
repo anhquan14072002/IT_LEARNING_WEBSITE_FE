@@ -11,12 +11,13 @@ import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { ProgressSpinner } from "primereact/progressspinner";
 import AddDocumentDialog from "../AddDocumentDialog";
 import UpdateDocumentDialog from "../UpdateDocumentDialog";
-import { ACCEPT, REJECT, formatDate } from "../../utils";
+import { ACCEPT, REJECT, formatDate, removeVietnameseTones } from "../../utils";
 import restClient from "../../services/restClient";
 import Loading from "../Loading";
 import "./index.css";
 import AddTopicDialog from "../AddTopicDialog";
 import UpdateTopicDialog from "../UpdateTopicDialog";
+import debounce from "lodash.debounce";
 
 export default function Topic() {
   const toast = useRef(null);
@@ -31,6 +32,7 @@ export default function Topic() {
   const [visibleUpdate, setVisibleUpdate] = useState(false);
   const [visibleDelete, setVisibleDelete] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [textSearch, setTextSearch] = useState("");
   //pagination
   const [first, setFirst] = useState(0);
   const [page, setPage] = useState(1);
@@ -39,7 +41,7 @@ export default function Topic() {
 
   useEffect(() => {
     fetchData();
-  }, [page, first, rows]);
+  }, [page, rows, textSearch]);
 
   const pagination = (page, rows) => {
     setLoading(true);
@@ -62,7 +64,25 @@ export default function Topic() {
   };
 
   const fetchData = () => {
-    pagination(page, rows);
+    if (textSearch.trim()) {
+      setLoading(true);
+      restClient({
+        url: `api/topic/searchbytopicpagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}`,
+        method: "GET",
+      })
+        .then((res) => {
+          const paginationData = JSON.parse(res.headers["x-pagination"]);
+          setTotalPage(paginationData.TotalPages);
+          setProducts(Array.isArray(res.data.data) ? res.data.data : []);
+        })
+        .catch((err) => {
+          console.error("Error fetching data:", err);
+          setProducts([]);
+        })
+        .finally(() => setLoading(false));
+    } else {
+      pagination(page, rows);
+    }
   };
 
   const onPageChange = (event) => {
@@ -76,6 +96,14 @@ export default function Topic() {
     const index = (page - 1) * rows + (rowIndex + 1);
     return <span>{index}</span>;
   };
+
+  const cities = [
+    { name: "New York", code: "NY" },
+    { name: "Rome", code: "RM" },
+    { name: "London", code: "LDN" },
+    { name: "Istanbul", code: "IST" },
+    { name: "Paris", code: "PRS" },
+  ];
 
   const actionBodyTemplate = (rowData) => {
     return (
@@ -144,6 +172,10 @@ export default function Topic() {
       });
   };
 
+  const handleSearchInput = debounce((text) => {
+    setTextSearch(text);
+  }, 300);
+
   return (
     <div>
       <Toast ref={toast} />
@@ -189,6 +221,9 @@ export default function Topic() {
           <div className="mb-10 flex flex-wrap items-center p-2">
             <div className="border-2 rounded-md p-2">
               <InputText
+                onChange={(e) => {
+                  handleSearchInput(removeVietnameseTones(e.target.value));
+                }}
                 placeholder="Search"
                 className="flex-1 focus:outline-none w-36 focus:ring-0"
               />
@@ -198,12 +233,19 @@ export default function Topic() {
               />
             </div>
 
-            <div className="flex-1 flex gap-3 justify-end">
+            <div className="flex-1 flex flex-wrap gap-3 justify-end">
               <div className="border-2 rounded-md mt-4">
-                {/* Dropdown for filters */}
-              </div>
-              <div className="border-2 rounded-md mt-4">
-                {/* Another dropdown for filters */}
+                <Dropdown
+                  filter
+                  ref={dropDownRef2}
+                  value={selectedCity}
+                  onChange={(e) => setSelectedCity(e.value)}
+                  options={cities}
+                  optionLabel="name"
+                  showClear
+                  placeholder="Tài liệu"
+                  className="w-full md:w-14rem shadow-none h-full"
+                />
               </div>
             </div>
           </div>
@@ -242,7 +284,7 @@ export default function Topic() {
                   header="Tài liệu"
                   className="border-b-2 border-t-2"
                 />
-                 <Column
+                <Column
                   field="objectives"
                   header="Mục tiêu chủ đề"
                   className="border-b-2 border-t-2"
@@ -268,7 +310,7 @@ export default function Topic() {
                 first={first}
                 rows={rows}
                 rowsPerPageOptions={[10, 20, 30]}
-                totalRecords={totalPage * rows} // Total records should be calculated based on total pages and rows per page
+                totalRecords={totalPage * rows} 
                 onPageChange={onPageChange}
                 className="custom-paginator mx-auto"
               />

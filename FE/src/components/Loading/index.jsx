@@ -1,13 +1,13 @@
 import React from "react";
 import { ProgressSpinner } from "primereact/progressspinner";
 
-export default function Loading() {
+export default function Loading({ heightValue }) {
   return (
     <div
       className="flex justify-center items-center"
-      style={{ height: "200px" }}
+      style={{ height: heightValue || "200px" }}
     >
-      <ProgressSpinner />
+      <ProgressSpinner style={heightValue ? { height: '50px' } : {}} />
     </div>
   );
 }

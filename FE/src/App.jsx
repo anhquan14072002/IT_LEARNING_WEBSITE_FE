@@ -32,7 +32,6 @@ function App() {
         <Route path="/checkmail" element={<CheckMail />} />
         <Route path="/changepassword" element={<ChangePassword />} />
       </Routes>
-      <Footer/>
     </Router>
   );
 }
