@@ -4,7 +4,6 @@ import Footer from "../../components/Footer";
 import ManageDocument from "../../components/ManageDocument";
 import { ProgressSpinner } from "primereact/progressspinner";
 import LoadingScreen from "../../components/LoadingScreen";
-import TopicList from "../../components/ManagementTopic/TopicList";
 
 const Dashboard = () => {
   const [open, setOpen] = useState(true);
@@ -19,7 +18,6 @@ const Dashboard = () => {
       title: "Quản lí chủ đề ",
       src: "Folder",
       index: 3,
-      component: <TopicList />,
     },
   ];
 

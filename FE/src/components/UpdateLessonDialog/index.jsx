@@ -43,7 +43,10 @@ export default function UpdateLessonDialog({
   useEffect(() => {
     const fetchTopics = async () => {
       try {
-        const res = await restClient({ url: "api/topic/getalltopic", method: "GET" });
+        const res = await restClient({
+          url: "api/topic/getalltopic",
+          method: "GET",
+        });
         if (Array.isArray(res.data.data)) {
           setListTopic(res.data.data);
           const selectedTopic = res.data.data.find(
@@ -178,7 +181,11 @@ export default function UpdateLessonDialog({
                   >
                     Hủy
                   </Button>
-                  <Button className="p-2 bg-blue-500 text-white" type="submit" disabled={isSubmitting}>
+                  <Button
+                    className="p-2 bg-blue-500 text-white"
+                    type="submit"
+                    disabled={isSubmitting}
+                  >
                     Cập nhật
                   </Button>
                 </div>

@@ -34,7 +34,6 @@ export default function Header({ params, setParams, textSearchProps }) {
   useEffect(() => {
     setTextSearch(textSearchProps); // Update state when props change
   }, [textSearchProps]);
-  
 
   return (
     <div className="w-full">
@@ -47,15 +46,7 @@ export default function Header({ params, setParams, textSearchProps }) {
           />
         </div>
         <div className="flex">
-<<<<<<< HEAD
-          {/* search */}
-          <div
-            className="border border-white rounded-3xl flex items-center px-2.5 py-2 gap-2.5"
-            onClick={() => navigate("/search")}
-          >
-=======
           <div className="border border-white rounded-3xl flex items-center px-2.5 py-2 gap-2.5">
->>>>>>> 118707fc46af9b4374ba57bbd7fec807a7564b25
             <svg
               xmlns="http://www.w3.org/2000/svg"
               x="0px"
@@ -96,20 +87,6 @@ export default function Header({ params, setParams, textSearchProps }) {
           </div>
 
           <div className="ml-10 px-5 flex gap-5">
-<<<<<<< HEAD
-            {/* <Button
-              label="Đăng nhập"
-              text
-              raised
-              className="text-stone-700 px-3 bg-[#89CFF3] "
-            />
-            <Button
-              label="Đăng kí"
-              style={{ backgroundColor: "#  " }}
-              className="text-stone-800 px-5"
-            /> */}
-=======
->>>>>>> 118707fc46af9b4374ba57bbd7fec807a7564b25
             <Button
               label="Đăng nhập"
               text
