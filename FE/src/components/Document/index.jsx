@@ -11,10 +11,11 @@ import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { ProgressSpinner } from "primereact/progressspinner";
 import AddDocumentDialog from "../AddDocumentDialog";
 import UpdateDocumentDialog from "../UpdateDocumentDialog";
-import { ACCEPT, REJECT, formatDate } from "../../utils";
+import { ACCEPT, REJECT, formatDate, removeVietnameseTones } from "../../utils";
 import restClient from "../../services/restClient";
 import Loading from "../Loading";
 import "./index.css";
+import debounce from "lodash.debounce";
 
 export default function Document() {
   const toast = useRef(null);
@@ -29,7 +30,10 @@ export default function Document() {
   const [visibleUpdate, setVisibleUpdate] = useState(false);
   const [visibleDelete, setVisibleDelete] = useState(false);
   const [loading, setLoading] = useState(false);
-  //pagination
+  const [filterClass, setFilterClass] = useState({ name: "" });
+  const [textSearch, setTextSearch] = useState("");
+
+  // Pagination
   const [first, setFirst] = useState(0);
   const [page, setPage] = useState(1);
   const [rows, setRows] = useState(10);
@@ -37,11 +41,10 @@ export default function Document() {
 
   useEffect(() => {
     fetchData();
-  }, [page, first, rows]);
+  }, [page, rows, textSearch]);
 
   const pagination = (page, rows) => {
     setLoading(true);
-
     restClient({
       url: `api/document/getalldocumentpagination?PageIndex=${page}&PageSize=${rows}`,
       method: "GET",
@@ -50,17 +53,34 @@ export default function Document() {
         const paginationData = JSON.parse(res.headers["x-pagination"]);
         setTotalPage(paginationData.TotalPages);
         setProducts(Array.isArray(res.data.data) ? res.data.data : []);
-        setLoading(false);
       })
       .catch((err) => {
         console.error("Error fetching data:", err);
         setProducts([]);
-        setLoading(false);
-      });
+      })
+      .finally(() => setLoading(false));
   };
 
   const fetchData = () => {
-    pagination(page, rows);
+    if (textSearch.trim()) {
+      setLoading(true);
+      restClient({
+        url: `api/document/searchbydocumentpagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}`,
+        method: "GET",
+      })
+        .then((res) => {
+          const paginationData = JSON.parse(res.headers["x-pagination"]);
+          setTotalPage(paginationData.TotalPages);
+          setProducts(Array.isArray(res.data.data) ? res.data.data : []);
+        })
+        .catch((err) => {
+          console.error("Error fetching data:", err);
+          setProducts([]);
+        })
+        .finally(() => setLoading(false));
+    } else {
+      pagination(page, rows);
+    }
   };
 
   const onPageChange = (event) => {
@@ -75,32 +95,28 @@ export default function Document() {
     return <span>{index}</span>;
   };
 
-  const actionBodyTemplate = (rowData) => {
-    return (
-      <div style={{ display: "flex" }}>
-        <Button
-          icon="pi pi-pencil"
-          className="text-blue-600 p-mr-2 shadow-none"
-          onClick={() => {
-            setUpdateValue(rowData);
-            setVisibleUpdate(true);
-          }}
-        />
-        <Button
-          icon="pi pi-trash"
-          className="text-red-600 shadow-none"
-          onClick={() => {
-            confirmDelete(rowData.id);
-          }}
-        />
-      </div>
-    );
-  };
+  const actionBodyTemplate = (rowData) => (
+    <div style={{ display: "flex" }}>
+      <Button
+        icon="pi pi-pencil"
+        className="text-blue-600 p-mr-2 shadow-none"
+        onClick={() => {
+          setUpdateValue(rowData);
+          setVisibleUpdate(true);
+        }}
+      />
+      <Button
+        icon="pi pi-trash"
+        className="text-red-600 shadow-none"
+        onClick={() => confirmDelete(rowData.id)}
+      />
+    </div>
+  );
 
   const confirmDelete = (id) => {
     setVisibleDelete(true);
     confirmDialog({
-      message: "Bạn có chắc chắn muốn tài liệu này?",
+      message: "Bạn có chắc chắn muốn xóa tài liệu này?",
       header: "Delete Confirmation",
       icon: "pi pi-info-circle",
       defaultFocus: "reject",
@@ -111,17 +127,13 @@ export default function Document() {
             label="Hủy"
             icon="pi pi-times"
             className="p-2 bg-red-500 text-white mr-2"
-            onClick={() => {
-              setVisibleDelete(false);
-            }}
+            onClick={() => setVisibleDelete(false)}
           />
           <Button
             label="Xóa"
             icon="pi pi-check"
             className="p-2 bg-blue-500 text-white"
-            onClick={() => {
-              deleteDocument(id);
-            }}
+            onClick={() => deleteDocument(id)}
           />
         </>
       ),
@@ -130,17 +142,29 @@ export default function Document() {
 
   const deleteDocument = (id) => {
     restClient({ url: `api/document/deletedocument/${id}`, method: "DELETE" })
-      .then((res) => {
+      .then(() => {
         fetchData();
         ACCEPT(toast, "Xóa thành công");
       })
       .catch((err) => {
         REJECT(toast, "Xảy ra lỗi khi xóa tài liệu này");
       })
-      .finally(() => {
-        setVisibleDelete(false);
-      });
+      .finally(() => setVisibleDelete(false));
   };
+
+  const cities = [{ name: "Cấp 1" }, { name: "Cấp 2" }, { name: "Cấp 3" }];
+
+  const handleSearch = (text) => {
+    if (text && text.name) {
+      setFilterClass({ name: text.name });
+    } else {
+      setFilterClass({ name: "" });
+    }
+  };
+
+  const handleSearchInput = debounce((text) => {
+    setTextSearch(text);
+  }, 300);
 
   return (
     <div>
@@ -170,16 +194,6 @@ export default function Document() {
               className="bg-blue-600 text-white p-2 text-sm font-normal"
               onClick={() => setVisible(true)}
             />
-            <Button
-              label="Xóa"
-              icon="pi pi-trash"
-              disabled={!selectedProduct || selectedProduct.length === 0}
-              severity="danger"
-              className="bg-red-600 text-white p-2 text-sm font-normal ml-3"
-              onClick={() => {
-                console.log("product list ::", selectedProduct);
-              }}
-            />
           </div>
         </div>
 
@@ -187,6 +201,9 @@ export default function Document() {
           <div className="mb-10 flex flex-wrap items-center p-2">
             <div className="border-2 rounded-md p-2">
               <InputText
+                onChange={(e) => {
+                  handleSearchInput(removeVietnameseTones(e.target.value));
+                }}
                 placeholder="Search"
                 className="flex-1 focus:outline-none w-36 focus:ring-0"
               />
@@ -196,12 +213,19 @@ export default function Document() {
               />
             </div>
 
-            <div className="flex-1 flex gap-3 justify-end">
+            <div className="flex-1 flex flex-wrap gap-3 justify-end">
               <div className="border-2 rounded-md mt-4">
-                {/* Dropdown for filters */}
-              </div>
-              <div className="border-2 rounded-md mt-4">
-                {/* Another dropdown for filters */}
+                <Dropdown
+                  filter
+                  ref={dropDownRef2}
+                  value={filterClass}
+                  onChange={(e) => handleSearch(e.value)}
+                  options={cities}
+                  optionLabel="name"
+                  showClear
+                  placeholder="Lớp"
+                  className="w-full md:w-14rem shadow-none h-full"
+                />
               </div>
             </div>
           </div>
@@ -219,11 +243,6 @@ export default function Document() {
                 scrollable
                 scrollHeight="30rem"
               >
-                <Column
-                  selectionMode="multiple"
-                  headerStyle={{ width: "3rem" }}
-                  className="border-b-2 border-t-2 custom-checkbox-column"
-                ></Column>
                 <Column
                   field="#"
                   header="#"
