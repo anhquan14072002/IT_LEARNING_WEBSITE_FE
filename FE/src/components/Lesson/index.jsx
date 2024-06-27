@@ -33,6 +33,7 @@ export default function Lesson() {
   const [loading, setLoading] = useState(false);
   const [modelUpdate, setModelUpdate] = useState({});
   const [textSearch, setTextSearch] = useState("");
+  const [loadingDeleteMany, setLoadingDeleteMany] = useState(false);
 
   //pagination
   const [first, setFirst] = useState(0);
@@ -49,7 +50,6 @@ export default function Lesson() {
   };
 
   const fetchData = (page, rows) => {
-
     if (textSearch.trim()) {
       setLoading(true);
       restClient({
@@ -67,24 +67,23 @@ export default function Lesson() {
         })
         .finally(() => setLoading(false));
     } else {
+      setLoading(true);
 
-    setLoading(true);
-
-    restClient({
-      url: `api/lesson/getalllessonpagination?PageIndex=${page}&PageSize=${rows}`,
-      method: "GET",
-    })
-      .then((res) => {
-        const paginationData = JSON.parse(res.headers["x-pagination"]);
-        setTotalPage(paginationData.TotalPages);
-        setProducts(Array.isArray(res.data.data) ? res.data.data : []);
-        setLoading(false);
+      restClient({
+        url: `api/lesson/getalllessonpagination?PageIndex=${page}&PageSize=${rows}`,
+        method: "GET",
       })
-      .catch((err) => {
-        console.error("Error fetching data:", err);
-        setProducts([]);
-        setLoading(false);
-      });
+        .then((res) => {
+          const paginationData = JSON.parse(res.headers["x-pagination"]);
+          setTotalPage(paginationData.TotalPages);
+          setProducts(Array.isArray(res.data.data) ? res.data.data : []);
+          setLoading(false);
+        })
+        .catch((err) => {
+          console.error("Error fetching data:", err);
+          setProducts([]);
+          setLoading(false);
+        });
     }
   };
 
@@ -175,6 +174,58 @@ export default function Lesson() {
     });
   };
 
+  const confirmDeleteMany = () => {
+    setVisibleDelete(true);
+    confirmDialog({
+      message: "Do you want to delete this record?",
+      header: "Delete Confirmation",
+      icon: "pi pi-info-circle",
+      defaultFocus: "reject",
+      acceptClassName: "p-button-danger",
+      footer: (
+        <>
+          <Button
+            label="Hủy"
+            icon="pi pi-times"
+            className="p-2 bg-red-500 text-white mr-2"
+            onClick={() => {
+              setVisibleDelete(false);
+              REJECT(toast);
+            }}
+          />
+          <Button
+            label="Xóa"
+            icon="pi pi-check"
+            className="p-2 bg-blue-500 text-white"
+            onClick={handleDeleteMany}
+          />
+        </>
+      ),
+    });
+  };
+
+  const handleDeleteMany = () => {
+    setLoadingDeleteMany(true);
+    const arrayId = selectedProduct.map((p, index) => p.id);
+    restClient({
+      url: `api/lesson/deleterangelesson`,
+      method: "DELETE",
+      data: arrayId,
+    })
+      .then((res) => {
+        ACCEPT(toast, "Xóa thành công");
+        setSelectedProduct([])
+        getData();
+      })
+      .catch((err) => {
+        REJECT(toast, "Xảy ra lỗi khi xóa thành công");
+      })
+      .finally(() => {
+        setLoadingDeleteMany(false);
+        setVisibleDelete(false);
+      });
+  };
+
   const deleteLesson = (id) => {
     restClient({ url: `api/lesson/deletelesson/${id}`, method: "DELETE" })
       .then((res) => {
@@ -227,9 +278,7 @@ export default function Lesson() {
               severity="danger"
               disabled={!selectedProduct || selectedProduct.length === 0}
               className="bg-red-600 text-white p-2 text-sm font-normal ml-3"
-              onClick={() => {
-                console.log("product list ::", selectedProduct);
-              }}
+              onClick={confirmDeleteMany}
             />
           </div>
         </div>

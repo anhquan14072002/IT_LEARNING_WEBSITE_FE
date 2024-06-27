@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from "react";
 import restClient from "../../services/restClient";
 import Loading from "../Loading";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 
 export default function CategoryOfClass({ display, params, setParams }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const [listClast, setListClass] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [selectedClassId, setSelectedClassId] = useState(null); 
 
   useEffect(() => {
     setLoading(true);
@@ -24,11 +26,28 @@ export default function CategoryOfClass({ display, params, setParams }) {
       });
   }, []);
 
-  const handleClick = (clastId) => {
-    setParams({
-      ...Object.fromEntries(params.entries()),
-      classId: clastId,
-    });
+  // Update selectedClassId when classId changes in URL query parameters
+  useEffect(() => {
+    const urlSearchParams = new URLSearchParams(location.search);
+    const urlClassId = urlSearchParams.get("classId");
+
+    if (urlClassId && !isNaN(urlClassId)) {
+      setSelectedClassId(parseInt(urlClassId, 10)); 
+    } else {
+      setSelectedClassId(null);
+    }
+  }, [location.search]);
+
+  const handleClick = (classId) => {
+    if (selectedClassId === classId) {
+      setSelectedClassId(null);
+      const updatedParams = { ...Object.fromEntries(params.entries()) };
+      delete updatedParams.classId;
+      setParams(updatedParams);
+    } else {
+      setSelectedClassId(classId);
+      setParams({ ...Object.fromEntries(params.entries()), classId });
+    }
   };
 
   return (
@@ -52,8 +71,7 @@ export default function CategoryOfClass({ display, params, setParams }) {
                     key={index}
                     onClick={() => handleClick(clast.id)}
                     className={`p-2 cursor-pointer w-full ${
-                      params.get("classId") !== null &&
-                      Number(params.get("classId")) === clast.id
+                      selectedClassId === clast.id
                         ? "bg-[#D1F7FF] hover:bg-[#D1F7FF]"
                         : "hover:bg-[#D1F7FF]"
                     }`}
