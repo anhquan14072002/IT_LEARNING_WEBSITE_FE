@@ -197,7 +197,7 @@ export default function Topic() {
               className="bg-blue-600 text-white p-2 text-sm font-normal"
               onClick={() => setVisible(true)}
             />
-            <Button
+            {/* <Button
               label="Xóa"
               icon="pi pi-trash"
               disabled={!selectedProduct || selectedProduct.length === 0}
@@ -206,7 +206,7 @@ export default function Topic() {
               onClick={() => {
                 console.log("product list ::", selectedProduct);
               }}
-            />
+            /> */}
           </div>
         </div>
         <div className="border-2 rounded-md mt-2">
@@ -255,11 +255,11 @@ export default function Topic() {
                 scrollable
                 scrollHeight="30rem"
               >
-                <Column
+                {/* <Column
                   selectionMode="multiple"
                   headerStyle={{ width: "3rem" }}
                   className="border-b-2 border-t-2 custom-checkbox-column"
-                ></Column>
+                ></Column> */}
                 <Column
                   field="#"
                   header="#"

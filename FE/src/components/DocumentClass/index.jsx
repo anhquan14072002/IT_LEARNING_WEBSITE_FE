@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import "./index.css";
 import restClient from "../../services/restClient";
 import Loading from "../Loading";
+import { useNavigate } from "react-router-dom";
 
 export default function DocumentClass({ display }) {
+  const navigate = useNavigate()
   const [listClast, setListClass] = useState([]);
   const [loading, setLoading] = useState(false);
 
@@ -43,6 +45,7 @@ export default function DocumentClass({ display }) {
                   key={index}
                   className="hover:bg-[#D1F7FF] p-2 cursor-pointer"
                   style={{ maxWidth: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
+                  onClick={() => navigate(`/search?classId=`+clast.id)}
                 >
                   Tài liệu {clast?.title}
                 </div>

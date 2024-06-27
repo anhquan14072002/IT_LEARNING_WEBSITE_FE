@@ -32,7 +32,7 @@ export default function Header({ params, setParams, textSearchProps }) {
   };
 
   useEffect(() => {
-    setTextSearch(textSearchProps); // Update state when props change
+    setTextSearch(""); 
   }, [textSearchProps]);
 
   return (

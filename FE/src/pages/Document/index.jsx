@@ -5,12 +5,16 @@ import Footer from "../../components/Footer";
 import CategoryOfClass from "../../components/CategoryOfClass";
 import DocumentClass from "../../components/DocumentClass";
 import Comment from "../../components/Comment";
+import { useParams } from "react-router-dom";
 
 export default function Document() {
   const fixedDivRef = useRef(null);
+  const {id} = useParams();
   const [fixedDivHeight, setFixedDivHeight] = useState(0);
   const [isDisplay, setIsDisplay] = useState(false);
   const displayRef = useRef(null);
+  const [documentDetailArrayList,setDocumentDetailArrayList] = useState({})
+
 
   useEffect(() => {
     const observer = new IntersectionObserver(

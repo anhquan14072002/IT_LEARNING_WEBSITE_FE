@@ -34,6 +34,7 @@ export default function Lesson() {
   const [loading, setLoading] = useState(false);
   const [modelUpdate, setModelUpdate] = useState({});
   const [textSearch, setTextSearch] = useState("");
+  const [loadingDeleteMany, setLoadingDeleteMany] = useState(false);
 
   //pagination
   const [first, setFirst] = useState(0);
@@ -83,12 +84,20 @@ export default function Lesson() {
         .then((res) => {
           const paginationData = JSON.parse(res.headers["x-pagination"]);
           setTotalPage(paginationData.TotalPages);
+<<<<<<< HEAD
           setLessons(Array.isArray(res.data.data) ? res.data.data : []);
+=======
+          setProducts(Array.isArray(res.data.data) ? res.data.data : []);
+>>>>>>> a3d031263af40ce7784930f5ff4cdfcc1daec0d1
           setLoading(false);
         })
         .catch((err) => {
           console.error("Error fetching data:", err);
+<<<<<<< HEAD
           setLessons([]);
+=======
+          setProducts([]);
+>>>>>>> a3d031263af40ce7784930f5ff4cdfcc1daec0d1
           setLoading(false);
         });
     }
@@ -178,6 +187,58 @@ export default function Lesson() {
         </>
       ),
     });
+  };
+
+  const confirmDeleteMany = () => {
+    setVisibleDelete(true);
+    confirmDialog({
+      message: "Do you want to delete this record?",
+      header: "Delete Confirmation",
+      icon: "pi pi-info-circle",
+      defaultFocus: "reject",
+      acceptClassName: "p-button-danger",
+      footer: (
+        <>
+          <Button
+            label="Hủy"
+            icon="pi pi-times"
+            className="p-2 bg-red-500 text-white mr-2"
+            onClick={() => {
+              setVisibleDelete(false);
+              REJECT(toast);
+            }}
+          />
+          <Button
+            label="Xóa"
+            icon="pi pi-check"
+            className="p-2 bg-blue-500 text-white"
+            onClick={handleDeleteMany}
+          />
+        </>
+      ),
+    });
+  };
+
+  const handleDeleteMany = () => {
+    setLoadingDeleteMany(true);
+    const arrayId = selectedProduct.map((p, index) => p.id);
+    restClient({
+      url: `api/lesson/deleterangelesson`,
+      method: "DELETE",
+      data: arrayId,
+    })
+      .then((res) => {
+        ACCEPT(toast, "Xóa thành công");
+        setSelectedProduct([])
+        getData();
+      })
+      .catch((err) => {
+        REJECT(toast, "Xảy ra lỗi khi xóa thành công");
+      })
+      .finally(() => {
+        setLoadingDeleteMany(false);
+        setVisibleDelete(false);
+      });
   };
 
   const deleteLesson = (id) => {
@@ -284,10 +345,7 @@ export default function Lesson() {
               severity="danger"
               disabled={!selectedLesson || selectedLesson.length === 0}
               className="bg-red-600 text-white p-2 text-sm font-normal ml-3"
-              onClick={() => {
-                console.log("Lesson list ::", selectedLesson);
-                confirmDeleteSelected();
-              }}
+              onClick={confirmDeleteMany}
             />
           </div>
         </div>

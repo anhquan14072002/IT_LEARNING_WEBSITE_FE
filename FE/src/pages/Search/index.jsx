@@ -22,12 +22,14 @@ export default function Search() {
   const [fixedDivHeight, setFixedDivHeight] = useState(0);
   const [isFooterVisible, setIsFooterVisible] = useState(false);
   const [selectedCity, setSelectedCity] = useState(null);
-  const [textSearch, setTextSearch] = useState(""); // Local state for search input
+  const [textSearch, setTextSearch] = useState("");
   const [params, setParams] = useSearchParams();
 
   //document
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [classId, setClassId] = useState(Object.fromEntries(params.entries()).classId || "");
+
 
   //pagination
   const [first, setFirst] = useState(0);
@@ -49,6 +51,7 @@ export default function Search() {
         Object.fromEntries(params.entries()).text || ""
       );
       setTextSearch(decodedText);
+      setClassId(Object.fromEntries(params.entries()).classId || "");
     }
   }, [params]);
 
@@ -92,16 +95,6 @@ export default function Search() {
     }
   }, [fixedDivRef]);
 
-  const handleSearch = (e) => {
-    if (e.key === "Enter") {
-      const encodedText = encodeURIComponent(textSearch.trim());
-      setParams({
-        ...Object.fromEntries(params.entries()),
-        text: encodedText || "",
-      });
-    }
-  };
-
   const handleSearchClick = () => {
     const encodedText = encodeURIComponent(textSearch.trim());
     setParams({
@@ -113,47 +106,47 @@ export default function Search() {
   //pagination and search
   useEffect(() => {
     fetchData();
-  }, [page, rows, textSearch]);
-  const pagination = (page, rows) => {
+  }, [page, rows, textSearch, classId]);
+
+  const fetchData = () => {
+    let url = 'api/document/searchbydocumentpagination?';
+    const params = new URLSearchParams();
+  
+    if (textSearch) {
+      params.append('Value', decodeURIComponent(textSearch));
+    }
+  
+    if (page) {
+      params.append('PageIndex', page.toString());
+    }
+  
+    if (rows) {
+      params.append('PageSize', rows.toString());
+    }
+  
+    if (classId) {
+      params.append('GradeId', classId);
+    }
+  
+    url += params.toString();
+  
     setLoading(true);
     restClient({
-      url: `api/document/getalldocumentpagination?PageIndex=${page}&PageSize=${rows}`,
-      method: "GET",
+      url,
+      method: 'GET',
     })
       .then((res) => {
-        console.log(res.data.data);
-        const paginationData = JSON.parse(res.headers["x-pagination"]);
+        const paginationData = JSON.parse(res.headers['x-pagination']);
         setTotalPage(paginationData.TotalPages);
         setProducts(Array.isArray(res.data.data) ? res.data.data : []);
       })
       .catch((err) => {
-        console.error("Error fetching data:", err);
+        console.error('Error fetching data:', err);
         setProducts([]);
       })
       .finally(() => setLoading(false));
   };
-
-  const fetchData = () => {
-    if (textSearch.trim()) {
-      setLoading(true);
-      restClient({
-        url: `api/document/searchbydocumentpagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}`,
-        method: "GET",
-      })
-        .then((res) => {
-          const paginationData = JSON.parse(res.headers["x-pagination"]);
-          setTotalPage(paginationData.TotalPages);
-          setProducts(Array.isArray(res.data.data) ? res.data.data : []);
-        })
-        .catch((err) => {
-          console.error("Error fetching data:", err);
-          setProducts([]);
-        })
-        .finally(() => setLoading(false));
-    } else {
-      pagination(page, rows);
-    }
-  };
+  
 
   const onPageChange = (event) => {
     const { page, rows, first } = event;
@@ -170,6 +163,7 @@ export default function Search() {
             params={params}
             setParams={setParams}
             textSearchProps={textSearch}
+            settextSearchProps={setTextSearch}
           />
           <Menu />
         </div>
@@ -189,7 +183,10 @@ export default function Search() {
                   value={textSearch} // Bind value to local state
                   placeholder="Search"
                   className="flex-1 focus:outline-none w-36 focus:ring-0"
-                  onChange={(e) => setTextSearch(e.target.value)} // Update textSearch state and params
+                  onChange={(e) => {
+                    // setTextSearch(e.target.value)
+                    setParams({...Object.fromEntries(params.entries()),text:encodeURIComponent(e.target.value)})
+                  }} // Update textSearch state and params
                 />
                 <Button
                   icon="pi pi-search"
