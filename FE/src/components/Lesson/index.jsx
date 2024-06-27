@@ -84,20 +84,12 @@ export default function Lesson() {
         .then((res) => {
           const paginationData = JSON.parse(res.headers["x-pagination"]);
           setTotalPage(paginationData.TotalPages);
-<<<<<<< HEAD
-          setLessons(Array.isArray(res.data.data) ? res.data.data : []);
-=======
           setProducts(Array.isArray(res.data.data) ? res.data.data : []);
->>>>>>> a3d031263af40ce7784930f5ff4cdfcc1daec0d1
           setLoading(false);
         })
         .catch((err) => {
           console.error("Error fetching data:", err);
-<<<<<<< HEAD
-          setLessons([]);
-=======
           setProducts([]);
->>>>>>> a3d031263af40ce7784930f5ff4cdfcc1daec0d1
           setLoading(false);
         });
     }
@@ -229,7 +221,7 @@ export default function Lesson() {
     })
       .then((res) => {
         ACCEPT(toast, "Xóa thành công");
-        setSelectedProduct([])
+        setSelectedProduct([]);
         getData();
       })
       .catch((err) => {
