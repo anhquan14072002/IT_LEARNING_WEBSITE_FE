@@ -6,17 +6,28 @@ import DocumentCard from "../../components/DocumentCard";
 import Footer from "../../components/Footer";
 import LazyComponent from "../../components/LazyComponent"; // Import LazyComponent
 import LoadingScreen from "../../components/LoadingScreen";
+import { getAllGrade } from "../../services/grade.api";
+import { getAllDocument } from "../../services/document.api";
+import Loading from "../../components/Loading";
 
 export default function Home() {
   const fixedDivRef = useRef(null);
   const [fixedDivHeight, setFixedDivHeight] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [classList, setListClass] = useState([]);
+  const [documentList, setDocumentList] = useState([]);
+  const [loadingGet, setLoadingGet] = useState(false);
 
   useEffect(() => {
     if (fixedDivRef.current) {
       setFixedDivHeight(fixedDivRef.current.offsetHeight);
     }
   }, [fixedDivRef, loading]);
+
+  useEffect(() => {
+    getAllGrade(setLoading, setListClass);
+    getAllDocument(setLoadingGet, setDocumentList);
+  }, []);
 
   return (
     <>
@@ -34,14 +45,14 @@ export default function Home() {
               Danh mục bài tập và soạn bài
             </h1>
             <div>
-              {[...Array(10).keys()].map((_, i) => {
-                const index = i + 3;
-                return (
-                  <LazyComponent key={index}>
-                    <Class classNumber={index} />
-                  </LazyComponent>
-                );
-              })}
+              {classList &&
+                classList?.map((item, i) => {
+                  return (
+                    <LazyComponent key={i}>
+                      <Class item={item} />
+                    </LazyComponent>
+                  );
+                })}
             </div>
           </div>
           <LazyComponent>
@@ -58,14 +69,16 @@ export default function Home() {
                 </h1>
               </div>
               <div className="flex flex-wrap justify-between gap-4 md:gap-3">
-                <DocumentCard
-                  title={
-                    "Tài liệu tin học JavaJavaJavaJavaJavaJavaJava0avaJavaJJavaJJavaJJavaJJavaJJavaJJavaJJavaJJavaJJavaJJavaJJavaJ"
-                  }
-                />
-                <DocumentCard title={"Tài liệu tin học Java"} />
-                <DocumentCard title={"Tài liệu tin học Java"} />
-                <DocumentCard title={"Tài liệu tin học Java"} />
+                {loadingGet ? (
+                  <div className="flex justify-center w-full">
+                    <Loading />
+                  </div>
+                ) : (
+                  documentList &&
+                  documentList.map((document, index) => (
+                    <DocumentCard key={index} document={document}/>
+                  ))
+                )}
               </div>
             </div>
           </LazyComponent>
