@@ -1,12 +1,12 @@
 import classNames from "classnames";
 import { useField } from "formik";
-
 const CustomTextInput = ({ label, ...props }) => {
     const [field, meta] = useField(props);
     return (
       <div className="mb-5">
         <label htmlFor={props.id || props.name}>{label}</label>
         <input
+          id="inputText"
           className={classNames(
             "w-full shadow-none p-1 border rounded-md",
             { "border-red-500": meta.touched && meta.error },

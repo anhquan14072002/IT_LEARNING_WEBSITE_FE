@@ -11,7 +11,7 @@ export const getDocumentByGradeId = async (id,setLoading,setDocumentList) => {
             setLoading(false);
         })
         .catch((err) => {
-            setListClass([]);
+            setDocumentList([]);
             setLoading(false);
         });
 }
