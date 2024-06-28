@@ -28,8 +28,11 @@ export default function Comment() {
   const [newRating, setNewRating] = useState(null);
 
   return (
-    <div className="py-20">
-      <h1 className="font-bold text-center">Phần đánh giá</h1>
+    <div>
+     
+      <div className="py-20">
+      <hr />
+      <h1 className="font-bold text-center mt-5">Phần đánh giá</h1>
       {/* Comment Editor */}
       <div className="mt-2 border border-solid border-gray-300 p-4 rounded-xl">
         <h2 className="font-bold mb-4">
@@ -41,10 +44,10 @@ export default function Comment() {
           stars={5}
           className="mb-4"
         />
-        <Editor
-          value={newComment}
-          onTextChange={(e) => setText(e.htmlValue)}
-          style={{ height: "250px" }}
+        <textarea
+          className="w-full h-20 border border-gray-400sadf"
+          defaultValue={newComment}
+          onChange={(e) => setText(e.htmlValue)}
         />
         <Button
           label="Gửi"
@@ -106,6 +109,7 @@ export default function Comment() {
           </div>
         )}
       </div>
+    </div>
     </div>
   );
 }
