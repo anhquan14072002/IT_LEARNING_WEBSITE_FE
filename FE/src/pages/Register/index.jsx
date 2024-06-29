@@ -24,20 +24,24 @@ const index = () => {
     getValues,
   } = useForm();
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const response = await verifyEmail(token);
-  //       console.log(response.data.isSucceeded);
-  //       // if (!response.data.isSucceeded) {
-  //       //   navigate("/checkmail");
-  //       // }
-  //     } catch (error) {
-  //       console.error("Error verifying email:", error);
-  //     }
-  //   };
-  //   fetchData();
-  // }, [token, navigate]);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        
+          const response = await verifyEmail(token);
+        
+        
+        console.log(response.data.isSucceeded);
+        
+        if (!response.data.isSucceeded) {
+          navigate("/checkmail");
+        }
+      } catch (error) {
+        console.error("Error verifying email:", error);
+      }
+    };
+    fetchData();
+  }, [token, navigate]);
 
   const onSubmit = async (data) => {
     const { firstname, lastname, username, password } = data;
@@ -65,13 +69,13 @@ const index = () => {
         </div>
 
         <div className="w-1/2  flex items-center justify-center ">
-          <div className="w-8/12   ">
+          <div className="w-7/12   ">
             <h1 className="text-left mb-4 font-bold text-black text-3xl">
               Tạo tài khoản
             </h1>
             <form onSubmit={handleSubmit(onSubmit)}>
-              <div className="flex">
-                <div className="mb-4 mr-8">
+              <div className="flex justify-between gap-5">
+                <div className="mb-4 basis-1/2">
                   <label htmlFor="firstname" className="cursor-pointer">
                     <h4 className=" text-xl text-black font-medium">
                       Họ <span className="text-red-500">*</span>
@@ -88,7 +92,7 @@ const index = () => {
                       <input
                         id="firstname"
                         type="text"
-                        className="w-full h- text-black-800 border border-solid border-gray-600  pb-2 pl-1 rounded-md"
+                        className="w-full h-10 text-black-800 border border-solid border-gray-600  pb-2 rounded-md"
                         placeholder="Nhập họ"
                         {...field}
                       />
@@ -101,7 +105,7 @@ const index = () => {
                     </span>
                   )}
                 </div>
-                <div className="mb-4">
+                <div className="mb-4 basis-1/2">
                   <label htmlFor="lastname" className="cursor-pointer">
                     <h4 className=" text-xl text-black font-medium">
                       Tên <span className="text-red-500">*</span>
@@ -109,7 +113,7 @@ const index = () => {
                   </label>
                   <Controller
                     name="lastname"
-                    defaultValue=""
+                    defaultValue="" 
                     control={control}
                     rules={{
                       required: "Tên không được để trống",
@@ -118,7 +122,7 @@ const index = () => {
                       <input
                         id="lastname"
                         type="text"
-                        className="w-full h-10 text-black-800 border border-solid border-gray-600  pb-2 pl-1 rounded-md"
+                        className="w-full h-10 text-black-800 border border-solid border-gray-600  pb-2 rounded-md"
                         placeholder="Nhập Tên"
                         {...field}
                       />
