@@ -49,7 +49,7 @@ export default function Home() {
                 classList?.map((item, i) => {
                   return (
                     <LazyComponent key={i}>
-                      <Class item={item} />
+                      <Class item={item} index={i} />
                     </LazyComponent>
                   );
                 })}
