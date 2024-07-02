@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { sendVerifyEmail } from "../../services/authenService";
 import { CHECKMAIL, REJECT} from "../../utils";
 import { Toast } from "primereact/toast";
+import Menu from "../../components/Menu";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -31,11 +32,12 @@ const Index = () => {
   return (
     <div className="min-h-screen overflow-hidden">
       <Header />
+      <Menu />
       <div className="flex h-screen  ">
         <div className="w-1/2">
           <div className="w-auto h-full">
             <img
-              src="https://primefaces.org/cdn/primereact/images/galleria/galleria7.jpg"
+                src="src/assets/OIG4.jpg"
               alt=""
               className="w-full h-full"
             />
