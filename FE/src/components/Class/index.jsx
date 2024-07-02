@@ -51,7 +51,7 @@ export default function Class({ item, index }) {
         }}
         className="overflow-hidden"
       >
-        <div className="flex items-start gap-20 flex-wrap">
+        <div className="flex justify-between gap-20 flex-wrap">
           <div>
             <h1 className="font-bold mb-3">Đề thi</h1>
             <h1>Đề thi 1</h1>
@@ -71,7 +71,7 @@ export default function Class({ item, index }) {
             </h1>
           </div>
           <div>
-            <h1 className="font-bold mb-3">Tài liệu</h1>
+            <h1 className="font-bold mb-3">Các bộ sách</h1>
             {documentList &&
               documentList.map((d, i) => (
                 <h1

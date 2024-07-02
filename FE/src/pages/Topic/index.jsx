@@ -6,7 +6,11 @@ import CategoryOfClass from "../../components/CategoryOfClass";
 import DocumentClass from "../../components/DocumentClass";
 import Comment from "../../components/Comment";
 import LessonInDocument from "../../components/LessonInDocument";
-import { getDocumentListByLessonId, getLessonById } from "../../services/lesson.api";
+import {
+  getDocumentListByLessonId,
+  getLessonById,
+  getTopicById,
+} from "../../services/lesson.api";
 import { useParams } from "react-router-dom";
 import Loading from "../../components/Loading";
 import { Button } from "primereact/button";
@@ -16,15 +20,15 @@ export default function Lesson() {
   const [fixedDivHeight, setFixedDivHeight] = useState(0);
   const [isDisplay, setIsDisplay] = useState(false);
   const displayRef = useRef(null);
-  const [lesson, setLesson] = useState({});
+  const [topic, setTopic] = useState({});
   const [loading, setLoading] = useState(false);
   const [loadingV1, setLoadingV1] = useState(false);
   const [documentList, setDocumentList] = useState({});
   const { id } = useParams();
 
   useEffect(() => {
-    getLessonById(id, setLoading, setLesson);
-    getDocumentListByLessonId(id,setLoadingV1, setDocumentList)
+    getTopicById(id, setLoading, setTopic);
+    // getDocumentListByLessonId(id, setLoadingV1, setDocumentList);
   }, []);
 
   useEffect(() => {
@@ -74,25 +78,20 @@ export default function Lesson() {
         <div className="pt-6 flex-1">
           {loading ? (
             <Loading />
-          ) : Object.keys(lesson).length > 0 ? (
+          ) : Object.keys(topic).length > 0 ? (
             <div>
-              <h2 className="text-xl font-bold">{lesson?.title}</h2>
-              <div className="flex justify-end">
-                <Button
-                  label="Tải tài liệu về máy"
-                  icon="pi pi-download"
-                  className="bg-blue-500 hover:bg-blue-300 p-2 text-white text-sm"
-                  onClick={handleDownload}
-                />
+              <h2 className="text-xl font-bold mb-5">{topic?.title}</h2>
+              <div>
+                <span className="font-semibold mb-2">Mục tiêu chủ đề :</span>
+                {topic?.objectives}
               </div>
-              <p
-                className="mt-4 text-lg"
-                dangerouslySetInnerHTML={{ __html: lesson.content }}
-              ></p>
-              {/* Add more details based on your lesson object */}
+              <div>
+                <span className="font-semibold">Nội dung chủ đề :</span>
+                {topic?.description}
+              </div>
             </div>
           ) : (
-            <p>No lesson data found.</p>
+            <p>No topic data found.</p>
           )}
         </div>
       </div>

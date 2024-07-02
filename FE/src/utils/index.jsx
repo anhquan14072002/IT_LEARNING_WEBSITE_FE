@@ -1,3 +1,5 @@
+import { jwtDecode } from "jwt-decode";
+
 export const formatDate = (value) => {
   if (!value) return "";
 
@@ -84,3 +86,43 @@ export function removeVietnameseTones(str) {
   );
   return str;
 }
+
+export const decodeToken = (token) => {
+  if (!token) {
+    throw new Error('Invalid token');
+  }
+
+  try {
+    return jwtDecode(token);
+  } catch (error) {
+    throw new Error('Error decoding token');
+  }
+};
+
+export const getTokenFromLocalStorage = () => {
+  try {
+    const token = localStorage.getItem('accessToken');
+    if (token === null) {
+      throw new Error('Token not found in localStorage');
+    }
+    return token;
+  } catch (error) {
+    return null; 
+  }
+};
+
+export const isLoggedIn = () => {
+  const storedToken = localStorage.getItem('accessToken');
+  
+  if (!storedToken) {
+    return false; 
+  }
+  
+  try {
+    const decodedToken = decodeToken(storedToken);
+    
+    return true; 
+  } catch (error) {
+    return false;
+  }
+};
