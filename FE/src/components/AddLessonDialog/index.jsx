@@ -81,7 +81,7 @@ export default function AddLessonDialog({
     console.log("files:" + files);
     console.log("====================================");
 
-    // setIsLoadingAddLesson(true);
+    setIsLoadingAddLesson(true);
 
     const formData = new FormData();
     formData.append("Title", values.title);
@@ -105,29 +105,25 @@ export default function AddLessonDialog({
       });
     }
 
-    console.log("====================================");
-    console.log(Object.fromEntries(formData.entries()));
-    console.log("====================================");
-
-    // restClient({
-    //   url: "api/lesson/createlesson",
-    //   method: "POST",
-    //   data: formData,
-    //   headers: { "Content-Type": "multipart/form-data" },
-    // })
-    //   .then((res) => {
-    //     SUCCESS(toast, "Thêm bài học thành công");
-    //     getData();
-    //     setIsLoadingAddLesson(false);
-    //     setFiles([]);
-    //   })
-    //   .catch((err) => {
-    //     REJECT(toast, "Cập nhật không thành công");
-    //     setIsLoadingAddLesson(false);
-    //   })
-    //   .finally(() => {
-    //     setVisible(false);
-    //   });
+    restClient({
+      url: "api/lesson/createlesson",
+      method: "POST",
+      data: formData,
+      headers: { "Content-Type": "multipart/form-data" },
+    })
+      .then((res) => {
+        SUCCESS(toast, "Thêm bài học thành công");
+        getData();
+        setIsLoadingAddLesson(false);
+        setFiles([]);
+      })
+      .catch((err) => {
+        REJECT(toast, "Cập nhật không thành công");
+        setIsLoadingAddLesson(false);
+      })
+      .finally(() => {
+        setVisible(false);
+      });
   };
 
   const onFileSelect = (e) => {

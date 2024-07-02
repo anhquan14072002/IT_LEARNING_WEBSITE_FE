@@ -10,8 +10,8 @@ import Search from './pages/Search';
 import CheckMail from './pages/CheckMail';
 import Document from './pages/Document';
 import Lesson from './pages/Lesson';
+import Topic from './pages/Topic';
 import ChangePassword from './pages/ChangePassword';
-import Footer from './components/Footer';
 
 
 function App() {
@@ -26,6 +26,7 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/document/:id" element={<Document />} />
+        <Route path="/topic/:id" element={<Topic />} />
         <Route path="/document/lesson/:id" element={<Lesson />} />
         <Route path="/forgotpassword" element={<ForgotPassword />} />
         <Route path="/profile" element={<Profile />} />

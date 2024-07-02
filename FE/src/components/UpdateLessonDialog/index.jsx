@@ -131,6 +131,16 @@ export default function UpdateLessonDialog({
           document: selectedDocument || {},
         });
 
+        console.log({
+          title: modelUpdate.title,
+          ...(inputContet && {
+            content: modelUpdate.content,
+          }),
+          topic: selectedTopic || {},
+          grade: selectedGrade || {},
+          document: selectedDocument || {},
+        });
+
         setInitialValuesReady(true); // Data has been fetched and initial values are set
       } catch (err) {
         console.error("Error fetching data:", err);
@@ -145,7 +155,7 @@ export default function UpdateLessonDialog({
 
   const onSubmit = async (values, { setSubmitting }) => {
     
-    // setIsLoadingAddUpdate(true);
+    setIsLoadingAddUpdate(true);
 
     const formData = new FormData();
     formData.append("Id", modelUpdate.id);
@@ -168,26 +178,22 @@ export default function UpdateLessonDialog({
       }
     }
 
-    console.log('====================================');
-    console.log(Object.fromEntries(formData.entries()));
-    console.log('====================================');
-
-    // try {
-    //   await restClient({
-    //     url: "api/lesson/updatelesson",
-    //     method: "PUT",
-    //     data: formData,
-    //     headers: { "Content-Type": "multipart/form-data" },
-    //   });
-    //   SUCCESS(toast, "Cập nhật bài học thành công");
-    //   getData();
-    // } catch (err) {
-    //   REJECT(toast, "Cập nhật không thành công");
-    // } finally {
-    //   setIsLoadingAddUpdate(false);
-    //   setVisibleUpdate(false);
-    //   setSubmitting(false);
-    // }
+    try {
+      await restClient({
+        url: "api/lesson/updatelesson",
+        method: "PUT",
+        data: formData,
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      SUCCESS(toast, "Cập nhật bài học thành công");
+      getData();
+    } catch (err) {
+      REJECT(toast, "Cập nhật không thành công");
+    } finally {
+      setIsLoadingAddUpdate(false);
+      setVisibleUpdate(false);
+      setSubmitting(false);
+    }
   };
 
   const onFileSelect = (e) => {
