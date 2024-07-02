@@ -238,14 +238,14 @@ export default function Search() {
               <Loading />
             ) : (
               <> */}
-            <div className="flex flex-wrap justify-center">
+            <div className="flex flex-wrap justify-start">
             {products &&
               products?.map((p, index) => {
                 return <CustomCard document={p} />;
               })}
             </div>
 
-            {Array.isArray(products) && products.length > 0  && (
+            {Array.isArray(products) && products.length > 0　&& totalPage > 1  && (
               <Paginator
                 first={first}
                 rows={rows}

@@ -7,7 +7,7 @@ import Footer from "../../components/Footer";
 import LazyComponent from "../../components/LazyComponent"; // Import LazyComponent
 import LoadingScreen from "../../components/LoadingScreen";
 import { getAllGrade } from "../../services/grade.api";
-import { getAllDocument } from "../../services/document.api";
+import { getAllDocument, getAllDocumentSortByAvg } from "../../services/document.api";
 import Loading from "../../components/Loading";
 
 export default function Home() {
@@ -26,7 +26,7 @@ export default function Home() {
 
   useEffect(() => {
     getAllGrade(setLoading, setListClass);
-    getAllDocument(setLoadingGet, setDocumentList);
+    getAllDocumentSortByAvg(setLoadingGet, setDocumentList);
   }, []);
 
   return (
@@ -42,7 +42,7 @@ export default function Home() {
 
           <div className="px-20" style={{ paddingTop: `${fixedDivHeight}px` }}>
             <h1 className="mt-10 text-2xl font-bold">
-              Danh mục bài tập và soạn bài
+              Bộ sách
             </h1>
             <div>
               {classList &&
