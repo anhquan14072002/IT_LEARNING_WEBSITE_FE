@@ -4,6 +4,7 @@ import Footer from "../../components/Footer";
 import ManageDocument from "../../components/ManageDocument";
 import { ProgressSpinner } from "primereact/progressspinner";
 import LoadingScreen from "../../components/LoadingScreen";
+import ContentLesson from "../../components/ContentLesson";
 
 const Dashboard = () => {
   const [open, setOpen] = useState(true);
@@ -14,6 +15,7 @@ const Dashboard = () => {
     { title: "Thống kê", src: "Chart_fill", index: 0 },
     { title: "Quản lí tài khoản", src: "User", index: 1 },
     { title: "Quản lí tài liệu/chủ đề/bài học ", src: "Folder", index: 2 },
+    { title: "Quản lí bài học ", src: "Folder", index: 3 },
   ];
   
   return (
@@ -70,6 +72,7 @@ const Dashboard = () => {
           <div className={`ml-20 mt-16 p-7`}>
             <div className="h-screen">
               {indexMenu === 2 && <ManageDocument />}
+              {indexMenu === 3 && <ContentLesson />}
             </div>
           </div>
         </>

@@ -158,7 +158,6 @@ export default function Document() {
                 toast={toast}
                 listCommentByUser={listCommentByUser}
                 fetDocumentByUser={fetDocumentByUser}
-                user={user}
               />
             </>
           )}

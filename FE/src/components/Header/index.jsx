@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import avatar from "../../assets/img/icons8-male-user-50.png";
 import arrowDown from "../../assets/img/icons8-sort-down-50.png";
 import "./index.css";
@@ -6,8 +6,9 @@ import { Tooltip } from "primereact/tooltip";
 import { useNavigate, useLocation } from "react-router-dom"; // Import useLocation
 import { Button } from "primereact/button";
 import { useDispatch, useSelector } from "react-redux";
-import { decodeToken, getTokenFromLocalStorage, isLoggedIn } from "../../utils";
+import { decodeToken, getTokenFromLocalStorage, isLoggedIn, logout } from "../../utils";
 import { addUser, retmoveUser } from "../../redux/userr/userSlice";
+import { Menu } from 'primereact/menu';
 
 export default function Header({ params, setParams, textSearchProps }) {
   const navigate = useNavigate();
@@ -16,12 +17,35 @@ export default function Header({ params, setParams, textSearchProps }) {
   const [menuOpen, setMenuOpen] = useState(false); // State to track menu open/close
   const user = useSelector((state) => state.user.value);
   const dispatch = useDispatch();
+  const menuLeft = useRef(null);
+  const menuRight = useRef(null);
 
-  console.log(user);
+  const handleLogout = () =>{
+    dispatch(retmoveUser())
+    logout()
+    navigate('/login')
+  }
+
+  const items = [
+    {
+      items: [
+        {
+          label: "Quản lí",
+          icon: "pi pi-chart-bar",
+        },
+        {
+          label: "Đăng xuất",
+          icon: "pi pi-sign-out",
+          command: handleLogout,
+        },
+      ],
+    },
+  ];
+
   useEffect(() => {
     console.log("Running useEffect");
     console.log("User state:", user);
-  
+
     if (!user || Object.keys(user).length === 0) {
       console.log("User is empty or not initialized");
       try {
@@ -35,7 +59,7 @@ export default function Header({ params, setParams, textSearchProps }) {
       }
     }
   }, []); // Add user to the dependency array to monitor changes
-  
+
   const handleKeyDown = (e) => {
     const trimmedText = e.target.value.trim();
     const encodedText = encodeURIComponent(trimmedText);
@@ -152,31 +176,47 @@ export default function Header({ params, setParams, textSearchProps }) {
                 </div>
                 <div>
                   <div className="ml-2 flex items-center">
-                    <img className="h-[30px] w-[30px] rounded-full" src={user.picture} />
-                    <img className="h-[15px] w-[15px]" src={arrowDown} />
+                    <img
+                      className="h-[40px] w-[40px] rounded-full"
+                      src={user.picture}
+                    />
+                    <Menu
+                      model={items}
+                      popup
+                      ref={menuRight}
+                      id="popup_menu_right"
+                      popupAlignment="right"
+                    />
+                    <Button
+                      icon="pi pi-angle-down"
+                      className="text-white shadow-none"
+                      onClick={(event) => menuRight.current.toggle(event)}
+                      aria-controls="popup_menu_right"
+                      aria-haspopup
+                    />
                   </div>
                 </div>
               </div>
             )}
 
-            {(!isLoggedIn() && (
-                <div className="ml-10 px-5 flex gap-5">
-                  <Button
-                    label="Đăng nhập"
-                    text
-                    raised
-                    className="text-white px-3"
-                    onClick={() => navigate("/login")}
-                  />
-                  <Button
-                    label="Đăng kí"
-                    severity="warning"
-                    style={{ backgroundColor: "#FAA500" }}
-                    className="text-white px-5"
-                    onClick={() => navigate("/checkmail")}
-                  />
-                </div>
-              ))}
+            {!isLoggedIn() && (
+              <div className="ml-10 px-5 flex gap-5">
+                <Button
+                  label="Đăng nhập"
+                  text
+                  raised
+                  className="text-white px-3"
+                  onClick={() => navigate("/login")}
+                />
+                <Button
+                  label="Đăng kí"
+                  severity="warning"
+                  style={{ backgroundColor: "#FAA500" }}
+                  className="text-white px-5"
+                  onClick={() => navigate("/checkmail")}
+                />
+              </div>
+            )}
           </div>
         </div>
       </div>

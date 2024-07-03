@@ -118,7 +118,7 @@ export default function AddLessonDialog({
         setFiles([]);
       })
       .catch((err) => {
-        REJECT(toast, "Cập nhật không thành công");
+        REJECT(toast, "Xảy ra lỗi khi thêm bài học");
         setIsLoadingAddLesson(false);
       })
       .finally(() => {

@@ -15,6 +15,25 @@ import CustomDropdown from "../../shared/CustomDropdown";
 
 const validationSchema = Yup.object({
   title: Yup.string().required("Tiêu đề không được bỏ trống"),
+  author: Yup.string().required("Tác giả không được bỏ trống"),
+  edition: Yup.number()
+    .required("Phiên bản không được bỏ trống")
+    .positive("Phiên bản phải lớn hơn 0")
+    .integer("Phiên bản phải là số nguyên"),
+  publicationYear: Yup.number()
+    .required("Năm xuất bản không được bỏ trống")
+    .positive("Năm xuất bản phải lớn hơn 0")
+    .integer("Năm xuất bản phải là số nguyên"),
+  bookCollection: Yup.object()
+    .test("is-not-empty", "Không được để trống trường này", (value) => {
+      return Object.keys(value).length !== 0; // Check if object is not empty
+    })
+    .required("Không bỏ trống trường này"),
+  typeBook: Yup.object()
+    .test("is-not-empty", "Không được để trống trường này", (value) => {
+      return Object.keys(value).length !== 0; // Check if object is not empty
+    })
+    .required("Không bỏ trống trường này"),
   grade: Yup.object()
     .test("is-not-empty", "Không được để trống trường này", (value) => {
       return Object.keys(value).length !== 0; // Check if object is not empty
@@ -33,8 +52,15 @@ export default function AddDocumentDialog({
     title: "",
     grade: {},
     description: "",
+    author: "",
+    edition: null,
+    publicationYear: null,
+    bookCollection: {},
+    typeBook: {},
   };
   const [gradeList, setGradeList] = useState([]);
+  const [bookCollectionList, setBookCollectionList] = useState([]);
+  const [typeBookList, setTypeBookList] = useState([]);
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
@@ -45,6 +71,31 @@ export default function AddDocumentDialog({
       .catch((err) => {
         setGradeList([]);
       });
+    restClient({ url: "api/enum/getallbooktype", method: "GET" })
+      .then((res) => {
+        // Transform 'name' to 'title' in each object
+        const transformedData = res.data.data.map((item) => ({
+          title: item.name,
+          idNumber: item.value,
+        }));
+        setTypeBookList(Array.isArray(transformedData) ? transformedData : []);
+      })
+      .catch((err) => {
+        setTypeBookList([]);
+      });
+
+    restClient({ url: "api/enum/getallbookcollection", method: "GET" })
+      .then((res) => {
+        // Transform 'name' to 'title' in each object
+        const transformedData = res.data.data.map((item) => ({
+          title: item.name,
+          idNumber: item.value,
+        }));
+        setBookCollectionList(Array.isArray(transformedData) ? transformedData : []);
+      })
+      .catch((err) => {
+        setBookCollectionList([]);
+      });
   }, []);
 
   const onSubmit = (values) => {
@@ -54,8 +105,13 @@ export default function AddDocumentDialog({
       title: values.title,
       gradeId: values.grade.id,
       description: values.description,
-      isActive: true
-    }
+      bookCollection: values.bookCollection.idNumber,
+      author: values.author,
+      publicationYear: values.publicationYear,
+      edition: values.edition,
+      typeOfBook: values.typeBook.idNumber,
+      isActive: true,
+    };
     restClient({
       url: "api/document/createdocument",
       method: "POST",
@@ -109,6 +165,45 @@ export default function AddDocumentDialog({
                 id="grade"
                 options={gradeList}
               />
+              {/* // */}
+              <CustomDropdown
+                title="bộ sách"
+                label="Bộ sách"
+                name="bookCollection"
+                id="bookCollection"
+                options={bookCollectionList}
+              />
+
+              <CustomDropdown
+                title="loại sách"
+                label="Loại sách"
+                name="typeBook"
+                id="typeBook"
+                options={typeBookList}
+              />
+
+              <CustomTextInput
+                label="Tác giả"
+                name="author"
+                type="text"
+                id="author"
+              />
+
+              <CustomTextInput
+                label="Năm xuất bản"
+                name="publicationYear"
+                type="number"
+                id="publicationYear"
+              />
+
+              <CustomTextInput
+                label="Phiên bản"
+                name="edition"
+                type="number"
+                id="edition"
+              />
+
+              {/* // */}
 
               <div>
                 <CustomEditor

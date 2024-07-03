@@ -13,7 +13,13 @@ import AddLessonDialog from "../AddLessonDialog";
 import UpdateLessonDialog from "../UpdateLessonDialog";
 import UpdateDocumentDialog from "../UpdateDocumentDialog";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
-import { ACCEPT, REJECT, formatDate, getTokenFromLocalStorage, removeVietnameseTones } from "../../utils";
+import {
+  ACCEPT,
+  REJECT,
+  formatDate,
+  getTokenFromLocalStorage,
+  removeVietnameseTones,
+} from "../../utils";
 import Loading from "../Loading";
 import restClient from "../../services/restClient";
 import { Link } from "react-router-dom";
@@ -21,7 +27,7 @@ import debounce from "lodash.debounce";
 import { InputSwitch } from "primereact/inputswitch";
 import { Tooltip } from "primereact/tooltip";
 
-export default function Lesson() {
+export default function ContentLesson() {
   const toast = useRef(null);
   const dropDownRef1 = useRef(null);
   const dropDownRef2 = useRef(null);
@@ -42,6 +48,8 @@ export default function Lesson() {
   const [page, setPage] = useState(1);
   const [rows, setRows] = useState(10);
   const [totalPage, setTotalPage] = useState(0);
+
+  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
     fetchData(page, rows);
@@ -144,28 +152,16 @@ export default function Lesson() {
     );
   };
 
-  const changeStatusLesson= (value,id)=>{
-    restClient({
-      url: 'api/lesson/updatestatuslesson?id='+id,
-      method: 'PUT',
-      headers: {
-        Authorization: `Bearer ${getTokenFromLocalStorage()}` 
-      }
-    }).then((res)=>{
-      ACCEPT(toast,"Thay đổi trạng thái thành công")
-      getData()
-    }).catch((err)=>{
-      REJECT(toast,"Lỗi khi thay đổi trạng thái")
-    })
-  }
-
   const status = (rowData, { rowIndex }) => {
     return (
-        <InputSwitch
-          checked={rowData.isActive}
-          onChange={(e) => changeStatusLesson(e.value, rowData.id)}
-          tooltip={rowData.isActive ? 'Bài học này đã được duyệt':'Bài học chưa được duyệt'}
-        />
+      <InputSwitch
+        checked={rowData.isActive}
+        tooltip={
+          rowData.isActive
+            ? "Bài học này đã được duyệt"
+            : "Bài học chưa được duyệt"
+        }
+      />
     );
   };
 
@@ -382,13 +378,13 @@ export default function Lesson() {
                 header="File tài liệu"
                 className="border-b-2 border-t-2"
                 body={file}
-                style={{ width: '10%' }}
+                style={{ width: "10%" }}
               ></Column>
               <Column
                 header="Trạng thái"
                 className="border-b-2 border-t-2"
                 body={status}
-                style={{ width: '10%' }}
+                style={{ width: "10%" }}
               ></Column>
               <Column
                 field="createdDate"

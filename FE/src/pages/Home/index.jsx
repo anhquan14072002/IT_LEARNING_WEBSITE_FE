@@ -9,8 +9,10 @@ import LoadingScreen from "../../components/LoadingScreen";
 import { getAllGrade } from "../../services/grade.api";
 import { getAllDocument, getAllDocumentSortByAvg } from "../../services/document.api";
 import Loading from "../../components/Loading";
+import { useNavigate } from "react-router-dom";
 
 export default function Home() {
+  const navigate = useNavigate()
   const fixedDivRef = useRef(null);
   const [fixedDivHeight, setFixedDivHeight] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -64,7 +66,7 @@ export default function Home() {
                 <h1 className="text-gray-500">
                   Dành cho các học sinh từ lớp 1-12
                 </h1>
-                <h1 className="text-blue-500 cursor-pointer">
+                <h1 className="text-blue-500 cursor-pointer" onClick={()=>navigate('/search')}>
                   &gt;&gt; Xem tất cả khóa học
                 </h1>
               </div>

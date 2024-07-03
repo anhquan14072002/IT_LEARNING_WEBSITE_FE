@@ -126,3 +126,12 @@ export const isLoggedIn = () => {
     return false;
   }
 };
+
+const clearTokens = () => {
+  localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken'); 
+};
+
+export const logout = () => {
+  clearTokens();
+};
