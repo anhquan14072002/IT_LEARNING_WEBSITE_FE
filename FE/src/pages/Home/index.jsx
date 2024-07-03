@@ -36,7 +36,7 @@ export default function Home() {
       {loading ? (
         <LoadingScreen setLoading={setLoading} />
       ) : (
-        <div className="min-h-screen flex flex-col">
+        <div>
           <div ref={fixedDivRef} className="fixed top-0 w-full z-10">
             <Header />
             <Menu />

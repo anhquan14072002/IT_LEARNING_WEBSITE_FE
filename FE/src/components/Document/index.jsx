@@ -252,6 +252,7 @@ export default function Document() {
                 <Column
                   field="title"
                   header="Tiêu đề"
+                  style={{width:'40%'}}
                   className="border-b-2 border-t-2"
                 />
                 <Column

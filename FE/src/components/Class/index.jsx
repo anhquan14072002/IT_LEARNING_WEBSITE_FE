@@ -17,8 +17,27 @@ export default function Class({ item, index }) {
     }
   }, [toggle, item.id]);
 
+  // useEffect(() => {
+  //   setContentHeight(toggle ? `${contentRef.current.scrollHeight}px` : "0px");
+  // }, [toggle]);
   useEffect(() => {
-    setContentHeight(toggle ? `${contentRef.current.scrollHeight}px` : "0px");
+    setTimeout(()=>{
+      // Function to update contentHeight based on toggle state
+    const updateContentHeight = () => {
+      setContentHeight(toggle ? `${contentRef.current.scrollHeight}px` : "0px");
+    };
+
+    // Call initially and on toggle change
+    updateContentHeight();
+
+    // Listen to window resize events
+    window.addEventListener('resize', updateContentHeight);
+
+    // Cleanup function to remove event listener
+    return () => {
+      window.removeEventListener('resize', updateContentHeight);
+    };
+    },100)
   }, [toggle]);
 
   const handleToggle = () => {

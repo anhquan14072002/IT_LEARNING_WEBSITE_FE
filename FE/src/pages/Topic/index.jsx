@@ -14,8 +14,9 @@ import {
 import { useParams } from "react-router-dom";
 import Loading from "../../components/Loading";
 import { Button } from "primereact/button";
+import restClient from "../../services/restClient";
 
-export default function Lesson() {
+export default function Topic() {
   const fixedDivRef = useRef(null);
   const [fixedDivHeight, setFixedDivHeight] = useState(0);
   const [isDisplay, setIsDisplay] = useState(false);
@@ -26,10 +27,28 @@ export default function Lesson() {
   const [documentList, setDocumentList] = useState({});
   const { id } = useParams();
 
+  const fetchData = async () => {
+    try {
+      const responseTopic = await restClient({
+        url: "api/index/getalltopicindex/" + id,
+        method: "GET",
+      });
+
+      const responseMenu = await restClient({
+        url: `api/index/getalldocumentindex/` + responseTopic.data?.data?.id,
+        method: "GET",
+      });
+      setDocumentList(responseMenu.data?.data);
+      console.log("====================================");
+      console.log(responseMenu.data?.data);
+      console.log("====================================");
+    } catch (err) {}
+  };
+
   useEffect(() => {
     getTopicById(id, setLoading, setTopic);
-    // getDocumentListByLessonId(id, setLoadingV1, setDocumentList);
-  }, []);
+    fetchData();
+  }, [id]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -62,10 +81,6 @@ export default function Lesson() {
     }
   }, [fixedDivRef]);
 
-  const handleDownload = () => {
-    window.open(`${lesson?.urlDownload}`);
-  };
-
   return (
     <div className="min-h-screen flex flex-col">
       <div ref={fixedDivRef} className="fixed top-0 w-full z-10">
@@ -73,7 +88,11 @@ export default function Lesson() {
         <Menu />
       </div>
       <div style={{ paddingTop: `${fixedDivHeight}px` }} className="flex gap-5">
-        <LessonInDocument display={isDisplay} documentList={documentList} />
+        <LessonInDocument
+          display={isDisplay}
+          documentList={documentList}
+          topicId={id}
+        />
 
         <div className="pt-6 flex-1">
           {loading ? (
@@ -87,7 +106,10 @@ export default function Lesson() {
               </div>
               <div>
                 <span className="font-semibold">Nội dung chủ đề :</span>
-                {topic?.description}
+                <span
+                  className="inline"
+                  dangerouslySetInnerHTML={{ __html: topic?.description }}
+                />
               </div>
             </div>
           ) : (

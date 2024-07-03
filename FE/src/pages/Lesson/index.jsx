@@ -6,10 +6,14 @@ import CategoryOfClass from "../../components/CategoryOfClass";
 import DocumentClass from "../../components/DocumentClass";
 import Comment from "../../components/Comment";
 import LessonInDocument from "../../components/LessonInDocument";
-import { getDocumentListByLessonId, getLessonById } from "../../services/lesson.api";
+import {
+  getDocumentListByLessonId,
+  getLessonById,
+} from "../../services/lesson.api";
 import { useParams } from "react-router-dom";
 import Loading from "../../components/Loading";
 import { Button } from "primereact/button";
+import restClient from "../../services/restClient";
 
 export default function Lesson() {
   const fixedDivRef = useRef(null);
@@ -22,10 +26,40 @@ export default function Lesson() {
   const [documentList, setDocumentList] = useState({});
   const { id } = useParams();
 
+  const fetchData = async () => {
+    try {
+      const responseTopic = await restClient({
+        url: `api/index/getalllessonindex/${id}`,
+        method: "GET",
+      });
+  
+      console.log('Response Topic:', responseTopic);
+  
+      const lessonId = responseTopic.data?.data?.id;
+  
+      if (lessonId) {
+        const responseMenu = await restClient({
+          url: `api/index/getalldocumentindex/${lessonId}`,
+          method: "GET",
+        });
+  
+        console.log('Response Menu:', responseMenu);
+  
+        setDocumentList(responseMenu.data?.data);
+      } else {
+        console.log('Lesson ID not found in response data.');
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      // Optionally, you can set an error state or handle the error in another way
+    }
+  };
+  
+
   useEffect(() => {
     getLessonById(id, setLoading, setLesson);
-    getDocumentListByLessonId(id,setLoadingV1, setDocumentList)
-  }, []);
+    fetchData()
+  }, [id]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -69,7 +103,7 @@ export default function Lesson() {
         <Menu />
       </div>
       <div style={{ paddingTop: `${fixedDivHeight}px` }} className="flex gap-5">
-        <LessonInDocument display={isDisplay} documentList={documentList} />
+        <LessonInDocument display={isDisplay} documentList={documentList} lessonId={id}/>
 
         <div className="pt-6 flex-1">
           {loading ? (
