@@ -164,7 +164,7 @@ export default function UpdateLessonDialog({
     if (inputContet) {
       formData.append("Content", values.content);
     }
-    formData.append("IsActive", true);
+    formData.append("IsActive", false);
     
     if(!inputContet) {
       if (files.some((file) => file.size > 10485760)) {

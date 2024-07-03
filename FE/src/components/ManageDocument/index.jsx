@@ -21,10 +21,10 @@ export default function ManageDocument() {
   return (
     <div>
       {/* menubar */}
-      <div className="flex justify-center border-b-2 border-[#D1F7FF]">
+      <div className="flex justify-start border-b-2 mb-5 border-[#D1F7FF]">
         <h1
           className={classNames("p-5 cursor-pointer hover:bg-[#D1F7FF]", {
-            "bg-[#D1F7FF]": navIndex === 1,
+            "bg-[#D1F7FF] font-bold": navIndex === 1,
           })}
           onClick={() => setNavIndex(1)}
         >
@@ -32,7 +32,7 @@ export default function ManageDocument() {
         </h1>
         <h1
           className={classNames("p-5 cursor-pointer hover:bg-[#D1F7FF]", {
-            "bg-[#D1F7FF]": navIndex === 2,
+            "bg-[#D1F7FF] font-bold": navIndex === 2,
           })}
           onClick={() => setNavIndex(2)}
         >
@@ -40,7 +40,7 @@ export default function ManageDocument() {
         </h1>
         <h1
           className={classNames("p-5 cursor-pointer hover:bg-[#D1F7FF]", {
-            "bg-[#D1F7FF]": navIndex === 3,
+            "bg-[#D1F7FF] font-bold": navIndex === 3,
           })}
           onClick={() => setNavIndex(3)}
         >

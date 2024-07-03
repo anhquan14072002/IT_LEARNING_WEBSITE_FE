@@ -322,7 +322,7 @@ export default function Topic() {
               <Paginator
                 first={first}
                 rows={rows}
-                rowsPerPageOptions={[10, 20, 30]}
+                rowsPerPageOptions={[1, 20, 30]}
                 totalRecords={totalPage * rows}
                 onPageChange={onPageChange}
                 className="custom-paginator mx-auto"

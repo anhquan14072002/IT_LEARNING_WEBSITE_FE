@@ -89,7 +89,7 @@ export default function AddLessonDialog({
     if (inputContet) {
       formData.append("Content", values.content);
     }
-    formData.append("IsActive", true);
+    formData.append("IsActive", false);
 
     if (!inputContet) {
       if (files.length === 0) {
