@@ -11,6 +11,7 @@ const CustomDropdown = ({
   clearTopic,
   setClearTopic,
   touched,
+  customTitle,
   ...props
 }) => {
   const [field, meta, helpers] = useField(props);
@@ -24,6 +25,9 @@ const CustomDropdown = ({
   }, [clearTopic]);
 
   const handleOnChange = (e) => {
+    console.log('====================================');
+    console.log(e);
+    console.log('====================================');
     helpers.setValue(e.value);
     setTouchedState(true); // Set touched state to true when onChange is triggered
     if (props.onChange) {
@@ -51,7 +55,7 @@ const CustomDropdown = ({
         onChange={handleOnChange}
         onBlur={handleBlur} // Handle onBlur to set touched state manually
         onClear={handleClear} // Handle onClear to reset the field value and set touched state
-        optionLabel="title"
+        optionLabel={customTitle || "title"}
         filter
         showClear
         placeholder={title}

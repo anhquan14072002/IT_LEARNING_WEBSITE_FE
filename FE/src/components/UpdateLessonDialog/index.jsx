@@ -28,7 +28,7 @@ export default function UpdateLessonDialog({
   const [initialValuesReady, setInitialValuesReady] = useState(false);
 
   //select insert content
-  const [inputContet, setInputContent] = useState(true);
+  const [inputContet, setInputContent] = useState(modelUpdate.content ? true : false);
 
   const validationSchema = Yup.object({
     title: Yup.string().required("Tiêu đề không được bỏ trống"),
@@ -317,9 +317,10 @@ export default function UpdateLessonDialog({
                     value={inputContet} // Ensure this matches with the state variable
                     onChange={handleChangeInputType} // Make sure handleChangeInputType is correctly defined
                     className="text-sm border border-gray-300 p-1 rounded-md"
+                    
                   >
-                    <option value={true}>Soạn bài</option>
-                    <option value={false}>Tải file lên</option>
+                    <option value="true" selected={inputContet === true}>Soạn bài</option>
+                    <option value="false" selected={inputContet === false}>Tải file lên</option>
                   </select>
                 </div>
 

@@ -6,9 +6,10 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
 import { Editor } from "primereact/editor";
 import { useSelector } from "react-redux";
-import { REJECT, SUCCESS } from "../../utils";
+import { ACCEPT, REJECT, SUCCESS, isLoggedIn } from "../../utils";
 import restClient from "../../services/restClient";
 import Loading from "../Loading";
+import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 
 const commentsData = [
   {
@@ -35,13 +36,17 @@ export default function Comment({
   const [comments, setComments] = useState(commentsData);
   const [newComment, setNewComment] = useState("");
   const [newRating, setNewRating] = useState(null);
+  const [updateCommentState, setUpdateCommentState] = useState("");
   const user = useSelector((state) => state.user.value);
   const [commentList, setCommentList] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [updatedComment, setUpdatedComment] = useState({});
+  const [updateRating, setUpdateRating] = useState(null);
+  const [visibleDelete, setVisibleDelete] = useState(false);
 
   useEffect(() => {
     fetchComment();
-  }, []);
+  }, [user]);
 
   const fetchComment = () => {
     if (user && user.sub) {
@@ -115,14 +120,106 @@ export default function Comment({
     }
   };
 
+  const updateComment = () => {
+    console.log("comment::", updateCommentState);
+    console.log("rating::", updateRating);
+    if (
+      !updateCommentState ||
+      (typeof updateCommentState === "string" && !updateCommentState.trim())
+    ) {
+      REJECT(toast, "Vui lòng không để trống ô bình luận");
+    }
+    if (!updateRating) {
+      REJECT(toast, "Vui lòng chọn điểm đánh giá");
+    }
+    if (
+      updateCommentState &&
+      updateRating &&
+      typeof updateCommentState === "string" &&
+      updateCommentState.trim()
+    ) {
+      const data = {
+        id: updatedComment.id,
+        note: updateCommentState,
+        rating: updateRating,
+        documentId,
+        userId: user?.sub,
+      };
+      restClient({
+        url: "api/commentdocument/updatecommentdocument",
+        method: "PUT",
+        data,
+      })
+        .then((res) => {
+          setUpdateCommentState("");
+          setUpdateRating(null);
+          setUpdatedComment({});
+          SUCCESS(toast, "Thêm đánh giá thành công");
+          fetchComment();
+          fetDocumentByUser();
+        })
+        .catch((err) => {
+          REJECT(toast, "Xảy ra lỗi khi thêm đánh giá");
+        });
+    }
+  };
+
+  const confirmDelete = (id) => {
+    setVisibleDelete(true);
+    confirmDialog({
+      message: "Bạn có chắc chắn muốn xóa bình luận này?",
+      header: "Delete Confirmation",
+      icon: "pi pi-info-circle",
+      defaultFocus: "reject",
+      acceptClassName: "p-button-danger",
+      footer: (
+        <>
+          <Button
+            label="Hủy"
+            icon="pi pi-times"
+            className="p-2 bg-red-500 text-white mr-2"
+            onClick={() => {
+              setVisibleDelete(false);
+            }}
+          />
+          <Button
+            label="Xóa"
+            icon="pi pi-check"
+            className="p-2 bg-blue-500 text-white"
+            onClick={() => {
+              deleteDocument(id);
+            }}
+          />
+        </>
+      ),
+    });
+  };
+
+  const deleteDocument = (id) => {
+    restClient({
+      url: "api/commentdocument/deletecommentdocument/" + id,
+      method: "DELETE",
+    })
+      .then(() => {
+        fetchComment();
+        fetDocumentByUser();
+        ACCEPT(toast, "Xóa thành công");
+        setVisibleDelete(false)
+      })
+      .catch((err) => {
+        REJECT(toast, "Xảy ra lỗi khi xóa");
+      });
+  };
+
   return (
     <div>
       <div className="py-20">
+        <ConfirmDialog visible={visibleDelete} />
         <hr />
         <h1 className="font-bold text-center mt-5">Phần đánh giá</h1>
         {/* Comment Editor */}
 
-        {listCommentByUser.length === 0 && (
+        {listCommentByUser.length === 0 && isLoggedIn() && (
           <div className="mt-2 border border-solid border-gray-300 p-4 rounded-xl">
             <h2 className="font-bold mb-4">
               Nhập đánh giá của bạn về bộ tài liệu này
@@ -148,14 +245,48 @@ export default function Comment({
           </div>
         )}
 
+        {updatedComment && Object.keys(updatedComment).length > 0 && (
+          <div className="mt-2 border border-solid border-gray-300 p-4 rounded-xl">
+            <h2 className="font-bold mb-4">
+              Cập nhật đánh giá của bạn về bộ tài liệu này
+            </h2>
+            <Rating
+              value={updateRating}
+              onChange={(e) => setUpdateRating(e.value)}
+              stars={5}
+              className="mb-4"
+            />
+            <textarea
+              className="w-full h-20 border border-gray-400sadf"
+              defaultValue={updateCommentState}
+              onChange={(e) => setUpdateCommentState(e.target.value)}
+            />
+            <Button
+              label="Gửi"
+              icon="pi pi-send"
+              className="bg-blue-600 p-2 text-white 
+        "
+              onClick={updateComment}
+            />
+            <Button
+              label="Hủy"
+              icon="pi pi-times"
+              className="bg-red-600 p-2 ml-2 text-white 
+        "
+              onClick={() => setUpdatedComment({})}
+            />
+          </div>
+        )}
+
         {/* Comments Of User */}
         <div className="mt-10">
           <>
             {listCommentByUser &&
+              updatedComment &&
+              Object.keys(updatedComment).length === 0 &&
               listCommentByUser.map((comment, index) => (
                 <>
                   <div className="my-5">
-                    {" "}
                     <div className="flex gap-5 items-center" key={index}>
                       <div>
                         <img
@@ -204,7 +335,11 @@ export default function Comment({
                           label="Edit"
                           className="p-button-success p-button-outlined bg-green-500 text-white p-1"
                           icon="pi pi-pencil"
-                          onClick={() => handleEdit(comment)}
+                          onClick={() => {
+                            setUpdatedComment(comment);
+                            setUpdateRating(comment.rating);
+                            setUpdateCommentState(comment.note);
+                          }}
                         />
                       </div>
                       <div>
@@ -212,7 +347,7 @@ export default function Comment({
                           label="Delete"
                           className="p-button-danger p-button-outlined bg-red-500 text-white p-1"
                           icon="pi pi-trash"
-                          onClick={() => handleDelete(comment.id)}
+                          onClick={() => confirmDelete(comment.id)}
                         />
                       </div>
                     </div>

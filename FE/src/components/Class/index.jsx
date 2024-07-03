@@ -51,7 +51,7 @@ export default function Class({ item, index }) {
         }}
         className="overflow-hidden"
       >
-        <div className="flex justify-between gap-20 flex-wrap">
+        <div className="flex gap-20 flex-wrap">
           <div>
             <h1 className="font-bold mb-3">Đề thi</h1>
             <h1>Đề thi 1</h1>
@@ -83,7 +83,7 @@ export default function Class({ item, index }) {
                 </h1>
               ))}
             {documentList && documentList.length > 4 && (
-              <h1 className="text-sm text-blue-600 mt-3 cursor-pointer">
+              <h1 className="text-sm text-blue-600 mt-3 cursor-pointer" onClick={()=>navigate('/search?classId='+item.id)}>
                 Xem tất cả
               </h1>
             )}

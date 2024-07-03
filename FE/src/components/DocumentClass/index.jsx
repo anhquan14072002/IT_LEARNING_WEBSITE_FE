@@ -47,7 +47,7 @@ export default function DocumentClass({ display }) {
                   style={{ maxWidth: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
                   onClick={() => navigate(`/search?classId=`+clast.id)}
                 >
-                  Tài liệu {clast?.title}
+                  Bộ sách {clast?.title}
                 </div>
               ))}
           </div>
