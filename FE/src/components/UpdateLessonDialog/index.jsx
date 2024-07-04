@@ -11,16 +11,7 @@ import restClient from "../../services/restClient";
 import Loading from "../Loading";
 import { REJECT, SUCCESS } from "../../utils";
 import "./index.css";
-
-const validationSchema = Yup.object({
-  title: Yup.string().required("Tiêu đề không được bỏ trống"),
-  content: Yup.string().required("Mô tả không được bỏ trống"),
-  topic: Yup.object()
-    .test("is-not-empty", "Chủ đề không được bỏ trống", (value) => {
-      return Object.keys(value).length !== 0;
-    })
-    .required("Chủ đề không được bỏ trống"),
-});
+import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
 
 export default function UpdateLessonDialog({
   visibleUpdate,
@@ -31,62 +22,161 @@ export default function UpdateLessonDialog({
 }) {
   const [files, setFiles] = useState([]);
   const [topicList, setListTopic] = useState([]);
+  const [gradeList, setListGrade] = useState([]);
+  const [documentList, setListDocument] = useState([]);
   const [isLoadingAddUpdate, setIsLoadingAddUpdate] = useState(false);
   const [initialValuesReady, setInitialValuesReady] = useState(false);
+
+  //select insert content
+  const [inputContet, setInputContent] = useState(
+    modelUpdate.content ? true : false
+  );
+
+  const validationSchema = Yup.object({
+    title: Yup.string().required("Tiêu đề không được bỏ trống"),
+    ...(inputContet && {
+      content: Yup.string().required("Mô tả không được bỏ trống"),
+    }),
+    topic: Yup.object()
+      .test("is-not-empty", "Chủ đề không được bỏ trống", (value) => {
+        return Object.keys(value).length !== 0;
+      })
+      .required("Chủ đề không được bỏ trống"),
+    grade: Yup.object()
+      .test("is-not-empty", "Không được để trống trường này", (value) => {
+        return Object.keys(value).length !== 0; // Check if object is not empty
+      })
+      .required("Không bỏ trống trường này"),
+    document: Yup.object()
+      .test("is-not-empty", "Không được để trống trường này", (value) => {
+        return Object.keys(value).length !== 0; // Check if object is not empty
+      })
+      .required("Không bỏ trống trường này"),
+  });
+
+  const [clearTopic, setClearTopic] = useState(false);
+  const [clearGrade, setClearGrade] = useState(false);
 
   const [initialValues, setInitialValues] = useState({
     title: "",
     topic: {},
-    content: "",
+    ...(inputContet && {
+      content: "",
+    }),
+    document: {},
+    grade: {},
   });
+
+  const handleChangeInputType = (e) => {
+    console.log("====================================");
+    console.log(e.target.value); // This should log the selected option value ("true" or "false")
+    console.log("====================================");
+    setInputContent(e.target.value === "true"); // Convert the selected value to a boolean
+  };
 
   useEffect(() => {
     const fetchTopics = async () => {
       try {
-        const res = await restClient({
-          url: "api/topic/getalltopic",
+        const topicResponse = await restClient({
+          url: `api/topic/gettopicbyid?id=${modelUpdate.topicId}`,
           method: "GET",
         });
-        if (Array.isArray(res.data.data)) {
-          setListTopic(res.data.data);
-          const selectedTopic = res.data.data.find(
-            (item) => Number(item.id) === Number(modelUpdate.topicId)
-          );
-          setInitialValues({
-            title: modelUpdate.title,
+
+        const selectedTopic = topicResponse.data?.data;
+
+        const documentResponse = await restClient({
+          url: `api/document/getdocumentbyid/${selectedTopic.documentId}`,
+          method: "GET",
+        });
+
+        const selectedDocument = documentResponse.data?.data;
+
+        const gradeResponse = await restClient({
+          url: `api/grade/getgradebyid/${selectedDocument.gradeId}`,
+          method: "GET",
+        });
+
+        const selectedGrade = gradeResponse.data?.data;
+
+        const listGradeResponse = await restClient({
+          url: `api/grade/getallgrade`,
+          method: "GET",
+        });
+
+        const listGrade = listGradeResponse.data?.data;
+
+        const listDocumentByIdResponse = await restClient({
+          url: `api/document/getalldocumentbygrade/` + selectedGrade.id,
+          method: "GET",
+        });
+
+        const listDocumentById = listDocumentByIdResponse.data?.data;
+
+        const listTopicByDocuResponse = await restClient({
+          url: `api/topic/getalltopicbydocument/` + selectedDocument.id,
+          method: "GET",
+        });
+
+        const listTopicByDocu = listTopicByDocuResponse.data?.data;
+
+        setListTopic(listTopicByDocu);
+        setListDocument(listDocumentById);
+        setListGrade(listGrade);
+
+        setInitialValues({
+          title: modelUpdate.title,
+          ...(inputContet && {
             content: modelUpdate.content,
-            topic: selectedTopic || {},
-          });
-          setInitialValuesReady(true); // Data has been fetched and initial values are set
-        }
+          }),
+          topic: selectedTopic || {},
+          grade: selectedGrade || {},
+          document: selectedDocument || {},
+        });
+
+        console.log({
+          title: modelUpdate.title,
+          ...(inputContet && {
+            content: modelUpdate.content,
+          }),
+          topic: selectedTopic || {},
+          grade: selectedGrade || {},
+          document: selectedDocument || {},
+        });
+
+        setInitialValuesReady(true); // Data has been fetched and initial values are set
       } catch (err) {
-        setListTopic([]);
+        console.error("Error fetching data:", err);
+        // Handle error state here if needed
       }
     };
 
     if (visibleUpdate) {
       fetchTopics();
     }
-  }, [visibleUpdate, modelUpdate]);
+  }, [visibleUpdate, modelUpdate, inputContet]);
 
   const onSubmit = async (values, { setSubmitting }) => {
-    if (files.some((file) => file.size > 10485760)) {
-      REJECT(toast, "Vui lòng chọn file nhỏ hơn hoặc bằng 10mb");
-      return;
-    }
     setIsLoadingAddUpdate(true);
 
     const formData = new FormData();
     formData.append("Id", modelUpdate.id);
     formData.append("Title", values.title);
     formData.append("TopicId", values.topic.id); // Use topic.id for TopicId
-    formData.append("Content", values.content);
-    formData.append("IsActive", true);
+    if (inputContet) {
+      formData.append("Content", values.content);
+    }
+    formData.append("IsActive", false);
 
-    if (files) {
-      files.forEach((file) => {
-        formData.append("FilePath", file);
-      });
+    if (!inputContet) {
+      if (files.some((file) => file.size > 10485760)) {
+        REJECT(toast, "Vui lòng chọn file nhỏ hơn hoặc bằng 10mb");
+        return;
+      }
+      if (files) {
+        files.forEach((file) => {
+          formData.append("FilePath", file);
+        });
+      }
     }
 
     try {
@@ -109,6 +199,58 @@ export default function UpdateLessonDialog({
 
   const onFileSelect = (e) => {
     setFiles(e.files);
+  };
+
+  const handleOnChangeGrade = (e, helpers, setTouchedState, props) => {
+    setClearTopic(true);
+    setClearGrade(true);
+    helpers.setValue(e.value);
+    setTouchedState(true); // Set touched state to true when onChange is triggered
+    if (props.onChange) {
+      props.onChange(e); // Propagate the onChange event if provided
+    }
+    restClient({
+      url: `api/document/getalldocumentbygrade/` + e.target.value.id,
+      method: "GET",
+    })
+      .then((res) => {
+        setListDocument(res.data.data || []);
+        setListTopic([]);
+      })
+      .catch((err) => {
+        setListDocument([]);
+        setListTopic([]);
+      });
+  };
+
+  const handleOnChangeDocument = (e, helpers, setTouchedState, props) => {
+    setClearTopic(true);
+    if (!e.target.value || !e.target.value.id) {
+      setListTopic([]);
+      helpers.setValue({});
+      setTouchedState(true); // Set touched state to true when onChange is triggered
+      if (props.onChange) {
+        props.onChange(e); // Propagate the onChange event if provided
+      }
+      return; // Exit early if e.target.value or e.target.value.id is undefined
+    }
+
+    helpers.setValue(e.value);
+    setTouchedState(true); // Set touched state to true when onChange is triggered
+    if (props.onChange) {
+      props.onChange(e); // Propagate the onChange event if provided
+    }
+
+    restClient({
+      url: `api/topic/getalltopicbydocument/` + e.target.value.id,
+      method: "GET",
+    })
+      .then((res) => {
+        setListTopic(res.data.data || []);
+      })
+      .catch((err) => {
+        setListTopic([]);
+      });
   };
 
   return (
@@ -134,11 +276,27 @@ export default function UpdateLessonDialog({
           >
             {({ isSubmitting }) => (
               <Form>
-                <CustomTextInput
-                  label="Tiêu đề"
-                  name="title"
-                  type="text"
-                  id="title"
+                <CustomDropdownInSearch
+                  title="Chọn lớp"
+                  label="Lớp"
+                  name="grade"
+                  id="grade"
+                  isClear={false}
+                  handleOnChange={handleOnChangeGrade}
+                  options={gradeList}
+                />
+
+                <CustomDropdownInSearch
+                  title="Chọn tài liệu"
+                  label="Tài liệu"
+                  name="document"
+                  id="document"
+                  isClear={true}
+                  clearGrade={clearGrade}
+                  setClearGrade={setClearGrade}
+                  disabled={!documentList || documentList.length === 0} // Disable if documentList is empty or undefined
+                  handleOnChange={handleOnChangeDocument}
+                  options={documentList}
                 />
 
                 <CustomDropdown
@@ -146,31 +304,59 @@ export default function UpdateLessonDialog({
                   title="Chọn chủ đề"
                   name="topic"
                   id="topic"
+                  clearTopic={clearTopic}
+                  setClearTopic={setClearTopic}
+                  disabled={!topicList || topicList.length === 0}
                   options={topicList}
                 />
 
-                <div>
-                  <label htmlFor="content">Nội dung bài học</label>
-                  <CustomEditor name="content" id="content">
-                    <ErrorMessage name="content" component="div" />
-                  </CustomEditor>
+                <div className="flex justify-between mb-1">
+                  <h1>Nội dung bài học</h1>
+                  <select
+                    value={inputContet} // Ensure this matches with the state variable
+                    onChange={handleChangeInputType} // Make sure handleChangeInputType is correctly defined
+                    className="text-sm border border-gray-300 p-1 rounded-md"
+                  >
+                    <option value="true" selected={inputContet === true}>
+                      Soạn bài
+                    </option>
+                    <option value="false" selected={inputContet === false}>
+                      Tải file lên
+                    </option>
+                  </select>
                 </div>
 
-                <div>
-                  <label htmlFor="fileUpload">Tải file lên</label>
-                  <FileUpload
-                    id="fileUpload"
-                    name="files"
-                    url={"/api/upload"}
-                    accept=".docx, application/vnd.openxmlformats-officedocument.wordprocessingml.document, .pdf, application/pdf"
-                    maxFileSize={10485760} // 10MB
-                    emptyTemplate={
-                      <p className="m-0">Drag and drop files here to upload.</p>
-                    }
-                    className="custom-file-upload mb-2"
-                    onSelect={onFileSelect}
-                  />
-                </div>
+                {inputContet ? (
+                  <div>
+                    <CustomEditor name="content" id="content">
+                      <ErrorMessage name="content" component="div" />
+                    </CustomEditor>
+                  </div>
+                ) : (
+                  <div>
+                    <label htmlFor="fileUpload">Tải file lên</label>
+                    <FileUpload
+                      id="fileUpload"
+                      name="files"
+                      url={"/api/upload"}
+                      accept=".docx, application/vnd.openxmlformats-officedocument.wordprocessingml.document, .pdf, application/pdf"
+                      maxFileSize={10485760} // 10MB
+                      emptyTemplate={
+                        <p className="m-0">
+                          Drag and drop files here to upload.
+                        </p>
+                      }
+                      className="custom-file-upload mb-2"
+                      onSelect={onFileSelect}
+                    />
+                  </div>
+                )}
+                <CustomTextInput
+                  label="Tiêu đề"
+                  name="title"
+                  type="text"
+                  id="title"
+                />
 
                 <div className="flex justify-end gap-2">
                   <Button

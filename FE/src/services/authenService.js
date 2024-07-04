@@ -71,9 +71,9 @@ export function verifyEmail(token) {
   });
 }
 
-export function registerUser({ email,username,firstname, lastname, password }) {
+export function registerUser({ email,username,firstname, lastname, password}) {
   return restClient({
-    url: "api/user/regesteruser",
+    url: "api/user/registeruser",
     method: "POST",
     data: {
       email: email,

@@ -22,13 +22,13 @@ export default function Search() {
   const [fixedDivHeight, setFixedDivHeight] = useState(0);
   const [isFooterVisible, setIsFooterVisible] = useState(false);
   const [selectedCity, setSelectedCity] = useState(null);
-  const [textSearch, setTextSearch] = useState("");
   const [params, setParams] = useSearchParams();
 
   //document
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [classId, setClassId] = useState(Object.fromEntries(params.entries()).classId || "");
+  const [textSearch, setTextSearch] = useState(Object.fromEntries(params.entries()).text || "");
 
 
   //pagination
@@ -238,12 +238,14 @@ export default function Search() {
               <Loading />
             ) : (
               <> */}
+            <div className="flex flex-wrap justify-start">
             {products &&
               products?.map((p, index) => {
                 return <CustomCard document={p} />;
               })}
+            </div>
 
-            {Array.isArray(products) && products.length > 0 && (
+            {Array.isArray(products) && products.length > 0　&& totalPage > 1  && (
               <Paginator
                 first={first}
                 rows={rows}

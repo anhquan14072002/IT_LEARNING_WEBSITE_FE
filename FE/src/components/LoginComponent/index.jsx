@@ -4,10 +4,15 @@ import { LoginSocialFacebook } from "reactjs-social-login";
 import { loginByFacebook, loginByGoogle } from "../../services/authenService";
 import "primeicons/primeicons.css";
 import { useNavigate } from "react-router-dom";
+import { decodeToken } from "../../utils";
+import { useDispatch } from "react-redux";
+import { addUser } from "../../redux/userr/userSlice";
 
-const clientId ="1064675960403-r511aufechb2vs1enui9asqmv5npno05.apps.googleusercontent.com";
+const clientId =
+  "1064675960403-r511aufechb2vs1enui9asqmv5npno05.apps.googleusercontent.com";
 
 const Index = () => {
+  const dispatch = useDispatch();
   const token = (response) => {
     localStorage.setItem("accessToken", response.data.data.accessToken);
     localStorage.setItem("refreshToken", response.data.data.refreshToken);
@@ -18,12 +23,22 @@ const Index = () => {
   const onSuccess = async (response) => {
     const idToken = response.credential;
     try {
-      console.log(response);
-     const responses = await loginByGoogle(idToken);
+      const responses = await loginByGoogle(idToken);
+      handleTokenResponse(responses)
       token(responses);
       navigate("/");
     } catch (error) {
       alert("Login không thành công ");
+    }
+  };
+
+  const handleTokenResponse = (responses) => {
+    try {
+      const decodedToken = decodeToken(responses?.data?.data?.accessToken);
+      dispatch(addUser(decodedToken));
+    } catch (error) {
+      console.error('Error decoding or dispatching:', error.message);
+      // Handle error (e.g., show an error message to the user)
     }
   };
 
@@ -36,7 +51,7 @@ const Index = () => {
     console.log(accessToken);
     try {
       const response = await loginByFacebook(accessToken);
-      token(response)
+      token(response);
       navigate("/");
     } catch (error) {
       alert("Đ login đc");

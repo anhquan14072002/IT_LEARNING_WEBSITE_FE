@@ -5,11 +5,12 @@ import Header from "../../components/Header";
 import { getUser, updateUser } from "../../services/profileService";
 import { REJECT, SUCCESS } from "../../utils";
 import { Toast } from "primereact/toast";
-
+import Loading from "../../components/Loading";
 const Index = () => {
   const toast = useRef(null);
   const [imageURL, setImageURL] = useState(null);
   const [imageFile, setImageFile] = useState(null);
+  const [loading, setLoading] = useState(false);
   const {
     control,
     handleSubmit,
@@ -24,6 +25,8 @@ const Index = () => {
       try {
         const response = await getUser(id);
         if (response.data && response.data.data) {
+          setLoading(true)
+         
           const userData = response.data.data;
           setImageURL(userData.image);
           setValue("firstname", userData.firstName);
@@ -37,6 +40,7 @@ const Index = () => {
           setValue("phoneNumber", userData.phoneNumber);
         }
       } catch (error) {
+        setLoading(false);
         console.error("Error:", error);
       }
     };
@@ -79,7 +83,8 @@ const Index = () => {
           onSubmit={handleSubmit(onSubmit)}
           className="bg-white shadow-md rounded-lg p-20"
         >
-          <h1 className="font-semibold text-3xl text-center mb-6  text-gray-800">
+          {!loading ? <Loading/> : (<>
+            <h1 className="font-semibold text-3xl text-center mb-6  text-gray-800">
             Thông Tin Hồ Sơ
           </h1>
           <div className="flex">
@@ -281,7 +286,9 @@ const Index = () => {
                 </button>
               </div>
             </div>
-          </div>
+          </div></>)}
+          
+          
         </form>
         <Toast ref={toast} />
       </div>

@@ -1,13 +1,33 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useField } from "formik";
 import { Dropdown } from "primereact/dropdown";
 import classNames from "classnames";
+import "./index.css";
 
-const CustomDropdown = ({ label, options, title, ...props }) => {
+const CustomDropdown = ({
+  label,
+  options,
+  title,
+  clearTopic,
+  setClearTopic,
+  touched,
+  customTitle,
+  ...props
+}) => {
   const [field, meta, helpers] = useField(props);
   const [touchedState, setTouchedState] = useState(false); // State to manage touched state manually
 
+  useEffect(() => {
+    if (clearTopic) {
+      handleClear();
+      setClearTopic(false);
+    }
+  }, [clearTopic]);
+
   const handleOnChange = (e) => {
+    console.log('====================================');
+    console.log(e);
+    console.log('====================================');
     helpers.setValue(e.value);
     setTouchedState(true); // Set touched state to true when onChange is triggered
     if (props.onChange) {
@@ -17,7 +37,7 @@ const CustomDropdown = ({ label, options, title, ...props }) => {
 
   const handleClear = () => {
     helpers.setValue(null); // Clear the field value
-    setTouchedState(true); // Set touched state to true after clearing
+    // setTouchedState(touched || true); // Set touched state to true after clearing
   };
 
   const handleBlur = () => {
@@ -26,7 +46,7 @@ const CustomDropdown = ({ label, options, title, ...props }) => {
   };
 
   return (
-    <div className="mb-5 flex-1">
+    <div className="mb-5 flex-1 ">
       <label htmlFor={props.id || props.name}>{label}</label>
       <Dropdown
         {...field}
@@ -35,7 +55,7 @@ const CustomDropdown = ({ label, options, title, ...props }) => {
         onChange={handleOnChange}
         onBlur={handleBlur} // Handle onBlur to set touched state manually
         onClear={handleClear} // Handle onClear to reset the field value and set touched state
-        optionLabel="title"
+        optionLabel={customTitle || "title"}
         filter
         showClear
         placeholder={title}
@@ -45,9 +65,10 @@ const CustomDropdown = ({ label, options, title, ...props }) => {
         })}
       />
       {meta.error &&
-        (meta.touched || touchedState) && ( // Show error message if meta.error and either meta.touched or touchedState is true
+        (meta.touched || touchedState) && (
           <div className="text-red-500">{meta.error}</div>
-        )}
+        )
+      }
     </div>
   );
 };

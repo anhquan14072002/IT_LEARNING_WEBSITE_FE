@@ -7,10 +7,12 @@ import Footer from "../../components/Footer";
 import LazyComponent from "../../components/LazyComponent"; // Import LazyComponent
 import LoadingScreen from "../../components/LoadingScreen";
 import { getAllGrade } from "../../services/grade.api";
-import { getAllDocument } from "../../services/document.api";
+import { getAllDocument, getAllDocumentSortByAvg } from "../../services/document.api";
 import Loading from "../../components/Loading";
+import { useNavigate } from "react-router-dom";
 
 export default function Home() {
+  const navigate = useNavigate()
   const fixedDivRef = useRef(null);
   const [fixedDivHeight, setFixedDivHeight] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -26,7 +28,7 @@ export default function Home() {
 
   useEffect(() => {
     getAllGrade(setLoading, setListClass);
-    getAllDocument(setLoadingGet, setDocumentList);
+    getAllDocumentSortByAvg(setLoadingGet, setDocumentList);
   }, []);
 
   return (
@@ -34,7 +36,7 @@ export default function Home() {
       {loading ? (
         <LoadingScreen setLoading={setLoading} />
       ) : (
-        <div className="min-h-screen flex flex-col">
+        <div>
           <div ref={fixedDivRef} className="fixed top-0 w-full z-10">
             <Header />
             <Menu />
@@ -42,14 +44,14 @@ export default function Home() {
 
           <div className="px-20" style={{ paddingTop: `${fixedDivHeight}px` }}>
             <h1 className="mt-10 text-2xl font-bold">
-              Danh mục bài tập và soạn bài
+              Bộ sách
             </h1>
             <div>
               {classList &&
                 classList?.map((item, i) => {
                   return (
                     <LazyComponent key={i}>
-                      <Class item={item} />
+                      <Class item={item} index={i} />
                     </LazyComponent>
                   );
                 })}
@@ -64,7 +66,7 @@ export default function Home() {
                 <h1 className="text-gray-500">
                   Dành cho các học sinh từ lớp 1-12
                 </h1>
-                <h1 className="text-blue-500 cursor-pointer">
+                <h1 className="text-blue-500 cursor-pointer" onClick={()=>navigate('/search')}>
                   &gt;&gt; Xem tất cả khóa học
                 </h1>
               </div>

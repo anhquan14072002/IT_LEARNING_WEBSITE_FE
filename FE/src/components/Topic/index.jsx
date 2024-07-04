@@ -38,6 +38,20 @@ export default function Topic() {
   const [page, setPage] = useState(1);
   const [rows, setRows] = useState(10);
   const [totalPage, setTotalPage] = useState(0);
+
+  // useEffect(() => {
+  //   restClient({
+  //     url: `api/grade/getallgrade`,
+  //     method: "GET",
+  //   })
+  //     .then((res) => {
+  //       setListGrade(res.data.data || []);
+  //     })
+  //     .catch((err) => {
+  //       setListGrade([]);
+  //     });
+  // }, []);
+
   useEffect(() => {
     fetchData();
   }, [page, rows, textSearch]);
@@ -306,7 +320,7 @@ export default function Topic() {
               <Paginator
                 first={first}
                 rows={rows}
-                rowsPerPageOptions={[10, 20, 30]}
+                rowsPerPageOptions={[1, 20, 30]}
                 totalRecords={totalPage * rows}
                 onPageChange={onPageChange}
                 className="custom-paginator mx-auto"

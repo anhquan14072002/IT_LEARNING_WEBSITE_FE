@@ -13,11 +13,17 @@ import restClient from "../../services/restClient";
 import Loading from "../Loading";
 import { Dropdown } from "primereact/dropdown";
 import CustomDropdown from "../../shared/CustomDropdown";
+import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
 
 const validationSchema = Yup.object({
   title: Yup.string().required("Tiêu đề không được bỏ trống"),
   objectives: Yup.string().required("Mục tiêu chủ đề không được bỏ trống"),
   description: Yup.string().required("Mô tả không được bỏ trống"),
+  grade: Yup.object()
+    .test("is-not-empty", "Không được để trống trường này", (value) => {
+      return Object.keys(value).length !== 0; // Check if object is not empty
+    })
+    .required("Không bỏ trống trường này"),
   document: Yup.object()
     .test("is-not-empty", "Không được để trống trường này", (value) => {
       return Object.keys(value).length !== 0; // Check if object is not empty
@@ -31,24 +37,39 @@ export default function AddTopicDialog({
   toast,
   fetchData,
 }) {
-  const initialValues = {
+  const [initialValues, setInitialValues] = useState({
     title: "",
     objectives: "",
+    grade: {},
     description: "",
     document: {},
-  };
+  });
   const [documentList, setDocumentList] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [gradeList, setListGrade] = useState([]);
 
   useEffect(() => {
-    restClient({ url: "api/document/getalldocument", method: "GET" })
+    restClient({
+      url: `api/grade/getallgrade`,
+      method: "GET",
+    })
       .then((res) => {
-        setDocumentList(Array.isArray(res.data.data) ? res.data.data : []);
+        setListGrade(res.data.data || []);
       })
       .catch((err) => {
-        setDocumentList([]);
+        setListGrade([]);
       });
   }, []);
+
+  // useEffect(() => {
+  //   restClient({ url: "api/document/getalldocument", method: "GET" })
+  //     .then((res) => {
+  //       setDocumentList(Array.isArray(res.data.data) ? res.data.data : []);
+  //     })
+  //     .catch((err) => {
+  //       setDocumentList([]);
+  //     });
+  // }, []);
 
   const onSubmit = (values) => {
     setLoading(true);
@@ -78,6 +99,24 @@ export default function AddTopicDialog({
       });
   };
 
+  const handleOnChangeGrade = (e, helpers, setTouchedState, props) => {
+    helpers.setValue(e.value);
+    setTouchedState(true); // Set touched state to true when onChange is triggered
+    if (props.onChange) {
+      props.onChange(e); // Propagate the onChange event if provided
+    }
+    restClient({
+      url: `api/document/getalldocumentbygrade/` + e.target.value.id,
+      method: "GET",
+    })
+      .then((res) => {
+        setDocumentList(res.data.data || []);
+      })
+      .catch((err) => {
+        setDocumentList([]);
+      });
+  };
+
   return (
     <Dialog
       header="Thêm chủ đề"
@@ -98,11 +137,14 @@ export default function AddTopicDialog({
         >
           {(formik) => (
             <Form>
-              <CustomTextInput
-                label="Tiêu đề"
-                name="title"
-                type="text"
-                id="title"
+              <CustomDropdownInSearch
+                title="Chọn lớp"
+                label="Lớp"
+                name="grade"
+                id="grade"
+                isClear={true}
+                handleOnChange={handleOnChangeGrade}
+                options={gradeList}
               />
 
               <CustomDropdown
@@ -110,6 +152,7 @@ export default function AddTopicDialog({
                 label="Tài liệu"
                 name="document"
                 id="document"
+                disabled={!documentList || documentList.length === 0}
                 options={documentList}
               />
 
@@ -136,6 +179,13 @@ export default function AddTopicDialog({
                   <ErrorMessage name="description" component="div" />
                 </CustomEditor>
               </div>
+
+              <CustomTextInput
+                label="Tiêu đề"
+                name="title"
+                type="text"
+                id="title"
+              />
 
               <div className="flex justify-end gap-2">
                 <Button
