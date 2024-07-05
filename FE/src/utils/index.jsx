@@ -89,49 +89,82 @@ export function removeVietnameseTones(str) {
 
 export const decodeToken = (token) => {
   if (!token) {
-    throw new Error('Invalid token');
+    throw new Error("Invalid token");
   }
 
   try {
     return jwtDecode(token);
   } catch (error) {
-    throw new Error('Error decoding token');
+    throw new Error("Error decoding token");
+  } finally {
+    // Ensure token is deleted or cleared regardless of the try/catch outcome
+    token = null; // Clearing the token variable
   }
 };
 
 export const getTokenFromLocalStorage = () => {
   try {
-    const token = localStorage.getItem('accessToken');
+    const token = localStorage.getItem("accessToken");
     if (token === null) {
-      throw new Error('Token not found in localStorage');
+      throw new Error("Token not found in localStorage");
     }
     return token;
   } catch (error) {
-    return null; 
+    return null;
   }
 };
 
 export const isLoggedIn = () => {
-  const storedToken = localStorage.getItem('accessToken');
-  
+  const storedToken = localStorage.getItem("accessToken");
+
   if (!storedToken) {
-    return false; 
+    return false;
   }
-  
+
   try {
     const decodedToken = decodeToken(storedToken);
-    
-    return true; 
+
+    return true;
   } catch (error) {
     return false;
   }
 };
 
 const clearTokens = () => {
-  localStorage.removeItem('accessToken');
-  localStorage.removeItem('refreshToken'); 
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
 };
 
 export const logout = () => {
   clearTokens();
+};
+
+export const decodeIfNeeded = (content) => {
+  try {
+    if (/^[A-Za-z0-9+/=]+\s*$/.test(content)) {
+      // Decode Base64 to binary string
+      const decodedString = atob(content);
+
+      const utf8String = decodeURIComponent(
+        Array.from(decodedString)
+          .map(
+            (char) => "%" + ("00" + char.charCodeAt(0).toString(16)).slice(-2)
+          )
+          .join("")
+      );
+
+      return utf8String;
+    }
+  } catch (error) {
+    console.error("Error decoding Base64 content:", error);
+  }
+
+  return content;
+};
+
+export const isBase64 = (content) => {
+  if (/^[A-Za-z0-9+/=]+\s*$/.test(content)) {
+    return true;
+  }
+  return false;
 };

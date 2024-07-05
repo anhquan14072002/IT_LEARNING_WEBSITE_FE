@@ -13,13 +13,21 @@ import AddLessonDialog from "../AddLessonDialog";
 import UpdateLessonDialog from "../UpdateLessonDialog";
 import UpdateDocumentDialog from "../UpdateDocumentDialog";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
-import { ACCEPT, REJECT, formatDate, getTokenFromLocalStorage, removeVietnameseTones } from "../../utils";
+import {
+  ACCEPT,
+  REJECT,
+  decodeIfNeeded,
+  formatDate,
+  getTokenFromLocalStorage,
+  removeVietnameseTones,
+} from "../../utils";
 import Loading from "../Loading";
 import restClient from "../../services/restClient";
 import { Link } from "react-router-dom";
 import debounce from "lodash.debounce";
 import { InputSwitch } from "primereact/inputswitch";
 import { Tooltip } from "primereact/tooltip";
+import { Dialog } from "primereact/dialog";
 
 export default function Lesson() {
   const toast = useRef(null);
@@ -36,6 +44,8 @@ export default function Lesson() {
   const [modelUpdate, setModelUpdate] = useState({});
   const [textSearch, setTextSearch] = useState("");
   const [loadingDeleteMany, setLoadingDeleteMany] = useState(false);
+  const [visibleDialog, setVisibleDialog] = useState(false);
+  const [content, setContent] = useState("");
 
   //pagination
   const [first, setFirst] = useState(0);
@@ -132,40 +142,44 @@ export default function Lesson() {
     return <span>{index}</span>;
   };
   const file = (rowData, { rowIndex }) => {
-    return !rowData.content ? (
+    return (
       <Link
         className="p-2 bg-blue-500 text-white rounded-md"
         to={`${rowData.urlDownload}`}
       >
         Tải về
       </Link>
-    ) : (
-      <></>
     );
   };
 
-  const changeStatusLesson= (value,id)=>{
+  const changeStatusLesson = (value, id) => {
     restClient({
-      url: 'api/lesson/updatestatuslesson?id='+id,
-      method: 'PUT',
+      url: "api/lesson/updatestatuslesson?id=" + id,
+      method: "PUT",
       headers: {
-        Authorization: `Bearer ${getTokenFromLocalStorage()}` 
-      }
-    }).then((res)=>{
-      ACCEPT(toast,"Thay đổi trạng thái thành công")
-      getData()
-    }).catch((err)=>{
-      REJECT(toast,"Lỗi khi thay đổi trạng thái")
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
     })
-  }
+      .then((res) => {
+        ACCEPT(toast, "Thay đổi trạng thái thành công");
+        getData();
+      })
+      .catch((err) => {
+        REJECT(toast, "Lỗi khi thay đổi trạng thái");
+      });
+  };
 
   const status = (rowData, { rowIndex }) => {
     return (
-        <InputSwitch
-          checked={rowData.isActive}
-          onChange={(e) => changeStatusLesson(e.value, rowData.id)}
-          tooltip={rowData.isActive ? 'Bài học này đã được duyệt':'Bài học chưa được duyệt'}
-        />
+      <InputSwitch
+        checked={rowData.isActive}
+        onChange={(e) => changeStatusLesson(e.value, rowData.id)}
+        tooltip={
+          rowData.isActive
+            ? "Bài học này đã được duyệt"
+            : "Bài học chưa được duyệt"
+        }
+      />
     );
   };
 
@@ -254,6 +268,22 @@ export default function Lesson() {
       });
   };
 
+  const view = (rowData, { rowIndex }) => {
+    return (
+      <Button
+        label="Chi tiết"
+        icon="pi pi-info-circle"
+        className="text-white p-2 shadow-none bg-blue-600 hover:bg-blue-400"
+        onClick={() => handleOpenDialog(rowData.content)}
+      />
+    );
+  };
+
+  const handleOpenDialog = (content) => {
+    setContent(content);
+    setVisibleDialog(true);
+  };
+
   const deleteLesson = (id) => {
     restClient({ url: `api/lesson/deletelesson/${id}`, method: "DELETE" })
       .then((res) => {
@@ -275,6 +305,17 @@ export default function Lesson() {
   return (
     <div>
       <Toast ref={toast} />
+      <Dialog
+        header="Nội dung chi tiết"
+        visible={visibleDialog}
+        style={{ width: "50vw" }}
+        onHide={() => {
+          if (!visibleDialog) return;
+          setVisibleDialog(false);
+        }}
+      >
+        <div className="ql-editor" dangerouslySetInnerHTML={{ __html: decodeIfNeeded(content) }}></div>
+      </Dialog>
       <ConfirmDialog visible={visibleDelete} />
       <AddLessonDialog
         visible={visible}
@@ -368,6 +409,7 @@ export default function Lesson() {
                 body={indexBodyTemplate}
                 className="border-b-2 border-t-2"
               />
+
               <Column
                 field="title"
                 header="Tiêu đề"
@@ -382,13 +424,13 @@ export default function Lesson() {
                 header="File tài liệu"
                 className="border-b-2 border-t-2"
                 body={file}
-                style={{ width: '10%' }}
+                style={{ width: "10%" }}
               ></Column>
               <Column
                 header="Trạng thái"
                 className="border-b-2 border-t-2"
                 body={status}
-                style={{ width: '10%' }}
+                style={{ width: "10%" }}
               ></Column>
               <Column
                 field="createdDate"
@@ -400,6 +442,13 @@ export default function Lesson() {
                 field="lastModifiedDate"
                 header="Ngày cập nhật"
                 body={(rowData) => formatDate(rowData.lastModifiedDate)}
+                className="border-b-2 border-t-2"
+              ></Column>
+              <Column
+                field="info"
+                header=""
+                style={{ width: "10%" }}
+                body={view}
                 className="border-b-2 border-t-2"
               ></Column>
               <Column
