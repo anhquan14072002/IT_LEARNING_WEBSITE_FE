@@ -14,6 +14,7 @@ import { useParams } from "react-router-dom";
 import Loading from "../../components/Loading";
 import { Button } from "primereact/button";
 import restClient from "../../services/restClient";
+import { decodeIfNeeded, isBase64 } from "../../utils";
 
 export default function Lesson() {
   const fixedDivRef = useRef(null);
@@ -32,33 +33,32 @@ export default function Lesson() {
         url: `api/index/getalllessonindex/${id}`,
         method: "GET",
       });
-  
-      console.log('Response Topic:', responseTopic);
-  
+
+      console.log("Response Topic:", responseTopic);
+
       const lessonId = responseTopic.data?.data?.id;
-  
+
       if (lessonId) {
         const responseMenu = await restClient({
           url: `api/index/getalldocumentindex/${lessonId}`,
           method: "GET",
         });
-  
-        console.log('Response Menu:', responseMenu);
-  
+
+        console.log("Response Menu:", responseMenu);
+
         setDocumentList(responseMenu.data?.data);
       } else {
-        console.log('Lesson ID not found in response data.');
+        console.log("Lesson ID not found in response data.");
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
+      console.error("Error fetching data:", error);
       // Optionally, you can set an error state or handle the error in another way
     }
   };
-  
 
   useEffect(() => {
     getLessonById(id, setLoading, setLesson);
-    fetchData()
+    fetchData();
   }, [id]);
 
   useEffect(() => {
@@ -98,33 +98,50 @@ export default function Lesson() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <div ref={fixedDivRef} className="fixed top-0 w-full z-10">
+      <div ref={fixedDivRef} className="fixed top-0 w-full z-50">
         <Header />
         <Menu />
       </div>
       <div style={{ paddingTop: `${fixedDivHeight}px` }} className="flex gap-5">
-        <LessonInDocument display={isDisplay} documentList={documentList} lessonId={id}/>
+        <LessonInDocument
+          display={isDisplay}
+          documentList={documentList}
+          lessonId={id}
+        />
 
         <div className="pt-6 flex-1">
           {loading ? (
             <Loading />
           ) : Object.keys(lesson).length > 0 ? (
-            <div>
-              <h2 className="text-xl font-bold">{lesson?.title}</h2>
-              <div className="flex justify-end">
-                <Button
-                  label="Tải tài liệu về máy"
-                  icon="pi pi-download"
-                  className="bg-blue-500 hover:bg-blue-300 p-2 text-white text-sm"
-                  onClick={handleDownload}
-                />
+            <>
+              <div>
+                <h2 className="text-xl font-bold">{lesson?.title}</h2>
+                <div className="flex justify-end mb-5">
+                  <Button
+                    label="Tải tài liệu về máy"
+                    icon="pi pi-download"
+                    className="bg-blue-500 hover:bg-blue-300 p-2 text-white text-sm"
+                    onClick={handleDownload}
+                  />
+                </div>
+
+                {/* Add more details based on your lesson object */}
               </div>
-              <p
-                className="mt-4 text-lg"
-                dangerouslySetInnerHTML={{ __html: lesson.content }}
-              ></p>
-              {/* Add more details based on your lesson object */}
-            </div>
+              {isBase64(lesson.content) ? (
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: decodeIfNeeded(lesson.content),
+                  }}
+                />
+              ) : (
+                <div
+                  className="ql-editor" // Add Quill's class if necessary
+                  dangerouslySetInnerHTML={{
+                    __html: lesson.content,
+                  }}
+                />
+              )}
+            </>
           ) : (
             <p>No lesson data found.</p>
           )}

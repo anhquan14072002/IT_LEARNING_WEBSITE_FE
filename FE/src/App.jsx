@@ -13,7 +13,6 @@ import Lesson from './pages/Lesson';
 import Topic from './pages/Topic';
 import ChangePassword from './pages/ChangePassword';
 
-
 function App() {
   return (
    

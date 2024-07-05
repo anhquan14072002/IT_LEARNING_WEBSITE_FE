@@ -40,8 +40,8 @@ export default function AddLessonDialog({
     }),
     topic: Yup.object()
       .test("is-not-empty", "Không được để trống trường này", (value) => {
-          return Object.keys(value).length !== 0; // Check if object is not empty
-        })
+        return Object.keys(value).length !== 0; // Check if object is not empty
+      })
       .required("Không bỏ trống trường này"),
     grade: Yup.object()
       .test("is-not-empty", "Không được để trống trường này", (value) => {
@@ -246,6 +246,13 @@ export default function AddLessonDialog({
                 options={topicList}
               />
 
+              <CustomTextInput
+                label="Tiêu đề"
+                name="title"
+                type="text"
+                id="title"
+              />
+
               <div className="flex justify-between mb-1">
                 <h1>Nội dung bài học</h1>
                 <select
@@ -279,13 +286,6 @@ export default function AddLessonDialog({
                   />
                 </div>
               )}
-
-              <CustomTextInput
-                label="Tiêu đề"
-                name="title"
-                type="text"
-                id="title"
-              />
 
               <div className="flex justify-end gap-2">
                 <Button

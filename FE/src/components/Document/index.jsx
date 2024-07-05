@@ -70,6 +70,7 @@ export default function Document() {
       })
         .then((res) => {
           const paginationData = JSON.parse(res.headers["x-pagination"]);
+          setUpdateValue({})
           setTotalPage(paginationData.TotalPages);
           setProducts(Array.isArray(res.data.data) ? res.data.data : []);
         })

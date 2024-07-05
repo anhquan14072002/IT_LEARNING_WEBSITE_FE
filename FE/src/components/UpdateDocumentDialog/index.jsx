@@ -63,6 +63,7 @@ export default function UpdateDocumentDialog({
 
   useEffect(() => {
     const fetchGrades = async () => {
+      setLoading(true);
       try {
         // Fetch grade data by
         const gradeAllResponse = await restClient({
@@ -143,7 +144,10 @@ export default function UpdateDocumentDialog({
         setGradeList(listGrade);
         setBookCollectionList(selectedbookCollectionMap);
         setTypeBookList(selectedBookTypeMap);
-      } catch (err) {}
+      } catch (err) {
+      } finally {
+        setLoading(false);
+      }
     };
 
     if (visibleUpdate) {
@@ -260,7 +264,7 @@ export default function UpdateDocumentDialog({
                   name="description"
                   id="description"
                 >
-                  <ErrorMessage name="description" component="div" />
+                  {/* <ErrorMessage name="description" component="div" /> */}
                 </CustomEditor>
               </div>
               <div className="flex justify-end gap-2">

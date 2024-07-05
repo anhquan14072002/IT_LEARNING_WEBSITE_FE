@@ -46,11 +46,11 @@ export default function LessonInDocument({
 
     setTimeout(() => {
       scrollToSelectedLesson();
-    }, 100);
+    }, 300);
   }, [lessonId, topicId]);
 
   return (
-    <div className="w-[15%] bg-gray-100 border-r-2 flex flex-col gap-3 min-h-screen pt-5 pb-">
+    <div className="w-[15%] bg-gray-100 border-r-2 flex flex-col gap-3 min-h-screen pb-">
       <div
         className={`fixed w-[15%] ${
           display
@@ -58,7 +58,7 @@ export default function LessonInDocument({
             : "transition duration-200 ease-in-out opacity-100"
         } `}
       >
-        <span ref={tooltipTargetRef} data-pr-tooltip={documentList?.title}>
+        {/* <span ref={tooltipTargetRef} data-pr-tooltip={documentList?.title}>
           <h1
             className="title font-bold text-xl pl-2"
             style={{
@@ -74,18 +74,18 @@ export default function LessonInDocument({
           </h1>
         </span>
 
-        <Tooltip target={tooltipTargetRef.current} options={options} />
+        <Tooltip target={tooltipTargetRef.current} options={options} /> */}
 
-        <hr />
+        {/* <hr /> */}
 
         <div
-          className="overflow-y-auto h-[75vh] custom-scrollbar"
+          className="overflow-y-auto h-[100vh] custom-scrollbar"
           ref={scrollContainerRef}
         >
           {documentList &&
             documentList.topics &&
             documentList.topics.map((topic) => (
-              <div key={topic.id} className="mb-4">
+              <div key={topic.id} className="">
                 <h2
                   className={`font-semibold pl-1 text-lg topic-${topic.id} ${
                     Number(topicId) === Number(topic.id) &&
@@ -95,9 +95,26 @@ export default function LessonInDocument({
                 >
                   {topic.title}
                 </h2>
+                <ul className="">
+                  {Array.isArray(topic.lessons) &&
+                    topic.lessons.map((lesson, i) => (
+                      <li
+                        key={lesson.id}
+                        className={`lesson-${lesson.id} pl-1 ${
+                          Number(lessonId) === Number(lesson.id) &&
+                          "bg-[#4dceef] py-2 px-1"
+                        } hover:bg-[#4dceef] hover:py-2 hover:px-1 cursor-pointer`}
+                        onClick={() =>
+                          navigate("/document/lesson/" + lesson.id)
+                        }
+                      >
+                        {lesson.title}
+                      </li>
+                    ))}
+                </ul>
                 {topic.childTopics &&
                   topic.childTopics.map((childTopic) => (
-                    <div key={childTopic.id} className="mb-4">
+                    <div key={childTopic.id} className="">
                       <h3
                         className={`topic-${
                           childTopic.id
@@ -113,7 +130,7 @@ export default function LessonInDocument({
                         childTopic.lessons.map((lesson) => (
                           <div
                             key={lesson.id}
-                            className={`lesson-${lesson.id} ${
+                            className={`lesson-${lesson.id} pl-1 ${
                               Number(lessonId) === Number(lesson.id) &&
                               "bg-[#4dceef] py-2 px-1"
                             } hover:bg-[#4dceef] hover:py-2 hover:px-1 cursor-pointer`}

@@ -39,7 +39,7 @@ export default function Document() {
   }, []);
 
   useEffect(() => {
-    fetDocumentByUser()
+    fetDocumentByUser();
   }, [user]);
 
   const fetDocumentByUser = () => {
@@ -47,7 +47,7 @@ export default function Document() {
       restClient({
         url:
           `api/commentdocument/getallcommentdocumentbyuseridpagination?userId=` +
-          user.sub,
+          user.sub+"&documentId="+id,
         method: "GET",
       })
         .then((res) => {
@@ -118,6 +118,20 @@ export default function Document() {
                         >
                           {topic.title}
                         </h2>
+                        <ul className="list-disc pl-6">
+                          {Array.isArray(topic.lessons) &&
+                            topic.lessons.map((lesson, i) => (
+                              <li
+                                key={i}
+                                className="hover:text-green-600 cursor-pointer"
+                                onClick={() =>
+                                  navigate("/document/lesson/" + lesson.id)
+                                }
+                              >
+                                {lesson.title}
+                              </li>
+                            ))}
+                        </ul>
                         {Array.isArray(topic.childTopics) &&
                           topic.childTopics.map((childTopic, idx) => (
                             <div key={idx} className="ml-4 mt-2">

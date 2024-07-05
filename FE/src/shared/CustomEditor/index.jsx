@@ -1,11 +1,13 @@
 import classNames from "classnames";
 import { useField } from "formik";
 import { Editor } from "primereact/editor";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import DOMPurify from 'dompurify';
 
 const CustomEditor = ({ label, ...props }) => {
   const [field, meta, helpers] = useField(props);
   const [focus, setFocus] = useState(false);
+  const editorRef = useRef(null);
 
   const handleChange = (e) => {
     helpers.setValue(e.htmlValue);
@@ -23,6 +25,7 @@ const CustomEditor = ({ label, ...props }) => {
         )}
       >
         <Editor
+          ref={editorRef}
           id={props.id || props.name}
           value={field.value}
           onTextChange={handleChange}
