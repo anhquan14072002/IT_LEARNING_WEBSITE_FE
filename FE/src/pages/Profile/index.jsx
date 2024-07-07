@@ -70,10 +70,20 @@ const Index = () => {
 
   const handleImageChange = (e, field) => {
     const file = e.target.files[0];
-    setImageFile(file);
-    setImageURL(URL.createObjectURL(file));
-    field.onChange(file);
-  };
+    const allowedTypes = ["image/jpeg", "image/png"];
+
+    if (file && allowedTypes.includes(file.type)) {
+      console.log("File hợp lệ:", file);
+      setImageFile(file);
+      setImageURL(URL.createObjectURL(file));
+      field.onChange(file);
+
+    } else {
+      
+      console.log("File không hợp lệ:", file);
+      alert("Vui lòng chọn tệp JPG hoặc PNG.");
+    }
+  }
 
   return (
     <>
