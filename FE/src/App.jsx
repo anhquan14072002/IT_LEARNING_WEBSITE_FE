@@ -1,27 +1,34 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import Home from './pages/Home';
-import About from './pages/About';
-import Dashboard from './pages/Dashboard';
-import Login from './pages/Login';
-import Register from './pages/Register';
-import ForgotPassword from './pages/ForgotPassword';
-import Profile from './pages/Profile';
-import Search from './pages/Search';
-import CheckMail from './pages/CheckMail';
-import Document from './pages/Document';
-import Lesson from './pages/Lesson';
-import Topic from './pages/Topic';
-import ChangePassword from './pages/ChangePassword';
-
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./pages/Home";
+import About from "./pages/About";
+import Dashboard from "./pages/Dashboard";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import ForgotPassword from "./pages/ForgotPassword";
+import Profile from "./pages/Profile";
+import Search from "./pages/Search";
+import CheckMail from "./pages/CheckMail";
+import Document from "./pages/Document";
+import Lesson from "./pages/Lesson";
+import Topic from "./pages/Topic";
+import ChangePassword from "./pages/ChangePassword";
+import ImportQuiz from "./pages/Quiz/ImportQuiz";
+import ImportStepOne from "./components/Quiz/ImportStepOne";
+import ImportStepTwo from "./components/Quiz/ImportStepTwo";
+import ImportStepThree from "./components/Quiz/ImportStepThree";
 
 function App() {
   return (
-   
     <Router>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/about" element={<About />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/importQuiz" element={<ImportQuiz />}>
+          <Route path="stepOne" element={<ImportStepOne />} />
+          <Route path="stepTwo" element={<ImportStepTwo />} />
+          <Route path="stepThree" element={<ImportStepThree />} />
+        </Route>
         <Route path="/search" element={<Search />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />

@@ -16,6 +16,7 @@ const Dashboard = () => {
     { title: "Quản lí tài khoản", src: "User", index: 1 },
     { title: "Quản lí tài liệu/chủ đề/bài học ", src: "Folder", index: 2 },
     { title: "Quản lí bài học ", src: "Folder", index: 3 },
+    { title: "Quản lí Quiz ", src: "Folder", index: 4 },
   ];
 
   return (
@@ -73,6 +74,7 @@ const Dashboard = () => {
             <div className="h-screen">
               {indexMenu === 2 && <ManageDocument />}
               {indexMenu === 3 && <ContentLesson />}
+              {indexMenu === 4 && <ManageQuiz />}
             </div>
           </div>
         </>
