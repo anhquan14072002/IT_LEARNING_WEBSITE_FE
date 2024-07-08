@@ -17,6 +17,8 @@ import "primereact/resources/themes/saga-blue/theme.css";
 import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import "./index.css";
+import { InputText } from "primereact/inputtext";
+
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -138,7 +140,7 @@ const Index = () => {
                     control={control}
                     rules={{ required: "Họ không được để trống" }}
                     render={({ field }) => (
-                      <input
+                      <InputText
                         id="firstname"
                         type="text"
                         className="w-full h-12 text-black-800 border border-solid  border-gray-500 pb-2 rounded-md"
@@ -166,7 +168,7 @@ const Index = () => {
                     control={control}
                     rules={{ required: "Tên không được để trống" }}
                     render={({ field }) => (
-                      <input
+                      <InputText
                         id="lastname"
                         type="text"
                         className="w-full h-12 text-black-800 border border-solid  border-gray-500 pb-2 rounded-md"
@@ -196,7 +198,7 @@ const Index = () => {
                     control={control}
                     rules={{ required: "Tên tài khoản không được để trống" }}
                     render={({ field }) => (
-                      <input
+                      <InputText
                       id="username"
                       type="text"
                       className="w-full h-12 text-black-800 border border-solid  border-gray-500 pb-2 pl-1 rounded-md focus:border-blue-400"
@@ -258,7 +260,7 @@ const Index = () => {
                     },
                   }}
                   render={({ field }) => (
-                    <input
+                    <InputText
                       id="password"
                       type="password"
                       className="w-full h-12 text-black-800 border border-solid  border-gray-500 pb-1 pl-1 rounded-md"
@@ -291,7 +293,7 @@ const Index = () => {
                       "Mật khẩu nhập lại không khớp",
                   }}
                   render={({ field }) => (
-                    <input
+                    <InputText
                       id="passwordAgain"
                       type="password"
                       className="w-full h-12 text-black-800 border border-solid  border-gray-500 pb-2 pl-1 rounded-md"

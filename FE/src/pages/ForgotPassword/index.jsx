@@ -4,6 +4,7 @@ import { useForm, Controller } from "react-hook-form";
 import Header from "../../components/Header";
 import { useLocation } from "react-router-dom";
 import {  resetPassword } from "../../services/authenService";
+import { InputText } from "primereact/inputtext";
 function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
@@ -38,11 +39,7 @@ const index = () => {
       <div className="flex h-screen">
         <div className="w-1/2">
           <div className="w-auto h-full">
-            <img
-              src="https://primefaces.org/cdn/primereact/images/galleria/galleria7.jpg"
-              alt=""
-              className="w-full h-full"
-            />
+          <img src="src/assets/OIG4.jpg" alt="" className="w-full h-full" />
           </div>
         </div>
 
@@ -72,7 +69,7 @@ const index = () => {
                     },
                   }}
                   render={({ field }) => (
-                    <input
+                    <InputText
                       id="password"
                       type="password"
                       className=" w-full h-10 text-black-800 border border-solid border-gray-600  pb-2 pl-1 rounded-md"
@@ -105,7 +102,7 @@ const index = () => {
                       "Mật khẩu nhập lại không khớp",
                   }}
                   render={({ field }) => (
-                    <input
+                    <InputText
                       id="passwordAgain"
                       type="password"
                       className=" w-full h-10 text-black-800 border border-solid border-gray-600  pb-2 pl-1 rounded-md"
