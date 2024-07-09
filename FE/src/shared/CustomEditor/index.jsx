@@ -2,7 +2,6 @@ import classNames from "classnames";
 import { useField } from "formik";
 import { Editor } from "primereact/editor";
 import { useEffect, useRef, useState } from "react";
-import DOMPurify from 'dompurify';
 
 const CustomEditor = ({ label, ...props }) => {
   const [field, meta, helpers] = useField(props);

@@ -8,6 +8,7 @@ export default function LessonInDocument({
   documentList,
   lessonId,
   topicId,
+  fixedDivRef
 }) {
   const navigate = useNavigate();
   const scrollContainerRef = useRef(null);
@@ -49,8 +50,16 @@ export default function LessonInDocument({
     }, 300);
   }, [lessonId, topicId]);
 
+  const getHeight = () => {
+    if (fixedDivRef && fixedDivRef.current) {
+      const fixedDivHeight = fixedDivRef.current.clientHeight;
+      return `calc(100vh - ${fixedDivHeight}px)`;
+    }
+    return '100vh'; // Default to 100vh if fixedDivRef is not available
+  };
+
   return (
-    <div className="w-[15%] bg-gray-100 border-r-2 flex flex-col gap-3 min-h-screen pb-">
+    <div className="w-[15%] bg-gray-100 border-r-2 flex flex-col gap-3 min-h-screen">
       <div
         className={`fixed w-[15%] ${
           display
@@ -58,28 +67,10 @@ export default function LessonInDocument({
             : "transition duration-200 ease-in-out opacity-100"
         } `}
       >
-        {/* <span ref={tooltipTargetRef} data-pr-tooltip={documentList?.title}>
-          <h1
-            className="title font-bold text-xl pl-2"
-            style={{
-              maxHeight: "100px",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-            }}
-          >
-            {documentList?.title}
-          </h1>
-        </span>
-
-        <Tooltip target={tooltipTargetRef.current} options={options} /> */}
-
-        {/* <hr /> */}
 
         <div
-          className="overflow-y-auto h-[100vh] custom-scrollbar"
+          className="overflow-y-auto custom-scrollbar"
+          style={{ height: getHeight() }}
           ref={scrollContainerRef}
         >
           {documentList &&
