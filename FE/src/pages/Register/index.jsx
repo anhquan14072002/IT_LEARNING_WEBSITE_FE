@@ -202,7 +202,7 @@ const Index = () => {
                       id="username"
                       type="text"
                       className="w-full h-12 text-black-800 border border-solid  border-gray-500 pb-2 pl-1 rounded-md focus:border-blue-400"
-                      placeholder="Nhập Tên"
+                      placeholder="Nhập tên tài khoản"
                       {...field}
                     />
                     
@@ -227,7 +227,7 @@ const Index = () => {
                       onChange={handleSelected}
                       options={classes}
                       optionLabel="class"
-                      placeholder="Chọn Lớp"
+                      placeholder="Chọn lớp"
                       maxSelectedLabels={12}
                       className="w-full"
                     />
