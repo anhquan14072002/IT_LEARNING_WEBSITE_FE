@@ -34,7 +34,7 @@ const Flashcard = ({ flashcard, showAnswer, setShowAnswer }) => {
             <strong>
               {indexToLetter(flashcard?.quizAnswers.indexOf(correctAnswer))}:
             </strong>{" "}
-            {correctAnswer.content}
+            {correctAnswer?.content}
           </div>
         )}
       </>

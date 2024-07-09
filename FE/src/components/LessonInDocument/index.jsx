@@ -59,9 +59,9 @@ export default function LessonInDocument({
   };
 
   return (
-    <div className="w-[15%] bg-gray-100 border-r-2 flex flex-col gap-3 min-h-screen">
+    <div className="w-[18%] bg-gray-100 border-r-2 flex flex-col gap-3 min-h-screen">
       <div
-        className={`fixed w-[15%] ${
+        className={`fixed w-[18%] ${
           display
             ? "transition duration-200 ease-in-out opacity-0"
             : "transition duration-200 ease-in-out opacity-100"
@@ -80,8 +80,8 @@ export default function LessonInDocument({
                 <h2
                   className={`font-semibold pl-1 text-lg topic-${topic.id} ${
                     Number(topicId) === Number(topic.id) &&
-                    "bg-[#4dceef] py-2 px-1"
-                  } hover:bg-[#4dceef] hover:py-2 hover:px-1 cursor-pointer`}
+                    "bg-[#4dceef]"
+                  } hover:bg-[#4dceef] cursor-pointer`}
                   onClick={() => navigate("/topic/" + topic.id)}
                 >
                   {topic.title}
@@ -93,8 +93,8 @@ export default function LessonInDocument({
                         key={lesson.id}
                         className={`lesson-${lesson.id} pl-1 ${
                           Number(lessonId) === Number(lesson.id) &&
-                          "bg-[#4dceef] py-2 px-1"
-                        } hover:bg-[#4dceef] hover:py-2 hover:px-1 cursor-pointer`}
+                          "bg-[#4dceef]"
+                        } hover:bg-[#4dceef] cursor-pointer`}
                         onClick={() =>
                           navigate("/document/lesson/" + lesson.id)
                         }
@@ -111,8 +111,8 @@ export default function LessonInDocument({
                           childTopic.id
                         } font-semibold pl-1 text-base ${
                           Number(topicId) === Number(childTopic.id) &&
-                          "bg-[#4dceef] py-2 px-1"
-                        } hover:bg-[#4dceef] hover:py-2 hover:px-1 cursor-pointer`}
+                          "bg-[#4dceef]"
+                        } hover:bg-[#4dceef] cursor-pointer`}
                         onClick={() => navigate("/topic/" + childTopic.id)}
                       >
                         {childTopic.title}
@@ -123,8 +123,8 @@ export default function LessonInDocument({
                             key={lesson.id}
                             className={`lesson-${lesson.id} pl-1 ${
                               Number(lessonId) === Number(lesson.id) &&
-                              "bg-[#4dceef] py-2 px-1"
-                            } hover:bg-[#4dceef] hover:py-2 hover:px-1 cursor-pointer`}
+                              "bg-[#4dceef]"
+                            } hover:bg-[#4dceef] cursor-pointer`}
                             onClick={() =>
                               navigate("/document/lesson/" + lesson.id)
                             }

@@ -6,6 +6,9 @@ import { ProgressSpinner } from "primereact/progressspinner";
 import LoadingScreen from "../../components/LoadingScreen";
 import ContentLesson from "../../components/ContentLesson";
 import QuizManagement from "../../components/QuizManagement";
+import { Tooltip } from "primereact/tooltip";
+import ManageExam from "../../components/ManageExam";
+import ManageTag from "../../components/ManageTag";
 
 const Dashboard = () => {
   const [open, setOpen] = useState(true);
@@ -17,9 +20,11 @@ const Dashboard = () => {
     { title: "Quản lí tài khoản", src: "User", index: 1 },
     { title: "Quản lí tài liệu/chủ đề/bài học ", src: "Folder", index: 2 },
     { title: "Quản lí bài học ", src: "Folder", index: 3 },
-    { title: "Quản lí câu hỏi ôn tập ", src: "Folder", index: 4},
+    { title: "Quản lí câu hỏi ôn tập ", src: "Folder", index: 4 },
+    { title: "Quản lí đề thi", src: "Folder", index: 5 },
+    { title: "Quản lí tag ", src: "Folder", index: 6 },
   ];
-  
+
   return (
     <>
       {loading ? (
@@ -51,22 +56,26 @@ const Dashboard = () => {
               </div>
               <ul className="pt-6">
                 {Menus.map((Menu, index) => (
-                  <li
-                    key={index}
-                    className={`flex rounded-md p-2 cursor-pointer hover:bg-light-white text-gray-300 text-sm items-center gap-x-4 mt-2 ${
-                      index === indexMenu ? "bg-light-white" : ""
-                    }`}
-                    onClick={() => setIndexMenu(index)}
-                  >
-                    <img src={`/src/assets/${Menu.src}.png`} />
-                    <span
-                      className={`${
-                        !open ? "hidden" : ""
-                      } origin-left duration-200`}
+                  <>
+                    {/* <Tooltip target={"target"} content={Menu?.title} /> */}
+
+                    <li
+                      key={index}
+                      className={`flex rounded-md p-2 cursor-pointer hover:bg-light-white text-gray-300 text-sm items-center gap-x-4 mt-2 ${
+                        index === indexMenu ? "bg-light-white" : ""
+                      }`}
+                      onClick={() => setIndexMenu(index)}
                     >
-                      {Menu.title}
-                    </span>
-                  </li>
+                      <img src={`/src/assets/${Menu.src}.png`} />
+                      <span
+                        className={`${
+                          !open ? "hidden" : ""
+                        } origin-left duration-200`}
+                      >
+                        {Menu.title}
+                      </span>
+                    </li>
+                  </>
                 ))}
               </ul>
             </div>
@@ -76,6 +85,8 @@ const Dashboard = () => {
               {indexMenu === 2 && <ManageDocument />}
               {indexMenu === 3 && <ContentLesson />}
               {indexMenu === 4 && <QuizManagement />}
+              {indexMenu === 5 && <ManageExam />}
+              {indexMenu === 6 && <ManageTag />}
             </div>
           </div>
         </>

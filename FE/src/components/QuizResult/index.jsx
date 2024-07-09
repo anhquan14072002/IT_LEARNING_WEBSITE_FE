@@ -82,7 +82,7 @@ const QuizResult = ({  totalQuestions, quizData, userAnswers }) => {
                           <FontAwesomeIcon icon={faTimes} className="text-red-600 mr-2" />
                         )
                       ) : null}
-                      {answer.content}
+                      {answer?.content}
                     </li>
                   ))}
                 </ul>

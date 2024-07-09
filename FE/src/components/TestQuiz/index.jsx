@@ -122,7 +122,7 @@ const TestQuiz = ({ quizData }) => {
                   : "bg-gray-200 hover:bg-gray-300"
               }`}
             >
-              {answer.content}
+              {answer?.content}
             </button>
           ))}
         </div>
