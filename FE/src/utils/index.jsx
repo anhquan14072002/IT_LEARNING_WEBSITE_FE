@@ -124,9 +124,15 @@ export const isLoggedIn = () => {
   try {
     const decodedToken = decodeToken(storedToken);
 
-    return true;
+    // Check if the token has expired
+    const currentTimestamp = Date.now() / 1000; // Convert milliseconds to seconds
+    if (decodedToken.exp && decodedToken.exp < currentTimestamp) {
+      return false; // Token has expired
+    }
+
+    return true; // Token is valid and not expired
   } catch (error) {
-    return false;
+    return false; // Token decoding failed
   }
 };
 

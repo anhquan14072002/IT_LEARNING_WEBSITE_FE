@@ -89,11 +89,11 @@ export default function Lesson() {
           const paginationData = JSON.parse(res.headers["x-pagination"]);
           setTotalPage(paginationData.TotalPages);
           setProducts(Array.isArray(res.data.data) ? res.data.data : []);
-          setLoading(false);
         })
         .catch((err) => {
           console.error("Error fetching data:", err);
           setProducts([]);
+        }).finally(()=>{
           setLoading(false);
         });
     }

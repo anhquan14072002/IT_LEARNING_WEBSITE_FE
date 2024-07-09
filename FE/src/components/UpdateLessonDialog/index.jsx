@@ -9,7 +9,7 @@ import { Button } from "primereact/button";
 import { FileUpload } from "primereact/fileupload";
 import restClient from "../../services/restClient";
 import Loading from "../Loading";
-import { REJECT, SUCCESS } from "../../utils";
+import { decodeIfNeeded, isBase64, REJECT, SUCCESS } from "../../utils";
 import "./index.css";
 import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
 
@@ -60,7 +60,7 @@ export default function UpdateLessonDialog({
     title: "",
     topic: {},
     ...(inputContent && {
-      content: "",
+      content: decodeIfNeeded(modelUpdate.content),
     }),
     document: {},
     grade: {},
@@ -126,7 +126,7 @@ export default function UpdateLessonDialog({
 
         const updatedInitialValues = {
           title: modelUpdate.title,
-          content: modelUpdate.content,
+          content: decodeIfNeeded(modelUpdate.content),
           topic: selectedTopic || {},
           grade: selectedGrade || {},
           document: selectedDocument || {},

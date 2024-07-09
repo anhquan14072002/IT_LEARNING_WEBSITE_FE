@@ -12,6 +12,9 @@ import Document from './pages/Document';
 import Lesson from './pages/Lesson';
 import Topic from './pages/Topic';
 import ChangePassword from './pages/ChangePassword';
+import Quiz from './pages/Quiz';
+import FlashCard from './pages/FlashCard';
+import TestQuizPage from './pages/TestQuizPage';
 
 function App() {
   return (
@@ -26,7 +29,10 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/document/:id" element={<Document />} />
         <Route path="/topic/:id" element={<Topic />} />
+        <Route path="/quiz/:id" element={<Quiz />} />
+        <Route path="/testquiz/:id" element={<TestQuizPage />} />
         <Route path="/document/lesson/:id" element={<Lesson />} />
+        <Route path="/flashcard/:id" element={<FlashCard />} />
         <Route path="/forgotpassword" element={<ForgotPassword />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/checkmail" element={<CheckMail />} />
