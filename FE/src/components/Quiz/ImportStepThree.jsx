@@ -2,7 +2,8 @@ import React, { useContext } from "react";
 import FormDataContext from "../../store/FormDataContext";
 
 function ImportStepThree(props) {
-  const { success, fail } = useContext(FormDataContext);
+  const { success, fail, idImport } = useContext(FormDataContext);
+  console.log(idImport);
   return (
     <article>
       <div className="flex flex-col gap-3">
@@ -10,7 +11,6 @@ function ImportStepThree(props) {
         <p>
           Tải về tập tin chứa kết quả nhập khẩu
           <a href="#" className="text-blue-700 font-medium">
-            {" "}
             Tại đây
           </a>
         </p>

@@ -28,7 +28,11 @@ function ImportStepTwo() {
           console.log("File uploaded successfully:", response.data);
           // Optionally clear file metadata from Redux after successful import
           setExcelValidateResponse(response.data);
-          checkRecord(response.data.countSuccess, response.data.countFail);
+          checkRecord(
+            response.data.countSuccess,
+            response.data.countFail,
+            response.data.idImport
+          );
         } else {
           console.error("File upload failed:", response);
         }
@@ -87,7 +91,7 @@ function ImportStepTwo() {
         <DataTable
           value={excelValidateResponse.quizQuestionImportDtos}
           scrollable
-          scrollHeight="33rem"
+          scrollHeight="84vh"
           tableStyle={{ minWidth: "120rem" }}
           className="border-t-2"
         >
