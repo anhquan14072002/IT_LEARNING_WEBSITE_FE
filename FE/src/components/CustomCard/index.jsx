@@ -17,8 +17,8 @@ const CustomCard = ({ document }) => {
           </p>
         </div>
         <div className="flex items-center mt-3">
-          <Rating value={5} readOnly cancel={false} className="custom-rating" />
-          <span className="ml-1 text-gray-600">(59)</span>
+          <Rating value={document?.averageRating} readOnly cancel={false} className="custom-rating" />
+          <span className="ml-1 text-gray-600">{document?.totalReviewer}</span>
         </div>
       </div>
     </div>

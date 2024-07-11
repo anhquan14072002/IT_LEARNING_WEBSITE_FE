@@ -8,6 +8,7 @@ export default function LessonInDocument({
   documentList,
   lessonId,
   topicId,
+  fixedDivRef
 }) {
   const navigate = useNavigate();
   const scrollContainerRef = useRef(null);
@@ -49,37 +50,27 @@ export default function LessonInDocument({
     }, 300);
   }, [lessonId, topicId]);
 
+  const getHeight = () => {
+    if (fixedDivRef && fixedDivRef.current) {
+      const fixedDivHeight = fixedDivRef.current.clientHeight;
+      return `calc(100vh - ${fixedDivHeight}px)`;
+    }
+    return '100vh'; // Default to 100vh if fixedDivRef is not available
+  };
+
   return (
-    <div className="w-[15%] bg-gray-100 border-r-2 flex flex-col gap-3 min-h-screen pb-">
+    <div className="w-[18%] bg-gray-100 border-r-2 flex flex-col gap-3 min-h-screen">
       <div
-        className={`fixed w-[15%] ${
+        className={`fixed w-[18%] ${
           display
             ? "transition duration-200 ease-in-out opacity-0"
             : "transition duration-200 ease-in-out opacity-100"
         } `}
       >
-        {/* <span ref={tooltipTargetRef} data-pr-tooltip={documentList?.title}>
-          <h1
-            className="title font-bold text-xl pl-2"
-            style={{
-              maxHeight: "100px",
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              display: "-webkit-box",
-              WebkitLineClamp: 2,
-              WebkitBoxOrient: "vertical",
-            }}
-          >
-            {documentList?.title}
-          </h1>
-        </span>
-
-        <Tooltip target={tooltipTargetRef.current} options={options} /> */}
-
-        {/* <hr /> */}
 
         <div
-          className="overflow-y-auto h-[100vh] custom-scrollbar"
+          className="overflow-y-auto custom-scrollbar"
+          style={{ height: getHeight() }}
           ref={scrollContainerRef}
         >
           {documentList &&
@@ -89,8 +80,8 @@ export default function LessonInDocument({
                 <h2
                   className={`font-semibold pl-1 text-lg topic-${topic.id} ${
                     Number(topicId) === Number(topic.id) &&
-                    "bg-[#4dceef] py-2 px-1"
-                  } hover:bg-[#4dceef] hover:py-2 hover:px-1 cursor-pointer`}
+                    "bg-[#4dceef]"
+                  } hover:bg-[#4dceef] cursor-pointer`}
                   onClick={() => navigate("/topic/" + topic.id)}
                 >
                   {topic.title}
@@ -102,8 +93,8 @@ export default function LessonInDocument({
                         key={lesson.id}
                         className={`lesson-${lesson.id} pl-1 ${
                           Number(lessonId) === Number(lesson.id) &&
-                          "bg-[#4dceef] py-2 px-1"
-                        } hover:bg-[#4dceef] hover:py-2 hover:px-1 cursor-pointer`}
+                          "bg-[#4dceef]"
+                        } hover:bg-[#4dceef] cursor-pointer`}
                         onClick={() =>
                           navigate("/document/lesson/" + lesson.id)
                         }
@@ -120,8 +111,8 @@ export default function LessonInDocument({
                           childTopic.id
                         } font-semibold pl-1 text-base ${
                           Number(topicId) === Number(childTopic.id) &&
-                          "bg-[#4dceef] py-2 px-1"
-                        } hover:bg-[#4dceef] hover:py-2 hover:px-1 cursor-pointer`}
+                          "bg-[#4dceef]"
+                        } hover:bg-[#4dceef] cursor-pointer`}
                         onClick={() => navigate("/topic/" + childTopic.id)}
                       >
                         {childTopic.title}
@@ -132,8 +123,8 @@ export default function LessonInDocument({
                             key={lesson.id}
                             className={`lesson-${lesson.id} pl-1 ${
                               Number(lessonId) === Number(lesson.id) &&
-                              "bg-[#4dceef] py-2 px-1"
-                            } hover:bg-[#4dceef] hover:py-2 hover:px-1 cursor-pointer`}
+                              "bg-[#4dceef]"
+                            } hover:bg-[#4dceef] cursor-pointer`}
                             onClick={() =>
                               navigate("/document/lesson/" + lesson.id)
                             }
