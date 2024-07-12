@@ -1,0 +1,6 @@
+.p-multiselect-header{
+    display: none;
+}
+ .p-focus , .p-inputwrapper-focus{
+    border: solid black 1px;
+}

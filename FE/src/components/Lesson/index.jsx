@@ -15,6 +15,7 @@ import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import {
   ACCEPT,
   REJECT,
+  decodeIfNeeded,
   formatDate,
   getTokenFromLocalStorage,
   removeVietnameseTones,
@@ -25,6 +26,7 @@ import { Link } from "react-router-dom";
 import debounce from "lodash.debounce";
 import { InputSwitch } from "primereact/inputswitch";
 import { Tooltip } from "primereact/tooltip";
+import { Dialog } from "primereact/dialog";
 
 export default function Lesson() {
   const toast = useRef(null);
@@ -42,6 +44,8 @@ export default function Lesson() {
   const [modelUpdate, setModelUpdate] = useState({});
   const [textSearch, setTextSearch] = useState("");
   const [loadingDeleteMany, setLoadingDeleteMany] = useState(false);
+  const [visibleDialog, setVisibleDialog] = useState(false);
+  const [content, setContent] = useState("");
 
   //pagination
   const [first, setFirst] = useState(0);
@@ -92,11 +96,12 @@ export default function Lesson() {
           const paginationData = JSON.parse(res.headers["x-pagination"]);
           setTotalPage(paginationData.TotalPages);
           setProducts(Array.isArray(res.data.data) ? res.data.data : []);
-          setLoading(false);
         })
         .catch((err) => {
           console.error("Error fetching data:", err);
           setProducts([]);
+        })
+        .finally(() => {
           setLoading(false);
         });
     }
@@ -145,15 +150,13 @@ export default function Lesson() {
     return <span>{index}</span>;
   };
   const file = (rowData, { rowIndex }) => {
-    return !rowData.content ? (
+    return (
       <Link
         className="p-2 bg-blue-500 text-white rounded-md"
         to={`${rowData.urlDownload}`}
       >
         Tải về
       </Link>
-    ) : (
-      <></>
     );
   };
 
@@ -272,6 +275,22 @@ export default function Lesson() {
       });
   };
 
+  const view = (rowData, { rowIndex }) => {
+    return (
+      <Button
+        label="Chi tiết"
+        icon="pi pi-info-circle"
+        className="text-white p-2 shadow-none bg-blue-600 hover:bg-blue-400"
+        onClick={() => handleOpenDialog(rowData.content)}
+      />
+    );
+  };
+
+  const handleOpenDialog = (content) => {
+    setContent(content);
+    setVisibleDialog(true);
+  };
+
   const deleteLesson = (id) => {
     restClient({ url: `api/lesson/deletelesson/${id}`, method: "DELETE" })
       .then((res) => {
@@ -330,6 +349,20 @@ export default function Lesson() {
   return (
     <div>
       <Toast ref={toast} />
+      <Dialog
+        header="Nội dung chi tiết"
+        visible={visibleDialog}
+        style={{ width: "50vw" }}
+        onHide={() => {
+          if (!visibleDialog) return;
+          setVisibleDialog(false);
+        }}
+      >
+        <div
+          className="ql-editor"
+          dangerouslySetInnerHTML={{ __html: decodeIfNeeded(content) }}
+        ></div>
+      </Dialog>
       <ConfirmDialog visible={visibleDelete} />
       <Dialog
         visible={deleteLessonsDialog}
@@ -438,6 +471,7 @@ export default function Lesson() {
                 body={indexBodyTemplate}
                 className="border-b-2 border-t-2"
               />
+
               <Column
                 field="title"
                 header="Tiêu đề"
@@ -470,6 +504,13 @@ export default function Lesson() {
                 field="lastModifiedDate"
                 header="Ngày cập nhật"
                 body={(rowData) => formatDate(rowData.lastModifiedDate)}
+                className="border-b-2 border-t-2"
+              ></Column>
+              <Column
+                field="info"
+                header=""
+                style={{ width: "10%" }}
+                body={view}
                 className="border-b-2 border-t-2"
               ></Column>
               <Column

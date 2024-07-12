@@ -1,23 +1,23 @@
+import debounce from "lodash.debounce";
+import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
+import { Toast } from "primereact/toast";
 import React, { useEffect, useRef, useState } from "react";
-import { InputText } from "primereact/inputtext";
-import { Dropdown } from "primereact/dropdown";
+import AddTopicDialog from "../AddTopicDialog";
+import UpdateTopicDialog from "../UpdateTopicDialog";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { ContextMenu } from "primereact/contextmenu";
 import { Paginator } from "primereact/paginator";
-import { Toast } from "primereact/toast";
 import { Button } from "primereact/button";
-import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
-import { ProgressSpinner } from "primereact/progressspinner";
-import AddDocumentDialog from "../AddDocumentDialog";
-import UpdateDocumentDialog from "../UpdateDocumentDialog";
-import { ACCEPT, REJECT, formatDate, removeVietnameseTones } from "../../utils";
+import { InputText } from "primereact/inputtext";
+import { Dropdown } from "primereact/dropdown";
 import restClient from "../../services/restClient";
 import Loading from "../Loading";
-import "./index.css";
-import debounce from "lodash.debounce";
+import { ACCEPT, formatDate, getTokenFromLocalStorage, REJECT } from "../../utils";
+import { InputSwitch } from "primereact/inputswitch";
+import AddQuizLesson from "../AddQuizLesson";
+import UpdateQuizLesson from "../UpdateQuizLesson";
 
-export default function Document() {
+export default function ManagementQuizLesson() {
   const toast = useRef(null);
   const dropDownRef1 = useRef(null);
   const dropDownRef2 = useRef(null);
@@ -30,10 +30,8 @@ export default function Document() {
   const [visibleUpdate, setVisibleUpdate] = useState(false);
   const [visibleDelete, setVisibleDelete] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [filterClass, setFilterClass] = useState({ name: "" });
   const [textSearch, setTextSearch] = useState("");
-
-  // Pagination
+  //pagination
   const [first, setFirst] = useState(0);
   const [page, setPage] = useState(1);
   const [rows, setRows] = useState(10);
@@ -45,43 +43,44 @@ export default function Document() {
 
   const pagination = (page, rows) => {
     setLoading(true);
+
     restClient({
-      url: `api/document/getalldocumentpagination?PageIndex=${page}&PageSize=${rows}`,
+      url: `api/quiz/getallquizpagination?PageIndex=${page}&PageSize=${rows}`,
       method: "GET",
     })
       .then((res) => {
         const paginationData = JSON.parse(res.headers["x-pagination"]);
         setTotalPage(paginationData.TotalPages);
         setProducts(Array.isArray(res.data.data) ? res.data.data : []);
+        setLoading(false);
       })
       .catch((err) => {
         console.error("Error fetching data:", err);
         setProducts([]);
-      })
-      .finally(() => setLoading(false));
+        setLoading(false);
+      });
   };
 
   const fetchData = () => {
-    if (textSearch.trim()) {
-      setLoading(true);
-      restClient({
-        url: `api/document/searchbydocumentpagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}`,
-        method: "GET",
-      })
-        .then((res) => {
-          const paginationData = JSON.parse(res.headers["x-pagination"]);
-          setUpdateValue({})
-          setTotalPage(paginationData.TotalPages);
-          setProducts(Array.isArray(res.data.data) ? res.data.data : []);
-        })
-        .catch((err) => {
-          console.error("Error fetching data:", err);
-          setProducts([]);
-        })
-        .finally(() => setLoading(false));
-    } else {
-      pagination(page, rows);
-    }
+    // if (textSearch.trim()) {
+    //   setLoading(true);
+    //   restClient({
+    //     url: `api/topic/searchbytopicpagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}`,
+    //     method: "GET",
+    //   })
+    //     .then((res) => {
+    //       const paginationData = JSON.parse(res.headers["x-pagination"]);
+    //       setTotalPage(paginationData.TotalPages);
+    //       setProducts(Array.isArray(res.data.data) ? res.data.data : []);
+    //     })
+    //     .catch((err) => {
+    //       console.error("Error fetching data:", err);
+    //       setProducts([]);
+    //     })
+    //     .finally(() => setLoading(false));
+    // } else {
+    pagination(page, rows);
+    // }
   };
 
   const onPageChange = (event) => {
@@ -96,28 +95,40 @@ export default function Document() {
     return <span>{index}</span>;
   };
 
-  const actionBodyTemplate = (rowData) => (
-    <div style={{ display: "flex" }}>
-      <Button
-        icon="pi pi-pencil"
-        className="text-blue-600 p-mr-2 shadow-none"
-        onClick={() => {
-          setUpdateValue(rowData);
-          setVisibleUpdate(true);
-        }}
-      />
-      <Button
-        icon="pi pi-trash"
-        className="text-red-600 shadow-none"
-        onClick={() => confirmDelete(rowData.id)}
-      />
-    </div>
-  );
+  const cities = [
+    { name: "New York", code: "NY" },
+    { name: "Rome", code: "RM" },
+    { name: "London", code: "LDN" },
+    { name: "Istanbul", code: "IST" },
+    { name: "Paris", code: "PRS" },
+  ];
+
+  const actionBodyTemplate = (rowData) => {
+    return (
+      <div style={{ display: "flex" }}>
+        <Button
+          icon="pi pi-pencil"
+          className="text-blue-600 p-mr-2 shadow-none"
+          onClick={() => {
+            setUpdateValue(rowData);
+            setVisibleUpdate(true);
+          }}
+        />
+        <Button
+          icon="pi pi-trash"
+          className="text-red-600 shadow-none"
+          onClick={() => {
+            confirmDelete(rowData.id);
+          }}
+        />
+      </div>
+    );
+  };
 
   const confirmDelete = (id) => {
     setVisibleDelete(true);
     confirmDialog({
-      message: "Bạn có chắc chắn muốn xóa tài liệu này?",
+      message: "Bạn có chắc chắn muốn bài quiz này?",
       header: "Delete Confirmation",
       icon: "pi pi-info-circle",
       defaultFocus: "reject",
@@ -128,13 +139,17 @@ export default function Document() {
             label="Hủy"
             icon="pi pi-times"
             className="p-2 bg-red-500 text-white mr-2"
-            onClick={() => setVisibleDelete(false)}
+            onClick={() => {
+              setVisibleDelete(false);
+            }}
           />
           <Button
             label="Xóa"
             icon="pi pi-check"
             className="p-2 bg-blue-500 text-white"
-            onClick={() => deleteDocument(id)}
+            onClick={() => {
+              deleteDocument(id);
+            }}
           />
         </>
       ),
@@ -142,42 +157,65 @@ export default function Document() {
   };
 
   const deleteDocument = (id) => {
-    restClient({ url: `api/document/deletedocument/${id}`, method: "DELETE" })
-      .then(() => {
+    restClient({ url: `api/quiz/deletequiz/${id}`, method: "DELETE" })
+      .then((res) => {
         fetchData();
         ACCEPT(toast, "Xóa thành công");
       })
       .catch((err) => {
-        REJECT(toast, "Xảy ra lỗi khi xóa tài liệu này");
+        REJECT(toast, "Xảy ra lỗi khi xóa chủ đề này");
       })
-      .finally(() => setVisibleDelete(false));
-  };
-
-  const cities = [{ name: "Cấp 1" }, { name: "Cấp 2" }, { name: "Cấp 3" }];
-
-  const handleSearch = (text) => {
-    if (text && text.name) {
-      setFilterClass({ name: text.name });
-    } else {
-      setFilterClass({ name: "" });
-    }
+      .finally(() => {
+        setVisibleDelete(false);
+      });
   };
 
   const handleSearchInput = debounce((text) => {
     setTextSearch(text);
   }, 300);
 
+  const changeStatusLesson = (value, id) => {
+    restClient({
+      url: "api/quiz/updatestatusquiz?id=" + id,
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
+    })
+      .then((res) => {
+        ACCEPT(toast, "Thay đổi trạng thái thành công");
+        fetchData();
+      })
+      .catch((err) => {
+        REJECT(toast, "Lỗi khi thay đổi trạng thái");
+      });
+  };
+
+  const status = (rowData, { rowIndex }) => {
+    return (
+      <InputSwitch
+        checked={rowData.isActive}
+        onChange={(e) => changeStatusLesson(e.value, rowData.id)}
+        tooltip={
+          rowData.isActive
+            ? "Đã được duyệt"
+            : "Chưa được duyệt"
+        }
+      />
+    );
+  };
+
   return (
     <div>
       <Toast ref={toast} />
       <ConfirmDialog visible={visibleDelete} />
-      <AddDocumentDialog
+      <AddQuizLesson
         visible={visible}
         setVisible={setVisible}
         toast={toast}
         fetchData={fetchData}
       />
-      <UpdateDocumentDialog
+      <UpdateQuizLesson
         visibleUpdate={visibleUpdate}
         setVisibleUpdate={setVisibleUpdate}
         updateValue={updateValue}
@@ -186,7 +224,7 @@ export default function Document() {
       />
       <div>
         <div className="flex justify-between pt-1">
-          <h1 className="font-bold text-3xl">Tài liệu</h1>
+          <h1 className="font-bold text-3xl">Các bài quiz</h1>
           <div>
             <Button
               label="Thêm mới"
@@ -195,6 +233,16 @@ export default function Document() {
               className="bg-blue-600 text-white p-2 text-sm font-normal"
               onClick={() => setVisible(true)}
             />
+            {/* <Button
+              label="Xóa"
+              icon="pi pi-trash"
+              disabled={!selectedProduct || selectedProduct.length === 0}
+              severity="danger"
+              className="bg-red-600 text-white p-2 text-sm font-normal ml-3"
+              onClick={() => {
+                console.log("product list ::", selectedProduct);
+              }}
+            /> */}
           </div>
         </div>
 
@@ -219,12 +267,12 @@ export default function Document() {
                 <Dropdown
                   filter
                   ref={dropDownRef2}
-                  value={filterClass}
-                  onChange={(e) => handleSearch(e.value)}
+                  value={selectedCity}
+                  onChange={(e) => setSelectedCity(e.value)}
                   options={cities}
                   optionLabel="name"
                   showClear
-                  placeholder="Lớp"
+                  placeholder="Tài liệu"
                   className="w-full md:w-14rem shadow-none h-full"
                 />
               </div>
@@ -244,6 +292,11 @@ export default function Document() {
                 scrollable
                 scrollHeight="30rem"
               >
+                {/* <Column
+                  selectionMode="multiple"
+                  headerStyle={{ width: "3rem" }}
+                  className="border-b-2 border-t-2 custom-checkbox-column"
+                ></Column> */}
                 <Column
                   field="#"
                   header="#"
@@ -253,24 +306,45 @@ export default function Document() {
                 <Column
                   field="title"
                   header="Tiêu đề"
-                  style={{width:'40%'}}
                   className="border-b-2 border-t-2"
+                  style={{ width: "15%" }}
                 />
                 <Column
-                  field="gradeTitle"
-                  header="Lớp"
+                  field="topicTitle"
+                  header="Chủ đề"
                   className="border-b-2 border-t-2"
+                  style={{ width: "20%" }}
                 />
+                <Column
+                  field="lessonTitle"
+                  header="Bài học"
+                  className="border-b-2 border-t-2"
+                  style={{ width: "20%" }}
+                />
+                <Column
+                  field="score"
+                  header="Điểm"
+                  className="border-b-2 border-t-2"
+                  style={{ width: "15%" }}
+                />
+                <Column
+                  header="Trạng thái"
+                  className="border-b-2 border-t-2"
+                  body={status}
+                  style={{ width: "10%" }}
+                ></Column>
                 <Column
                   field="createdDate"
                   header="Ngày tạo"
                   className="border-b-2 border-t-2"
+                  style={{ width: "10%" }}
                   body={(rowData) => formatDate(rowData.createdDate)}
                 />
                 <Column
                   field="lastModifiedDate"
                   header="Ngày cập nhật"
                   className="border-b-2 border-t-2"
+                  style={{ width: "10%" }}
                   body={(rowData) => formatDate(rowData.lastModifiedDate)}
                 />
                 <Column
@@ -282,7 +356,7 @@ export default function Document() {
                 first={first}
                 rows={rows}
                 rowsPerPageOptions={[10, 20, 30]}
-                totalRecords={totalPage * rows} // Total records should be calculated based on total pages and rows per page
+                totalRecords={totalPage * rows}
                 onPageChange={onPageChange}
                 className="custom-paginator mx-auto"
               />

@@ -11,8 +11,8 @@ export default function DocumentCard({ document }) {
           <h1 className="font-bold text-xl mb-2 overflow-hidden text-center text-ellipsis">{document?.title}</h1>
         </div>
         <div className="px-6 py-2 flex items-center justify-center">
-          <Rating value={5} readOnly cancel={false} />
-          <span className="ml-1">(59)</span>
+          <Rating value={document?.averageRating} readOnly cancel={false} />
+          <span className="ml-1">{document?.totalReviewer}</span>
         </div>
       </div>
     </div>

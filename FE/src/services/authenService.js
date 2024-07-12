@@ -46,9 +46,9 @@ export function resetPassword({ token, email, password }) {
     method: "POST",
     data: {
       token: token,
-      email:email,
-      newPassword:password
-    }
+      email: email,
+      newPassword: password,
+    },
   });
 }
 
@@ -71,7 +71,13 @@ export function verifyEmail(token) {
   });
 }
 
-export function registerUser({ email,username,firstname, lastname, password}) {
+export function registerUser({
+  email,
+  username,
+  firstname,
+  lastname,
+  password,
+}) {
   return restClient({
     url: "api/user/registeruser",
     method: "POST",
@@ -80,7 +86,31 @@ export function registerUser({ email,username,firstname, lastname, password}) {
       userName: username,
       firstName: firstname,
       lastName: lastname,
+      password: password,
+      phoneNumber: "0987654321",
+    },
+  });
+}
+export function createUserGrade({ userId, gradeId }) {
+  if (!Array.isArray(gradeId)) {
+    gradeId = gradeId.split(",").map((id) => parseInt(id.trim(), 10));
+  }
+  return restClient({
+    url: "api/usergrade/updaterangeusergrade",
+    method: "POST",
+    data: {
+      userId: userId,
+      gradeIds: gradeId,
+    },
+  });
+}
+export function loginWithRoleAdmin(email, password) {
+  return restClient({
+    url: `api/admin/login`,
+    method: `POST`,
+    data: {
+      email: email,
       password: password
-    }
+    },
   });
 }

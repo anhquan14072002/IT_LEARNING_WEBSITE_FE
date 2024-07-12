@@ -6,7 +6,7 @@ import { InputTextarea } from "primereact/inputtextarea";
 import { Button } from "primereact/button";
 import { Editor } from "primereact/editor";
 import { useSelector } from "react-redux";
-import { ACCEPT, REJECT, SUCCESS, isLoggedIn } from "../../utils";
+import { ACCEPT, REJECT, SUCCESS, formatDate, isLoggedIn } from "../../utils";
 import restClient from "../../services/restClient";
 import Loading from "../Loading";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
@@ -204,7 +204,7 @@ export default function Comment({
         fetchComment();
         fetDocumentByUser();
         ACCEPT(toast, "Xóa thành công");
-        setVisibleDelete(false)
+        setVisibleDelete(false);
       })
       .catch((err) => {
         REJECT(toast, "Xảy ra lỗi khi xóa");
@@ -290,14 +290,14 @@ export default function Comment({
                     <div className="flex gap-5 items-center" key={index}>
                       <div>
                         <img
-                          src={"https://picsum.photos/200/300"}
+                          src={comment?.avatar}
                           className="border border-gray-300 rounded-full h-16 w-16"
                         />
                       </div>
                       <div className="border border-solid border-gray-300 p-4 rounded-xl flex-1">
-                        <div className="flex gap-5">
+                        <div className="flex justify-between">
                           <div>
-                            <p className="font-bold">name</p>
+                            <p className="font-bold">{comment.fullName}</p>
                           </div>
                           <div>
                             <p className="text-gray-500 flex items-center">
@@ -310,7 +310,10 @@ export default function Comment({
                                 <path d="M96 32V64H48C21.5 64 0 85.5 0 112v48H448V112c0-26.5-21.5-48-48-48H352V32c0-17.7-14.3-32-32-32s-32 14.3-32 32V64H160V32c0-17.7-14.3-32-32-32S96 14.3 96 32zM448 192H0V464c0 26.5 21.5 48 48 48H400c26.5 0 48-21.5 48-48V192z" />
                               </svg>
                               {/* &nbsp;{new Date(comment.createdAt).toLocaleString()} */}
-                              date
+                              {comment.lastModifiedDate
+                                ? "Cập nhật lúc " +
+                                  formatDate(comment.lastModifiedDate)
+                                : formatDate(comment?.createdDate)}
                             </p>
                           </div>
                         </div>
@@ -368,14 +371,14 @@ export default function Comment({
                   <div className="flex gap-5 items-center mt-5" key={index}>
                     <div>
                       <img
-                        src={"https://picsum.photos/200/300"}
+                        src={comment.avatar}
                         className="border border-gray-300 rounded-full h-16 w-16"
                       />
                     </div>
                     <div className="border border-solid border-gray-300 p-4 rounded-xl flex-1">
-                      <div className="flex gap-5">
+                      <div className="flex justify-between">
                         <div>
-                          <p className="font-bold">name</p>
+                          <p className="font-bold">{comment.fullName}</p>
                         </div>
                         <div>
                           <p className="text-gray-500 flex items-center">
@@ -388,7 +391,10 @@ export default function Comment({
                               <path d="M96 32V64H48C21.5 64 0 85.5 0 112v48H448V112c0-26.5-21.5-48-48-48H352V32c0-17.7-14.3-32-32-32s-32 14.3-32 32V64H160V32c0-17.7-14.3-32-32-32S96 14.3 96 32zM448 192H0V464c0 26.5 21.5 48 48 48H400c26.5 0 48-21.5 48-48V192z" />
                             </svg>
                             {/* &nbsp;{new Date(comment.createdAt).toLocaleString()} */}
-                            date
+                            {comment.lastModifiedDate
+                                ? "Cập nhật lúc " +
+                                  formatDate(comment.lastModifiedDate)
+                                : formatDate(comment?.createdDate)}
                           </p>
                         </div>
                       </div>

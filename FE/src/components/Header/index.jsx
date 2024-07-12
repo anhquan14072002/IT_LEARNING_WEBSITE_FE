@@ -48,6 +48,7 @@ export default function Header({ params, setParams, textSearchProps }) {
   ];
 
   useEffect(() => {
+    console.log("picture::",user.picture);
     console.log("Running useEffect");
     console.log("User state:", user);
 
@@ -56,7 +57,7 @@ export default function Header({ params, setParams, textSearchProps }) {
       try {
         const token = getTokenFromLocalStorage();
         const decodedToken = decodeToken(token);
-        console.log("Decoded token:", decodedToken);
+        
         dispatch(addUser(decodedToken));
       } catch (error) {
         console.error("Error decoding token:", error);

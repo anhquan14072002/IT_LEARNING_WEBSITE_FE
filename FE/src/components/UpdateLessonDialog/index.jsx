@@ -9,7 +9,7 @@ import { Button } from "primereact/button";
 import { FileUpload } from "primereact/fileupload";
 import restClient from "../../services/restClient";
 import Loading from "../Loading";
-import { REJECT, SUCCESS } from "../../utils";
+import { decodeIfNeeded, isBase64, REJECT, SUCCESS } from "../../utils";
 import "./index.css";
 import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
 
@@ -26,15 +26,14 @@ export default function UpdateLessonDialog({
   const [documentList, setListDocument] = useState([]);
   const [isLoadingAddUpdate, setIsLoadingAddUpdate] = useState(false);
   const [initialValuesReady, setInitialValuesReady] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  //select insert content
-  const [inputContet, setInputContent] = useState(
-    modelUpdate.content ? true : false
-  );
+  // Select input content type
+  const [inputContent, setInputContent] = useState(!!modelUpdate.content); // Initialize based on modelUpdate.content
 
   const validationSchema = Yup.object({
     title: Yup.string().required("Tiêu đề không được bỏ trống"),
-    ...(inputContet && {
+    ...(inputContent && {
       content: Yup.string().required("Mô tả không được bỏ trống"),
     }),
     topic: Yup.object()
@@ -60,22 +59,24 @@ export default function UpdateLessonDialog({
   const [initialValues, setInitialValues] = useState({
     title: "",
     topic: {},
-    ...(inputContet && {
-      content: "",
+    ...(inputContent && {
+      content: decodeIfNeeded(modelUpdate.content),
     }),
     document: {},
     grade: {},
   });
 
   const handleChangeInputType = (e) => {
-    console.log("====================================");
-    console.log(e.target.value); // This should log the selected option value ("true" or "false")
-    console.log("====================================");
     setInputContent(e.target.value === "true"); // Convert the selected value to a boolean
   };
 
   useEffect(() => {
+    setInputContent(!!modelUpdate.content);
+  }, [modelUpdate]);
+
+  useEffect(() => {
     const fetchTopics = async () => {
+      setLoading(true);
       try {
         const topicResponse = await restClient({
           url: `api/topic/gettopicbyid?id=${modelUpdate.topicId}`,
@@ -123,37 +124,27 @@ export default function UpdateLessonDialog({
         setListDocument(listDocumentById);
         setListGrade(listGrade);
 
-        setInitialValues({
+        const updatedInitialValues = {
           title: modelUpdate.title,
-          ...(inputContet && {
-            content: modelUpdate.content,
-          }),
+          content: decodeIfNeeded(modelUpdate.content),
           topic: selectedTopic || {},
           grade: selectedGrade || {},
           document: selectedDocument || {},
-        });
+        };
 
-        console.log({
-          title: modelUpdate.title,
-          ...(inputContet && {
-            content: modelUpdate.content,
-          }),
-          topic: selectedTopic || {},
-          grade: selectedGrade || {},
-          document: selectedDocument || {},
-        });
-
+        setInitialValues(updatedInitialValues);
         setInitialValuesReady(true); // Data has been fetched and initial values are set
       } catch (err) {
-        console.error("Error fetching data:", err);
-        // Handle error state here if needed
+        setInitialValues({});
+      } finally {
+        setLoading(false);
       }
     };
 
     if (visibleUpdate) {
       fetchTopics();
     }
-  }, [visibleUpdate, modelUpdate, inputContet]);
+  }, [visibleUpdate, modelUpdate]);
 
   const onSubmit = async (values, { setSubmitting }) => {
     setIsLoadingAddUpdate(true);
@@ -162,12 +153,12 @@ export default function UpdateLessonDialog({
     formData.append("Id", modelUpdate.id);
     formData.append("Title", values.title);
     formData.append("TopicId", values.topic.id); // Use topic.id for TopicId
-    if (inputContet) {
+    if (inputContent) {
       formData.append("Content", values.content);
     }
     formData.append("IsActive", false);
 
-    if (!inputContet) {
+    if (!inputContent) {
       if (files.some((file) => file.size > 10485760)) {
         REJECT(toast, "Vui lòng chọn file nhỏ hơn hoặc bằng 10mb");
         return;
@@ -187,7 +178,10 @@ export default function UpdateLessonDialog({
         headers: { "Content-Type": "multipart/form-data" },
       });
       SUCCESS(toast, "Cập nhật bài học thành công");
-      getData();
+
+      // Reset form state and fetch new data
+      setFiles([]);
+      getData(); // Fetch updated data
     } catch (err) {
       REJECT(toast, "Cập nhật không thành công");
     } finally {
@@ -310,23 +304,26 @@ export default function UpdateLessonDialog({
                   options={topicList}
                 />
 
+                <CustomTextInput
+                  label="Tiêu đề"
+                  name="title"
+                  type="text"
+                  id="title"
+                />
+
                 <div className="flex justify-between mb-1">
                   <h1>Nội dung bài học</h1>
                   <select
-                    value={inputContet} // Ensure this matches with the state variable
+                    value={inputContent.toString()} // Ensure this matches with the state variable
                     onChange={handleChangeInputType} // Make sure handleChangeInputType is correctly defined
                     className="text-sm border border-gray-300 p-1 rounded-md"
                   >
-                    <option value="true" selected={inputContet === true}>
-                      Soạn bài
-                    </option>
-                    <option value="false" selected={inputContet === false}>
-                      Tải file lên
-                    </option>
+                    <option value="true">Soạn bài</option>
+                    <option value="false">Tải file lên</option>
                   </select>
                 </div>
 
-                {inputContet ? (
+                {inputContent ? (
                   <div>
                     <CustomEditor name="content" id="content">
                       <ErrorMessage name="content" component="div" />
@@ -351,12 +348,6 @@ export default function UpdateLessonDialog({
                     />
                   </div>
                 )}
-                <CustomTextInput
-                  label="Tiêu đề"
-                  name="title"
-                  type="text"
-                  id="title"
-                />
 
                 <div className="flex justify-end gap-2">
                   <Button
