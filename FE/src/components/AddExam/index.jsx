@@ -10,11 +10,16 @@ import { REJECT, SUCCESS } from "../../utils";
 import axios from "axios";
 import { Dropdown } from "primereact/dropdown";
 import { FileUpload } from "primereact/fileupload";
+import CustomDropdown from "../../shared/CustomDropdown";
 
 const validationSchema = Yup.object({
   title: Yup.string().required("Tiêu đề không được bỏ trống"),
   description: Yup.string().required("Mô tả không được bỏ trống"),
-  province: Yup.string().required("Không được để trống"),
+  province: Yup.object()
+    .test("is-not-empty", "Không được để trống trường này", (value) => {
+      return Object.keys(value).length !== 0; // Check if object is not empty
+    })
+    .required("Không bỏ trống trường này"),
   year: Yup.number()
     .required("Năm không được bỏ trống")
     .min(1900, "Năm phải lớn hơn hoặc bằng 1900"),
@@ -29,7 +34,9 @@ export default function AddExam({ visible, setVisible, toast, fetchData }) {
   useEffect(() => {
     const fetchProvinces = async () => {
       try {
-        const response = await axios.get("https://esgoo.net/api-tinhthanh/1/0.htm");
+        const response = await axios.get(
+          "https://esgoo.net/api-tinhthanh/1/0.htm"
+        );
         setProvinceList(response?.data?.data || []);
       } catch (error) {
         console.error("Error fetching provinces:", error);
@@ -40,13 +47,16 @@ export default function AddExam({ visible, setVisible, toast, fetchData }) {
 
   const initialValues = {
     title: "",
-    province: "",
+    province: {},
     description: "",
     year: "",
     numberQuestion: "",
   };
 
   const onSubmit = async (values) => {
+    console.log("====================================");
+    console.log(values);
+    console.log("====================================");
     setLoading(true);
     try {
       const formData = new FormData();
@@ -69,7 +79,6 @@ export default function AddExam({ visible, setVisible, toast, fetchData }) {
 
       SUCCESS(toast, "Thêm đề thi thành công");
       fetchData(); // Update the exam list
-
     } catch (error) {
       console.error("Error adding exam:", error);
       REJECT(toast, error.message);
@@ -98,28 +107,51 @@ export default function AddExam({ visible, setVisible, toast, fetchData }) {
           validationSchema={validationSchema}
           onSubmit={onSubmit}
         >
-          {({ setFieldValue, values }) => (
+          {(formik) => (
             <Form>
-              <CustomTextInput label="Tiêu đề" name="title" type="text" />
+              <CustomTextInput
+                label="Tiêu đề"
+                id="title"
+                name="title"
+                type="text"
+              />
 
-              <Dropdown
-                value={values.province}
+              {/* <Dropdown
                 onChange={(e) => setFieldValue("province", e.value)}
+                id="province" name="province"
                 options={provinceList}
                 optionLabel="name"
                 placeholder="Chọn Tỉnh"
                 className="w-full md:w-14rem"
+              /> */}
+              <CustomDropdown
+                title="Tỉnh"
+                label="Tỉnh"
+                customTitle="name"
+                id="province"
+                name="province"
+                options={provinceList}
               />
 
-              <CustomTextInput label="Năm" name="year" type="number" />
+              <CustomTextInput
+                label="Năm"
+                id="year"
+                name="year"
+                type="number"
+              />
 
               <CustomTextInput
                 label="Số lượng câu hỏi"
+                id="numberQuestion"
                 name="numberQuestion"
                 type="number"
               />
 
-              <CustomEditor label="Thông tin chi tiết" name="description">
+              <CustomEditor
+                label="Thông tin chi tiết"
+                id="description"
+                name="description"
+              >
                 <ErrorMessage name="description" component="div" />
               </CustomEditor>
 
@@ -129,7 +161,9 @@ export default function AddExam({ visible, setVisible, toast, fetchData }) {
                 url={"/api/upload"}
                 accept=".pdf, application/pdf"
                 maxFileSize={10485760} // 10MB
-                emptyTemplate={<p className="m-0">Drag and drop files here to upload.</p>}
+                emptyTemplate={
+                  <p className="m-0">Drag and drop files here to upload.</p>
+                }
                 className="custom-file-upload mb-2"
                 onSelect={onFileSelect}
               />

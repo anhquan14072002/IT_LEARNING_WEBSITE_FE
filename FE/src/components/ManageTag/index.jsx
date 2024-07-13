@@ -20,7 +20,7 @@ import {
   removeVietnameseTones,
 } from "../../utils";
 import { InputSwitch } from "primereact/inputswitch";
-import AddTag from "../AddTag";
+// import AddTag from "../AddTag";
 import UpdateQuizLesson from "../UpdateQuizLesson";
 
 export default function ManagementQuizLesson() {
