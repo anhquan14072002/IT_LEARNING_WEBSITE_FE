@@ -80,7 +80,7 @@ export default function AddLessonDialog({
     console.log("====================================");
     console.log("files:" + files);
     console.log("====================================");
-console.log(values.title,values.topic.id );
+
     setIsLoadingAddLesson(true);
 
     const formData = new FormData();
