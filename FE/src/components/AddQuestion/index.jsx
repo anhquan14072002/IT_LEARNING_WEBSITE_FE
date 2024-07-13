@@ -17,6 +17,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
     questionLevel: {},
     quiz: {},
     QuestionTrueFalse: undefined, // Initialize QuestionTrueFalse
+    hint: "",
   });
 
   const [typeList, settypeList] = useState([]);
@@ -24,6 +25,11 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
   const [questionLevel, setquestionLevelList] = useState([]);
   const [quizList, setquizListList] = useState([]);
   const [typeQuestion, setTypeQuestion] = useState("");
+
+  const shuffle = [
+    { title: "Có trộn", valueTitle: true },
+    { title: "Không trộn", valueTitle: false },
+  ];
 
   useEffect(() => {
     const fetchFormData = async () => {
@@ -75,30 +81,34 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
       REJECT(toast, "Bạn phải chọn đáp án đúng");
     } else {
       const QuestionTrueFalseValue = values.QuestionTrueFalse === "true";
-      const model = {
-        type: values.type.typeName,
-        content: values.content,
-        isActive: true,
-        questionLevel: values.questionLevel.levelName,
-        quizId: values.quiz.id,
-        quizAnswers: [
-          {
-            content: "Đúng",
-            isCorrect: (QuestionTrueFalseValue) === true,
-          },
-          {
-            content: "Sai",
-            isCorrect: (QuestionTrueFalseValue) === false,
-          },
-        ],
-      };
-      console.log('====================================');
-      console.log(model);
-      console.log('====================================');
+
+      // Create a new FormData object
+      let formData = new FormData();
+
+      // Append each field to the FormData object
+      formData.append("type", values.type.typeName);
+      formData.append("content", values?.content);
+      formData.append("isActive", true); // Assuming isActive is a boolean
+      formData.append("questionLevel", values?.questionLevel?.levelName);
+      formData.append("IsShuffle", values?.shuffle?.valueTitle);
+      formData.append("quizId", values?.quiz?.id);
+
+      formData.append("QuizAnswers", [
+        {
+          content: "Đúng",
+          isCorrect: values.QuestionTrueFalseValue === true,
+        },
+        {
+          content: "Sai",
+          isCorrect: values.QuestionTrueFalseValue === false,
+        },
+      ]);
+      
+
       restClient({
         url: "api/quizquestion/createquizquestion",
         method: "POST",
-        data: model,
+        data: formData,
       })
         .then((res) => {
           SUCCESS(toast, "Thêm câu hỏi thành công thành công");
@@ -129,9 +139,20 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
     }
   };
 
+  const handleChangeShuffle = (e, helpers, setTouchedState, props) => {
+    helpers.setValue(e?.value);
+    setTouchedState(true);
+
+    if (props.onChange) {
+      props.onChange(e);
+    }
+  };
+
   // Define dynamic validation schema based on typeQuestion
   const validationSchema = Yup.object().shape({
     content: Yup.string().required("Nội dung không được bỏ trống"),
+    shuffle: Yup.object().required("Không bỏ trống trường này"),
+    hint: Yup.string().required("Giải thích đáp án không được bỏ trống"),
     type: Yup.object()
       .test("is-not-empty", "Không được để trống trường này", (value) => {
         return Object.keys(value).length !== 0;
@@ -147,10 +168,6 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
         return Object.keys(value).length !== 0;
       })
       .required("Không bỏ trống trường này"),
-    QuestionTrueFalse: Yup.boolean().when("type", {
-      is: (val) => val?.typeName === "QuestionTrueFalse", // Condition for validation
-      then: Yup.boolean().required("Bạn phải chọn đáp án đúng"), // Validation rule
-    }),
   });
 
   return (
@@ -161,6 +178,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
       onHide={() => {
         if (!visible) return;
         setVisible(false);
+        setTypeQuestion("");
       }}
     >
       {loading === true ? (
@@ -202,45 +220,65 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
                 label="Loại câu hỏi"
                 name="type"
                 id="type"
-                isClear={true}
+                isClear={false}
                 handleOnChange={handleChangeType}
                 options={typeList}
               />
 
               {typeQuestion === "QuestionTrueFalse" && (
-                <div className="mt-4">
-                  <label
-                    htmlFor="QuestionTrueFalse"
-                    className="block text-sm font-medium text-gray-700"
-                  >
-                    Đáp án đúng
-                  </label>
-                  <div className="mt-1">
-                    <label className="inline-flex items-center">
-                      <Field
-                        type="radio"
-                        className="form-radio text-blue-500"
-                        name="QuestionTrueFalse"
-                        value="true" // Specify values as strings
-                      />
-                      <span className="ml-2">Đúng</span>
+                <>
+                  <div className="my-4">
+                    <label
+                      htmlFor="QuestionTrueFalse"
+                      className="block text-md text-gray-700"
+                    >
+                      Đáp án đúng
                     </label>
-                    <label className="inline-flex items-center ml-6">
-                      <Field
-                        type="radio"
-                        className="form-radio text-blue-500"
-                        name="QuestionTrueFalse"
-                        value="false" // Specify values as strings
-                      />
-                      <span className="ml-2">Sai</span>
-                    </label>
+                    <div className="mt-1">
+                      <label className="inline-flex items-center">
+                        <Field
+                          type="radio"
+                          className="form-radio text-blue-500"
+                          name="QuestionTrueFalse"
+                          value="true" // Specify values as strings
+                        />
+                        <span className="ml-2">Đúng</span>
+                      </label>
+                      <label className="inline-flex items-center ml-6">
+                        <Field
+                          type="radio"
+                          className="form-radio text-blue-500"
+                          name="QuestionTrueFalse"
+                          value="false" // Specify values as strings
+                        />
+                        <span className="ml-2">Sai</span>
+                      </label>
+                    </div>
+                    <ErrorMessage
+                      name="QuestionTrueFalse"
+                      component="div"
+                      className="text-red-500"
+                    />
                   </div>
-                  <ErrorMessage
-                    name="QuestionTrueFalse"
-                    component="div"
-                    className="text-red-500"
+                  <CustomDropdownInSearch
+                    title="Trộn đáp án"
+                    label="Trộn đáp án"
+                    name="shuffle"
+                    id="shuffle"
+                    isClear={false}
+                    handleOnChange={handleChangeShuffle}
+                    options={shuffle}
                   />
-                </div>
+                  <div>
+                    <div>
+                      <CustomEditor
+                        label="Giải thích đáp án"
+                        name="hint"
+                        id="hint"
+                      />
+                    </div>
+                  </div>
+                </>
               )}
 
               <div className="flex justify-end gap-2 mt-5">

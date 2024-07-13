@@ -1,0 +1,23 @@
+/* index.css */
+
+@media (min-width: 1368px) {
+  .lesson-box {
+    order: 1;
+  }
+
+  .question-box {
+    order: 2;
+  }
+}
+
+@media (max-width: 1368px) {
+  .lesson-box {
+    width: 100% !important;
+    order: 2;
+  }
+
+  .question-box {
+    width: 100% !important;
+    order: 1;
+  }
+}
