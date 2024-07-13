@@ -5,6 +5,7 @@ import Header from "../../components/Header";
 import { changePassword } from "../../services/profileService";
 import { Toast } from "primereact/toast";
 import { REJECT, SUCCESS } from "../../utils";
+import { InputText } from "primereact/inputtext";
 
 const index = () => {
   const toast = useRef(null);
@@ -59,7 +60,7 @@ const index = () => {
                 },
               }}
               render={({ field }) => (
-                <input
+                <InputText
                   id="password"
                   type="password"
                   className="w-full h-10 text-black-800 border border-gray-300 rounded-md px-3"
@@ -92,7 +93,7 @@ const index = () => {
                 },
               }}
               render={({ field }) => (
-                <input
+                <InputText
                   id="newPassword"
                   type="password"
                   className="w-full h-10 text-black-800 border border-gray-300 rounded-md px-3"
@@ -122,7 +123,7 @@ const index = () => {
                   "Mật khẩu nhập lại không khớp",
               }}
               render={({ field }) => (
-                <input
+                <InputText
                   id="passwordAgain"
                   type="password"
                   className="w-full h-10 text-black-800 border border-gray-300 rounded-md px-3"

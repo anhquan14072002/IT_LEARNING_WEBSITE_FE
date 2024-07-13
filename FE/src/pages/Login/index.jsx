@@ -8,6 +8,8 @@ import { forgotPassword, login} from "../../services/authenService";
 import { CHECKMAIL, REJECT } from "../../utils";
 import { Toast } from "primereact/toast";
 import Menu from "../../components/Menu";
+import { InputText } from "primereact/inputtext";
+
 const Index = () => {
   const toast= useRef(null)
   const [checked, setChecked] = useState(false);
@@ -108,13 +110,14 @@ const Index = () => {
                    
                   }}
                   render={({ field }) => (
-                    <input
-                      id="email"
-                      type="text"
-                      className="w-full h-10 text-black-800 border border-solid border-gray-600 pb-2 pl-1 rounded-md"
-                      placeholder="Nhập email hoặc tài khoản"
-                      {...field}
-                    />
+                    <InputText
+                    id="email"
+                    type="text"
+                    className="w-full h-10 text-black-800 border border-solid border-gray-600 pb-2 pl-1 rounded-md"
+                    placeholder="Nhập email hoặc tài khoản"
+                    {...field}
+                     />
+                   
                   )}
                 />
                 <br />
@@ -145,7 +148,7 @@ const Index = () => {
                       },
                     }}
                     render={({ field }) => (
-                      <input
+                      <InputText
                         id="password"
                         type="password"
                         className="w-full h-10 text-black-800 border border-solid border-gray-600 pb-2 pl-1 rounded-md"
