@@ -11,18 +11,25 @@ import axios from "axios";
 import { Dropdown } from "primereact/dropdown";
 import { FileUpload } from "primereact/fileupload";
 import CustomDropdown from "../../shared/CustomDropdown";
+import restClient from "../../services/restClient";
 
 const validationSchema = Yup.object({
   title: Yup.string().required("Tiêu đề không được bỏ trống"),
   description: Yup.string().required("Mô tả không được bỏ trống"),
   province: Yup.object()
     .test("is-not-empty", "Không được để trống trường này", (value) => {
-      return Object.keys(value).length !== 0; // Check if object is not empty
+      return Object.keys(value).length !== 0; 
     })
     .required("Không bỏ trống trường này"),
-  year: Yup.number()
+    year: Yup.number()
     .required("Năm không được bỏ trống")
-    .min(1900, "Năm phải lớn hơn hoặc bằng 1900"),
+    .min(1900, "Năm phải lớn hơn 1900")
+    .integer("Năm phải là số nguyên")
+    .test(
+      'len',
+      'Sai định dạng năm',
+      val=> val.toString().length === 4
+    ),
   numberQuestion: Yup.number().required("Không được bỏ trống"),
 });
 
@@ -58,24 +65,22 @@ export default function AddExam({ visible, setVisible, toast, fetchData }) {
     console.log(values);
     console.log("====================================");
     setLoading(true);
+    const formData = new FormData();
+    formData.append("Title", values.title);
+    formData.append("Province", values.province.name_en);
+    formData.append("Description", values.description);
+    formData.append("NumberQuestion", values.numberQuestion);
+    formData.append("Year", values.year);
+    formData.append("isActive", true);
+    formData.append("ExamFile", files);
+
     try {
-      const formData = new FormData();
-      formData.append("title", values.title);
-      formData.append("province", values.province);
-      formData.append("description", values.description);
-      formData.append("numberQuestion", values.numberQuestion);
-      formData.append("year", values.year);
-      formData.append("isActive", true);
-
-      files.forEach((file) => {
-        formData.append("files", file);
-      });
-
-      console.log("Submitting model:", values.title);
-
-      const response = await axios.post("api/exam/createexam", formData, {
+      restClient({
+        url: "api/exam/createexam",
+        method: "POST",
+        data: formData,
         headers: { "Content-Type": "multipart/form-data" },
-      });
+      })
 
       SUCCESS(toast, "Thêm đề thi thành công");
       fetchData(); // Update the exam list
@@ -116,14 +121,7 @@ export default function AddExam({ visible, setVisible, toast, fetchData }) {
                 type="text"
               />
 
-              {/* <Dropdown
-                onChange={(e) => setFieldValue("province", e.value)}
-                id="province" name="province"
-                options={provinceList}
-                optionLabel="name"
-                placeholder="Chọn Tỉnh"
-                className="w-full md:w-14rem"
-              /> */}
+             
               <CustomDropdown
                 title="Tỉnh"
                 label="Tỉnh"

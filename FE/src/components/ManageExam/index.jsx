@@ -14,8 +14,9 @@ import restClient from "../../services/restClient";
 import Loading from "../Loading";
 import { ACCEPT, formatDate, getTokenFromLocalStorage, REJECT, removeVietnameseTones } from "../../utils";
 import { InputSwitch } from "primereact/inputswitch";
-import UpdateQuizLesson from "../UpdateQuizLesson";
+
 import AddExam from "../AddExam";
+import UpdateExam from "../UpdateExam";
 
 export default function ManageExam() {
   const toast = useRef(null);
@@ -217,7 +218,7 @@ export default function ManageExam() {
         toast={toast}
         fetchData={fetchData}
       />
-      <UpdateQuizLesson
+      <UpdateExam
         visibleUpdate={visibleUpdate}
         setVisibleUpdate={setVisibleUpdate}
         updateValue={updateValue}
