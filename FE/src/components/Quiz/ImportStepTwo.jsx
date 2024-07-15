@@ -1,6 +1,6 @@
 import { Column } from "primereact/column";
 import { DataTable } from "primereact/datatable";
-import React, { useContext, useEffect, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import FormDataContext from "../../store/FormDataContext";
 import axios from "axios";
 import { BASE_URL } from "../../services/restClient";
@@ -8,6 +8,8 @@ import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
 import Loading from "../Loading";
+import { REJECT } from "../../utils";
+import { Toast } from "primereact/toast";
 function ImportStepTwo() {
   const [excelValidateResponse, setExcelValidateResponse] = useState([]);
   const { formData, file, checkRecord, idImportFail } =
@@ -15,10 +17,28 @@ function ImportStepTwo() {
   const [visibleDelete, setVisibleDelete] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const toast = useRef(null);
   useEffect(() => {
     const handleUpload = async () => {
       if (!file) {
-        showFileSelectDialog();
+        setVisibleDelete(true);
+        confirmDialog({
+          message: "Please select a file.",
+          header: "Thông báo",
+          icon: "pi pi-info-circle",
+          defaultFocus: "reject",
+          acceptClassName: "p-button-danger",
+          footer: (
+            <Button
+              label="Quay lại"
+              className="p-2 bg-blue-500 text-white mr-2"
+              onClick={() => {
+                navigate("/importQuiz/stepOne");
+                setVisibleDelete(false);
+              }}
+            />
+          ),
+        });
         return;
       }
 
@@ -46,34 +66,18 @@ function ImportStepTwo() {
         }
       } catch (err) {
         console.error("Error uploading file:", err);
+        REJECT(toast, "Xảy ra lỗi khi tải file excel này");
+        setTimeout(() => {
+          navigate("/importQuiz/stepOne");
+        }, 3000);
       } finally {
         setLoading(false);
       }
     };
 
     handleUpload();
-  }, [file, formData, checkRecord, navigate]);
+  }, []);
 
-  const showFileSelectDialog = () => {
-    setVisibleDelete(true);
-    confirmDialog({
-      message: "Please select a file.",
-      header: "Thông báo",
-      icon: "pi pi-info-circle",
-      defaultFocus: "reject",
-      acceptClassName: "p-button-danger",
-      footer: (
-        <Button
-          label="Quay lại"
-          className="p-2 bg-blue-500 text-white mr-2"
-          onClick={() => {
-            navigate("/importQuiz/stepOne");
-            setVisibleDelete(false);
-          }}
-        />
-      ),
-    });
-  };
   async function exportToExcel() {
     try {
       let res = await axios.get(
@@ -141,6 +145,7 @@ function ImportStepTwo() {
     <Loading />
   ) : (
     <article>
+      <Toast ref={toast} />
       <ConfirmDialog visible={visibleDelete} className="w-96" />
       <p className="pb-2">
         <span className="font-bold mr-28">

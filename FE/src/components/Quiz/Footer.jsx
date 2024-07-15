@@ -20,7 +20,7 @@ function Footer({ Menus }) {
 
   const locationSplit = location.pathname.split("/")[2];
   const indexRoute = Menus.findIndex((menu) => menu.path === locationSplit);
-  const { success, idImportResult, file } = useContext(FormDataContext);
+  const { success, step } = useContext(FormDataContext);
   function implement() {
     const nextRoute = Menus[indexRoute + 1].path;
     navigate(nextRoute);
@@ -57,7 +57,7 @@ function Footer({ Menus }) {
             icon={arrows}
             title="Thực hiện"
             onClick={implement}
-            disabled={success == 0 && idImportResult}
+            disabled={success == 0 && step == "stepTwo"}
           />
         )}
         <IconButton

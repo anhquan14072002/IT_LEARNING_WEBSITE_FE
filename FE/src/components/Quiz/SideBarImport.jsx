@@ -1,6 +1,7 @@
 import { Button } from "primereact/button";
-import React, { useState } from "react";
-import { NavLink } from "react-router-dom";
+import React, { useContext, useEffect, useState } from "react";
+import { NavLink, useLocation } from "react-router-dom";
+import FormDataContext from "../../store/FormDataContext";
 
 function ItemSideBar({ Menu, index, indexMenu }) {
   return (
@@ -25,6 +26,14 @@ function ItemSideBar({ Menu, index, indexMenu }) {
 }
 function SideBarImport({ Menus }) {
   const [indexMenu, setIndexMenu] = useState(0);
+  const { setStep } = useContext(FormDataContext);
+
+  const location = useLocation();
+
+  useEffect(() => {
+    setStep(location.pathname.split("/")[2]);
+  }, [location]);
+
   return (
     <div className={`w-2/12 bg-[#F5F7F8] min-h-[80vh] pr-2 duration-300`}>
       <ul className=" ">

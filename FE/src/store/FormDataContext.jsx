@@ -11,6 +11,7 @@ export const FormDataProvider = ({ children }) => {
   const [idImport, setIdImport] = useState("");
   const [idImportFail, setIdImportFail] = useState("");
   const [idImportResult, setIdImportResult] = useState("");
+  const [step, setStep] = useState("");
 
   function setData(formData, file) {
     setFile(file);
@@ -29,12 +30,14 @@ export const FormDataProvider = ({ children }) => {
         formData,
         file,
         setData,
+        step,
         idImport,
         idImportFail,
         idImportResult,
         success,
         fail,
         checkRecord,
+        setStep,
       }}
     >
       {children}
