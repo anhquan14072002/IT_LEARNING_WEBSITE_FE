@@ -2,8 +2,6 @@ import debounce from "lodash.debounce";
 import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
 import React, { useEffect, useRef, useState } from "react";
-import AddTopicDialog from "../AddTopicDialog";
-import UpdateTopicDialog from "../UpdateTopicDialog";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Paginator } from "primereact/paginator";
@@ -14,8 +12,9 @@ import restClient from "../../services/restClient";
 import Loading from "../Loading";
 import { ACCEPT, formatDate, getTokenFromLocalStorage, REJECT, removeVietnameseTones } from "../../utils";
 import { InputSwitch } from "primereact/inputswitch";
-import UpdateQuizLesson from "../UpdateQuizLesson";
 import AddExam from "../AddExam";
+import UpdateExam from "../UpdateExam";
+import AnswerExam from "../AnwserExam";
 
 export default function ManageExam() {
   const toast = useRef(null);
@@ -27,7 +26,9 @@ export default function ManageExam() {
   const cm = useRef(null);
   const [visible, setVisible] = useState(false);
   const [updateValue, setUpdateValue] = useState({});
+  const [examValue, setExamValue] = useState({});
   const [visibleUpdate, setVisibleUpdate] = useState(false);
+  const [visibleExam, setVisibleExam] = useState(false);
   const [visibleDelete, setVisibleDelete] = useState(false);
   const [loading, setLoading] = useState(false);
   const [textSearch, setTextSearch] = useState("");
@@ -125,7 +126,20 @@ export default function ManageExam() {
       </div>
     );
   };
-
+  const anwserTemple =( rowData) =>{
+    return (
+      <div style={{ display: "flex" }}>
+        <Button
+          label="Đáp án"
+           className="bg-blue-600 text-white p-2 text-sm font-normal"
+          onClick={() => {
+            setExamValue(rowData);
+            setVisibleExam(true);
+          }}
+        />
+      </div>
+    );
+  }
   const confirmDelete = (id) => {
     setVisibleDelete(true);
     confirmDialog({
@@ -217,13 +231,20 @@ export default function ManageExam() {
         toast={toast}
         fetchData={fetchData}
       />
-      <UpdateQuizLesson
+      <UpdateExam
         visibleUpdate={visibleUpdate}
         setVisibleUpdate={setVisibleUpdate}
         updateValue={updateValue}
         toast={toast}
         fetchData={fetchData}
-      />
+      /> 
+      <AnswerExam
+      visibleExam={visibleExam}
+      setVisibleExam={setVisibleExam}
+      examValue={examValue}
+      toast={toast}
+    
+    />
       <div>
         <div className="flex justify-between pt-1">
           <h1 className="font-bold text-3xl">Các Đề Kiểm Tra</h1>
@@ -292,6 +313,7 @@ export default function ManageExam() {
                   className="border-b-2 border-t-2"
                   style={{ width: "10%" }}
                 />
+              
                 <Column
                   field="title"
                   header="Tiêu đề"
@@ -299,7 +321,12 @@ export default function ManageExam() {
                   style={{ width: "15%" }}
                 />
                 
-                
+                <Column
+                    header="Đáp án"
+                  className="border-b-2 border-t-2"
+                  style={{ width: "15%" }}
+                  body={anwserTemple}
+                />
                 <Column
                   field="province"
                   header="Tỉnh"
@@ -316,7 +343,7 @@ export default function ManageExam() {
                   header="Trạng thái"
                   className="border-b-2 border-t-2"
                   body={status}
-                  style={{ width: "15%" }}
+                  style={{ width: "10%" }}
                 ></Column>
                 <Column
                   field="createdDate"

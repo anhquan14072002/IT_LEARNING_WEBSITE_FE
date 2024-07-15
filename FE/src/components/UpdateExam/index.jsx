@@ -33,18 +33,20 @@ const validationSchema = Yup.object({
   numberQuestion: Yup.number().required("Không được bỏ trống"),
 });
 
-export default function AddExam({ visible, setVisible, toast, fetchData }) {
+export default function UpdateExam({ visibleUpdate, setVisibleUpdate, updateValue,toast, fetchData }) {
   const [files, setFiles] = useState([]);
   const [provinceList, setProvinceList] = useState([]);
-  const [loading, setLoading] = useState(false);
-
+  const [loading, setLoading] = useState(false); 
+ 
   useEffect(() => {
+    console.log(updateValue.id);
     const fetchProvinces = async () => {
       try {
         const response = await axios.get(
           "https://esgoo.net/api-tinhthanh/1/0.htm"
         );
         setProvinceList(response?.data?.data || []);
+        setFiles(updateValue.examFile)
       } catch (error) {
         console.error("Error fetching provinces:", error);
       }
@@ -53,11 +55,11 @@ export default function AddExam({ visible, setVisible, toast, fetchData }) {
   }, []);
 
   const initialValues = {
-    title: "",
-    province: {},
-    description: "",
-    year: "",
-    numberQuestion: "",
+    title: updateValue.title,
+    province: updateValue.province,
+    description: updateValue.description,
+    year: updateValue.year,
+    numberQuestion: updateValue.numberQuestion,
   };
 
   const onSubmit = async (values) => {
@@ -67,35 +69,36 @@ export default function AddExam({ visible, setVisible, toast, fetchData }) {
     setLoading(true);
     const tag =["1","2","3"]
     const formData = new FormData();
+    formData.append("Id", updateValue.id);
     formData.append("Title", values.title);
     formData.append("Province", values.province.name_en);
     formData.append("Description", values.description);
     formData.append("NumberQuestion", values.numberQuestion);
     formData.append("Year", values.year);
-    formData.append("isActive", true);
-
+    formData.append("IsActive", true);
     tag.forEach((item, index) => {
       formData.append(`tagValues[${index}]`, item);
     });
-    formData.append("ExamFile", files);
-    try {
-      restClient({
-        url: "api/exam/createexam",
-        method: "POST",
-        data: formData,
-        headers: { "Content-Type": "multipart/form-data" },
-      })
-      SUCCESS(toast, "Thêm đề thi thành công");
-      fetchData(); // Update the exam list
-    } catch (error) {
-      console.error("Error adding exam:", error);
-      REJECT(toast, error.message);
-    } finally {
-      setLoading(false);
-      setVisible(false);
-    }
-  };
+    formData.append("FileUpload", files);
 
+   
+  try {
+    const response = await restClient({
+      url: "api/exam/updateexam",
+      method: "PUT",
+      data: formData,
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+    SUCCESS(toast, "Thêm đề thi thành công");
+    fetchData(); // Update the exam list
+  } catch (error) {
+    console.error("Error adding exam:", error);
+    REJECT(toast, error.message);
+  } finally {
+    setLoading(false);
+    setVisibleUpdate(false);
+  }}
+  
   const onFileSelect = (e) => {
     setFiles(e.files);
   };
@@ -103,9 +106,9 @@ export default function AddExam({ visible, setVisible, toast, fetchData }) {
   return (
     <Dialog
       header="Thêm Đề Thi"
-      visible={visible}
+      visible={visibleUpdate}
       style={{ width: "50vw" }}
-      onHide={() => setVisible(false)}
+      onHide={() => setVisibleUpdate(false)}
     >
       {loading ? (
         <Loading />
@@ -126,7 +129,7 @@ export default function AddExam({ visible, setVisible, toast, fetchData }) {
 
              
               <CustomDropdown
-                title="Tỉnh"
+                title={updateValue.province ? updateValue.province : "Tỉnh"}
                 label="Tỉnh"
                 customTitle="name"
                 id="province"
@@ -173,7 +176,7 @@ export default function AddExam({ visible, setVisible, toast, fetchData }) {
                 <Button
                   className="p-2 bg-red-500 text-white"
                   type="button"
-                  onClick={() => setVisible(false)}
+                  onClick={() => setVisibleUpdate(false)}
                 >
                   Hủy
                 </Button>
