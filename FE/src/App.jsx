@@ -15,7 +15,9 @@ import ChangePassword from './pages/ChangePassword';
 import Quiz from './pages/Quiz';
 import FlashCard from './pages/FlashCard';
 import TestQuizPage from './pages/TestQuizPage';
-// import ExamDetail from './pages/ExamDetail';
+import ExamDetail from './pages/ExamDetail';
+import ExamResult from './pages/ExamResult';
+
 
 function App() {
   return (
@@ -38,7 +40,8 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/checkmail" element={<CheckMail />} />
         <Route path="/changepassword" element={<ChangePassword />} />
-        {/* <Route path="/examdetail" element={<ExamDetail />} /> */}
+        <Route path="/examdetail/:id" element={<ExamDetail />} />
+        <Route path="/examresult/:id" element={<ExamResult />} />
         </Routes>
     </Router>
   );
