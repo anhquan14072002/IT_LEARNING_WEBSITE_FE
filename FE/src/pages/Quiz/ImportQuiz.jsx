@@ -3,6 +3,7 @@ import SideBarImport from "../../components/Quiz/SideBarImport";
 import { Outlet } from "react-router-dom";
 import Footer from "../../components/Quiz/Footer";
 import { FormDataProvider } from "../../store/FormDataContext";
+import Header from "../../components/Header";
 
 const Menus = [
   { title: "1. Chọn tệp nguồn", index: 0, path: "stepOne" },
@@ -13,6 +14,7 @@ const Menus = [
 function ImportQuiz() {
   return (
     <FormDataProvider>
+      <Header />
       <div className="p-5">
         <div className="flex">
           <SideBarImport Menus={Menus} />

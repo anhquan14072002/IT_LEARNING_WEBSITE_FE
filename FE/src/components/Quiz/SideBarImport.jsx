@@ -26,7 +26,7 @@ function ItemSideBar({ Menu, index, indexMenu }) {
 function SideBarImport({ Menus }) {
   const [indexMenu, setIndexMenu] = useState(0);
   return (
-    <div className={`w-2/12 bg-[#F5F7F8] min-h-[88vh] pr-2 duration-300`}>
+    <div className={`w-2/12 bg-[#F5F7F8] min-h-[80vh] pr-2 duration-300`}>
       <ul className=" ">
         {Menus.map((Menu, index) => (
           <ItemSideBar

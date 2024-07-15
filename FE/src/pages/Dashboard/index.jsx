@@ -84,13 +84,9 @@ const Dashboard = () => {
             <div className="h-screen">
               {indexMenu === 2 && <ManageDocument />}
               {indexMenu === 3 && <ContentLesson />}
-<<<<<<< HEAD
-              {indexMenu === 4 && <ManageQuiz />}
-=======
               {indexMenu === 4 && <QuizManagement />}
               {indexMenu === 5 && <ManageExam />}
               {indexMenu === 6 && <ManageTag />}
->>>>>>> 0b9ba9a7b6c3dc9c372925380feefd141d07f553
             </div>
           </div>
         </>

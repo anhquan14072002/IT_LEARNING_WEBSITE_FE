@@ -3,6 +3,7 @@ import { InputText } from "primereact/inputtext";
 import React, { useContext, useRef, useState } from "react";
 import axios from "axios";
 import FormDataContext from "../../store/FormDataContext";
+import { BASE_URL } from "../../services/restClient";
 
 function ImportStepOne(props) {
   const fileInputRef = useRef(null);
@@ -29,13 +30,10 @@ function ImportStepOne(props) {
 
   async function exportToExcel() {
     try {
-      let res = await axios.get(
-        "https://localhost:7000/api/quizquestion/exportexcel",
-        {
-          params: { checkData: 1 },
-          responseType: "arraybuffer", // Important to handle binary data
-        }
-      );
+      let res = await axios.get(`${BASE_URL}/api/quizquestion/exportexcel`, {
+        params: { checkData: 1 },
+        responseType: "arraybuffer", // Important to handle binary data
+      });
       console.log(res);
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement("a");
