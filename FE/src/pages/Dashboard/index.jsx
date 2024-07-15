@@ -57,7 +57,7 @@ const Dashboard = () => {
               <ul className="pt-6">
                 {Menus.map((Menu, index) => (
                   <>
-                    {/* <Tooltip target={"target"} content={Menu?.title} /> */}
+                    <Tooltip target={"target"} content={Menu?.title} />
 
                     <li
                       key={index}

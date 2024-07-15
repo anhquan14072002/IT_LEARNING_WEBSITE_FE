@@ -45,6 +45,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/checkmail" element={<CheckMail />} />
         <Route path="/changepassword" element={<ChangePassword />} />
+        {/* <Route path="/examdetail" element={<ExamDetail />} /> */}
       </Routes>
     </Router>
   );

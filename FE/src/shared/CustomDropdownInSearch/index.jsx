@@ -31,7 +31,7 @@ const CustomDropdownInSearch = ({
 
   const handleClear = () => {
     helpers.setValue(null); // Clear the field value
-    // setTouchedState(true); // Set touched state to true after clearing
+    // setTouchedState(true); // Set touched state to true after clearing 
   };
 
   return (
