@@ -46,14 +46,14 @@ const Dashboard = () => {
                border-2 rounded-full ${!open ? "rotate-180" : ""}`}
                 onClick={() => setOpen(!open)}
               />
-              <div className="flex gap-x-4 items-center">
+              {/* <div className="flex gap-x-4 items-center">
                 <img
                   src="/src/assets/logo.png"
                   className={`cursor-pointer duration-500 ${
                     open ? "rotate-[360deg]" : ""
                   }`}
                 />
-              </div>
+              </div> */}
               <ul className="pt-6">
                 {Menus.map((Menu, index) => (
                   <>
