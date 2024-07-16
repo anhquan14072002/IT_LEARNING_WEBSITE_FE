@@ -9,11 +9,30 @@ import "./index.css"; // Assuming you have your styles in index.css
 const ViewQuestionInTest = ({ quizData }) => {
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [showBackToTop, setShowBackToTop] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(30);
+  const [quizCompleted,setQuizCompleted] = useState(false);
   const questionRefs = useRef([]);
 
   useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft((prevTime) => {
+        if (prevTime === 0) {
+          clearInterval(timer); // Stop the timer
+          handleQuizCompletion(); // Handle quiz completion when time runs out
+          return 0;
+        }
+        return prevTime - 1;
+      });
+    }, 1000);
+    return () => {
+      clearInterval(timer);
+    };
+  }, []);
+
+  useEffect(() => {
     const handleScroll = () => {
-      if (window.scrollY > 200) { // Adjust 200 to the desired scroll position
+      if (window.scrollY > 200) {
+        // Adjust 200 to the desired scroll position
         setShowBackToTop(true);
       } else {
         setShowBackToTop(false);
@@ -55,8 +74,21 @@ const ViewQuestionInTest = ({ quizData }) => {
     });
   };
 
+  const handleQuizCompletion = () => {
+    setQuizCompleted(true); // Set quizCompleted to true
+  };
+
+  if (quizCompleted) {
+    return (
+      <QuizResult
+        totalQuestions={quizData.length}
+        quizData={quizData}
+      />
+    );
+  }
+
   return (
-    <div className="flex justify-center flex-wrap">
+    <div className="flex justify-center flex-wrap" id="question">
       {/* Question Box */}
       <div className="lesson-box w-3/4 p-4">
         {quizData?.map((question, index) => (
@@ -91,6 +123,11 @@ const ViewQuestionInTest = ({ quizData }) => {
 
       {/* Lesson Box */}
       <div className="question-box p-4">
+        <Button label="Nộp bài" className="text-center bg-blue-600 hover:bg-blue-400 text-white w-full mb-2 py-1"/>
+        <div className="text-right text-blue-600 underline">
+          Thời gian làm bài: {Math.floor(timeLeft / 60)}:
+          {timeLeft % 60 < 10 ? "0" + (timeLeft % 60) : timeLeft % 60}
+        </div>
         <ul className="flex flex-wrap gap-2 border p-5 justify-center shadow-lg">
           {quizData?.map((question, index) => (
             <li

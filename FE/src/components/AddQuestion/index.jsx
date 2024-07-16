@@ -93,7 +93,20 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
       formData.append("IsShuffle", values?.shuffle?.valueTitle);
       formData.append("quizId", values?.quiz?.id);
 
-      formData.append("QuizAnswers", [
+      // [
+      //   {
+      //     content: "Đúng",
+      //     isCorrect: values.QuestionTrueFalseValue === true,
+      //   },
+      //   {
+      //     content: "Sai",
+      //     isCorrect: values.QuestionTrueFalseValue === false,
+      //   },
+      // ].forEach((obj , index) => {
+      //   formData
+      // })
+
+      formData.append("QuizAnswers",JSON.stringify( [
         {
           content: "Đúng",
           isCorrect: values.QuestionTrueFalseValue === true,
@@ -102,7 +115,8 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
           content: "Sai",
           isCorrect: values.QuestionTrueFalseValue === false,
         },
-      ]);
+      ]));
+      
       
 
       restClient({
