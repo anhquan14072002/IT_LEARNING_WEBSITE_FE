@@ -39,7 +39,7 @@ function ImportStepOne(props) {
       const link = document.createElement("a");
       // Set the href attribute to the Blob URL
       link.href = url;
-      let nameExcel = `Quiz_Question_${new Date()
+      let nameExcel = `Quiz-${new Date()
         .toLocaleString()
         .replace(/[\/:]/g, "-")
         .replace(/,/g, "")}.xlsx`;
