@@ -1,11 +1,17 @@
 /* index.css */
 
 @media (min-width: 1368px) {
+  #question{
+    justify-content: start;
+  }
   .lesson-box {
     order: 1;
   }
 
   .question-box {
+    position: fixed !important;
+    width: 25%;
+    right: 0;
     order: 2;
   }
 }

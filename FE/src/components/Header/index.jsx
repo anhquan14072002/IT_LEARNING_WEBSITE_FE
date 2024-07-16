@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import avatar from "../../assets/img/icons8-male-user-50.png";
+import logo from "../../assets/logo.png";
 import arrowDown from "../../assets/img/icons8-sort-down-50.png";
 import "./index.css";
 import { Tooltip } from "primereact/tooltip";
@@ -100,8 +101,8 @@ export default function Header({ params, setParams, textSearchProps }) {
         <div className="bg-[#1976D2] flex justify-between py-4 px-16">
           <div className="flex items-center">
             <img
-              className="h-[30px] w-[30px]"
-              src={avatar}
+              className="h-[50px] w-[50px] cursor-pointer"
+              src={logo}
               onClick={() => navigate("/")}
             />
           </div>
