@@ -10,6 +10,7 @@
 
   .question-box {
     position: fixed !important;
+    width: 25%;
     right: 0;
     order: 2;
   }

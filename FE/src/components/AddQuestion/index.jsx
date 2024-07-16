@@ -106,7 +106,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
       //   formData
       // })
 
-      formData.append("QuizAnswers",JSON.stringify( [
+      [
         {
           content: "Đúng",
           isCorrect: values.QuestionTrueFalseValue === true,
@@ -115,9 +115,11 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
           content: "Sai",
           isCorrect: values.QuestionTrueFalseValue === false,
         },
-      ]));
-      
-      
+      ].forEach((obj, index) => {
+        Object.entries(obj).forEach(([key, value]) => {
+          formData.append(`QuizAnswers[${index}].${key}`, value);
+        });
+      });
 
       restClient({
         url: "api/quizquestion/createquizquestion",
