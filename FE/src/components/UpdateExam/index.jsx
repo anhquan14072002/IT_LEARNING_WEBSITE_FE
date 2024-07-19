@@ -6,72 +6,88 @@ import CustomTextInput from "../../shared/CustomTextInput";
 import CustomEditor from "../../shared/CustomEditor";
 import { Button } from "primereact/button";
 import Loading from "../Loading";
-import { REJECT, SUCCESS } from "../../utils";
+import {
+  getProvinceByName,
+  getTypeByCode,
+  REJECT,
+  SUCCESS,
+  TYPE,
+} from "../../utils";
 import axios from "axios";
 import { Dropdown } from "primereact/dropdown";
 import { FileUpload } from "primereact/fileupload";
 import CustomDropdown from "../../shared/CustomDropdown";
 import restClient from "../../services/restClient";
+import { province } from "../../services/province";
 
 const validationSchema = Yup.object({
+  type: Yup.object()
+    .test("is-not-empty", "Không được để trống trường này", (value) => {
+      return Object.keys(value).length !== 0;
+    })
+    .required("Không bỏ trống trường này"),
   title: Yup.string().required("Tiêu đề không được bỏ trống"),
   description: Yup.string().required("Mô tả không được bỏ trống"),
   province: Yup.object()
     .test("is-not-empty", "Không được để trống trường này", (value) => {
-      return Object.keys(value).length !== 0; 
+      return Object.keys(value).length !== 0;
     })
     .required("Không bỏ trống trường này"),
-    year: Yup.number()
+  year: Yup.number()
     .required("Năm không được bỏ trống")
     .min(1900, "Năm phải lớn hơn 1900")
     .integer("Năm phải là số nguyên")
-    .test(
-      'len',
-      'Sai định dạng năm',
-      val=> val.toString().length === 4
-    ),
+    .test("len", "Sai định dạng năm", (val) => val.toString().length === 4),
   numberQuestion: Yup.number().required("Không được bỏ trống"),
 });
 
-export default function UpdateExam({ visibleUpdate, setVisibleUpdate, updateValue,toast, fetchData }) {
+export default function UpdateExam({
+  visibleUpdate,
+  setVisibleUpdate,
+  updateValue,
+  toast,
+  fetchData,
+}) {
   const [files, setFiles] = useState([]);
+  const [fileSolution, setFileSolution] = useState([]);
   const [provinceList, setProvinceList] = useState([]);
-  const [loading, setLoading] = useState(false); 
- 
+  const [loading, setLoading] = useState(false);
+  const [type, setType] = useState(updateValue.type);
+  const [initialValues, setInitialValues] = useState({
+    type: {},
+    title: "",
+    province: {},
+    description: "",
+    year: "",
+    numberQuestion: "",
+  });
+
+  
   useEffect(() => {
-    console.log(updateValue.id);
-    const fetchProvinces = async () => {
-      try {
-        const response = await axios.get(
-          "https://esgoo.net/api-tinhthanh/1/0.htm"
-        );
-        setProvinceList(response?.data?.data || []);
-        setFiles(updateValue.examFile)
-      } catch (error) {
-        console.error("Error fetching provinces:", error);
-      }
-    };
-    fetchProvinces();
-  }, []);
-
-  const initialValues = {
-    title: updateValue.title,
-    province: updateValue.province,
-    description: updateValue.description,
-    year: updateValue.year,
-    numberQuestion: updateValue.numberQuestion,
-  };
-
+    if (province?.data && updateValue) {
+      setProvinceList(province.data);
+      setInitialValues(() => ({
+        type: getTypeByCode(updateValue.type),
+        title: updateValue.title,
+        province: getProvinceByName(updateValue.province),
+        description: updateValue.description,
+        year: updateValue.year,
+        numberQuestion: updateValue.numberQuestion,
+      }));
+    }
+  }, [province, updateValue]);
   const onSubmit = async (values) => {
     console.log("====================================");
     console.log(values);
     console.log("====================================");
     setLoading(true);
-    const tag =["1","2","3"]
+   
+    const tag = ["1", "2", "3"];
     const formData = new FormData();
     formData.append("Id", updateValue.id);
+    formData.append("Type", values.type.code);
     formData.append("Title", values.title);
-    formData.append("Province", values.province.name_en);
+    formData.append("Province", values.province.name);
     formData.append("Description", values.description);
     formData.append("NumberQuestion", values.numberQuestion);
     formData.append("Year", values.year);
@@ -79,33 +95,37 @@ export default function UpdateExam({ visibleUpdate, setVisibleUpdate, updateValu
     tag.forEach((item, index) => {
       formData.append(`tagValues[${index}]`, item);
     });
-    formData.append("FileUpload", files);
+    formData.append("ExamEssayFileUpload", files);
+    formData.append("ExamSolutionFileUpload", fileSolution);
 
-   
-  try {
-    const response = await restClient({
-      url: "api/exam/updateexam",
-      method: "PUT",
-      data: formData,
-      headers: { "Content-Type": "multipart/form-data" },
-    });
-    SUCCESS(toast, "Thêm đề thi thành công");
-    fetchData(); // Update the exam list
-  } catch (error) {
-    console.error("Error adding exam:", error);
-    REJECT(toast, error.message);
-  } finally {
-    setLoading(false);
-    setVisibleUpdate(false);
-  }}
-  
+    try {
+      const response = await restClient({
+        url: "api/exam/updateexam",
+        method: "PUT",
+        data: formData,
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      SUCCESS(toast, "Thêm đề thi thành công");
+      fetchData(); // Update the exam list
+    } catch (error) {
+      console.error("Error adding exam:", error);
+      REJECT(toast, error.message);
+    } finally {
+      setLoading(false);
+      setVisibleUpdate(false);
+    }
+  };
+
   const onFileSelect = (e) => {
     setFiles(e.files);
   };
-
+  const onFileSolutionSelect = (e) => {
+    setFileSolution(e.files);
+  };
+  console.log(type);
   return (
     <Dialog
-      header="Thêm Đề Thi"
+      header="Sửa Đề Thi"
       visible={visibleUpdate}
       style={{ width: "50vw" }}
       onHide={() => setVisibleUpdate(false)}
@@ -127,7 +147,16 @@ export default function UpdateExam({ visibleUpdate, setVisibleUpdate, updateValu
                 type="text"
               />
 
-             
+              <CustomDropdown
+                title={updateValue.type ? updateValue.type : " Chọn Loại"}
+                label="Loại"
+                customTitle="name"
+                id="type"
+                name="type"
+                options={TYPE}
+                onChange={(e) => setType(e.value.code)}
+                disabled={true}
+              />
               <CustomDropdown
                 title={updateValue.province ? updateValue.province : "Tỉnh"}
                 label="Tỉnh"
@@ -159,19 +188,34 @@ export default function UpdateExam({ visibleUpdate, setVisibleUpdate, updateValu
                 <ErrorMessage name="description" component="div" />
               </CustomEditor>
 
-              <h1>Tải File</h1>
-              <FileUpload
-                name="demo[]"
-                url={"/api/upload"}
-                accept=".pdf, application/pdf"
-                maxFileSize={10485760} // 10MB
-                emptyTemplate={
-                  <p className="m-0">Drag and drop files here to upload.</p>
-                }
-                className="custom-file-upload mb-2"
-                onSelect={onFileSelect}
-              />
-
+              {updateValue.type === 1 && (
+                <>
+                  <h1>File Đề Bài</h1>
+                  <FileUpload
+                    name="demo[]"
+                    url={"/api/upload"}
+                    accept=".pdf, application/pdf"
+                    maxFileSize={10485760} // 10MB
+                    emptyTemplate={
+                      <p className="m-0">Drag and drop files here to upload.</p>
+                    }
+                    className="custom-file-upload mb-2"
+                    onSelect={onFileSelect}
+                  />
+                  <h1>File Đề Lời Giải</h1>
+                  <FileUpload
+                    name="demo[]"
+                    url={"/api/upload"}
+                    accept=".pdf, application/pdf"
+                    maxFileSize={10485760} // 10MB
+                    emptyTemplate={
+                      <p className="m-0">Drag and drop files here to upload.</p>
+                    }
+                    className="custom-file-upload mb-2"
+                    onSelect={onFileSolutionSelect}
+                  />
+                </>
+              )}
               <div className="flex justify-end gap-2">
                 <Button
                   className="p-2 bg-red-500 text-white"

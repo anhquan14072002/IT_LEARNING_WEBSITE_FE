@@ -10,11 +10,19 @@ import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 import restClient from "../../services/restClient";
 import Loading from "../Loading";
-import { ACCEPT, formatDate, getTokenFromLocalStorage, REJECT, removeVietnameseTones } from "../../utils";
+import {
+  ACCEPT,
+  formatDate,
+  getTokenFromLocalStorage,
+  REJECT,
+  removeVietnameseTones,
+} from "../../utils";
 import { InputSwitch } from "primereact/inputswitch";
 import AddExam from "../AddExam";
 import UpdateExam from "../UpdateExam";
 import AnswerExam from "../AnwserExam";
+import ExamCode from "../ExamCode";
+
 
 export default function ManageExam() {
   const toast = useRef(null);
@@ -26,12 +34,14 @@ export default function ManageExam() {
   const cm = useRef(null);
   const [visible, setVisible] = useState(false);
   const [updateValue, setUpdateValue] = useState({});
-  const [examValue, setExamValue] = useState({});
   const [visibleUpdate, setVisibleUpdate] = useState(false);
-  const [visibleExam, setVisibleExam] = useState(false);
   const [visibleDelete, setVisibleDelete] = useState(false);
   const [loading, setLoading] = useState(false);
   const [textSearch, setTextSearch] = useState("");
+  const [visibleExamCode, setVisibleExamCode] = useState(false);
+  const [examCodeValue, setExamCodeValue] = useState(false);
+  const [title, setTitle] = useState("");
+
   //pagination
   const [first, setFirst] = useState(0);
   const [page, setPage] = useState(1);
@@ -53,7 +63,7 @@ export default function ManageExam() {
         const paginationData = JSON.parse(res.headers["x-pagination"]);
         setTotalPage(paginationData.TotalPages);
         setProducts(Array.isArray(res.data.data) ? res.data.data : []);
-        console.log(res.data.data );
+        console.log(res.data.data);
         setLoading(false);
       })
       .catch((err) => {
@@ -126,20 +136,31 @@ export default function ManageExam() {
       </div>
     );
   };
-  const anwserTemple =( rowData) =>{
+
+  const examCodeTemple = (rowData) =>{
+    return(
+     
+      <Button
+      tooltip="Xem chi tiết các mã đề"
+        icon="pi pi-info-circle"
+        className="text-blue-600 p-mr-2 shadow-none"
+        onClick={() => {
+          
+          setTitle(rowData?.title)
+          setExamCodeValue(rowData);
+          setVisibleExamCode(true);
+        }}
+      />
+      
+    )
+  }
+  const anwserTemple = (rowData) => {
     return (
       <div style={{ display: "flex" }}>
-        <Button
-          label="Đáp án"
-           className="bg-blue-600 text-white p-2 text-sm font-normal"
-          onClick={() => {
-            setExamValue(rowData);
-            setVisibleExam(true);
-          }}
-        />
+        {rowData.type === 1 ? (<h1>Tự Luận</h1>):(<h1>Trắc Nghiệm</h1>)}
       </div>
     );
-  }
+  };
   const confirmDelete = (id) => {
     setVisibleDelete(true);
     confirmDialog({
@@ -189,9 +210,9 @@ export default function ManageExam() {
     setTextSearch(text);
   }, 300);
 
-  const changeStatusExam = async (value,id) => {
+  const changeStatusExam = async (value, id) => {
     console.log(value, id);
-   await restClient({
+    await restClient({
       url: "api/exam/updatestatusexam?id=" + id,
       method: "PUT",
       headers: {
@@ -212,11 +233,7 @@ export default function ManageExam() {
       <InputSwitch
         checked={rowData.isActive}
         onChange={(e) => changeStatusExam(e.value, rowData.id)}
-        tooltip={
-          rowData.isActive
-            ? "Đã được duyệt"
-            : "Chưa được duyệt"
-        }
+        tooltip={rowData.isActive ? "Đã được duyệt" : "Chưa được duyệt"}
       />
     );
   };
@@ -237,14 +254,15 @@ export default function ManageExam() {
         updateValue={updateValue}
         toast={toast}
         fetchData={fetchData}
-      /> 
-      <AnswerExam
-      visibleExam={visibleExam}
-      setVisibleExam={setVisibleExam}
-      examValue={examValue}
-      toast={toast}
+      />
     
-    />
+       <ExamCode
+        visibleExamCode={visibleExamCode}
+        setVisibleExamCode={setVisibleExamCode}
+        setTitle={title}
+        examCodeValue={examCodeValue}
+        toast={toast}
+      />
       <div>
         <div className="flex justify-between pt-1">
           <h1 className="font-bold text-3xl">Các Đề Kiểm Tra</h1>
@@ -305,37 +323,38 @@ export default function ManageExam() {
                 scrollable
                 scrollHeight="30rem"
               >
-           
                 <Column
                   field="#"
                   header="#"
                   body={indexBodyTemplate}
                   className="border-b-2 border-t-2"
-                  style={{ width: "10%" }}
+                  style={{ width: "5%" }}
                 />
-              
+
                 <Column
                   field="title"
                   header="Tiêu đề"
                   className="border-b-2 border-t-2"
                   style={{ width: "15%" }}
                 />
-                
+
                 <Column
-                    header="Đáp án"
+                  header="Loại đề"
                   className="border-b-2 border-t-2"
                   style={{ width: "15%" }}
                   body={anwserTemple}
                 />
+               
                 <Column
+                  header="Chi Tiết"
+                  style={{ width: "10%" }}
+
+                  className="border-b-2 border-t-2"
+                  body={examCodeTemple}
+                />
+                 <Column
                   field="province"
                   header="Tỉnh"
-                  className="border-b-2 border-t-2"
-                  style={{ width: "10%" }}
-                />
-                <Column
-                  field="year"
-                  header="Năm"
                   className="border-b-2 border-t-2"
                   style={{ width: "10%" }}
                 />

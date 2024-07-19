@@ -1,4 +1,5 @@
 import { jwtDecode } from "jwt-decode";
+import { province } from "../services/province";
 
 export const formatDate = (value) => {
   if (!value) return "";
@@ -173,4 +174,17 @@ export const isBase64 = (content) => {
     return true;
   }
   return false;
+};
+
+export const getProvinceByName = (name)=>{
+  const foundProvince = province.data.find(province=> province.name === name);
+  return foundProvince
+}
+export const TYPE = [
+  { name: "Tự Luận", code: 1 },
+  { name: "Trắc Nghiệm", code: 2 },
+];
+
+export const getTypeByCode = (code) => {
+  return TYPE.find(type => type.code === code);
 };
