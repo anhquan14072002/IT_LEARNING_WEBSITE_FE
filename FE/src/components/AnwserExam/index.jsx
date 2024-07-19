@@ -15,13 +15,14 @@ export default function AnswerExam({
   const [answers, setAnswers] = useState([]);
 
   useEffect(() => {
+   
     if (examValue && examValue.numberQuestion) {
       setAnswers(Array(examValue.numberQuestion).fill(""));
     }
     const fetchData = async () => {
       try {
         const response = await restClient({
-          url: `api/examanswer/getallexamanswerbyexamid/${examValue.id}`,
+          url: `api/examanswer/getallexamanswerbyexamcodeid/${examValue.id}`,
           method: "GET",
         });
         const fetchedAnswers = response?.data?.data || [];
@@ -39,8 +40,10 @@ export default function AnswerExam({
         REJECT(toast, error.message);
       }
     };
-    fetchData();
-  }, [examValue, examValue.id]);
+    if(visibleExam ){
+      fetchData();
+    }
+  }, [examValue, examValue.id,visibleExam]);
 
   const handleSelectChange = (event, index) => {
     const newAnswers = [...answers];
@@ -58,7 +61,7 @@ export default function AnswerExam({
     }
 
     const data = {
-      examId: examValue?.id || 0,
+      examCodeId: examValue?.id || 0,
       answerDtos: answers.map((answer, index) => ({
         numberOfQuestion: index + 1,
         answer: answer,
