@@ -78,9 +78,9 @@ const ExamDetail = () => {
         data: payload,
       });
       SUCCESS(toast, "Nộp bài thành công ");
-      setTimeout(() => {
-        navigate(`/examresult/${userId}`);
-      }, 1000);
+      // setTimeout(() => {
+      //   navigate(`/examresult/${userId}`);
+      // }, 1000);
     } catch (error) {
       console.error("Error adding exam:", error);
       REJECT(toast, error.message);
