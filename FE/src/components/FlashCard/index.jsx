@@ -17,8 +17,8 @@ const Flashcard = ({ flashcard, showAnswer, setShowAnswer }) => {
         {!showAnswer ? (
           <>
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold text-center w-full mb-5">
-                {flashcard?.content}
+              <h2 className="text-xl font-bold text-center w-full mb-5" dangerouslySetInnerHTML={{__html:flashcard?.content}}>
+                
               </h2>
             </div>
             <div className="flex flex-wrap gap-10">

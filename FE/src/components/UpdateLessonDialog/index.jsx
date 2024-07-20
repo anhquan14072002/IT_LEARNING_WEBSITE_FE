@@ -124,6 +124,8 @@ export default function UpdateLessonDialog({
         setListDocument(listDocumentById);
         setListGrade(listGrade);
 
+        console.log("decoded content::",decodeIfNeeded(modelUpdate.content));
+
         const updatedInitialValues = {
           title: modelUpdate.title,
           content: decodeIfNeeded(modelUpdate.content),

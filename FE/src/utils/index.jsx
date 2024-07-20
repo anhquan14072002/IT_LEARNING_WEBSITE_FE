@@ -160,7 +160,12 @@ export const decodeIfNeeded = (content) => {
           .join("")
       );
 
-      return utf8String;
+      // Remove <meta>, <title>, and <style> tags from the decoded content
+      const cleanedContent = utf8String.replace(/<meta[^>]*>/g, '')
+                                       .replace(/<title[^>]*>(.*?)<\/title>/g, '')
+                                       .replace(/<style[^>]*>(.*?)<\/style>/g, '');
+
+      return cleanedContent;
     }
   } catch (error) {
     console.error("Error decoding Base64 content:", error);
@@ -168,6 +173,7 @@ export const decodeIfNeeded = (content) => {
 
   return content;
 };
+
 
 export const isBase64 = (content) => {
   if (/^[A-Za-z0-9+/=]+\s*$/.test(content)) {

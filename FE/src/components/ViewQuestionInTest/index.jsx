@@ -1,16 +1,42 @@
 import React, { useState, useEffect, useRef } from "react";
 import QuizResult from "../../components/QuizResult";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
-import { ProgressBar } from "primereact/progressbar";
 import { Button } from "primereact/button";
-import "./index.css"; // Assuming you have your styles in index.css
+import { Image } from "primereact/image"; // Assuming you're using PrimeReact's Image component
+import parse from "html-react-parser";
+import "./index.css";
 
-const ViewQuestionInTest = ({ quizData }) => {
+const CustomImage = ({ src, alt, width }) => {
+  const zoomIcon = () => {
+    return <i className="pi pi-plus text-white"></i>;
+  };
+  const zoomOutIcon = () => {
+    return <i className="pi pi-minus text-white"></i>;
+  };
+  const closeIcon = () => {
+    return <i className="pi pi-times text-white"></i>;
+  };
+  return (
+    <Image
+      src={src}
+      zoomSrc={src}
+      alt={alt}
+      className="hover:brightness-50 transition-all duration-300"
+      style={{ width: width }}
+      zoomInIcon={zoomIcon}
+      zoomOutIcon={zoomOutIcon}
+      closeIcon={closeIcon}
+      rotateLeftIcon={<></>}
+      rotateRightIcon={<></>}
+      preview
+    />
+  );
+};
+
+const ViewQuestionInTest = ({ quizData, quizDetail }) => {
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [showBackToTop, setShowBackToTop] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(30);
-  const [quizCompleted,setQuizCompleted] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(300);
+  const [quizCompleted, setQuizCompleted] = useState(false);
   const questionRefs = useRef([]);
 
   useEffect(() => {
@@ -32,7 +58,6 @@ const ViewQuestionInTest = ({ quizData }) => {
   useEffect(() => {
     const handleScroll = () => {
       if (window.scrollY > 200) {
-        // Adjust 200 to the desired scroll position
         setShowBackToTop(true);
       } else {
         setShowBackToTop(false);
@@ -45,16 +70,6 @@ const ViewQuestionInTest = ({ quizData }) => {
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
-
-  // Function to scroll to a specific question number
-  const scrollToQuestion = (index) => {
-    if (questionRefs.current[index]) {
-      questionRefs.current[index].scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
-  };
 
   const handleAnswerSelect = (questionId, answerId) => {
     setSelectedAnswers((prevState) => ({
@@ -75,33 +90,61 @@ const ViewQuestionInTest = ({ quizData }) => {
   };
 
   const handleQuizCompletion = () => {
-    setQuizCompleted(true); // Set quizCompleted to true
+    setQuizCompleted(true);
+  };
+
+  const renderHtmlContent = (content) => {
+    // Replace <img> tags with CustomImage components
+    const options = {
+      replace: ({ name, attribs, children }) => {
+        if (name === "img") {
+          const { src, alt, width } = attribs;
+          return <CustomImage src={src} alt={alt} width={width} />;
+        }
+      },
+    };
+
+    return parse(content, options);
+  };
+
+  const logAllImgTags = (content) => {
+    // Create a new DOMParser instance
+    const parser = new DOMParser();
+
+    // Parse the content as HTML
+    const doc = parser.parseFromString(content, "text/html");
+
+    // Query for all <img> tags
+    const imgTags = doc.querySelectorAll("img");
+
+    // Log each <img> tag
+    imgTags.forEach((img) => {
+      console.log(img.outerHTML);
+    });
   };
 
   if (quizCompleted) {
-    return (
-      <QuizResult
-        totalQuestions={quizData.length}
-        quizData={quizData}
-      />
-    );
+    return <QuizResult totalQuestions={quizData.length} quizData={quizData} />;
   }
 
   return (
     <div className="flex justify-center flex-wrap" id="question">
       {/* Question Box */}
       <div className="lesson-box w-3/4 p-4">
-        {quizData?.map((question, index) => (
+        <h1 className="text-center font-bold text-xl mb-3">
+          {quizDetail?.title}
+        </h1>
+        {quizData?.map((question, questionIndex) => (
           <div
-            key={question.id}
-            ref={(el) => (questionRefs.current[index] = el)} // Assigning ref to each question div
+            key={question?.id}
+            ref={(el) => (questionRefs.current[questionIndex] = el)}
             className="border shadow-lg p-5 rounded-lg mb-4"
           >
-            <p>Câu {`${index + 1}: `}</p>
-            <div dangerouslySetInnerHTML={{ __html: question.content }}></div>
-            <ul className="flex flex-wrap gap-5">
-              {question.quizAnswers.map((answer) => (
-                <li key={answer.id}>
+            <p className="font-bold">Câu {`${questionIndex + 1}: `}</p>
+            <div>{renderHtmlContent(question.content)}</div>
+            <ul className="flex flex-wrap gap-5 mt-5">
+              {question.quizAnswers.map((answer, index) => (
+                <li key={answer?.id}>
                   <label>
                     <input
                       type="radio"
@@ -123,8 +166,11 @@ const ViewQuestionInTest = ({ quizData }) => {
 
       {/* Lesson Box */}
       <div className="question-box p-4">
-        <Button label="Nộp bài" className="text-center bg-blue-600 hover:bg-blue-400 text-white w-full mb-2 py-1"/>
-        <div className="text-right text-blue-600 underline">
+        <Button
+          label="Nộp bài"
+          className="text-center bg-blue-600 hover:bg-blue-400 text-white w-full mb-2 py-1"
+        />
+        <div className="text-right text-red-600 underline">
           Thời gian làm bài: {Math.floor(timeLeft / 60)}:
           {timeLeft % 60 < 10 ? "0" + (timeLeft % 60) : timeLeft % 60}
         </div>
@@ -137,8 +183,6 @@ const ViewQuestionInTest = ({ quizData }) => {
                   ? "border-black border"
                   : "bg-blue-500 text-white"
               }`}
-              onClick={() => scrollToQuestion(index)}
-              style={{ cursor: "pointer" }}
             >
               {`${index + 1}`}
             </li>
