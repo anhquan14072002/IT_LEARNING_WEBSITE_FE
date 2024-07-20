@@ -16,7 +16,7 @@ export default function ExamCode({
   setVisibleExamCode,
   examCodeValue,
   setTitle,
-  toast,
+  toast
 }) {
   const [visibleAddExamCode, setVisibleAddExamCode] = useState(false);
   const [products, setProducts] = useState([]);
@@ -57,7 +57,7 @@ export default function ExamCode({
         className="text-blue-600 p-mr-2 shadow-none"
         onClick={() => {
           setUpdateValue(rowData);
-          setVisibleUpdate(true);
+          // setVisibleUpdate(true);
         }}
       />
       <Button
@@ -65,6 +65,7 @@ export default function ExamCode({
         className="text-red-600 shadow-none"
         onClick={() => {
           confirmDelete(rowData.id);
+          console.log("Hello");
         }}
       />
     </div>
@@ -76,8 +77,8 @@ export default function ExamCode({
     await restClient({ url: `api/examcode/deleteexamcodebyid/${id}`, method: "DELETE" })
       .then((res) => {
         fetchData();
-        ACCEPT(toast, "Xóa thành công");
         setVisibleDelete(false);
+        ACCEPT(toast, "Xóa thành công");
       })
       .catch((err) => {
         REJECT(toast, "Xảy ra lỗi khi xóa đề thi này");
@@ -89,7 +90,7 @@ export default function ExamCode({
 
 
   const confirmDelete = (id) => {
-    setVisibleDelete(true);
+    // setVisibleDelete(false);
     confirmDialog({
       message: "Bạn có chắc chắn muốn xóa đề thi này?",
       header: "Delete Confirmation",
@@ -98,6 +99,14 @@ export default function ExamCode({
       acceptClassName: "p-button-danger",
       footer: (
         <>
+         <Button
+            label="Hủy"
+            icon="pi pi-times"
+            className="p-2 bg-red-500 text-white mr-2"
+            onClick={() => {
+              // setVisibleDelete(false);
+            }}
+          />
           <Button
             label="Xóa"
             icon="pi pi-check"
@@ -105,6 +114,7 @@ export default function ExamCode({
             onClick={() => {
               deleteExamCode(id);
             }}
+            
           />
         </>
       ),

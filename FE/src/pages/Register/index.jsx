@@ -104,7 +104,7 @@ const Index = () => {
       const userId = response?.data?.data?.id;
       await createUserGrade({ userId, gradeId });
       SUCCESS(toast, "Đăng kí thành công");
-      // setTimeout(() => navigate("/login"), 3000);
+      setTimeout(() => navigate("/login"), 3000);
     } catch (error) {
       REJECT(toast, "Không đăng kí được");
     }
@@ -143,7 +143,7 @@ const Index = () => {
                       <InputText
                         id="firstname"
                         type="text"
-                        className="w-full h-12 text-black-800 border border-solid  border-gray-500 pb-2 rounded-md"
+                        className="w-full h-12 text-black-800 border border-solid  border-gray-500 pb-2 rounded-md shadow-none"
                         placeholder="Nhập họ"
                         {...field}
                       />
@@ -171,7 +171,7 @@ const Index = () => {
                       <InputText
                         id="lastname"
                         type="text"
-                        className="w-full h-12 text-black-800 border border-solid  border-gray-500 pb-2 rounded-md"
+                        className="w-full h-12 text-black-800 border border-solid  border-gray-500 pb-2 rounded-md shadow-none"
                         placeholder="Nhập Tên"
                         {...field}
                       />
@@ -201,7 +201,7 @@ const Index = () => {
                       <InputText
                       id="username"
                       type="text"
-                      className="w-full h-12 text-black-800 border border-solid  border-gray-500 pb-2 pl-1 rounded-md focus:border-blue-400"
+                      className="w-full h-12 text-black-800 border border-solid  border-gray-500 pb-2 pl-1 rounded-md shadow-none focus:border-blue-400"
                       placeholder="Nhập tên tài khoản"
                       {...field}
                     />
@@ -221,7 +221,7 @@ const Index = () => {
                       Lớp <span className="text-red-500">*</span>
                     </h4>
                   </label>
-                  <div className="card border border-gray-500 rounded-md flex justify-content-center">
+                  <div className="card border border-gray-500 rounded-md  flex justify-content-center">
                     <MultiSelect
                       value={selectClass}
                       onChange={handleSelected}
@@ -229,7 +229,7 @@ const Index = () => {
                       optionLabel="class"
                       placeholder="Chọn lớp"
                       maxSelectedLabels={12}
-                      className="w-full"
+                      className="w-full shadow-none"
                     />
                   </div>
                   {errors.selectClass && (
@@ -263,7 +263,7 @@ const Index = () => {
                     <InputText
                       id="password"
                       type="password"
-                      className="w-full h-12 text-black-800 border border-solid  border-gray-500 pb-1 pl-1 rounded-md"
+                      className="w-full h-12 text-black-800 border border-solid  border-gray-500 pb-1 pl-1 rounded-md shadow-none"
                       placeholder="Nhập mật khẩu"
                       {...field}
                     />
@@ -296,7 +296,7 @@ const Index = () => {
                     <InputText
                       id="passwordAgain"
                       type="password"
-                      className="w-full h-12 text-black-800 border border-solid  border-gray-500 pb-2 pl-1 rounded-md"
+                      className="w-full h-12 text-black-800 border border-solid  border-gray-500 pb-2 pl-1 rounded-md shadow-none"
                       placeholder="Nhập mật khẩu"
                       {...field}
                     />
