@@ -21,6 +21,8 @@ import {
   faArrowRight,
   faDownload,
 } from "@fortawesome/free-solid-svg-icons";
+import { Editor } from "primereact/editor";
+import './index.css'
 
 export default function Lesson() {
   const navigate = useNavigate();
@@ -231,7 +233,7 @@ export default function Lesson() {
                     className="flex items-center bg-blue-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
-                    Previous
+                    Trang trước
                   </button>
                   {lesson && lesson?.urlDownload && (
                     <button
@@ -246,7 +248,7 @@ export default function Lesson() {
                     className="flex items-center bg-blue-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     onClick={handleNext}
                   >
-                    Next
+                    Trang sau
                     <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
                   </button>
                 </div>
@@ -255,18 +257,21 @@ export default function Lesson() {
                 {/* Add more details based on your lesson object */}
               </div>
               {isBase64(lesson.content) ? (
-                <div
-                  dangerouslySetInnerHTML={{
-                    __html: decodeIfNeeded(lesson.content),
-                  }}
-                />
+                // <div
+                //   className="ql-editor"
+                //   dangerouslySetInnerHTML={{
+                //     __html: decodeIfNeeded(lesson.content),
+                //   }}
+                // />
+                <Editor value={decodeIfNeeded(lesson?.content)} readOnly={true} headerTemplate={<></>} className="custom-editor-class" />
               ) : (
-                <div
-                  className="ql-editor" // Add Quill's class if necessary
-                  dangerouslySetInnerHTML={{
-                    __html: lesson.content,
-                  }}
-                />
+                <Editor value={lesson?.content} readOnly={true} headerTemplate={<></>} className="custom-editor-class"  />
+                // <div
+                //   className="ql-editor" // Add Quill's class if necessary
+                //   dangerouslySetInnerHTML={{
+                //     __html: lesson.content,
+                //   }}
+                // />
               )}
             </>
           ) : (

@@ -16,6 +16,7 @@ import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import {
   ACCEPT,
   REJECT,
+  decodeIfNeeded,
   formatDate,
   getTokenFromLocalStorage,
   removeVietnameseTones,
@@ -26,8 +27,10 @@ import { Link } from "react-router-dom";
 import debounce from "lodash.debounce";
 import { InputSwitch } from "primereact/inputswitch";
 import { Tooltip } from "primereact/tooltip";
+import { Dialog } from "primereact/dialog";
+import { Editor } from "primereact/editor";
 
-export default function ContentLesson() {
+export default function Lesson() {
   const toast = useRef(null);
   const dropDownRef1 = useRef(null);
   const dropDownRef2 = useRef(null);
@@ -42,14 +45,14 @@ export default function ContentLesson() {
   const [modelUpdate, setModelUpdate] = useState({});
   const [textSearch, setTextSearch] = useState("");
   const [loadingDeleteMany, setLoadingDeleteMany] = useState(false);
+  const [visibleDialog, setVisibleDialog] = useState(false);
+  const [content, setContent] = useState("");
 
   //pagination
   const [first, setFirst] = useState(0);
   const [page, setPage] = useState(1);
   const [rows, setRows] = useState(10);
   const [totalPage, setTotalPage] = useState(0);
-
-  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
     fetchData(page, rows);
@@ -87,11 +90,12 @@ export default function ContentLesson() {
           const paginationData = JSON.parse(res.headers["x-pagination"]);
           setTotalPage(paginationData.TotalPages);
           setProducts(Array.isArray(res.data.data) ? res.data.data : []);
-          setLoading(false);
         })
         .catch((err) => {
           console.error("Error fetching data:", err);
           setProducts([]);
+        })
+        .finally(() => {
           setLoading(false);
         });
     }
@@ -140,22 +144,36 @@ export default function ContentLesson() {
     return <span>{index}</span>;
   };
   const file = (rowData, { rowIndex }) => {
-    return !rowData.content ? (
+    return (
       <Link
         className="p-2 bg-blue-500 text-white rounded-md"
         to={`${rowData.urlDownload}`}
       >
         Tải về
       </Link>
-    ) : (
-      <></>
     );
+  };
+
+  const changeStatusLesson = (value, id) => {
+    restClient({
+      url: "api/lesson/updatestatuslesson?id=" + id,
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
+    })
+      .then((res) => {
+        ACCEPT(toast, "Thay đổi trạng thái thành công");
+        getData();
+      })
+      .catch((err) => {
+        REJECT(toast, "Lỗi khi thay đổi trạng thái");
+      });
   };
 
   const status = (rowData, { rowIndex }) => {
     return (
       <InputSwitch
-        checked={rowData.isActive}
         tooltip={
           rowData.isActive
             ? "Bài học này đã được duyệt"
@@ -250,6 +268,22 @@ export default function ContentLesson() {
       });
   };
 
+  const view = (rowData, { rowIndex }) => {
+    return (
+      <Button
+        label="Chi tiết"
+        icon="pi pi-info-circle"
+        className="text-white p-2 shadow-none bg-blue-600 hover:bg-blue-400"
+        onClick={() => handleOpenDialog(rowData?.content)}
+      />
+    );
+  };
+
+  const handleOpenDialog = (content) => {
+    setContent(content);
+    setVisibleDialog(true);
+  };
+
   const deleteLesson = (id) => {
     restClient({ url: `api/lesson/deletelesson/${id}`, method: "DELETE" })
       .then((res) => {
@@ -271,6 +305,22 @@ export default function ContentLesson() {
   return (
     <div>
       <Toast ref={toast} />
+      <Dialog
+        header="Nội dung chi tiết"
+        visible={visibleDialog}
+        style={{ width: "50vw" }}
+        onHide={() => {
+          if (!visibleDialog) return;
+          setVisibleDialog(false);
+        }}
+      >
+        <Editor
+          value={decodeIfNeeded(content)}
+          readOnly={true}
+          headerTemplate={<></>}
+          className="custom-editor-class"
+        />
+      </Dialog>
       <ConfirmDialog visible={visibleDelete} />
       <AddLessonDialog
         visible={visible}
@@ -324,7 +374,33 @@ export default function ContentLesson() {
               />
             </div>
 
-            <div className="flex-1 flex flex-wrap gap-3 justify-end">
+            {/* <div className="flex-1 flex flex-wrap gap-3 justify-end">
+              <div className="border-2 rounded-md mt-4">
+                <Dropdown
+                  filter
+                  ref={dropDownRef2}
+                  value={selectedCity}
+                  onChange={(e) => setSelectedCity(e.value)}
+                  options={cities}
+                  optionLabel="name"
+                  showClear
+                  placeholder="Lớp"
+                  className="w-full md:w-14rem shadow-none h-full"
+                />
+              </div>
+              <div className="border-2 rounded-md mt-4">
+                <Dropdown
+                  filter
+                  ref={dropDownRef2}
+                  value={selectedCity}
+                  onChange={(e) => setSelectedCity(e.value)}
+                  options={cities}
+                  optionLabel="name"
+                  showClear
+                  placeholder="Bộ sách"
+                  className="w-full md:w-14rem shadow-none h-full"
+                />
+              </div>
               <div className="border-2 rounded-md mt-4">
                 <Dropdown
                   filter
@@ -338,7 +414,7 @@ export default function ContentLesson() {
                   className="w-full md:w-14rem shadow-none h-full"
                 />
               </div>
-            </div>
+            </div> */}
           </div>
           {loading ? (
             <Loading />
@@ -363,39 +439,52 @@ export default function ContentLesson() {
                 header="#"
                 body={indexBodyTemplate}
                 className="border-b-2 border-t-2"
+                style={{ minWidth: '5rem' }}
               />
+
               <Column
                 field="title"
                 header="Tiêu đề"
                 className="border-b-2 border-t-2"
+                style={{ minWidth: '12rem' }}
               ></Column>
               <Column
                 field="topicTitle"
                 header="Chủ đề"
                 className="border-b-2 border-t-2"
+                style={{ minWidth: '12rem' }}
               ></Column>
               <Column
                 header="File tài liệu"
                 className="border-b-2 border-t-2"
                 body={file}
-                style={{ width: "10%" }}
+                style={{ minWidth: '12rem' }}
               ></Column>
               <Column
                 header="Trạng thái"
                 className="border-b-2 border-t-2"
                 body={status}
-                style={{ width: "10%" }}
+                style={{ minWidth: '10rem' }}
               ></Column>
               <Column
                 field="createdDate"
                 header="Ngày tạo"
                 body={(rowData) => formatDate(rowData.createdDate)}
                 className="border-b-2 border-t-2"
+                style={{ minWidth: '20rem' }}
               ></Column>
               <Column
                 field="lastModifiedDate"
                 header="Ngày cập nhật"
                 body={(rowData) => formatDate(rowData.lastModifiedDate)}
+                className="border-b-2 border-t-2"
+                style={{ minWidth: '20rem' }}
+              ></Column>
+              <Column
+                field="info"
+                header=""
+                style={{ minWidth: '12rem' }}
+                body={view}
                 className="border-b-2 border-t-2"
               ></Column>
               <Column

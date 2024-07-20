@@ -30,8 +30,9 @@ export default function Document() {
   const [visibleUpdate, setVisibleUpdate] = useState(false);
   const [visibleDelete, setVisibleDelete] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [filterClass, setFilterClass] = useState({ name: "" });
+  const [filterClass, setFilterClass] = useState({});
   const [textSearch, setTextSearch] = useState("");
+  const [gradeList, setGradeList] = useState([]);
 
   // Pagination
   const [first, setFirst] = useState(0);
@@ -40,13 +41,28 @@ export default function Document() {
   const [totalPage, setTotalPage] = useState(0);
 
   useEffect(() => {
+    restClient({
+      url: "api/grade/getallgrade",
+      method: "GET",
+    })
+      .then((res) => {
+        setGradeList(res?.data?.data);
+      })
+      .catch((err) => {
+        setGradeList([]);
+      });
+  }, []);
+
+  useEffect(() => {
     fetchData();
-  }, [page, rows, textSearch]);
+  }, [page, rows, textSearch, filterClass]);
 
   const pagination = (page, rows) => {
     setLoading(true);
     restClient({
-      url: `api/document/getalldocumentpagination?PageIndex=${page}&PageSize=${rows}`,
+      url: `api/document/searchbydocumentpagination?PageIndex=${page}&PageSize=${rows}&${
+        filterClass?.id && `GradeId=${filterClass?.id}`
+      }`,
       method: "GET",
     })
       .then((res) => {
@@ -65,12 +81,14 @@ export default function Document() {
     if (textSearch.trim()) {
       setLoading(true);
       restClient({
-        url: `api/document/searchbydocumentpagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}`,
+        url: `api/document/searchbydocumentpagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}&${
+          filterClass?.id && `GradeId=${filterClass?.id}`
+        }`,
         method: "GET",
       })
         .then((res) => {
           const paginationData = JSON.parse(res.headers["x-pagination"]);
-          setUpdateValue({})
+          setUpdateValue({});
           setTotalPage(paginationData.TotalPages);
           setProducts(Array.isArray(res.data.data) ? res.data.data : []);
         })
@@ -156,11 +174,7 @@ export default function Document() {
   const cities = [{ name: "Cấp 1" }, { name: "Cấp 2" }, { name: "Cấp 3" }];
 
   const handleSearch = (text) => {
-    if (text && text.name) {
-      setFilterClass({ name: text.name });
-    } else {
-      setFilterClass({ name: "" });
-    }
+    setFilterClass(text);
   };
 
   const handleSearchInput = debounce((text) => {
@@ -221,8 +235,8 @@ export default function Document() {
                   ref={dropDownRef2}
                   value={filterClass}
                   onChange={(e) => handleSearch(e.value)}
-                  options={cities}
-                  optionLabel="name"
+                  options={gradeList}
+                  optionLabel="title"
                   showClear
                   placeholder="Lớp"
                   className="w-full md:w-14rem shadow-none h-full"
@@ -249,27 +263,49 @@ export default function Document() {
                   header="#"
                   body={indexBodyTemplate}
                   className="border-b-2 border-t-2"
+                  style={{ minWidth: '5rem' }}
                 />
                 <Column
                   field="title"
                   header="Tiêu đề"
-                  style={{width:'40%'}}
+                  style={{ minWidth: '12rem' }}
                   className="border-b-2 border-t-2"
                 />
                 <Column
                   field="gradeTitle"
                   header="Lớp"
+                  style={{ minWidth: '12rem' }}
+                  className="border-b-2 border-t-2"
+                />
+                <Column
+                  field="bookCollection"
+                  header="Bộ sưu tập sách"
+                  style={{ minWidth: '12rem' }}
+                  className="border-b-2 border-t-2"
+                />
+                <Column
+                  field="typeOfBook"
+                  header="Loại sách"
+                  style={{ minWidth: '12rem' }}
+                  className="border-b-2 border-t-2"
+                />
+                <Column
+                  field="author"
+                  header="Tác giả"
+                  style={{ minWidth: '12rem' }}
                   className="border-b-2 border-t-2"
                 />
                 <Column
                   field="createdDate"
                   header="Ngày tạo"
+                  style={{ minWidth: '12rem' }}
                   className="border-b-2 border-t-2"
                   body={(rowData) => formatDate(rowData.createdDate)}
                 />
                 <Column
                   field="lastModifiedDate"
                   header="Ngày cập nhật"
+                  style={{ minWidth: '12rem' }}
                   className="border-b-2 border-t-2"
                   body={(rowData) => formatDate(rowData.lastModifiedDate)}
                 />

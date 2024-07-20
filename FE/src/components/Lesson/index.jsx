@@ -28,6 +28,7 @@ import debounce from "lodash.debounce";
 import { InputSwitch } from "primereact/inputswitch";
 import { Tooltip } from "primereact/tooltip";
 import { Dialog } from "primereact/dialog";
+import { Editor } from "primereact/editor";
 
 export default function Lesson() {
   const toast = useRef(null);
@@ -93,7 +94,8 @@ export default function Lesson() {
         .catch((err) => {
           console.error("Error fetching data:", err);
           setProducts([]);
-        }).finally(()=>{
+        })
+        .finally(() => {
           setLoading(false);
         });
     }
@@ -274,7 +276,7 @@ export default function Lesson() {
         label="Chi tiết"
         icon="pi pi-info-circle"
         className="text-white p-2 shadow-none bg-blue-600 hover:bg-blue-400"
-        onClick={() => handleOpenDialog(rowData.content)}
+        onClick={() => handleOpenDialog(rowData?.content)}
       />
     );
   };
@@ -314,7 +316,12 @@ export default function Lesson() {
           setVisibleDialog(false);
         }}
       >
-        <div className="ql-editor" dangerouslySetInnerHTML={{ __html: decodeIfNeeded(content) }}></div>
+        <Editor
+          value={decodeIfNeeded(content)}
+          readOnly={true}
+          headerTemplate={<></>}
+          className="custom-editor-class"
+        />
       </Dialog>
       <ConfirmDialog visible={visibleDelete} />
       <AddLessonDialog
@@ -369,7 +376,33 @@ export default function Lesson() {
               />
             </div>
 
-            <div className="flex-1 flex flex-wrap gap-3 justify-end">
+            {/* <div className="flex-1 flex flex-wrap gap-3 justify-end">
+              <div className="border-2 rounded-md mt-4">
+                <Dropdown
+                  filter
+                  ref={dropDownRef2}
+                  value={selectedCity}
+                  onChange={(e) => setSelectedCity(e.value)}
+                  options={cities}
+                  optionLabel="name"
+                  showClear
+                  placeholder="Lớp"
+                  className="w-full md:w-14rem shadow-none h-full"
+                />
+              </div>
+              <div className="border-2 rounded-md mt-4">
+                <Dropdown
+                  filter
+                  ref={dropDownRef2}
+                  value={selectedCity}
+                  onChange={(e) => setSelectedCity(e.value)}
+                  options={cities}
+                  optionLabel="name"
+                  showClear
+                  placeholder="Bộ sách"
+                  className="w-full md:w-14rem shadow-none h-full"
+                />
+              </div>
               <div className="border-2 rounded-md mt-4">
                 <Dropdown
                   filter
@@ -383,7 +416,7 @@ export default function Lesson() {
                   className="w-full md:w-14rem shadow-none h-full"
                 />
               </div>
-            </div>
+            </div> */}
           </div>
           {loading ? (
             <Loading />
@@ -408,46 +441,51 @@ export default function Lesson() {
                 header="#"
                 body={indexBodyTemplate}
                 className="border-b-2 border-t-2"
+                style={{ minWidth: '5rem' }}
               />
 
               <Column
                 field="title"
                 header="Tiêu đề"
                 className="border-b-2 border-t-2"
+                style={{ minWidth: '12rem' }}
               ></Column>
               <Column
                 field="topicTitle"
                 header="Chủ đề"
                 className="border-b-2 border-t-2"
+                style={{ minWidth: '12rem' }}
               ></Column>
               <Column
                 header="File tài liệu"
                 className="border-b-2 border-t-2"
                 body={file}
-                style={{ width: "10%" }}
+                style={{ minWidth: '12rem' }}
               ></Column>
               <Column
                 header="Trạng thái"
                 className="border-b-2 border-t-2"
                 body={status}
-                style={{ width: "10%" }}
+                style={{ minWidth: '10rem' }}
               ></Column>
               <Column
                 field="createdDate"
                 header="Ngày tạo"
                 body={(rowData) => formatDate(rowData.createdDate)}
                 className="border-b-2 border-t-2"
+                style={{ minWidth: '20rem' }}
               ></Column>
               <Column
                 field="lastModifiedDate"
                 header="Ngày cập nhật"
                 body={(rowData) => formatDate(rowData.lastModifiedDate)}
                 className="border-b-2 border-t-2"
+                style={{ minWidth: '20rem' }}
               ></Column>
               <Column
                 field="info"
                 header=""
-                style={{ width: "10%" }}
+                style={{ minWidth: '12rem' }}
                 body={view}
                 className="border-b-2 border-t-2"
               ></Column>

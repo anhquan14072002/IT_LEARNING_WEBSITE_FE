@@ -23,7 +23,12 @@
   }
 
   .question-box {
+    margin-top: 10px;
     width: 100% !important;
     order: 1;
   }
+}
+
+.p-image-preview-enter-done .p-image-preview{
+  scale: 3;
 }

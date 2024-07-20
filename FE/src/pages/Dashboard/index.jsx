@@ -9,20 +9,22 @@ import QuizManagement from "../../components/QuizManagement";
 import { Tooltip } from "primereact/tooltip";
 import ManageExam from "../../components/ManageExam";
 import ManageTag from "../../components/ManageTag";
+import { useNavigate, useParams } from "react-router-dom";
 
 const Dashboard = () => {
   const [open, setOpen] = useState(true);
-  const [indexMenu, setIndexMenu] = useState(0);
+  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const { typeId } = useParams();
 
   const Menus = [
-    { title: "Thống kê", src: "Chart_fill", index: 0 },
-    { title: "Quản lí tài khoản", src: "User", index: 1 },
-    { title: "Quản lí tài liệu/chủ đề/bài học ", src: "Folder", index: 2 },
-    { title: "Quản lí bài học ", src: "Folder", index: 3 },
-    { title: "Quản lí câu hỏi ôn tập ", src: "Folder", index: 4 },
-    { title: "Quản lí đề thi", src: "Folder", index: 5 },
-    { title: "Quản lí tag ", src: "Folder", index: 6 },
+    { title: "Thống kê", src: "Chart_fill", index: "statistic" },
+    { title: "Quản lí tài khoản", src: "User", index: "user" },
+    { title: "Quản lí tài liệu/chủ đề/bài học ", src: "Folder", index: "adminManageDocument" },
+    { title: "Quản lí bài học ", src: "Folder", index: "lesson" },
+    { title: "Quản lí câu hỏi ôn tập ", src: "Folder", index: "quiz" },
+    { title: "Quản lí đề thi", src: "Folder", index: "test" },
+    { title: "Quản lí tag ", src: "Folder", index: "tag" },
   ];
 
   return (
@@ -55,38 +57,33 @@ const Dashboard = () => {
                 />
               </div> */}
               <ul className="pt-6">
-                {Menus.map((Menu, index) => (
-                  <>
-                    <Tooltip target={"target"} content={Menu?.title} />
-
-                    <li
-                      key={index}
-                      className={`flex rounded-md p-2 cursor-pointer hover:bg-light-white text-gray-300 text-sm items-center gap-x-4 mt-2 ${
-                        index === indexMenu ? "bg-light-white" : ""
-                      }`}
-                      onClick={() => setIndexMenu(index)}
-                    >
-                      <img src={`/src/assets/${Menu.src}.png`} />
-                      <span
-                        className={`${
-                          !open ? "hidden" : ""
-                        } origin-left duration-200`}
-                      >
-                        {Menu.title}
-                      </span>
-                    </li>
-                  </>
+                {Menus.map((Menu) => (
+                  <li
+                    key={Menu.index}
+                    className={`flex rounded-md p-2 cursor-pointer hover:bg-light-white text-gray-300 text-sm items-center gap-x-4 mt-2 ${
+                      Menu.index === Number(typeId) ? "bg-light-white" : ""
+                    }`}
+                    onClick={() => {
+                      navigate(`/dashboard/${Menu.index}`);
+                    }}
+                  >
+                    <Tooltip target={`menu-${Menu.index}`} content={Menu.title} />
+                    <img src={`/src/assets/${Menu.src}.png`} alt={Menu.title} />
+                    <span className={`${!open ? "hidden" : ""} origin-left duration-200`}>
+                      {Menu.title}
+                    </span>
+                  </li>
                 ))}
               </ul>
             </div>
           </div>
-          <div className={`ml-20 mt-16 p-7`}>
+          <div className="ml-20 mt-16 p-7">
             <div className="h-screen">
-              {indexMenu === 2 && <ManageDocument />}
-              {indexMenu === 3 && <ContentLesson />}
-              {indexMenu === 4 && <QuizManagement />}
-              {indexMenu === 5 && <ManageExam />}
-              {indexMenu === 6 && <ManageTag />}
+              {typeId === "adminManageDocument" && <ManageDocument />}
+              {typeId === "lesson" && <ContentLesson />}
+              {typeId === "quiz" && <QuizManagement />}
+              {typeId === "test" && <ManageExam />}
+              {typeId === "tag" && <ManageTag />}
             </div>
           </div>
         </>
