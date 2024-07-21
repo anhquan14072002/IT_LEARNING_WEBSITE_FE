@@ -22,6 +22,7 @@ import {
 import { InputSwitch } from "primereact/inputswitch";
 // import AddTag from "../AddTag";
 import UpdateQuizLesson from "../UpdateQuizLesson";
+import AddTag from "../AddTag";
 
 export default function ManagementQuizLesson() {
   const toast = useRef(null);

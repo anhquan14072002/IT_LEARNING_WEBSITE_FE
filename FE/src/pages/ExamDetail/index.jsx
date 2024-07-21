@@ -30,7 +30,7 @@ const ExamDetail = () => {
     const fetchData = async () => {
       try {
         const response = await getExamCodeById(id);
-        console.log(response?.data?.data[0]?.examTitle);
+        console.log(response?.data?.data?.length);
         setData(response?.data?.data[0]);
         setExamList(response?.data?.data);
         setViewPdf(response?.data?.data[0].examFile);
@@ -59,11 +59,21 @@ const ExamDetail = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+
+    const countAnswers = Object.keys(answers).length;
+    console.log("Answers state:", countAnswers);
+    console.log("Answers state:", answers);
     console.log(data?.numberQuestion);
+    if (countAnswers !== data?.numberQuestion) {
+      REJECT(toast, "Vui lòng trả lời tất cả các câu hỏi trước khi nộp bài.");
+      return;
+    }
+
     const formattedAnswers = Object.keys(answers).map((key) => ({
       numberOfQuestion: parseInt(key.replace("question", ""), 10),
       answer: answers[key],
     }));
+
     console.log("Submitted answers:", formattedAnswers);
     const payload = {
       userId: userId,
@@ -72,15 +82,16 @@ const ExamDetail = () => {
     };
     console.log(payload);
     try {
-      await restClient({
+      const response = await restClient({
         url: "api/userexam/submitexam",
         method: "POST",
         data: payload,
       });
+      console.log(response?.data?.data);
       SUCCESS(toast, "Nộp bài thành công ");
-      // setTimeout(() => {
-      //   navigate(`/examresult/${userId}`);
-      // }, 1000);
+      setTimeout(() => {
+        navigate(`/examresult/${response?.data?.data}`);
+      }, 1000);
     } catch (error) {
       console.error("Error adding exam:", error);
       REJECT(toast, error.message);
@@ -103,15 +114,16 @@ const ExamDetail = () => {
       <div className="m-4 ">
         <div className="text-2xl font-semibold mb-4 flex flex-col  ">
           <div className="mb-5"> {data?.examTitle}</div>
-
-          <Dropdown
-            value={selectedExamCode}
-            onChange={handleChangeExamCode}
-            options={examList}
-            optionLabel="code"
-            placeholder={data?.code}
-            className="w-fit md:w-14rem border border-black  items-center shadow-none "
-          />
+          {examList?.length !== 1 && (
+            <Dropdown
+              value={selectedExamCode}
+              onChange={handleChangeExamCode}
+              options={examList}
+              optionLabel="code"
+              placeholder={data?.code}
+              className="w-fit md:w-14rem border border-black  items-center shadow-none "
+            />
+          )}
         </div>
         <div
           className={`h-screen w-full flex mt-5 ${
@@ -154,10 +166,15 @@ const ExamDetail = () => {
                                 answers[`question${questionNumber}`] === "A"
                               }
                               onChange={handleInputChange}
+                              hidden
                             />
                             <label
                               htmlFor={`answerA${questionNumber}`}
-                              className="answer-label"
+                              className={`answer-label border border-black p-1 rounded-full w-8 h-8 flex items-center justify-center ${
+                                answers[`question${questionNumber}`] === "A"
+                                  ? "bg-blue-400"
+                                  : "bg-white"
+                              }`}
                             >
                               A
                             </label>
@@ -172,10 +189,15 @@ const ExamDetail = () => {
                                 answers[`question${questionNumber}`] === "B"
                               }
                               onChange={handleInputChange}
+                              hidden
                             />
                             <label
                               htmlFor={`answerB${questionNumber}`}
-                              className="answer-label"
+                              className={`answer-label border border-black p-1 rounded-full w-8 h-8 flex items-center justify-center ${
+                                answers[`question${questionNumber}`] === "B"
+                                  ? "bg-blue-400"
+                                  : "bg-white"
+                              }`}
                             >
                               B
                             </label>
@@ -190,10 +212,15 @@ const ExamDetail = () => {
                                 answers[`question${questionNumber}`] === "C"
                               }
                               onChange={handleInputChange}
+                              hidden
                             />
                             <label
                               htmlFor={`answerC${questionNumber}`}
-                              className="answer-label"
+                              className={`answer-label border border-black p-1 rounded-full w-8 h-8 flex items-center justify-center ${
+                                answers[`question${questionNumber}`] === "C"
+                                  ? "bg-blue-400"
+                                  : "bg-white"
+                              }`}
                             >
                               C
                             </label>
@@ -208,10 +235,15 @@ const ExamDetail = () => {
                                 answers[`question${questionNumber}`] === "D"
                               }
                               onChange={handleInputChange}
+                              hidden
                             />
                             <label
                               htmlFor={`answerD${questionNumber}`}
-                              className="answer-label"
+                              className={`answer-label border border-black p-1 rounded-full w-8 h-8 flex items-center justify-center ${
+                                answers[`question${questionNumber}`] === "D"
+                                  ? "bg-blue-400"
+                                  : "bg-white"
+                              }`}
                             >
                               D
                             </label>
@@ -232,9 +264,9 @@ const ExamDetail = () => {
                 <label htmlFor="button">
                   <span
                     id="button"
-                    className=" mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                    className=" text-xl text-center justify-center flex mt-4 bg-blue-500 hover:bg-blue-700 text-white font-bold py-4 px-10 rounded"
                   >
-                    Submit
+                    Nộp bài
                   </span>
                 </label>
               </div>

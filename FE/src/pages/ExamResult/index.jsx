@@ -1,39 +1,44 @@
-import React, { useEffect, useState } from 'react';
-import restClient from '../../services/restClient';
-import { useParams } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import restClient from "../../services/restClient";
+import { useParams } from "react-router-dom";
 
 const Index = () => {
-  const [score, setScore] = useState(null); // Initialize score state to null or appropriate initial value
+  const [score, setScore] = useState(null);
+  const [historyExam, setHistoryExam] = useState([]);
   const { id } = useParams();
 
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await restClient({
-          url: `api/userexam/getlistresultexamofuserbyuserid/${id}`,
-          method: 'GET',
+          url: `api/userexam/getuserexambyid/${id}`,
+          method: "GET",
         });
-        console.log(response.data); // Assuming response contains data property with score
-        setScore(response.data); // Set score state with the fetched data
-        // You can add toast notification here for successful data fetch
+        setScore(response?.data?.data?.score);
+        setHistoryExam(response?.data?.data?.historyExam);
+        console.log(response?.data?.data?.historyExam);
       } catch (error) {
-        console.error('Error fetching data:', error);
-        // Handle error with toast notification or other error handling
+        console.error("Error fetching data:", error);
       }
     };
 
     fetchData();
-  }, [id]); // Add id to dependency array to fetch data whenever id changes
+  }, [id]);
 
   return (
-    <div>
-      <h1>Điểm của bạn</h1>
-      {score !== null ? (
-        <p>Điểm của bạn là: {score}</p>
-      ) : (
-        <p>Loading...</p>
-      )}
+    <div className="text-center h-screen font-sans m-5 p-5 border border-gray-300 rounded-lg shadow-lg bg-gray-100">
+    <h1 className="text-2xl text-gray-800 mb-4">Điểm của bạn</h1>
+    <p className="text-lg text-gray-600 mb-6"> {score}</p>
+    <h1>Kết quả</h1>
+    <div className="flex flex-col items-center">
+      {historyExam.map((item, index) => (
+        <div key={index} className="bg-gray-200 p-4 mb-2 rounded-md w-4/5 max-w-md">
+          Câu hỏi số {item?.numberOfQuestion} : {item?.userAnswer}
+        </div>
+      ))}
     </div>
+  </div>
+  
   );
 };
 
