@@ -3,62 +3,66 @@ import { Dialog } from "primereact/dialog";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import CustomTextInput from "../../shared/CustomTextInput";
+import CustomSelectInput from "../../shared/CustomSelectInput";
+import CustomTextarea from "../../shared/CustomTextarea";
 import { Button } from "primereact/button";
+import CustomEditor from "../../shared/CustomEditor";
 import { ACCEPT, REJECT, removeVietnameseTones, SUCCESS } from "../../utils";
 import restClient from "../../services/restClient";
 import Loading from "../Loading";
+import { Dropdown } from "primereact/dropdown";
+import CustomDropdown from "../../shared/CustomDropdown";
+import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
 
 const validationSchema = Yup.object({
   title: Yup.string().required("Tiêu đề không được bỏ trống"),
 });
 
-export default function AddTag({
-  visible,
-  setVisible,
+export default function UpdateTag({
+  visibleUpdate,
+  setVisibleUpdate,
+  updateValue,
   toast,
   fetchData,
 }) {
-  const[loading,setLoading] = useState(true)
-  const initialValues= ({
-  title:""
-  });
-  
-
-
-  const onSubmit = async(values) => {
+  const [loading, setLoading] = useState(true);
+  const initialValues = {
+    title: updateValue?.title,
+  };
+  const onSubmit = async (values) => {
     console.log(values.title);
     const data = {
+      id: updateValue?.id,
       title: values.title,
       keyWord: removeVietnameseTones(values.title),
-      isActive:false
-    }
+      isActive: updateValue?.isActive,
+    };
     await restClient({
-      url:'api/tag/createtag',
-      method:"POST",
-      data:data
+      url: "api/tag/updatetag",
+      method: "PUT",
+      data: data,
     })
-    .then((res) => {
-      ACCEPT(toast, "Tạo Tag Thành Công");
-      fetchData();
-      setVisible(false);
-    })
-    .catch((err) => {
-      REJECT(toast, "Tag đã có ");
-    })
+      .then((res) => {
+        ACCEPT(toast, "Tạo Tag Thành Công");
+        fetchData();
+        setVisibleUpdate(false);
+      })
+      .catch((err) => {
+        REJECT(toast, "Tag đã có ");
+      });
   };
 
-  
   return (
     <Dialog
-      header="Thêm  Tag"
-      visible={visible}
+      header="Sửa Tag"
+      visible={visibleUpdate}
       style={{ width: "50vw" }}
       onHide={() => {
-        if (!visible) return;
-        setVisible(false);
+        if (!visibleUpdate) return;
+        setVisibleUpdate(false);
       }}
     >
-      {loading === false     ? (
+      {loading === false ? (
         <Loading />
       ) : (
         <Formik
@@ -68,9 +72,13 @@ export default function AddTag({
         >
           {(formik) => (
             <Form>
-      
               <CustomTextInput
-                  label={<><span>Tiêu đề</span><span style={{ color: 'red' }}>*</span></>}
+                label={
+                  <>
+                    <span>Tiêu đề</span>
+                    <span style={{ color: "red" }}>*</span>
+                  </>
+                }
                 name="title"
                 type="text"
                 id="title"
@@ -80,12 +88,12 @@ export default function AddTag({
                   className="p-2 bg-red-500 text-white"
                   type="button"
                   severity="danger"
-                  onClick={() => setVisible(false)}
+                  onClick={() => setVisibleUpdate(false)}
                 >
                   Hủy
                 </Button>
                 <Button className="p-2 bg-blue-500 text-white" type="submit">
-                  Thêm
+                  Sửa
                 </Button>
               </div>
             </Form>

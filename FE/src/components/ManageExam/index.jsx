@@ -23,7 +23,6 @@ import UpdateExam from "../UpdateExam";
 import AnswerExam from "../AnwserExam";
 import ExamCode from "../ExamCode";
 
-
 export default function ManageExam() {
   const toast = useRef(null);
   const dropDownRef1 = useRef(null);
@@ -137,27 +136,24 @@ export default function ManageExam() {
     );
   };
 
-  const examCodeTemple = (rowData) =>{
-    return(
-     
+  const examCodeTemplate = (rowData) => {
+    return (
       <Button
-      tooltip="Xem chi tiết các mã đề"
+        tooltip="Xem chi tiết các mã đề"
         icon="pi pi-info-circle"
         className="text-blue-600 p-mr-2 shadow-none"
         onClick={() => {
-          
-          setTitle(rowData?.title)
+          setTitle(rowData?.title);
           setExamCodeValue(rowData);
           setVisibleExamCode(true);
         }}
       />
-      
-    )
-  }
-  const anwserTemple = (rowData) => {
+    );
+  };
+  const examType = (rowData) => {
     return (
       <div style={{ display: "flex" }}>
-        {rowData.type === 1 ? (<h1>Tự Luận</h1>):(<h1>Trắc Nghiệm</h1>)}
+        {rowData.type === 1 ? <h1>Tự Luận</h1> : <h1>Trắc Nghiệm</h1>}
       </div>
     );
   };
@@ -255,8 +251,8 @@ export default function ManageExam() {
         toast={toast}
         fetchData={fetchData}
       />
-    
-       <ExamCode
+
+      <ExamCode
         visibleExamCode={visibleExamCode}
         setVisibleExamCode={setVisibleExamCode}
         setTitle={title}
@@ -342,28 +338,30 @@ export default function ManageExam() {
                   header="Loại đề"
                   className="border-b-2 border-t-2"
                   style={{ width: "15%" }}
-                  body={anwserTemple}
+                  body={examType}
                 />
-               
+
                 <Column
                   header="Chi Tiết"
-                  style={{ width: "10%" }}
-
                   className="border-b-2 border-t-2"
-                  body={examCodeTemple}
+                  style={{ width: "10%" }}
+                  body={examCodeTemplate}
                 />
-                 <Column
+
+                <Column
                   field="province"
                   header="Tỉnh"
                   className="border-b-2 border-t-2"
                   style={{ width: "10%" }}
                 />
+
                 <Column
                   header="Trạng thái"
                   className="border-b-2 border-t-2"
                   body={status}
                   style={{ width: "10%" }}
-                ></Column>
+                />
+
                 <Column
                   field="createdDate"
                   header="Ngày tạo"
@@ -371,6 +369,7 @@ export default function ManageExam() {
                   style={{ width: "15%" }}
                   body={(rowData) => formatDate(rowData.createdDate)}
                 />
+
                 <Column
                   field="lastModifiedDate"
                   header="Ngày cập nhật"
@@ -378,9 +377,11 @@ export default function ManageExam() {
                   style={{ width: "15%" }}
                   body={(rowData) => formatDate(rowData.lastModifiedDate)}
                 />
+
                 <Column
                   className="border-b-2 border-t-2"
                   body={actionBodyTemplate}
+                  style={{ width: "5%" }}
                 />
               </DataTable>
               <Paginator

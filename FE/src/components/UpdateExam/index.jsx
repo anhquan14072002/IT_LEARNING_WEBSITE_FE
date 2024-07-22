@@ -122,7 +122,6 @@ export default function UpdateExam({
   const onFileSolutionSelect = (e) => {
     setFileSolution(e.files);
   };
-  console.log(type);
   return (
     <Dialog
       header="Sửa Đề Thi"
