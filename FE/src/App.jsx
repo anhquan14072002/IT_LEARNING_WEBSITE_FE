@@ -45,14 +45,9 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/checkmail" element={<CheckMail />} />
         <Route path="/changepassword" element={<ChangePassword />} />
-<<<<<<< HEAD
-        {/* <Route path="/examdetail" element={<ExamDetail />} /> */}
+        {/* <Route path="/examdetail/:id" element={<ExamDetail />} /> */}
+        {/* <Route path="/examresult/:id" element={<ExamResult />} /> */}
       </Routes>
-=======
-        <Route path="/examdetail/:id" element={<ExamDetail />} />
-        <Route path="/examresult/:id" element={<ExamResult />} />
-        </Routes>
->>>>>>> 9704923e4470df268c5309432ca9f8a85b1bcba6
     </Router>
   );
 }
