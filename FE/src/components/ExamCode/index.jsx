@@ -16,7 +16,7 @@ export default function ExamCode({
   setVisibleExamCode,
   examCodeValue,
   setTitle,
-  toast
+  toast,
 }) {
   const [visibleAddExamCode, setVisibleAddExamCode] = useState(false);
   const [products, setProducts] = useState([]);
@@ -24,7 +24,7 @@ export default function ExamCode({
   const [loading, setLoading] = useState(false);
   const [visibleExam, setVisibleExam] = useState(false);
   const [examValue, setExamValue] = useState({});
-  const [visibleDelete, setVisibleDelete] = useState(false);
+  var visibleDelete = false;
 
   useEffect(() => {
     fetchData();
@@ -71,26 +71,28 @@ export default function ExamCode({
     </div>
   );
 
-  
   const deleteExamCode = async (id) => {
     console.log(id);
-    await restClient({ url: `api/examcode/deleteexamcodebyid/${id}`, method: "DELETE" })
+    await restClient({
+      url: `api/examcode/deleteexamcodebyid/${id}`,
+      method: "DELETE",
+    })
       .then((res) => {
         fetchData();
-        setVisibleDelete(false);
+        visibleDelete=false;
         ACCEPT(toast, "Xóa thành công");
       })
       .catch((err) => {
         REJECT(toast, "Xảy ra lỗi khi xóa đề thi này");
       })
       .finally(() => {
-        setVisibleDelete(false);
+        visibleDelete=false;
+
       });
   };
 
-
   const confirmDelete = (id) => {
-    // setVisibleDelete(false);
+    visibleDelete = false;
     confirmDialog({
       message: "Bạn có chắc chắn muốn xóa đề thi này?",
       header: "Delete Confirmation",
@@ -99,12 +101,13 @@ export default function ExamCode({
       acceptClassName: "p-button-danger",
       footer: (
         <>
-         <Button
+          <Button
             label="Hủy"
             icon="pi pi-times"
             className="p-2 bg-red-500 text-white mr-2"
             onClick={() => {
-              // setVisibleDelete(false);
+              visibleDelete=false;
+
             }}
           />
           <Button
@@ -114,7 +117,6 @@ export default function ExamCode({
             onClick={() => {
               deleteExamCode(id);
             }}
-            
           />
         </>
       ),
@@ -136,7 +138,6 @@ export default function ExamCode({
   };
   return (
     <>
- 
       <Toast ref={toast} />
       <Dialog
         header={setTitle}
