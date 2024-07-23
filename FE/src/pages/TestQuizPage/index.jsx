@@ -28,7 +28,7 @@ export default function TestQuizPage() {
       setLoading(true);
       try {
         const quizResponse = await restClient({
-          url: `api/quizquestion/getallquizquestionbyquizidpractice/${id}`,
+          url: `api/quizquestion/getallquizquestionbyquizidtest/${id}?size=30`,
           method: "GET",
         });
 

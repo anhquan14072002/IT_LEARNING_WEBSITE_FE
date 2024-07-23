@@ -4,7 +4,6 @@ import Menu from "../../components/Menu";
 import Class from "../../components/Class";
 import DocumentCard from "../../components/DocumentCard";
 import Footer from "../../components/Footer";
-import LazyComponent from "../../components/LazyComponent"; // Import LazyComponent
 import LoadingScreen from "../../components/LoadingScreen";
 import { getAllGrade } from "../../services/grade.api";
 import { getAllDocument, getAllDocumentSortByAvg } from "../../services/document.api";
@@ -50,14 +49,11 @@ export default function Home() {
               {classList &&
                 classList?.map((item, i) => {
                   return (
-                    <LazyComponent key={i}>
                       <Class item={item} index={i} />
-                    </LazyComponent>
                   );
                 })}
             </div>
           </div>
-          <LazyComponent>
             <div className="px-20 mt-16 mb-10">
               <h1 className="mt-10 text-2xl font-bold">
                 Tài liệu online cho giáo viên và học sinh
@@ -83,11 +79,8 @@ export default function Home() {
                 )}
               </div>
             </div>
-          </LazyComponent>
 
-          <LazyComponent>
             <Footer />
-          </LazyComponent>
         </div>
       )}
     </>

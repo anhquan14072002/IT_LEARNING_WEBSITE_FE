@@ -15,7 +15,7 @@ const CustomDropdownInSearch = ({
   ...props
 }) => {
   const [field, meta, helpers] = useField(props);
-  const [touchedState, setTouchedState] = useState(false); // State to manage touched state manually
+  const [touchedState, setTouchedState] = useState(props?.isTouched || false); // State to manage touched state manually
 
   useEffect(() => {
     if (clearGrade) {
@@ -36,7 +36,7 @@ const CustomDropdownInSearch = ({
 
   return (
     <div className="mb-5 flex-1">
-      <label htmlFor={props.id || props.name}>{label}</label>
+      <label htmlFor={props.id || props.name}>{label}{" "}{!props?.isNotRequired && (<span className="text-red-500">*</span>)}</label>
       <Dropdown
         {...field}
         {...props}

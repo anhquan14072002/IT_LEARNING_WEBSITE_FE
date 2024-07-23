@@ -5,7 +5,7 @@ const CustomSelectInput = ({ label,flexStyle, ...props }) => {
   const [field, meta] = useField(props);
   return (
     <div className={classNames("mb-5",flexStyle)}>
-      <label htmlFor={props.id || props.name}>{label}</label>
+      <label htmlFor={props.id || props.name}>{label}{" "}{!props?.isNotRequired && (<span className="text-red-500">*</span>)}</label>
       <select
         className={classNames(
           "w-full shadow-none p-1 border rounded-md",
