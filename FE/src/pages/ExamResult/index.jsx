@@ -26,16 +26,36 @@ const Index = () => {
   }, [id]);
 
   return (
-    <div className="text-center h-screen font-sans m-5 p-5 border border-gray-300 rounded-lg shadow-lg bg-gray-100">
+    <div className="text-center h-screen font-sans m-5 p-5 border border-gray-300 rounded-lg shadow-lg bg-gray-200">
     <h1 className="text-2xl text-gray-800 mb-4">Điểm của bạn</h1>
     <p className="text-lg text-gray-600 mb-6"> {score}</p>
-    <h1>Kết quả</h1>
+    <h1 className="text-2xl text-gray-800 mb-4">Kết quả</h1>
     <div className="flex flex-col items-center">
-      {historyExam.map((item, index) => (
-        <div key={index} className="bg-gray-200 p-4 mb-2 rounded-md w-4/5 max-w-md">
-          Câu hỏi số {item?.numberOfQuestion} : {item?.userAnswer}
-        </div>
-      ))}
+     
+        <div className="overflow-x-auto">
+        <table className="w-full bg-white">
+          <thead>
+            <tr>
+              <th className="py-2 px-4 border-b">Câu hỏi số</th>
+              <th className="py-2 px-4 border-b">Đáp án của bạn</th>
+              <th className="py-2 px-4 border-b">Đáp án đúng</th>
+            </tr>
+          </thead>
+          <tbody>
+          {historyExam.map((item, index) => (
+              <tr key={index} className="bg-gray-100 even:bg-white">
+                <td className="py-2 px-4 border-b">{item?.numberOfQuestion}</td>
+                <td className={`py-2 px-4 border-b ${item?.isCorrect ? 'text-green-600' : 'text-red-600'}`}>
+                  {item?.userAnswer} 
+                </td>
+                <td className="py-2 px-4 border-b text-green-600">{item?.isCorrect ? item?.userAnswer : item?.correctAnswer}</td>
+
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+     
     </div>
   </div>
   

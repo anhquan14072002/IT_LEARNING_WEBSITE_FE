@@ -47,15 +47,18 @@ export default function ManagementQuizLesson() {
     fetchData();
   }, [page, rows, textSearch]);
 
-  const pagination = (page, rows) => {
+  const pagination = (page, rows, textSearch) => {
     setLoading(true);
-
+    const title = "title";
     restClient({
-      url: `api/tag/getalltagpagination?PageIndex=${page}&PageSize=${rows}`,
+      url: `api/tag/searchbytagpagination?PageIndex=${page}&PageSize=${rows}&Key=${title}&Value=${textSearch}`,
       method: "GET",
     })
       .then((res) => {
-        const paginationData = JSON.parse(res.headers["x-pagination"]);
+        const paginationData = res.headers["x-pagination"] 
+          ? JSON.parse(res.headers["x-pagination"]) 
+          : { TotalPages: 0 };
+  
         setTotalPage(paginationData.TotalPages);
         setProducts(Array.isArray(res.data.data) ? res.data.data : []);
         setLoading(false);
@@ -66,27 +69,10 @@ export default function ManagementQuizLesson() {
         setLoading(false);
       });
   };
+  
 
   const fetchData = () => {
-    // if (textSearch.trim()) {
-    //   setLoading(true);
-    //   restClient({
-    //     url: `api/topic/searchbytopicpagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}`,
-    //     method: "GET",
-    //   })
-    //     .then((res) => {
-    //       const paginationData = JSON.parse(res.headers["x-pagination"]);
-    //       setTotalPage(paginationData.TotalPages);
-    //       setProducts(Array.isArray(res.data.data) ? res.data.data : []);
-    //     })
-    //     .catch((err) => {
-    //       console.error("Error fetching data:", err);
-    //       setProducts([]);
-    //     })
-    //     .finally(() => setLoading(false));
-    // } else {
-    pagination(page, rows);
-    // }
+    pagination(page, rows, textSearch);
   };
 
   const onPageChange = (event) => {
@@ -177,6 +163,7 @@ export default function ManagementQuizLesson() {
   };
 
   const handleSearchInput = debounce((text) => {
+    console.log(text);
     setTextSearch(text);
   }, 300);
 
@@ -195,7 +182,7 @@ export default function ManagementQuizLesson() {
       })
       .catch((err) => {
         REJECT(toast, "Lỗi khi thay đổi trạng thái");
-      })
+      });
   };
   const status = (rowData, { rowIndex }) => {
     return (
@@ -254,21 +241,7 @@ export default function ManagementQuizLesson() {
               />
             </div>
 
-            <div className="flex-1 flex flex-wrap gap-3 justify-end">
-              <div className="border-2 rounded-md mt-4">
-                <Dropdown
-                  filter
-                  ref={dropDownRef2}
-                  value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.value)}
-                  options={cities}
-                  optionLabel="name"
-                  showClear
-                  placeholder="Loại Tag"
-                  className="w-full md:w-14rem shadow-none h-full"
-                />
-              </div>
-            </div>
+           
           </div>
           {loading ? (
             <Loading />

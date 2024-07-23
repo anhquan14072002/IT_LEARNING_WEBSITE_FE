@@ -9,7 +9,7 @@ import { Button } from "primereact/button";
 import AddExamCode from "../AddExamCode";
 import AnswerExam from "../AnwserExam";
 import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
-import { ACCEPT, REJECT } from "../../utils";
+import { ACCEPT, formatDate, REJECT } from "../../utils";
 
 export default function ExamCode({
   visibleExamCode,
@@ -79,15 +79,14 @@ export default function ExamCode({
     })
       .then((res) => {
         fetchData();
-        visibleDelete=false;
+        visibleDelete = false;
         ACCEPT(toast, "Xóa thành công");
       })
       .catch((err) => {
         REJECT(toast, "Xảy ra lỗi khi xóa đề thi này");
       })
       .finally(() => {
-        visibleDelete=false;
-
+        visibleDelete = false;
       });
   };
 
@@ -106,8 +105,7 @@ export default function ExamCode({
             icon="pi pi-times"
             className="p-2 bg-red-500 text-white mr-2"
             onClick={() => {
-              visibleDelete=false;
-
+              visibleDelete = false;
             }}
           />
           <Button
@@ -185,25 +183,40 @@ export default function ExamCode({
               header="#"
               body={indexBodyTemplate}
               className="border-b-2 border-t-2"
-              style={{ width: "5%" }}
+              style={{ width: "10%" }}
             />
 
             <Column
               field="code"
               header="Mã Đề"
               className="border-b-2 border-t-2"
-              style={{ width: "15%" }}
+              style={{ width: "20%" }}
             />
             <Column
               header="Đáp án"
               className="border-b-2 border-t-2"
-              style={{ width: "15%" }}
+              style={{ width: "20%" }}
               body={anwserTemple}
             />
             <Column
-              header="Hoạt Động"
+              field="createdDate"
+              header="Ngày tạo"
+              className="border-b-2 border-t-2"
+              style={{ width: "20%" }}
+              body={(rowData) => formatDate(rowData.createdDate)}
+            />
+
+            <Column
+              field="lastModifiedDate"
+              header="Ngày cập nhật"
+              className="border-b-2 border-t-2"
+              style={{ width: "20%" }}
+              body={(rowData) => formatDate(rowData.lastModifiedDate)}
+            />
+            <Column
               className="border-b-2 border-t-2"
               body={actionBodyTemplate}
+              style={{ width: "10%" }}
             />
           </DataTable>
         )}
