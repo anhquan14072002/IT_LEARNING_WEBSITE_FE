@@ -32,7 +32,7 @@ const CustomTextarea = ({ label, ...props }) => {
 
   return (
     <div className="mb-5">
-      <label htmlFor={props.id || props.name}>{label}</label>
+      <label htmlFor={props.id || props.name}>{label}{" "}{!props?.isNotRequired && (<span className="text-red-500">*</span>)}</label>
       <textarea
         id={props.id || props.name}
         {...field}

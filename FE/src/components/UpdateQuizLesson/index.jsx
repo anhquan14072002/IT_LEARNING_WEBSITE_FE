@@ -25,6 +25,11 @@ const validationSchema = Yup.object({
       return Object.keys(value).length !== 0; // Check if object is not empty
     })
     .required("Không bỏ trống trường này"),
+  type: Yup.object()
+    .test("is-not-empty", "Không được để trống trường này", (value) => {
+      return Object.keys(value).length !== 0; // Check if object is not empty
+    })
+    .required("Không bỏ trống trường này"),
   document: Yup.object()
     .test("is-not-empty", "Không được để trống trường này", (value) => {
       return Object.keys(value).length !== 0; // Check if object is not empty
@@ -50,6 +55,7 @@ export default function AddQuizLesson({
     grade: {},
     description: "",
     document: {},
+    type:{},
     score: null,
     topic: {},
     lesson: {},
@@ -62,12 +68,13 @@ export default function AddQuizLesson({
   const [clearGrade, setClearGrade] = useState(false);
   const [clearLesson, setClearLesson] = useState(false);
   const [lessonList, setLessonList] = useState([]);
-  
+  const [typeList, setTypeList] = useState([]);
 
   useEffect(() => {
     const fetchInitialData = async () => {
       setLoading(true);
       try {
+        console.log(updateValue);
         if (updateValue && updateValue.lessonId) {
           const lessonById = await restClient({
             url: `api/lesson/getlessonbyid/${updateValue.lessonId}`,
@@ -79,12 +86,25 @@ export default function AddQuizLesson({
             ...prevValues,
             lesson: lessonByIdData,
           }));
-        }else{
-            setInitialValues((prevValues) => ({
-                ...prevValues,
-                lesson: {},
-              }));
+        } else {
+          setInitialValues((prevValues) => ({
+            ...prevValues,
+            lesson: {},
+          }));
         }
+
+        // Fetch type quizzes
+        const typeQuizResponse = await restClient({
+          url: `api/enum/gettypequiz`,
+          method: "GET",
+        });
+        const transformedData = typeQuizResponse?.data?.data?.map((item) => ({
+          title: item?.name,
+          id: item?.value,
+        }));
+        setTypeList(transformedData);
+
+        const typeFind = transformedData?.find((item,index)=> item?.title === updateValue?.type)
 
         const topicById = await restClient({
           url: `api/topic/gettopicbyid?id=${updateValue.topicId}`,
@@ -112,6 +132,7 @@ export default function AddQuizLesson({
           document: documentByIdData,
           score: updateValue.score,
           topic: selectTopicById,
+          type: typeFind
         }));
 
         const gradeAllResponse = await restClient({
@@ -141,7 +162,6 @@ export default function AddQuizLesson({
         });
         const dataLesson = lessonData.data?.data || {};
         setLessonList(dataLesson);
-
       } catch (err) {
         console.error("Error fetching data:", err);
       } finally {
@@ -152,7 +172,7 @@ export default function AddQuizLesson({
     if (visibleUpdate) {
       fetchInitialData();
     }
-  }, [visibleUpdate, updateValue]); 
+  }, [visibleUpdate, updateValue]);
 
   const onSubmit = (values) => {
     // {
@@ -164,8 +184,9 @@ export default function AddQuizLesson({
     //     "lessonId": 0
     //   }
     let model = {
-      id : updateValue.id,
+      id: updateValue.id,
       title: values.title,
+      type: values?.type?.id,
       description: values.description,
       score: values.score,
       topicId: values.topic.id,
@@ -173,8 +194,9 @@ export default function AddQuizLesson({
     };
     if (values.lesson && values.lesson.id) {
       model = {
-        id : updateValue.id,
+        id: updateValue.id,
         title: values.title,
+        type: values?.type?.id,
         description: values.description,
         score: values.score,
         topicId: values.topic.id,
@@ -206,9 +228,9 @@ export default function AddQuizLesson({
     setClearGrade(true);
     setClearTopic(true);
     setClearLesson(true);
-    setDocumentList([])
-    setListTopic([])
-    setLessonList([])
+    setDocumentList([]);
+    setListTopic([]);
+    setLessonList([]);
     helpers.setValue(e.value);
     setTouchedState(true); // Set touched state to true when onChange is triggered
     if (props.onChange) {
@@ -229,8 +251,8 @@ export default function AddQuizLesson({
   const handleOnChangeDocument = (e, helpers, setTouchedState, props) => {
     setClearTopic(true);
     setClearLesson(true);
-    setListTopic([])
-    setLessonList([])
+    setListTopic([]);
+    setLessonList([]);
     if (!e.target.value || !e.target.value.id) {
       setListTopic([]);
       helpers.setValue({});
@@ -261,7 +283,7 @@ export default function AddQuizLesson({
 
   const handleOnChangeTopic = (e, helpers, setTouchedState, props) => {
     setClearLesson(true);
-    setLessonList([])
+    setLessonList([]);
     if (!e.target.value || !e.target.value.id) {
       setLessonList([]);
       helpers.setValue({});
@@ -357,6 +379,14 @@ export default function AddQuizLesson({
                 setClearTopic={setClearLesson}
                 disabled={!lessonList || lessonList.length === 0}
                 options={lessonList}
+              />
+
+              <CustomDropdown
+                title="Thể loại"
+                label="thể loại"
+                name="type"
+                id="type"
+                options={typeList}
               />
 
               <CustomTextInput

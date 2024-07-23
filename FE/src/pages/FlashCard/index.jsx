@@ -76,7 +76,7 @@ export default function Quiz() {
        </div>
       )}
         <div
-          className={`w-1/2 shadow-lg rounded-md bg-white h-4/5 p-5 flex items-center justify-center cursor-pointer ${
+          className={`w-1/2 shadow-lg rounded-md bg-white h-4/5 p-5 flex items-center justify-center cursor-pointer overflow-y-auto ${
             showAnswer ? "flip" : ""
           }`}
           onClick={() => {

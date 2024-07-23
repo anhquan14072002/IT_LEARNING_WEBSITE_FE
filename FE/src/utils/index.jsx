@@ -1,6 +1,28 @@
 import { jwtDecode } from "jwt-decode";
 import { province } from "../services/province";
 
+export const handleMultipleContent = (answers) => {
+  return answers.some(
+    (answer) => !answer.content || answer.content.trim() === ""
+  );
+};
+
+export const handleMultipleCorrect = (answers) => {
+  const correctAnswers = answers.filter((answer) => answer.isCorrect);
+
+  return correctAnswers.length <= 1;
+};
+
+export const hasEmptyContent = (answers) => {
+  return answers.some(
+    (answer) => !answer.content || answer.content.trim() === ""
+  );
+};
+
+export const hasCorrectAnswer = (answers) => {
+  return answers.some((answer) => answer.isCorrect);
+};
+
 export const formatDate = (value) => {
   if (!value) return "";
 
@@ -161,9 +183,10 @@ export const decodeIfNeeded = (content) => {
       );
 
       // Remove <meta>, <title>, and <style> tags from the decoded content
-      const cleanedContent = utf8String.replace(/<meta[^>]*>/g, '')
-                                       .replace(/<title[^>]*>(.*?)<\/title>/g, '')
-                                       .replace(/<style[^>]*>(.*?)<\/style>/g, '');
+      const cleanedContent = utf8String
+        .replace(/<meta[^>]*>/g, "")
+        .replace(/<title[^>]*>(.*?)<\/title>/g, "")
+        .replace(/<style[^>]*>(.*?)<\/style>/g, "");
 
       return cleanedContent;
     }
@@ -174,7 +197,6 @@ export const decodeIfNeeded = (content) => {
   return content;
 };
 
-
 export const isBase64 = (content) => {
   if (/^[A-Za-z0-9+/=]+\s*$/.test(content)) {
     return true;
@@ -182,15 +204,17 @@ export const isBase64 = (content) => {
   return false;
 };
 
-export const getProvinceByName = (name)=>{
-  const foundProvince = province.data.find(province=> province.name === name);
-  return foundProvince
-}
+export const getProvinceByName = (name) => {
+  const foundProvince = province.data.find(
+    (province) => province.name === name
+  );
+  return foundProvince;
+};
 export const TYPE = [
   { name: "Tự Luận", code: 1 },
   { name: "Trắc Nghiệm", code: 2 },
 ];
 
 export const getTypeByCode = (code) => {
-  return TYPE.find(type => type.code === code);
+  return TYPE.find((type) => type.code === code);
 };

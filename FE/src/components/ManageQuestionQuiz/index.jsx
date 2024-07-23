@@ -22,6 +22,7 @@ import { InputSwitch } from "primereact/inputswitch";
 import AddQuizLesson from "../AddQuizLesson";
 import UpdateQuizLesson from "../UpdateQuizLesson";
 import AddQuestion from "../AddQuestion";
+import UpdateQuestion from "../UpdateQuestion";
 
 export default function ManageQuestionQuiz() {
   const toast = useRef(null);
@@ -99,6 +100,10 @@ export default function ManageQuestionQuiz() {
   const indexBodyTemplate = (rowData, { rowIndex }) => {
     const index = (page - 1) * rows + (rowIndex + 1);
     return <span>{index}</span>;
+  };
+
+  const content = (rowData, { rowIndex }) => {
+    return <span dangerouslySetInnerHTML={{ __html: rowData?.content }}></span>;
   };
 
   const cities = [
@@ -203,7 +208,7 @@ export default function ManageQuestionQuiz() {
   const status = (rowData, { rowIndex }) => {
     return (
       <InputSwitch
-        checked={rowData.isActive}
+        checked={rowData?.isActive}
         onChange={(e) => changeStatusLesson(e.value, rowData.id)}
         tooltip={rowData.isActive ? "Đã được duyệt" : "Chưa được duyệt"}
       />
@@ -220,7 +225,7 @@ export default function ManageQuestionQuiz() {
         toast={toast}
         fetchData={fetchData}
       />
-      <UpdateQuizLesson
+      <UpdateQuestion
         visibleUpdate={visibleUpdate}
         setVisibleUpdate={setVisibleUpdate}
         updateValue={updateValue}
@@ -309,10 +314,10 @@ export default function ManageQuestionQuiz() {
                   className="border-b-2 border-t-2"
                 />
                 <Column
-                  field="content"
                   header="Nội dung"
                   className="border-b-2 border-t-2"
                   style={{ width: "30%" }}
+                  body={content}
                 />
                 <Column
                   field="type"

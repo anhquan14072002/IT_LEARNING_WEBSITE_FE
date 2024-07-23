@@ -124,7 +124,7 @@ export default function UpdateLessonDialog({
         setListDocument(listDocumentById);
         setListGrade(listGrade);
 
-        console.log("decoded content::",decodeIfNeeded(modelUpdate.content));
+        console.log("decoded content::", decodeIfNeeded(modelUpdate.content));
 
         const updatedInitialValues = {
           title: modelUpdate.title,
@@ -137,7 +137,7 @@ export default function UpdateLessonDialog({
         setInitialValues(updatedInitialValues);
         setInitialValuesReady(true); // Data has been fetched and initial values are set
       } catch (err) {
-        setInitialValues({})
+        setInitialValues({});
       } finally {
         setLoading(false);
       }
@@ -170,6 +170,8 @@ export default function UpdateLessonDialog({
           formData.append("FilePath", file);
         });
       }
+    } else if (inputContent) {
+      formData.append("FilePath", null);
     }
 
     try {
