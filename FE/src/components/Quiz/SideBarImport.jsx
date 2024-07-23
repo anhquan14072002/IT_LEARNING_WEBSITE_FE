@@ -3,7 +3,10 @@ import React, { useContext, useEffect, useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import FormDataContext from "../../store/FormDataContext";
 
-function ItemSideBar({ Menu, index, indexMenu }) {
+function ItemSideBar({ Menu, index, indexMenu, step }) {
+  // let bgStep = "bg-blue-500";
+  // if (step === "stepOne") {
+  // }
   return (
     <li
       className={`flex p-2 rounded cursor-pointer bg-[#e9eaea] border border-[#c5c7c7] text-sm items-center gap-x-4 

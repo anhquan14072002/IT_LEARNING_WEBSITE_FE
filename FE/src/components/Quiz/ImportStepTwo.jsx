@@ -81,7 +81,7 @@ function ImportStepTwo() {
   async function exportToExcel() {
     try {
       let res = await axios.get(
-        `${BASE_URL}/api/quizquestion/ExportExcelFail/${idImportFail}`,
+        `${BASE_URL}/api/quizquestion/ExportExcelResult/${idImportResult}`,
         {
           responseType: "arraybuffer", // Important to handle binary data
         }
@@ -218,7 +218,7 @@ function ImportStepTwo() {
           className="text-blue-700 font-medium"
           onClick={exportToExcel}
         >
-          Tại đây
+          Tải tình trạng dữ liệu
         </a>
       </p>
     </article>

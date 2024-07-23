@@ -6,9 +6,15 @@ import arrows from "../../assets/img/arrows.png";
 import back from "../../assets/img/icons8-back-50.png";
 import cancel from "../../assets/img/icons8-cancel-24.png";
 import FormDataContext from "../../store/FormDataContext";
-function IconButton({ icon, title, ...props }) {
+function IconButton({ icon, title, active, ...props }) {
+  let cssButton = "border border-[#c5c7c7] py-1 px-3 mt-1";
+  console.log(active);
+  if (active) {
+    cssButton += " bg-blue-500";
+  }
+  console.log(cssButton);
   return (
-    <Button className="border border-[#c5c7c7] py-1 px-3 mt-1" {...props}>
+    <Button className={cssButton} {...props}>
       <img src={icon} width="25" height="25" className="mr-1" />
       {title}
     </Button>
@@ -33,6 +39,10 @@ function Footer({ Menus }) {
     console.log(nextRoute);
     navigate(nextRoute);
   }
+  let labelButton = "Tiếp Tục";
+  if (step === "stepTwo") {
+    labelButton = "Thực Hiện";
+  }
   return (
     <footer className="flex justify-between  mt-2">
       <Button
@@ -55,7 +65,7 @@ function Footer({ Menus }) {
         {indexRoute != 2 && (
           <IconButton
             icon={arrows}
-            title="Thực hiện"
+            title={labelButton}
             onClick={implement}
             disabled={success == 0 && step == "stepTwo"}
           />

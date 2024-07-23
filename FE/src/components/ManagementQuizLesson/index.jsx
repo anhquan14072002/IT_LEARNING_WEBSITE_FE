@@ -12,7 +12,12 @@ import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 import restClient from "../../services/restClient";
 import Loading from "../Loading";
-import { ACCEPT, formatDate, getTokenFromLocalStorage, REJECT } from "../../utils";
+import {
+  ACCEPT,
+  formatDate,
+  getTokenFromLocalStorage,
+  REJECT,
+} from "../../utils";
 import { InputSwitch } from "primereact/inputswitch";
 import AddQuizLesson from "../AddQuizLesson";
 import UpdateQuizLesson from "../UpdateQuizLesson";
@@ -121,6 +126,13 @@ export default function ManagementQuizLesson() {
             confirmDelete(rowData.id);
           }}
         />
+        <Button
+          label="Truy cập câu hỏi"
+          className="border-2"
+          onClick={() => {
+            // confirmDelete(rowData.id);
+          }}
+        />
       </div>
     );
   };
@@ -196,11 +208,7 @@ export default function ManagementQuizLesson() {
       <InputSwitch
         checked={rowData.isActive}
         onChange={(e) => changeStatusLesson(e.value, rowData.id)}
-        tooltip={
-          rowData.isActive
-            ? "Đã được duyệt"
-            : "Chưa được duyệt"
-        }
+        tooltip={rowData.isActive ? "Đã được duyệt" : "Chưa được duyệt"}
       />
     );
   };

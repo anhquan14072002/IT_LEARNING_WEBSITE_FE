@@ -79,7 +79,7 @@ function ImportStepOne(props) {
         />
         <Button
           className="border border-[#c5c7c7] py-1 px-4"
-          label="Chọn"
+          label="Upload"
           onClick={handleButtonClick}
         />
       </p>
@@ -92,7 +92,7 @@ function ImportStepOne(props) {
           onClick={exportToExcel}
         >
           {" "}
-          Tại đây
+          Tải file excel mẫu
         </a>
       </p>
     </article>
