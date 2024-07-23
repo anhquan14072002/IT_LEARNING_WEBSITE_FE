@@ -15,6 +15,7 @@ import ChangePassword from './pages/ChangePassword';
 import Quiz from './pages/Quiz';
 import FlashCard from './pages/FlashCard';
 import TestQuizPage from './pages/TestQuizPage';
+import ExamCodeDetail from './pages/ExamCodeDetail';
 import ExamDetail from './pages/ExamDetail';
 import ExamResult from './pages/ExamResult';
 
@@ -40,6 +41,7 @@ function App() {
         <Route path="/profile" element={<Profile />} />
         <Route path="/checkmail" element={<CheckMail />} />
         <Route path="/changepassword" element={<ChangePassword />} />
+        <Route path="/examcodedetail/:id" element={<ExamCodeDetail />} />
         <Route path="/examdetail/:id" element={<ExamDetail />} />
         <Route path="/examresult/:id" element={<ExamResult />} />
         </Routes>

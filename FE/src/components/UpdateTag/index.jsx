@@ -56,7 +56,7 @@ export default function UpdateTag({
     <Dialog
       header="Sửa Tag"
       visible={visibleUpdate}
-      style={{ width: "50vw" }}
+      style={{ width: "30vw" }}
       onHide={() => {
         if (!visibleUpdate) return;
         setVisibleUpdate(false);

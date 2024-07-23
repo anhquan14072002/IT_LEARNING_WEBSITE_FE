@@ -52,7 +52,7 @@ export default function AddTag({
     <Dialog
       header="Thêm  Tag"
       visible={visible}
-      style={{ width: "50vw" }}
+      style={{ width: "30vw" }}
       onHide={() => {
         if (!visible) return;
         setVisible(false);

@@ -119,14 +119,14 @@ export default function AddExam({ visible, setVisible, toast, fetchData }) {
           {(formik) => (
             <Form>
               <CustomTextInput
-                label="Tiêu đề"
+                 label={<><span>Tiêu đề</span><span style={{ color: 'red' }}>*</span></>}
                 id="title"
                 name="title"
                 type="text"
               />
               <CustomDropdown
                 title="Chọn Loại"
-                label="Loại"
+                label={<><span>Loại</span><span style={{ color: 'red' }}>*</span></>}
                 customTitle="name"
                 id="type"
                 name="type"
@@ -136,7 +136,7 @@ export default function AddExam({ visible, setVisible, toast, fetchData }) {
 
               <CustomDropdown
                 title="Tỉnh"
-                label="Tỉnh"
+                label={<><span>Tỉnh</span><span style={{ color: 'red' }}>*</span></>}
                 customTitle="name"
                 id="province"
                 name="province"
@@ -144,30 +144,23 @@ export default function AddExam({ visible, setVisible, toast, fetchData }) {
               />
 
               <CustomTextInput
-                label="Năm"
+                label={<><span>Năm</span><span style={{ color: 'red' }}>*</span></>}
                 id="year"
                 name="year"
                 type="number"
-              /> <span>*</span>
-              {type === 2 ? (
+              /> 
+              {type === 2 && (
               <CustomTextInput
-                label="Số lượng câu hỏi"
+              label={<><span>Số lượng câu hỏi</span><span style={{ color: 'red' }}>*</span></>}
                 id="numberQuestion"
                 name="numberQuestion"
                 type="number"
-              
-              />
-              ):(
-                <CustomTextInput
-                label="Số lượng câu hỏi"
-                id="numberQuestion"
-                name="numberQuestion"
-                type="number"
+     
               />
               )}
 
               <CustomEditor
-                label="Thông tin chi tiết"
+                 label={<><span>Thông tin chi tiết</span><span style={{ color: 'red' }}>*</span></>}
                 id="description"
                 name="description"
               >
