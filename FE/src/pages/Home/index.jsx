@@ -49,7 +49,7 @@ export default function Home() {
               {classList &&
                 classList?.map((item, i) => {
                   return (
-                      <Class item={item} index={i} />
+                      <Class item={item} index={i} key={i} />
                   );
                 })}
             </div>

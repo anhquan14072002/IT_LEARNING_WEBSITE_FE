@@ -72,6 +72,8 @@ const UpdateQuestion = ({
 
   useEffect(() => {
     const fetchFormData = async () => {
+
+      console.log("updatevalue::",updateValue);
       setLoading(true);
 
       updateValue?.quizAnswers.forEach((answer) => console.log(answer));
@@ -158,7 +160,7 @@ const UpdateQuestion = ({
                   (item, index) =>
                     item?.id === updateValue?.quizQuestionRelations[0]?.quizId
                 ),
-                content: updateValue.keyWord || "",
+                content: updateValue?.content || "",
                 type: typeObject || {},
                 questionLevel:
                   questionLevelData.find(
@@ -189,7 +191,7 @@ const UpdateQuestion = ({
                   (item, index) =>
                     item?.id === updateValue?.quizQuestionRelations[0]?.quizId
                 ),
-                content: updateValue.keyWord || "",
+                content: updateValue?.content || "",
                 type: typeObject || {},
                 questionLevel:
                   questionLevelData.find(
