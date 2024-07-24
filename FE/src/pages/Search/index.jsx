@@ -241,7 +241,7 @@ export default function Search() {
             <div className="flex flex-wrap justify-start">
             {products &&
               products?.map((p, index) => {
-                return <CustomCard document={p} />;
+                return <CustomCard document={p} key={index}/>;
               })}
             </div>
 
