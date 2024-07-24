@@ -19,7 +19,6 @@ import "primeicons/primeicons.css";
 import "./index.css";
 import { InputText } from "primereact/inputtext";
 
-
 function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
@@ -199,13 +198,12 @@ const Index = () => {
                     rules={{ required: "Tên tài khoản không được để trống" }}
                     render={({ field }) => (
                       <InputText
-                      id="username"
-                      type="text"
-                      className="w-full h-12 text-black-800 border border-solid  border-gray-500 pb-2 pl-1 rounded-md shadow-none focus:border-blue-400"
-                      placeholder="Nhập tên tài khoản"
-                      {...field}
-                    />
-                    
+                        id="username"
+                        type="text"
+                        className="w-full h-12 text-black-800 border border-solid  border-gray-500 pb-2 pl-1 rounded-md shadow-none focus:border-blue-400"
+                        placeholder="Nhập tên tài khoản"
+                        {...field}
+                      />
                     )}
                   />
                   <br />
@@ -229,7 +227,8 @@ const Index = () => {
                       optionLabel="class"
                       placeholder="Chọn lớp"
                       maxSelectedLabels={12}
-                      className="w-full shadow-none"
+                      className="w-full shadow-none custom-multiselect"
+                      display="chip"
                     />
                   </div>
                   {errors.selectClass && (

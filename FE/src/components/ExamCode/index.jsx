@@ -7,6 +7,7 @@ import restClient from "../../services/restClient";
 import { Toast } from "primereact/toast";
 import { Button } from "primereact/button";
 import AddExamCode from "../AddExamCode";
+import UpdateExamCode from "../UpdateExamCode";
 import AnswerExam from "../AnwserExam";
 import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
 import { ACCEPT, formatDate, REJECT } from "../../utils";
@@ -19,12 +20,13 @@ export default function ExamCode({
   toast,
 }) {
   const [visibleAddExamCode, setVisibleAddExamCode] = useState(false);
+  const [visibleUpdateExamCode, setVisibleUpdateExamCode] = useState(false);
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(false);
   const [visibleExam, setVisibleExam] = useState(false);
   const [examValue, setExamValue] = useState({});
-  var visibleDelete = false;
+  const [updateExamCodeValue, setUpdateExamCodeValue] = useState({});
 
   useEffect(() => {
     fetchData();
@@ -56,8 +58,8 @@ export default function ExamCode({
         icon="pi pi-pencil"
         className="text-blue-600 p-mr-2 shadow-none"
         onClick={() => {
-          setUpdateValue(rowData);
-          // setVisibleUpdate(true);
+          setUpdateExamCodeValue(rowData)
+          setVisibleUpdateExamCode(true)
         }}
       />
       <Button
@@ -150,6 +152,14 @@ export default function ExamCode({
           addExamCodeValue={examCodeValue?.id}
           fetchData={fetchData}
         />
+        <UpdateExamCode
+        visible={visibleUpdateExamCode}
+        setVisibleUpdateExamCode={setVisibleUpdateExamCode}
+        toast={toast}
+        updateExamCodeValue={updateExamCodeValue}
+        addExamCodeValue={examCodeValue?.id}
+        fetchData={fetchData}
+      />
         <AnswerExam
           visibleExam={visibleExam}
           setVisibleExam={setVisibleExam}
