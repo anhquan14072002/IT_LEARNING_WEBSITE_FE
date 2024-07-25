@@ -18,6 +18,7 @@ import TestQuizPage from './pages/TestQuizPage';
 import ExamCodeDetail from './pages/ExamCodeDetail';
 import ExamDetail from './pages/ExamDetail';
 import ExamResult from './pages/ExamResult';
+import ViewExam from './pages/ViewExam';
 
 
 function App() {
@@ -44,6 +45,7 @@ function App() {
         <Route path="/examcodedetail/:id" element={<ExamCodeDetail />} />
         <Route path="/examdetail/:id" element={<ExamDetail />} />
         <Route path="/examresult/:id" element={<ExamResult />} />
+        <Route path="/viewexam" element={<ViewExam />} />
         </Routes>
     </Router>
   );

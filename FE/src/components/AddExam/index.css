@@ -1,0 +1,5 @@
+.custom-multiselect .p-multiselect-token {
+    background-color: rgb(48, 54, 225) !important;
+    color: white !important; /* Optional: change text color to white for better contrast */
+  }
+  
