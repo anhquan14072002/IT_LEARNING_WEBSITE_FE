@@ -25,6 +25,11 @@ const validationSchema = Yup.object({
       return Object.keys(value).length !== 0; // Check if object is not empty
     })
     .required("Không bỏ trống trường này"),
+  type: Yup.object()
+    .test("is-not-empty", "Không được để trống trường này", (value) => {
+      return Object.keys(value).length !== 0; // Check if object is not empty
+    })
+    .required("Không bỏ trống trường này"),
   document: Yup.object()
     .test("is-not-empty", "Không được để trống trường này", (value) => {
       return Object.keys(value).length !== 0; // Check if object is not empty
@@ -52,6 +57,7 @@ export default function AddQuizLesson({
     score: null,
     topic: {},
     lesson: {},
+    type: {},
   });
   const [documentList, setDocumentList] = useState([]);
   const [topicList, setListTopic] = useState([]);
@@ -61,18 +67,38 @@ export default function AddQuizLesson({
   const [clearGrade, setClearGrade] = useState(false);
   const [clearLesson, setClearLesson] = useState(false);
   const [lessonList, setLessonList] = useState([]);
+  const [typeQuiz, setTypeQuiz] = useState([]);
 
   useEffect(() => {
-    restClient({
-      url: `api/grade/getallgrade`,
-      method: "GET",
-    })
-      .then((res) => {
-        setListGrade(res.data.data || []);
-      })
-      .catch((err) => {
+    const fetchData = async () => {
+      try {
+        // Fetch all grades
+        const gradeResponse = await restClient({
+          url: `api/grade/getallgrade`,
+          method: "GET",
+        });
+        setListGrade(gradeResponse?.data?.data || []);
+  
+        // Fetch type quizzes
+        const typeQuizResponse = await restClient({
+          url: `api/enum/gettypequiz`,
+          method: "GET",
+        });
+        const transformedData = typeQuizResponse?.data?.data?.map(item => ({
+          title: item?.name,
+          id: item?.value,
+        }));
+        setTypeQuiz(transformedData);
+      } catch (error) {
+        // Handle errors for both requests
+        console.error("Error fetching data:", error);
         setListGrade([]);
-      });
+        setTypeQuiz([]);
+      }
+    };
+  
+    // Call the fetchData function when the component mounts (empty dependency array)
+    fetchData();
   }, []);
 
   const onSubmit = (values) => {
@@ -85,19 +111,21 @@ export default function AddQuizLesson({
     //     "lessonId": 0
     //   }
     let model = {
-      title: values.title,
-      description: values.description,
-      score: values.score,
-      topicId: values.topic.id,
+      title: values?.title,
+      type: values?.type?.id,
+      description: values?.description,
+      score: values?.score,
+      topicId: values?.topic.id,
       isActive: true,
     };
-    if (values.lesson && values.lesson.id) {
+    if (values?.lesson && values?.lesson.id) {
       model = {
-        title: values.title,
-        description: values.description,
-        score: values.score,
-        topicId: values.topic.id,
-        lessonId: values.lesson.id,
+        title: values?.title,
+        type: values?.type?.id,
+        description: values?.description,
+        score: values?.score,
+        topicId: values?.topic.id,
+        lessonId: values?.lesson.id,
         isActive: true,
       };
     }
@@ -125,9 +153,9 @@ export default function AddQuizLesson({
     setClearGrade(true);
     setClearTopic(true);
     setClearLesson(true);
-    setDocumentList([])
-    setListTopic([])
-    setLessonList([])
+    setDocumentList([]);
+    setListTopic([]);
+    setLessonList([]);
     helpers.setValue(e.value);
     setTouchedState(true); // Set touched state to true when onChange is triggered
     if (props.onChange) {
@@ -148,8 +176,8 @@ export default function AddQuizLesson({
   const handleOnChangeDocument = (e, helpers, setTouchedState, props) => {
     setClearTopic(true);
     setClearLesson(true);
-    setListTopic([])
-    setLessonList([])
+    setListTopic([]);
+    setLessonList([]);
     if (!e.target.value || !e.target.value.id) {
       setListTopic([]);
       helpers.setValue({});
@@ -180,7 +208,7 @@ export default function AddQuizLesson({
 
   const handleOnChangeTopic = (e, helpers, setTouchedState, props) => {
     setClearLesson(true);
-    setLessonList([])
+    setLessonList([]);
     if (!e.target.value || !e.target.value.id) {
       setLessonList([]);
       helpers.setValue({});
@@ -272,10 +300,19 @@ export default function AddQuizLesson({
                 name="lesson"
                 id="lesson"
                 touched={false}
+                isNotRequired={true}
                 clearTopic={clearLesson}
                 setClearTopic={setClearLesson}
                 disabled={!lessonList || lessonList.length === 0}
                 options={lessonList}
+              />
+
+              <CustomDropdown
+                title="Thể loại"
+                label="thể loại"
+                name="type"
+                id="type"
+                options={typeQuiz}
               />
 
               <CustomTextInput

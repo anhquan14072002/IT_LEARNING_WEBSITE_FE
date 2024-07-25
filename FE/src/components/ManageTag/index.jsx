@@ -22,15 +22,15 @@ import {
 import { InputSwitch } from "primereact/inputswitch";
 // import AddTag from "../AddTag";
 import UpdateQuizLesson from "../UpdateQuizLesson";
+import AddTag from "../AddTag";
+import UpdateTag from "../UpdateTag";
 
 export default function ManagementQuizLesson() {
   const toast = useRef(null);
-  const dropDownRef1 = useRef(null);
   const dropDownRef2 = useRef(null);
   const [selectedCity, setSelectedCity] = useState(null);
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const cm = useRef(null);
   const [visible, setVisible] = useState(false);
   const [updateValue, setUpdateValue] = useState({});
   const [visibleUpdate, setVisibleUpdate] = useState(false);
@@ -45,17 +45,20 @@ export default function ManagementQuizLesson() {
 
   useEffect(() => {
     fetchData();
-  }, [page, rows, textSearch]);
+  }, []);
 
-  const pagination = (page, rows) => {
+  const pagination = (page, rows, textSearch) => {
     setLoading(true);
-
+    const title = "title";
     restClient({
-      url: `api/quiz/getallquizpagination?PageIndex=${page}&PageSize=${rows}`,
+      url: `api/tag/searchbytagpagination?PageIndex=${page}&PageSize=${rows}&Key=${title}&Value=${textSearch}`,
       method: "GET",
     })
       .then((res) => {
-        const paginationData = JSON.parse(res.headers["x-pagination"]);
+        const paginationData = res.headers["x-pagination"] 
+          ? JSON.parse(res.headers["x-pagination"]) 
+          : { TotalPages: 0 };
+  
         setTotalPage(paginationData.TotalPages);
         setProducts(Array.isArray(res.data.data) ? res.data.data : []);
         setLoading(false);
@@ -66,27 +69,10 @@ export default function ManagementQuizLesson() {
         setLoading(false);
       });
   };
+  
 
   const fetchData = () => {
-    // if (textSearch.trim()) {
-    //   setLoading(true);
-    //   restClient({
-    //     url: `api/topic/searchbytopicpagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}`,
-    //     method: "GET",
-    //   })
-    //     .then((res) => {
-    //       const paginationData = JSON.parse(res.headers["x-pagination"]);
-    //       setTotalPage(paginationData.TotalPages);
-    //       setProducts(Array.isArray(res.data.data) ? res.data.data : []);
-    //     })
-    //     .catch((err) => {
-    //       console.error("Error fetching data:", err);
-    //       setProducts([]);
-    //     })
-    //     .finally(() => setLoading(false));
-    // } else {
-    pagination(page, rows);
-    // }
+    pagination(page, rows, textSearch);
   };
 
   const onPageChange = (event) => {
@@ -154,7 +140,7 @@ export default function ManagementQuizLesson() {
             icon="pi pi-check"
             className="p-2 bg-blue-500 text-white"
             onClick={() => {
-              deleteDocument(id);
+              deleteTag(id);
             }}
           />
         </>
@@ -163,13 +149,13 @@ export default function ManagementQuizLesson() {
   };
 
   const deleteTag = (id) => {
-    restClient({ url: `api/quiz/deletequiz/${id}`, method: "DELETE" })
+    restClient({ url: `api/tag/deletetag/${id}`, method: "DELETE" })
       .then((res) => {
         fetchData();
         ACCEPT(toast, "Xóa thành công");
       })
       .catch((err) => {
-        REJECT(toast, "Xảy ra lỗi khi xóa chủ đề này");
+        REJECT(toast, "Xảy ra lỗi khi xóa tag này");
       })
       .finally(() => {
         setVisibleDelete(false);
@@ -177,14 +163,32 @@ export default function ManagementQuizLesson() {
   };
 
   const handleSearchInput = debounce((text) => {
+    console.log(text);
     setTextSearch(text);
   }, 300);
 
+  const changeStatusTag = async (value, id) => {
+    console.log(value, id);
+    await restClient({
+      url: `api/tag/updatestatustag/${id}`,
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
+    })
+      .then((res) => {
+        ACCEPT(toast, "Thay đổi trạng thái thành công");
+        fetchData();
+      })
+      .catch((err) => {
+        REJECT(toast, "Lỗi khi thay đổi trạng thái");
+      });
+  };
   const status = (rowData, { rowIndex }) => {
     return (
       <InputSwitch
         checked={rowData.isActive}
-        onChange={(e) => changeStatusLesson(e.value, rowData.id)}
+        onChange={(e) => changeStatusTag(e.value, rowData.id)}
         tooltip={rowData.isActive ? "Đã được duyệt" : "Chưa được duyệt"}
       />
     );
@@ -200,7 +204,7 @@ export default function ManagementQuizLesson() {
         toast={toast}
         fetchData={fetchData}
       />
-      <UpdateQuizLesson
+      <UpdateTag
         visibleUpdate={visibleUpdate}
         setVisibleUpdate={setVisibleUpdate}
         updateValue={updateValue}
@@ -237,21 +241,7 @@ export default function ManagementQuizLesson() {
               />
             </div>
 
-            <div className="flex-1 flex flex-wrap gap-3 justify-end">
-              <div className="border-2 rounded-md mt-4">
-                <Dropdown
-                  filter
-                  ref={dropDownRef2}
-                  value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.value)}
-                  options={cities}
-                  optionLabel="name"
-                  showClear
-                  placeholder="Loại Tag"
-                  className="w-full md:w-14rem shadow-none h-full"
-                />
-              </div>
-            </div>
+           
           </div>
           {loading ? (
             <Loading />
@@ -272,41 +262,38 @@ export default function ManagementQuizLesson() {
                   header="#"
                   body={indexBodyTemplate}
                   className="border-b-2 border-t-2"
+                  style={{ width: "5%" }}
                 />
                 <Column
                   field="title"
                   header="Tiêu đề"
                   className="border-b-2 border-t-2"
-                  style={{ width: "15%" }}
-                />
-                <Column
-                  field="topicTitle"
-                  header="Tên Tag"
-                  className="border-b-2 border-t-2"
-                  style={{ width: "20%" }}
-                />
-                <Column
-                  field="createdDate"
-                  header="Ngày Tạo"
-                  className="border-b-2 border-t-2"
-                  style={{ width: "20%" }}
+                  style={{ width: "30%" }}
                 />
                 <Column
                   header="Trạng thái"
                   className="border-b-2 border-t-2"
                   body={status}
-                  style={{ width: "10%" }}
+                  style={{ width: "15%" }}
                 ></Column>
+                <Column
+                  field="createdDate"
+                  header="Ngày Tạo"
+                  className="border-b-2 border-t-2"
+                  style={{ width: "20%" }}
+                  body={(rowData) => formatDate(rowData.createdDate)}
+                />
                 <Column
                   field="lastModifiedDate"
                   header="Ngày cập nhật"
                   className="border-b-2 border-t-2"
-                  style={{ width: "10%" }}
+                  style={{ width: "20%" }}
                   body={(rowData) => formatDate(rowData.lastModifiedDate)}
                 />
                 <Column
                   className="border-b-2 border-t-2"
                   body={actionBodyTemplate}
+                  style={{ width: "10%" }}
                 />
               </DataTable>
               <Paginator

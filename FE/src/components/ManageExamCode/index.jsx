@@ -2,8 +2,6 @@ import debounce from "lodash.debounce";
 import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
 import React, { useEffect, useRef, useState } from "react";
-import AddTopicDialog from "../AddTopicDialog";
-import UpdateTopicDialog from "../UpdateTopicDialog";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Paginator } from "primereact/paginator";
@@ -17,14 +15,14 @@ import {
   formatDate,
   getTokenFromLocalStorage,
   REJECT,
+  removeVietnameseTones,
 } from "../../utils";
 import { InputSwitch } from "primereact/inputswitch";
-import AddQuizLesson from "../AddQuizLesson";
-import UpdateQuizLesson from "../UpdateQuizLesson";
-import AddQuestion from "../AddQuestion";
-import UpdateQuestion from "../UpdateQuestion";
+import AddExam from "../AddExam";
+import UpdateExam from "../UpdateExam";
+import ExamCode from "../ExamCode";
 
-export default function ManageQuestionQuiz() {
+export default function ManageExam() {
   const toast = useRef(null);
   const dropDownRef1 = useRef(null);
   const dropDownRef2 = useRef(null);
@@ -38,6 +36,10 @@ export default function ManageQuestionQuiz() {
   const [visibleDelete, setVisibleDelete] = useState(false);
   const [loading, setLoading] = useState(false);
   const [textSearch, setTextSearch] = useState("");
+  const [visibleExamCode, setVisibleExamCode] = useState(false);
+  const [examCodeValue, setExamCodeValue] = useState(false);
+  const [title, setTitle] = useState("");
+
   //pagination
   const [first, setFirst] = useState(0);
   const [page, setPage] = useState(1);
@@ -52,13 +54,14 @@ export default function ManageQuestionQuiz() {
     setLoading(true);
 
     restClient({
-      url: `api/quizquestion/getallquizquestionpagination?PageIndex=${page}&PageSize=${rows}`,
+      url: `api/exam/searchbyexampagination?PageIndex=${page}&PageSize=${rows}&Type=2`,
       method: "GET",
     })
       .then((res) => {
         const paginationData = JSON.parse(res.headers["x-pagination"]);
         setTotalPage(paginationData.TotalPages);
         setProducts(Array.isArray(res.data.data) ? res.data.data : []);
+        console.log(res.data.data);
         setLoading(false);
       })
       .catch((err) => {
@@ -69,25 +72,8 @@ export default function ManageQuestionQuiz() {
   };
 
   const fetchData = () => {
-    // if (textSearch.trim()) {
-    //   setLoading(true);
-    //   restClient({
-    //     url: `api/topic/searchbytopicpagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}`,
-    //     method: "GET",
-    //   })
-    //     .then((res) => {
-    //       const paginationData = JSON.parse(res.headers["x-pagination"]);
-    //       setTotalPage(paginationData.TotalPages);
-    //       setProducts(Array.isArray(res.data.data) ? res.data.data : []);
-    //     })
-    //     .catch((err) => {
-    //       console.error("Error fetching data:", err);
-    //       setProducts([]);
-    //     })
-    //     .finally(() => setLoading(false));
-    // } else {
     pagination(page, rows);
-    // }
+
   };
 
   const onPageChange = (event) => {
@@ -100,10 +86,6 @@ export default function ManageQuestionQuiz() {
   const indexBodyTemplate = (rowData, { rowIndex }) => {
     const index = (page - 1) * rows + (rowIndex + 1);
     return <span>{index}</span>;
-  };
-
-  const content = (rowData, { rowIndex }) => {
-    return <span dangerouslySetInnerHTML={{ __html: rowData?.content }}></span>;
   };
 
   const cities = [
@@ -136,10 +118,31 @@ export default function ManageQuestionQuiz() {
     );
   };
 
+  const examCodeTemplate = (rowData) => {
+    return (
+      <Button
+        tooltip="Xem chi tiết các mã đề"
+        icon="pi pi-info-circle"
+        className="text-blue-600 p-mr-2 shadow-none"
+        onClick={() => {
+          setTitle(rowData?.title);
+          setExamCodeValue(rowData);
+          setVisibleExamCode(true);
+        }}
+      />
+    );
+  };
+  const examType = (rowData) => {
+    return (
+      <div style={{ display: "flex" }}>
+        {rowData.type === 1 ? <h1>Tự Luận</h1> : <h1>Trắc Nghiệm</h1>}
+      </div>
+    );
+  };
   const confirmDelete = (id) => {
     setVisibleDelete(true);
     confirmDialog({
-      message: "Bạn có chắc chắn muốn bài quiz này?",
+      message: "Bạn có chắc chắn muốn xóa đề thi này?",
       header: "Delete Confirmation",
       icon: "pi pi-info-circle",
       defaultFocus: "reject",
@@ -159,7 +162,7 @@ export default function ManageQuestionQuiz() {
             icon="pi pi-check"
             className="p-2 bg-blue-500 text-white"
             onClick={() => {
-              deleteDocument(id);
+              deleteExam(id);
             }}
           />
         </>
@@ -167,17 +170,14 @@ export default function ManageQuestionQuiz() {
     });
   };
 
-  const deleteDocument = (id) => {
-    restClient({
-      url: `api/quizquestion/deletequizquestion/${id}`,
-      method: "DELETE",
-    })
+  const deleteExam = async (id) => {
+    await restClient({ url: `api/exam/deleteexam/${id}`, method: "DELETE" })
       .then((res) => {
         fetchData();
         ACCEPT(toast, "Xóa thành công");
       })
       .catch((err) => {
-        REJECT(toast, "Xảy ra lỗi khi xóa câu hỏi này");
+        REJECT(toast, "Xảy ra lỗi khi xóa đề thi này");
       })
       .finally(() => {
         setVisibleDelete(false);
@@ -188,9 +188,10 @@ export default function ManageQuestionQuiz() {
     setTextSearch(text);
   }, 300);
 
-  const changeStatusLesson = (value, id) => {
-    restClient({
-      url: "api/quizquestion/updatestatusquizquestion?id=" + id,
+  const changeStatusExam = async (value, id) => {
+    console.log(value, id);
+    await restClient({
+      url: "api/exam/updatestatusexam?id=" + id,
       method: "PUT",
       headers: {
         Authorization: `Bearer ${getTokenFromLocalStorage()}`,
@@ -208,8 +209,8 @@ export default function ManageQuestionQuiz() {
   const status = (rowData, { rowIndex }) => {
     return (
       <InputSwitch
-        checked={rowData?.isActive}
-        onChange={(e) => changeStatusLesson(e.value, rowData.id)}
+        checked={rowData.isActive}
+        onChange={(e) => changeStatusExam(e.value, rowData.id)}
         tooltip={rowData.isActive ? "Đã được duyệt" : "Chưa được duyệt"}
       />
     );
@@ -219,30 +220,32 @@ export default function ManageQuestionQuiz() {
     <div>
       <Toast ref={toast} />
       <ConfirmDialog visible={visibleDelete} />
-      <AddQuestion
+      <AddExam
         visible={visible}
         setVisible={setVisible}
+        types = {2}
         toast={toast}
         fetchData={fetchData}
       />
-      <UpdateQuestion
+      <UpdateExam
         visibleUpdate={visibleUpdate}
         setVisibleUpdate={setVisibleUpdate}
         updateValue={updateValue}
         toast={toast}
         fetchData={fetchData}
       />
+
+      <ExamCode
+        visibleExamCode={visibleExamCode}
+        setVisibleExamCode={setVisibleExamCode}
+        setTitle={title}
+        examCodeValue={examCodeValue}
+        toast={toast}
+      />
       <div>
         <div className="flex justify-between pt-1">
-          <h1 className="font-bold text-3xl">Câu hỏi quiz</h1>
+          <h1 className="font-bold text-3xl">Các Đề Kiểm Tra</h1>
           <div>
-            <Button
-              label="Import"
-              icon="pi pi-plus-circle"
-              severity="info"
-              className="bg-blue-600 text-white p-2 text-sm font-normal"
-              onClick={() => setVisible(true)}
-            />
             <Button
               label="Thêm mới"
               icon="pi pi-plus-circle"
@@ -250,16 +253,6 @@ export default function ManageQuestionQuiz() {
               className="bg-blue-600 text-white p-2 text-sm font-normal"
               onClick={() => setVisible(true)}
             />
-            {/* <Button
-              label="Xóa"
-              icon="pi pi-trash"
-              disabled={!selectedProduct || selectedProduct.length === 0}
-              severity="danger"
-              className="bg-red-600 text-white p-2 text-sm font-normal ml-3"
-              onClick={() => {
-                console.log("product list ::", selectedProduct);
-              }}
-            /> */}
           </div>
         </div>
 
@@ -309,64 +302,69 @@ export default function ManageQuestionQuiz() {
                 scrollable
                 scrollHeight="30rem"
               >
-                {/* <Column
-                  selectionMode="multiple"
-                  headerStyle={{ width: "3rem" }}
-                  className="border-b-2 border-t-2 custom-checkbox-column"
-                ></Column> */}
                 <Column
                   field="#"
                   header="#"
                   body={indexBodyTemplate}
                   className="border-b-2 border-t-2"
+                  style={{ width: "5%" }}
                 />
+
                 <Column
-                  header="Nội dung"
-                  className="border-b-2 border-t-2"
-                  style={{ width: "30%" }}
-                  body={content}
-                />
-                <Column
-                  field="type"
-                  header="Loại câu hỏi"
-                  className="border-b-2 border-t-2"
-                  style={{ width: "20%" }}
-                />
-                <Column
-                  field="questionLevel"
-                  header="Mức độ"
-                  className="border-b-2 border-t-2"
-                  style={{ width: "20%" }}
-                />
-                {/* <Column
-                  field="score"
-                  header="Điểm"
+                  field="title"
+                  header="Tiêu đề"
                   className="border-b-2 border-t-2"
                   style={{ width: "15%" }}
-                /> */}
+                />
+
+                <Column
+                  header="Loại đề"
+                  className="border-b-2 border-t-2"
+                  style={{ width: "15%" }}
+                  body={examType}
+                />
+
+                <Column
+                  header="Chi Tiết"
+                  className="border-b-2 border-t-2"
+                  style={{ width: "10%" }}
+                  body={examCodeTemplate}
+                />
+
+                <Column
+                  field="province"
+                  header="Tỉnh"
+                  className="border-b-2 border-t-2"
+                  style={{ width: "10%" }}
+                />
+
                 <Column
                   header="Trạng thái"
                   className="border-b-2 border-t-2"
                   body={status}
                   style={{ width: "10%" }}
-                ></Column>
-                {/* <Column
+                />
+
+                <Column
                   field="createdDate"
                   header="Ngày tạo"
                   className="border-b-2 border-t-2"
-                  style={{ width: "10%" }}
+                  style={{ width: "15%" }}
                   body={(rowData) => formatDate(rowData.createdDate)}
                 />
+
                 <Column
                   field="lastModifiedDate"
                   header="Ngày cập nhật"
                   className="border-b-2 border-t-2"
-                  style={{ width: "10%" }}
+                  style={{ width: "15%" }}
                   body={(rowData) => formatDate(rowData.lastModifiedDate)}
-                /> */}
+                />
+
                 <Column
                   className="border-b-2 border-t-2"
                   body={actionBodyTemplate}
+                  style={{ width: "5%" }}
                 />
               </DataTable>
               <Paginator

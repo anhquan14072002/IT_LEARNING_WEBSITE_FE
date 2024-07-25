@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Dialog } from "primereact/dialog";
-import { Formik, Form, Field, ErrorMessage } from "formik";
+import { Formik, Form, Field, ErrorMessage, setIn } from "formik";
 import * as Yup from "yup";
 import CustomEditor from "../../shared/CustomEditor";
 import { Button } from "primereact/button";
@@ -18,7 +18,13 @@ import {
 } from "../../utils";
 import CustomTextInput from "../../shared/CustomTextInput";
 
-const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
+const UpdateQuestion = ({
+  visibleUpdate,
+  setVisibleUpdate,
+  updateValue,
+  toast,
+  fetchData,
+}) => {
   const [initialValues, setInitialValues] = useState({
     content: "",
     type: {},
@@ -32,7 +38,8 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
   const [loading, setLoading] = useState(false);
   const [questionLevel, setquestionLevelList] = useState([]);
   const [quizList, setquizListList] = useState([]);
-  const [typeQuestion, setTypeQuestion] = useState("");
+  const [typeQuestion, setTypeQuestion] = useState(updateValue?.type || "");
+  const [loadingForm, setLoadingForm] = useState(false);
 
   //answer of four answers
   const [fourAnswer, setFourAnswer] = useState([
@@ -65,8 +72,14 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
 
   useEffect(() => {
     const fetchFormData = async () => {
+
+      console.log("updatevalue::",updateValue);
       setLoading(true);
+
+      updateValue?.quizAnswers.forEach((answer) => console.log(answer));
+
       try {
+        // Fetch type list
         const typeListRes = await restClient({
           url: "api/enum/gettypequestion",
           method: "GET",
@@ -76,6 +89,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
           typeName: item.value,
         }));
 
+        // Fetch question level list
         const questionLevelRes = await restClient({
           url: "api/enum/getquestionlevel",
           method: "GET",
@@ -85,15 +99,126 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
           levelName: item.value,
         }));
 
+        // Fetch quiz list
         const quizListRes = await restClient({
           url: "api/quiz/getallquiz",
           method: "GET",
         });
         const quizListData = quizListRes?.data?.data;
 
+        // Update state with fetched data
         settypeList(typeData);
         setquestionLevelList(questionLevelData);
         setquizListList(quizListData);
+
+        // Check if updateValue is available and typeList and questionLevel are populated
+        if (
+          visibleUpdate &&
+          updateValue &&
+          typeData.length > 0 &&
+          questionLevelData.length > 0
+        ) {
+          try {
+            setLoadingForm(true);
+            setTypeQuestion(updateValue.type);
+
+            if (updateValue.type === "QuestionTrueFalse") {
+              const typeObject = typeData.find(
+                (item) => item?.title === "QuestionTrueFalse"
+              );
+
+              setInitialValues({
+                quiz: quizListData?.find(
+                  (item, index) =>
+                    item?.id === updateValue?.quizQuestionRelations[0]?.quizId
+                ),
+                content: updateValue.keyWord || "",
+                type: typeObject || {},
+                questionLevel:
+                  questionLevelData.find(
+                    (item) => item?.title === updateValue.questionLevel
+                  ) || {},
+                QuestionTrueFalse: String(
+                  updateValue?.quizAnswers.some(
+                    (answer) =>
+                      answer?.content === "Đúng" &&
+                      String(answer?.isCorrect) === "true"
+                  )
+                ),
+                shuffle: shuffle.find(
+                  (s, index) => updateValue?.isShuffle === s?.valueTitle
+                ),
+                hint: updateValue?.hint,
+              });
+            } else if (updateValue.type === "QuestionFourAnswer") {
+              const typeObject = typeData.find(
+                (item) => item?.title === "QuestionFourAnswer"
+              );
+
+              setInitialValues({
+                quiz: quizListData?.find(
+                  (item, index) =>
+                    item?.id === updateValue?.quizQuestionRelations[0]?.quizId
+                ),
+                content: updateValue?.content || "",
+                type: typeObject || {},
+                questionLevel:
+                  questionLevelData.find(
+                    (item) => item?.title === updateValue.questionLevel
+                  ) || {},
+                shuffle: shuffle.find(
+                  (s, index) => updateValue?.isShuffle === s?.valueTitle
+                ),
+                hint: updateValue?.hint,
+              });
+
+              const mappedFourAnswer = updateValue?.quizAnswers?.map(
+                (answer, index) => ({
+                  content: answer.content,
+                  isCorrect: answer.isCorrect,
+                })
+              );
+
+              // Set the state with mappedFourAnswer
+              setFourAnswer(mappedFourAnswer);
+            } else if (updateValue.type === "QuestionMultiChoice") {
+              const typeObject = typeData.find(
+                (item) => item?.title === "QuestionMultiChoice"
+              );
+
+              setInitialValues({
+                quiz: quizListData?.find(
+                  (item, index) =>
+                    item?.id === updateValue?.quizQuestionRelations[0]?.quizId
+                ),
+                content: updateValue?.content || "",
+                type: typeObject || {},
+                questionLevel:
+                  questionLevelData.find(
+                    (item) => item?.title === updateValue.questionLevel
+                  ) || {},
+                shuffle: shuffle.find(
+                  (s, index) => updateValue?.isShuffle === s?.valueTitle
+                ),
+                hint: updateValue?.hint,
+              });
+
+              const mappedMultipleAnswer = updateValue?.quizAnswers?.map(
+                (answer, index) => ({
+                  content: answer.content,
+                  isCorrect: answer.isCorrect,
+                })
+              );
+
+              // Set the state with mappedMultipleAnswer
+              setMultipleAnswer(mappedMultipleAnswer);
+            }
+          } catch (e) {
+            setLoadingForm(false);
+          } finally {
+            setLoadingForm(false);
+          }
+        }
       } catch (e) {
         settypeList([]);
         setquestionLevelList([]);
@@ -103,10 +228,10 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
       }
     };
 
-    if (visible) {
+    if (visibleUpdate) {
       fetchFormData();
     }
-  }, [visible]);
+  }, [visibleUpdate, updateValue]);
 
   const onSubmit = (values) => {
     if (typeQuestion === "QuestionTrueFalse") {
@@ -119,6 +244,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
         let formData = new FormData();
 
         // Append each field to the FormData object
+        formData.append("Id", updateValue?.id);
         formData.append("type", values.type.typeName);
         formData.append("content", values?.content);
         formData.append("isActive", true); // Assuming isActive is a boolean
@@ -128,19 +254,6 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
           formData.append("quizId", values?.quiz?.id);
         }
         formData.append("hint", values?.hint);
-
-        // [
-        //   {
-        //     content: "Đúng",
-        //     isCorrect: values.QuestionTrueFalseValue === true,
-        //   },
-        //   {
-        //     content: "Sai",
-        //     isCorrect: values.QuestionTrueFalseValue === false,
-        //   },
-        // ].forEach((obj , index) => {
-        //   formData
-        // })
 
         [
           {
@@ -158,8 +271,8 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
         });
 
         restClient({
-          url: "api/quizquestion/createquizquestion",
-          method: "POST",
+          url: "api/quizquestion/updatequizquestion",
+          method: "PUT",
           data: formData,
         })
           .then((res) => {
@@ -170,7 +283,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
             REJECT(toast, err.message);
           })
           .finally(() => {
-            setVisible(false);
+            setVisibleUpdate(false);
             setLoading(false);
           });
       }
@@ -187,6 +300,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
         let formData = new FormData();
 
         // Append each field to the FormData object
+        formData.append("Id", updateValue?.id);
         formData.append("type", values.type.typeName);
         formData.append("content", values?.content);
         formData.append("isActive", true); // Assuming isActive is a boolean
@@ -204,8 +318,8 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
         });
 
         restClient({
-          url: "api/quizquestion/createquizquestion",
-          method: "POST",
+          url: "api/quizquestion/updatequizquestion",
+          method: "PUT",
           data: formData,
         })
           .then((res) => {
@@ -216,7 +330,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
             REJECT(toast, err.message);
           })
           .finally(() => {
-            setVisible(false);
+            setVisibleUpdate(false);
             setLoading(false);
           });
       }
@@ -233,6 +347,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
         let formData = new FormData();
 
         // Append each field to the FormData object
+        formData.append("Id", updateValue?.id);
         formData.append("type", values.type.typeName);
         formData.append("content", values?.content);
         formData.append("isActive", true); // Assuming isActive is a boolean
@@ -250,8 +365,8 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
         });
 
         restClient({
-          url: "api/quizquestion/createquizquestion",
-          method: "POST",
+          url: "api/quizquestion/updatequizquestion",
+          method: "PUT",
           data: formData,
         })
           .then((res) => {
@@ -262,7 +377,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
             REJECT(toast, err.message);
           })
           .finally(() => {
-            setVisible(false);
+            setVisibleUpdate(false);
             setLoading(false);
           });
       }
@@ -386,11 +501,11 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
 
   return (
     <Dialog
-      header="Thêm câu hỏi"
-      visible={visible}
+      header="Cập nhật câu hỏi"
+      visible={visibleUpdate}
       style={{ width: "50vw" }}
       onHide={() => {
-        if (!visible) return;
+        if (!visibleUpdate) return;
         setNumberAnswerOfMultichoice(6);
         setMultipleAnswer(
           Array.from({ length: 6 }, (_, index) => ({
@@ -398,7 +513,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
             isCorrect: false,
           }))
         );
-        setVisible(false);
+        setVisibleUpdate(false);
         setFourAnswer([
           { content: "", isCorrect: false },
           { content: "", isCorrect: false },
@@ -609,8 +724,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
                   type="button"
                   severity="danger"
                   onClick={() => {
-                    setVisible(false);
-                    setVisible(false);
+                    setVisibleUpdate(false);
                     setFourAnswer([
                       { content: "", isCorrect: false },
                       { content: "", isCorrect: false },
@@ -630,7 +744,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
                   Hủy
                 </Button>
                 <Button className="p-2 bg-blue-500 text-white" type="submit">
-                  Thêm
+                  Cập nhật
                 </Button>
               </div>
             </Form>
@@ -641,4 +755,4 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
   );
 };
 
-export default AddQuestion;
+export default UpdateQuestion;

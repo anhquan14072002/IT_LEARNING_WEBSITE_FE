@@ -239,7 +239,7 @@ export default function Topic() {
               />
             </div>
 
-            <div className="flex-1 flex flex-wrap gap-3 justify-end">
+            {/* <div className="flex-1 flex flex-wrap gap-3 justify-end">
               <div className="border-2 rounded-md mt-4">
                 <Dropdown
                   filter
@@ -249,11 +249,24 @@ export default function Topic() {
                   options={cities}
                   optionLabel="name"
                   showClear
-                  placeholder="Tài liệu"
+                  placeholder="Lớp"
                   className="w-full md:w-14rem shadow-none h-full"
                 />
               </div>
-            </div>
+              <div className="border-2 rounded-md mt-4">
+                <Dropdown
+                  filter
+                  ref={dropDownRef2}
+                  value={selectedCity}
+                  onChange={(e) => setSelectedCity(e.value)}
+                  options={cities}
+                  optionLabel="name"
+                  showClear
+                  placeholder="Bộ sách"
+                  className="w-full md:w-14rem shadow-none h-full"
+                />
+              </div>
+            </div> */}
           </div>
           {loading ? (
             <Loading />
@@ -279,37 +292,38 @@ export default function Topic() {
                   header="#"
                   body={indexBodyTemplate}
                   className="border-b-2 border-t-2"
+                  style={{ minWidth: "5rem" }}
                 />
                 <Column
                   field="title"
                   header="Tiêu đề"
                   className="border-b-2 border-t-2"
+                  style={{ minWidth: "12rem" }}
                 />
                 <Column
                   field="documentTitle"
                   header="Tài liệu"
                   className="border-b-2 border-t-2"
+                  style={{ minWidth: "12rem" }}
                 />
                 <Column
                   field="objectives"
                   header="Mục tiêu chủ đề"
                   className="border-b-2 border-t-2"
-                  body={(rowData) => (
-                    <div
-                      dangerouslySetInnerHTML={{ __html: rowData.objectives }}
-                    />
-                  )}
+                  style={{ minWidth: "15rem" }}
                 />
                 <Column
                   field="createdDate"
                   header="Ngày tạo"
                   className="border-b-2 border-t-2"
+                  style={{ minWidth: "20rem" }}
                   body={(rowData) => formatDate(rowData.createdDate)}
                 />
                 <Column
                   field="lastModifiedDate"
                   header="Ngày cập nhật"
                   className="border-b-2 border-t-2"
+                  style={{ minWidth: "20rem" }}
                   body={(rowData) => formatDate(rowData.lastModifiedDate)}
                 />
                 <Column

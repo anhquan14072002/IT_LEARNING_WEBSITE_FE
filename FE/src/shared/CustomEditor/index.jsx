@@ -14,7 +14,7 @@ const CustomEditor = ({ label, ...props }) => {
 
   return (
     <div className="mb-5">
-      {label && <label htmlFor={props.id || props.name}>{label}</label>}
+      {label && <label htmlFor={props.id || props.name}>{label}{" "}{!props?.isNotRequired && (<span className="text-red-500">*</span>)}</label>}
       <div
         className={classNames(
           "w-full shadow-none border rounded-md",

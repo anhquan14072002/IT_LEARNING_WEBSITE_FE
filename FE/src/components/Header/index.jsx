@@ -19,7 +19,7 @@ import { Menu } from "primereact/menu";
 export default function Header({ params, setParams, textSearchProps }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const [textSearch, setTextSearch] = useState(textSearchProps);
+  const [textSearch, setTextSearch] = useState(textSearchProps || '');
   const [menuOpen, setMenuOpen] = useState(false); // State to track menu open/close
   const user = useSelector((state) => state.user.value);
   const dispatch = useDispatch();
