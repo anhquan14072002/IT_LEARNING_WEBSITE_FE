@@ -4,21 +4,24 @@ import { NavLink, useLocation } from "react-router-dom";
 import FormDataContext from "../../store/FormDataContext";
 
 function ItemSideBar({ Menu, index, indexMenu, step }) {
-  // let bgStep = "bg-blue-500";
-  // if (step === "stepOne") {
-  // }
+  // neeus step bawng step step cua Menu.pah thif cho bg nen
+  let bgStep =
+    "flex p-2 rounded cursor-pointer bg-[#e9eaea] border border-[#c5c7c7] text-sm items-center gap-x-4 ";
+  if (step === Menu.path) {
+    bgStep += " bg-blue-400";
+  }
   return (
     <li
-      className={`flex p-2 rounded cursor-pointer bg-[#e9eaea] border border-[#c5c7c7] text-sm items-center gap-x-4 
+      className={`${bgStep}
       ${index != 0 ? "mt-2" : ""}${
         index === indexMenu ? "bg-light-white" : ""
       }`}
     >
-      <Button disabled className={` origin-left duration-200 opacity-100 `}>
+      <Button disabled className="origin-left duration-200 opacity-100">
         <NavLink
           to={Menu.path}
           className={({ isActive }) =>
-            isActive ? "text-blue-700 font-bold" : undefined
+            isActive ? "text-white font-bold" : undefined
           }
         >
           {Menu.title}
@@ -29,7 +32,7 @@ function ItemSideBar({ Menu, index, indexMenu, step }) {
 }
 function SideBarImport({ Menus }) {
   const [indexMenu, setIndexMenu] = useState(0);
-  const { setStep } = useContext(FormDataContext);
+  const { setStep, step } = useContext(FormDataContext);
 
   const location = useLocation();
 
@@ -46,6 +49,7 @@ function SideBarImport({ Menus }) {
             Menu={Menu}
             index={index}
             indexMenu={indexMenu}
+            step={step}
           />
         ))}
       </ul>

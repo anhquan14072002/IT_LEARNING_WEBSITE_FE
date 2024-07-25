@@ -3,6 +3,7 @@ import React, { useContext } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import help from "../../assets/img/icons8-help-30.png";
 import arrows from "../../assets/img/arrows.png";
+import continueImg from "../../assets/img/continue.png";
 import back from "../../assets/img/icons8-back-50.png";
 import cancel from "../../assets/img/icons8-cancel-24.png";
 import FormDataContext from "../../store/FormDataContext";
@@ -40,8 +41,10 @@ function Footer({ Menus }) {
     navigate(nextRoute);
   }
   let labelButton = "Tiếp Tục";
+  let imgButton = continueImg;
   if (step === "stepTwo") {
     labelButton = "Thực Hiện";
+    imgButton = arrows;
   }
   return (
     <footer className="flex justify-between  mt-2">
@@ -64,7 +67,7 @@ function Footer({ Menus }) {
         )}
         {indexRoute != 2 && (
           <IconButton
-            icon={arrows}
+            icon={imgButton}
             title={labelButton}
             onClick={implement}
             disabled={success == 0 && step == "stepTwo"}
