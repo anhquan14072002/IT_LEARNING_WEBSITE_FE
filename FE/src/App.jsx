@@ -18,6 +18,8 @@ import TestQuizPage from './pages/TestQuizPage';
 import ExamCodeDetail from './pages/ExamCodeDetail';
 import ExamDetail from './pages/ExamDetail';
 import ExamResult from './pages/ExamResult';
+import ManageQuestionOfQuizlist from './pages/ManageQuestionOfQuizlist';
+import AddQuestionOfQuizlist from './pages/AddQuestionOfQuizlist';
 import ViewExam from './pages/ViewExam';
 
 
@@ -45,6 +47,8 @@ function App() {
         <Route path="/examcodedetail/:id" element={<ExamCodeDetail />} />
         <Route path="/examdetail/:id" element={<ExamDetail />} />
         <Route path="/examresult/:id" element={<ExamResult />} />
+        <Route path="/dashboard/quiz/managequestionofquizlist/:id" element={<ManageQuestionOfQuizlist />}/>
+        <Route path="/dashboard/quiz/addquestionofquizlist/:id" element={<AddQuestionOfQuizlist/>}/>
         <Route path="/viewexam" element={<ViewExam />} />
         </Routes>
     </Router>

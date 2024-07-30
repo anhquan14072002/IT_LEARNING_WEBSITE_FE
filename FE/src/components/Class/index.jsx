@@ -24,7 +24,7 @@ export default function Class({ item, index }) {
     setTimeout(()=>{
       // Function to update contentHeight based on toggle state
     const updateContentHeight = () => {
-      setContentHeight(toggle ? `${contentRef.current.scrollHeight}px` : "0px");
+      setContentHeight(toggle ? `${contentRef?.current?.scrollHeight}px` : "0px");
     };
 
     // Call initially and on toggle change

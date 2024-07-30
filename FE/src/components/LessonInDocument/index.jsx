@@ -63,8 +63,8 @@ export default function LessonInDocument({
       <div
         className={`fixed w-[18%] ${
           display
-            ? "transition duration-200 ease-in-out opacity-0"
-            : "transition duration-200 ease-in-out opacity-100"
+            ? "transition duration-200 ease-in-out hidden"
+            : "transition duration-200 ease-in-out block"
         } `}
       >
 

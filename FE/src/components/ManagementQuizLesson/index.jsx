@@ -16,6 +16,7 @@ import { ACCEPT, formatDate, getTokenFromLocalStorage, REJECT } from "../../util
 import { InputSwitch } from "primereact/inputswitch";
 import AddQuizLesson from "../AddQuizLesson";
 import UpdateQuizLesson from "../UpdateQuizLesson";
+import { useNavigate } from "react-router-dom";
 
 export default function ManagementQuizLesson() {
   const toast = useRef(null);
@@ -31,11 +32,14 @@ export default function ManagementQuizLesson() {
   const [visibleDelete, setVisibleDelete] = useState(false);
   const [loading, setLoading] = useState(false);
   const [textSearch, setTextSearch] = useState("");
+  const navigate = useNavigate()
+
   //pagination
   const [first, setFirst] = useState(0);
   const [page, setPage] = useState(1);
   const [rows, setRows] = useState(10);
   const [totalPage, setTotalPage] = useState(0);
+  
 
   useEffect(() => {
     fetchData();
@@ -105,7 +109,15 @@ export default function ManagementQuizLesson() {
 
   const actionBodyTemplate = (rowData) => {
     return (
-      <div style={{ display: "flex" }}>
+      <div style={{ display: "flex",gap:'2rem' }}>
+        <Button
+          icon="pi pi-cog"
+          label="Chỉnh sửa câu hỏi ôn tập"
+          className="bg-blue-600 p-mr-2 shadow-none p-2 text-white"
+          onClick={() => {
+            navigate("/dashboard/quiz/managequestionofquizlist/"+rowData?.id)
+          }}
+        />
         <Button
           icon="pi pi-pencil"
           className="text-blue-600 p-mr-2 shadow-none"
@@ -301,55 +313,57 @@ export default function ManagementQuizLesson() {
                   field="#"
                   header="#"
                   body={indexBodyTemplate}
+                  style={{ minWidth: '5rem' }}
                   className="border-b-2 border-t-2"
                 />
                 <Column
                   field="title"
                   header="Tiêu đề"
                   className="border-b-2 border-t-2"
-                  style={{ width: "15%" }}
+                  style={{ minWidth: '15rem' }}
                 />
                 <Column
                   field="topicTitle"
                   header="Chủ đề"
                   className="border-b-2 border-t-2"
-                  style={{ width: "20%" }}
+                  style={{ minWidth: '15rem' }}
                 />
                 <Column
                   field="lessonTitle"
                   header="Bài học"
                   className="border-b-2 border-t-2"
-                  style={{ width: "20%" }}
+                  style={{ minWidth: '15rem' }}
                 />
                 <Column
                   field="score"
                   header="Điểm"
                   className="border-b-2 border-t-2"
-                  style={{ width: "15%" }}
+                  style={{ minWidth: '15rem' }}
                 />
                 <Column
                   header="Trạng thái"
                   className="border-b-2 border-t-2"
                   body={status}
-                  style={{ width: "10%" }}
+                  style={{ minWidth: '15rem' }}
                 ></Column>
                 <Column
                   field="createdDate"
                   header="Ngày tạo"
                   className="border-b-2 border-t-2"
-                  style={{ width: "10%" }}
+                  style={{ minWidth: '15rem' }}
                   body={(rowData) => formatDate(rowData.createdDate)}
                 />
                 <Column
                   field="lastModifiedDate"
                   header="Ngày cập nhật"
                   className="border-b-2 border-t-2"
-                  style={{ width: "10%" }}
+                  style={{ minWidth: '15rem' }}
                   body={(rowData) => formatDate(rowData.lastModifiedDate)}
                 />
                 <Column
                   className="border-b-2 border-t-2"
                   body={actionBodyTemplate}
+                  style={{ minWidth: '25rem' }}
                 />
               </DataTable>
               <Paginator
