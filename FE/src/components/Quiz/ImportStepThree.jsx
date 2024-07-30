@@ -3,18 +3,20 @@ import FormDataContext from "../../store/FormDataContext";
 import restClient, { BASE_URL } from "../../services/restClient";
 import Loading from "../Loading";
 import axios from "axios";
+import { REJECT } from "../../utils";
+import { Toast } from "primereact/toast";
 function ImportStepThree(props) {
   const [loading, setLoading] = useState(false);
-  const { success, fail, idImport, idImportResult } =
+  const { success, fail, idImport, idImportResult, quizId } =
     useContext(FormDataContext);
   const didFetchRef = useRef(false);
-
+  const toast = useRef(null);
   useEffect(() => {
     if (didFetchRef.current) return;
     didFetchRef.current = true;
     setLoading(true);
     restClient({
-      url: `api/quizquestion/ImportExcel/${idImport}`,
+      url: `api/quizquestion/ImportExcel/${idImport}/${quizId}`,
       method: "GET",
     })
       .then((res) => {
@@ -22,7 +24,11 @@ function ImportStepThree(props) {
         console.log(res);
       })
       .catch((err) => {
-        console.error("Error fetching data:", err);
+        setLoading(true);
+        REJECT(toast, "Xảy ra lỗi khi nhập khẩu file excel này");
+        setTimeout(() => {
+          navigate("/importQuiz/stepOne");
+        }, 3000);
       })
       .finally(() => setLoading(false));
   }, []);
@@ -65,6 +71,7 @@ function ImportStepThree(props) {
         <Loading />
       ) : (
         <div className="flex flex-col gap-3">
+          <Toast ref={toast} />
           <h1 className="font-bold text-2xl">Kết quả nhập khẩu</h1>
           <p>
             Tải về tập tin chứa kết quả nhập khẩu

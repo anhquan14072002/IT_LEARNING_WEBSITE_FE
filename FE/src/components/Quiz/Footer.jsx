@@ -9,11 +9,9 @@ import cancel from "../../assets/img/icons8-cancel-24.png";
 import FormDataContext from "../../store/FormDataContext";
 function IconButton({ icon, title, active, ...props }) {
   let cssButton = "border border-[#c5c7c7] py-1 px-3 mt-1";
-  console.log(active);
   if (active) {
     cssButton += " bg-blue-500";
   }
-  console.log(cssButton);
   return (
     <Button className={cssButton} {...props}>
       <img src={icon} width="25" height="25" className="mr-1" />
@@ -37,7 +35,6 @@ function Footer({ Menus }) {
           -  w*/
     let nextRoute =
       indexRoute === 0 ? "/dashboard" : Menus[indexRoute - 1].path;
-    console.log(nextRoute);
     navigate(nextRoute);
   }
   let labelButton = "Tiếp Tục";
@@ -50,7 +47,7 @@ function Footer({ Menus }) {
     <footer className="flex justify-between  mt-2">
       <Button
         className="border border-[#c5c7c7] py-1 px-3"
-        tooltip="1. Tải mẫu excel để nhập khẩu tại link màu xanh 'Tại đây'
+        tooltip="1. Tải mẫu excel để nhập khẩu 'Tại file mẫu excel'
           2. Ấn nút Chọn và chọn tải liệu muốn nhập khẩu
           3. Ấn nút Thực hiện dưới màn hình 
           4. Kiểm tra những dữ liệu muốn nhập khẩu vào hệ thống

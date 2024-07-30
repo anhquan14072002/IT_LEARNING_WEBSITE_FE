@@ -52,14 +52,14 @@ function ImportStepTwo() {
 
         if (response.status === 200) {
           const responseData = response.data.data;
-          console.log("File uploaded successfully:", responseData);
           setExcelValidateResponse(responseData);
           checkRecord(
             responseData.countSuccess,
             responseData.countFail,
             responseData.idImport,
             responseData.idImportFail,
-            responseData.idImportResult
+            responseData.idImportResult,
+            2
           );
         } else {
           console.error("File upload failed:", response);
@@ -218,7 +218,7 @@ function ImportStepTwo() {
           className="text-blue-700 font-medium"
           onClick={exportToExcel}
         >
-          Tải tình trạng dữ liệu
+          &nbsp; Tại đây
         </a>
       </p>
     </article>

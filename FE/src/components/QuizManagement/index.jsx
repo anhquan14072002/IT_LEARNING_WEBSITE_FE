@@ -30,7 +30,7 @@ export default function QuizManagement() {
         </h1>
       </div>
       {navIndex === 1 && <ManagementQuizLesson />}
-      {navIndex === 2 && <ManageQuestionQuiz />}
+      {/* {navIndex === 2 && <ManageQuestionQuiz />} */}
     </div>
   );
 }

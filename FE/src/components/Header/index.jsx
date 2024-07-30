@@ -19,7 +19,7 @@ import { Menu } from "primereact/menu";
 export default function Header({ params, setParams, textSearchProps }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const [textSearch, setTextSearch] = useState(textSearchProps || '');
+  const [textSearch, setTextSearch] = useState(textSearchProps || "");
   const [menuOpen, setMenuOpen] = useState(false); // State to track menu open/close
   const user = useSelector((state) => state.user.value);
   const dispatch = useDispatch();
@@ -49,7 +49,7 @@ export default function Header({ params, setParams, textSearchProps }) {
   ];
 
   useEffect(() => {
-    console.log("picture::",user.picture);
+    console.log("picture::", user.picture);
     console.log("Running useEffect");
     console.log("User state:", user);
 
@@ -58,7 +58,7 @@ export default function Header({ params, setParams, textSearchProps }) {
       try {
         const token = getTokenFromLocalStorage();
         const decodedToken = decodeToken(token);
-        
+
         dispatch(addUser(decodedToken));
       } catch (error) {
         console.error("Error decoding token:", error);
