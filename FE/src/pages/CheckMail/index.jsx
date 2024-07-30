@@ -72,7 +72,7 @@ const Index = () => {
                     <InputText
                       id="email"
                       type="text"
-                      className="w-full h-10 text-black-800 border border-solid border-gray-600 pb-2 pl-1 rounded-md"
+                      className="w-full h-10 text-black-800 border border-solid border-gray-600 pb-2 pl-1 rounded-md shadow-none"
                       placeholder="Nhập email"
                       {...field}
                     />

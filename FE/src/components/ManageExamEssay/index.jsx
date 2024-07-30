@@ -2,8 +2,6 @@ import debounce from "lodash.debounce";
 import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
 import React, { useEffect, useRef, useState } from "react";
-import AddTopicDialog from "../AddTopicDialog";
-import UpdateTopicDialog from "../UpdateTopicDialog";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Paginator } from "primereact/paginator";
@@ -20,23 +18,28 @@ import {
   removeVietnameseTones,
 } from "../../utils";
 import { InputSwitch } from "primereact/inputswitch";
-// import AddTag from "../AddTag";
-import UpdateQuizLesson from "../UpdateQuizLesson";
-import AddTag from "../AddTag";
-import UpdateTag from "../UpdateTag";
+import AddExam from "../AddExam";
+import UpdateExam from "../UpdateExam";
 
-export default function ManagementQuizLesson() {
+
+export default function ManageExam() {
   const toast = useRef(null);
+  const dropDownRef1 = useRef(null);
   const dropDownRef2 = useRef(null);
   const [selectedCity, setSelectedCity] = useState(null);
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const cm = useRef(null);
   const [visible, setVisible] = useState(false);
   const [updateValue, setUpdateValue] = useState({});
   const [visibleUpdate, setVisibleUpdate] = useState(false);
   const [visibleDelete, setVisibleDelete] = useState(false);
   const [loading, setLoading] = useState(false);
   const [textSearch, setTextSearch] = useState("");
+  const [visibleExamCode, setVisibleExamCode] = useState(false);
+  const [examCodeValue, setExamCodeValue] = useState(false);
+  const [title, setTitle] = useState("");
+
   //pagination
   const [first, setFirst] = useState(0);
   const [page, setPage] = useState(1);
@@ -45,22 +48,20 @@ export default function ManagementQuizLesson() {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [page, rows, textSearch]);
 
-  const pagination = (page, rows, textSearch) => {
+  const pagination = (page, rows) => {
     setLoading(true);
-    const title = "title";
+
     restClient({
-      url: `api/tag/searchbytagpagination?PageIndex=${page}&PageSize=${rows}&Key=${title}&Value=${textSearch}`,
+      url: `api/exam/searchbyexampagination?PageIndex=${page}&PageSize=${rows}&Type=1`,
       method: "GET",
     })
       .then((res) => {
-        const paginationData = res.headers["x-pagination"] 
-          ? JSON.parse(res.headers["x-pagination"]) 
-          : { TotalPages: 0 };
-  
+        const paginationData = JSON.parse(res.headers["x-pagination"]);
         setTotalPage(paginationData.TotalPages);
         setProducts(Array.isArray(res.data.data) ? res.data.data : []);
+        console.log(res.data.data);
         setLoading(false);
       })
       .catch((err) => {
@@ -69,10 +70,10 @@ export default function ManagementQuizLesson() {
         setLoading(false);
       });
   };
-  
 
   const fetchData = () => {
-    pagination(page, rows, textSearch);
+    pagination(page, rows);
+
   };
 
   const onPageChange = (event) => {
@@ -117,10 +118,17 @@ export default function ManagementQuizLesson() {
     );
   };
 
+  const examType = (rowData) => {
+    return (
+      <div style={{ display: "flex" }}>
+        {rowData.type === 1 ? <h1>Tự Luận</h1> : <h1>Trắc Nghiệm</h1>}
+      </div>
+    );
+  };
   const confirmDelete = (id) => {
     setVisibleDelete(true);
     confirmDialog({
-      message: "Bạn có chắc chắn muốn bài quiz này?",
+      message: "Bạn có chắc chắn muốn xóa đề thi này?",
       header: "Delete Confirmation",
       icon: "pi pi-info-circle",
       defaultFocus: "reject",
@@ -140,7 +148,7 @@ export default function ManagementQuizLesson() {
             icon="pi pi-check"
             className="p-2 bg-blue-500 text-white"
             onClick={() => {
-              deleteTag(id);
+              deleteExam(id);
             }}
           />
         </>
@@ -148,14 +156,14 @@ export default function ManagementQuizLesson() {
     });
   };
 
-  const deleteTag = (id) => {
-    restClient({ url: `api/tag/deletetag/${id}`, method: "DELETE" })
+  const deleteExam = async (id) => {
+    await restClient({ url: `api/exam/deleteexam/${id}`, method: "DELETE" })
       .then((res) => {
         fetchData();
         ACCEPT(toast, "Xóa thành công");
       })
       .catch((err) => {
-        REJECT(toast, "Xảy ra lỗi khi xóa tag này");
+        REJECT(toast, "Xảy ra lỗi khi xóa đề thi này");
       })
       .finally(() => {
         setVisibleDelete(false);
@@ -163,14 +171,13 @@ export default function ManagementQuizLesson() {
   };
 
   const handleSearchInput = debounce((text) => {
-    console.log(text);
     setTextSearch(text);
   }, 300);
 
-  const changeStatusTag = async (value, id) => {
+  const changeStatusExam = async (value, id) => {
     console.log(value, id);
     await restClient({
-      url: `api/tag/updatestatustag/${id}`,
+      url: "api/exam/updatestatusexam?id=" + id,
       method: "PUT",
       headers: {
         Authorization: `Bearer ${getTokenFromLocalStorage()}`,
@@ -184,11 +191,12 @@ export default function ManagementQuizLesson() {
         REJECT(toast, "Lỗi khi thay đổi trạng thái");
       });
   };
+
   const status = (rowData, { rowIndex }) => {
     return (
       <InputSwitch
         checked={rowData.isActive}
-        onChange={(e) => changeStatusTag(e.value, rowData.id)}
+        onChange={(e) => changeStatusExam(e.value, rowData.id)}
         tooltip={rowData.isActive ? "Đã được duyệt" : "Chưa được duyệt"}
       />
     );
@@ -198,13 +206,14 @@ export default function ManagementQuizLesson() {
     <div>
       <Toast ref={toast} />
       <ConfirmDialog visible={visibleDelete} />
-      <AddTag
+      <AddExam
         visible={visible}
         setVisible={setVisible}
+        types = {1}
         toast={toast}
         fetchData={fetchData}
       />
-      <UpdateTag
+      <UpdateExam
         visibleUpdate={visibleUpdate}
         setVisibleUpdate={setVisibleUpdate}
         updateValue={updateValue}
@@ -213,7 +222,7 @@ export default function ManagementQuizLesson() {
       />
       <div>
         <div className="flex justify-between pt-1">
-          <h1 className="font-bold text-3xl">Các Tag</h1>
+          <h1 className="font-bold text-3xl">Các Đề Kiểm Tra</h1>
           <div>
             <Button
               label="Thêm mới"
@@ -241,7 +250,21 @@ export default function ManagementQuizLesson() {
               />
             </div>
 
-           
+            <div className="flex-1 flex flex-wrap gap-3 justify-end">
+              <div className="border-2 rounded-md mt-4">
+                <Dropdown
+                  filter
+                  ref={dropDownRef2}
+                  value={selectedCity}
+                  onChange={(e) => setSelectedCity(e.value)}
+                  options={cities}
+                  optionLabel="name"
+                  showClear
+                  placeholder="Tài liệu"
+                  className="w-full md:w-14rem shadow-none h-full"
+                />
+              </div>
+            </div>
           </div>
           {loading ? (
             <Loading />
@@ -264,36 +287,56 @@ export default function ManagementQuizLesson() {
                   className="border-b-2 border-t-2"
                   style={{ width: "5%" }}
                 />
+
                 <Column
                   field="title"
                   header="Tiêu đề"
                   className="border-b-2 border-t-2"
-                  style={{ width: "30%" }}
+                  style={{ width: "15%" }}
                 />
+
+                <Column
+                  header="Loại đề"
+                  className="border-b-2 border-t-2"
+                  style={{ width: "15%" }}
+                  body={examType}
+                />
+
+               
+                <Column
+                  field="province"
+                  header="Tỉnh"
+                  className="border-b-2 border-t-2"
+                  style={{ width: "10%" }}
+                />
+
                 <Column
                   header="Trạng thái"
                   className="border-b-2 border-t-2"
                   body={status}
-                  style={{ width: "15%" }}
-                ></Column>
+                  style={{ width: "10%" }}
+                />
+
                 <Column
                   field="createdDate"
-                  header="Ngày Tạo"
+                  header="Ngày tạo"
                   className="border-b-2 border-t-2"
-                  style={{ width: "20%" }}
+                  style={{ width: "15%" }}
                   body={(rowData) => formatDate(rowData.createdDate)}
                 />
+
                 <Column
                   field="lastModifiedDate"
                   header="Ngày cập nhật"
                   className="border-b-2 border-t-2"
-                  style={{ width: "20%" }}
+                  style={{ width: "15%" }}
                   body={(rowData) => formatDate(rowData.lastModifiedDate)}
                 />
+
                 <Column
                   className="border-b-2 border-t-2"
                   body={actionBodyTemplate}
-                  style={{ width: "10%" }}
+                  style={{ width: "5%" }}
                 />
               </DataTable>
               <Paginator

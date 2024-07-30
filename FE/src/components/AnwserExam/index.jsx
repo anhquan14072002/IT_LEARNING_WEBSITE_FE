@@ -13,9 +13,9 @@ export default function AnswerExam({
 }) {
   const [loading, setLoading] = useState(false);
   const [answers, setAnswers] = useState([]);
+  const [existingAnswers, setExistingAnswers] = useState([]);
 
   useEffect(() => {
-   
     if (examValue && examValue.numberQuestion) {
       setAnswers(Array(examValue.numberQuestion).fill(""));
     }
@@ -26,24 +26,26 @@ export default function AnswerExam({
           method: "GET",
         });
         const fetchedAnswers = response?.data?.data || [];
-        // Update answers array based on fetched data
+        setExistingAnswers(fetchedAnswers);
         setAnswers(
-          Array(examValue.numberQuestion).fill("").map((_, index) => {
-            const answer = fetchedAnswers.find(
-              (item) => item.numberOfQuestion === index + 1
-            );
-            return answer ? answer.answer : "";
-          })
+          Array(examValue.numberQuestion)
+            .fill("")
+            .map((_, index) => {
+              const answer = fetchedAnswers.find(
+                (item) => item.numberOfQuestion === index + 1
+              );
+              return answer ? answer.answer : "";
+            })
         );
       } catch (error) {
         console.error("Error fetching exam answers:", error);
         REJECT(toast, error.message);
       }
     };
-    if(visibleExam ){
+    if (visibleExam) {
       fetchData();
     }
-  }, [examValue, examValue.id,visibleExam]);
+  }, [examValue, visibleExam]);
 
   const handleSelectChange = (event, index) => {
     const newAnswers = [...answers];
@@ -53,6 +55,7 @@ export default function AnswerExam({
 
   const handleSubmit = async (event) => {
     event.preventDefault(); // Prevents default form submission
+    console.log(answers);
 
     // Check if all answers are selected
     if (answers.some((answer) => answer === "")) {
@@ -60,24 +63,58 @@ export default function AnswerExam({
       return;
     }
 
-    const data = {
-      examCodeId: examValue?.id || 0,
-      answerDtos: answers.map((answer, index) => ({
+    const newAnswers = answers.map((answer, index) => ({
+      numberOfQuestion: index + 1,
+      answer: answer,
+    }));
+
+    const updatePromises = newAnswers.map((newAnswer) => {
+      const existingAnswer = existingAnswers.find(
+        (exAnswer) => exAnswer.numberOfQuestion === newAnswer.numberOfQuestion
+      );
+      const newAnswers = answers.map((answer, index) => ({
         numberOfQuestion: index + 1,
         answer: answer,
-      })),
-    };
+      }));
+
+      const answerUpdateDtos = newAnswers.map((newAnswer) => {
+        const existingAnswer = existingAnswers.find(
+          (exAnswer) => exAnswer.numberOfQuestion === newAnswer.numberOfQuestion
+        );
+        return existingAnswer
+          ? { ...newAnswer, id: existingAnswer.id }
+          : { ...newAnswer };
+      });
+
+      if (existingAnswer) {
+        // Update existing answer
+        return restClient({
+          url: `api/examanswer/updaterangeexamanswer`,
+          method: "PUT",
+          data: {
+            examCodeId: examValue?.id,
+            answerUpdateDtos: answerUpdateDtos,
+          },
+        });
+      } else {
+        // Create new answer
+        return restClient({
+          url: "api/examanswer/createrangeexamanswer",
+          method: "POST",
+          data: {
+            examCodeId: examValue?.id,
+            answerDtos: [newAnswer],
+          },
+        });
+      }
+    });
 
     try {
       setLoading(true);
-      const response = await restClient({
-        url: "api/examanswer/createrangeexamanswer",
-        method: "POST",
-        data: data,
-      });
-      SUCCESS(toast, "Thêm đề thi thành công");
+      await Promise.all(updatePromises);
+      SUCCESS(toast, "Cập nhật đáp án thành công");
     } catch (error) {
-      console.error("Error adding exam:", error);
+      console.error("Error updating exam answers:", error);
       REJECT(toast, error.message);
     } finally {
       setLoading(false);
@@ -116,7 +153,10 @@ export default function AnswerExam({
           if (questionIndex < totalQuestions) {
             return (
               <div key={questionIndex} style={{ marginBottom: "1rem" }}>
-                <label htmlFor={`answer-${questionIndex}`} className="text-black mr-2">
+                <label
+                  htmlFor={`answer-${questionIndex}`}
+                  className="text-black mr-2"
+                >
                   Câu {questionIndex + 1}:
                 </label>
                 <select
@@ -147,7 +187,7 @@ export default function AnswerExam({
     <Dialog
       header="Đáp án"
       visible={visibleExam}
-      style={{ width: "75vw" }} // Adjusted width to accommodate dynamic columns
+      style={{ width: "75vw" }}
       onHide={() => setVisibleExam(false)}
     >
       {loading ? (
@@ -156,7 +196,14 @@ export default function AnswerExam({
         <div>
           <form onSubmit={handleSubmit}>
             <div style={{ overflow: "hidden" }}>{renderQuestions()}</div>
-            <Button type="submit" className="bg-blue-600 text-white p-2 text-sm font-normal" label="Thêm" />
+            <div className="mt-4 flex justify-end">
+              <Button
+                type="submit"
+                className="w-1/4 px-6 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+                label={!existingAnswers.length ? "Thêm" : "Sửa"}
+              />
+            </div>
+            
           </form>
         </div>
       )}

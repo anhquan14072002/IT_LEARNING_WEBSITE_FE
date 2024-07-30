@@ -7,9 +7,10 @@ import restClient from "../../services/restClient";
 import { Toast } from "primereact/toast";
 import { Button } from "primereact/button";
 import AddExamCode from "../AddExamCode";
+import UpdateExamCode from "../UpdateExamCode";
 import AnswerExam from "../AnwserExam";
 import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
-import { ACCEPT, REJECT } from "../../utils";
+import { ACCEPT, formatDate, REJECT } from "../../utils";
 
 export default function ExamCode({
   visibleExamCode,
@@ -19,12 +20,13 @@ export default function ExamCode({
   toast,
 }) {
   const [visibleAddExamCode, setVisibleAddExamCode] = useState(false);
+  const [visibleUpdateExamCode, setVisibleUpdateExamCode] = useState(false);
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [loading, setLoading] = useState(false);
   const [visibleExam, setVisibleExam] = useState(false);
   const [examValue, setExamValue] = useState({});
-  const [visibleDelete, setVisibleDelete] = useState(false);
+  const [updateExamCodeValue, setUpdateExamCodeValue] = useState({});
 
   useEffect(() => {
     fetchData();
@@ -56,8 +58,8 @@ export default function ExamCode({
         icon="pi pi-pencil"
         className="text-blue-600 p-mr-2 shadow-none"
         onClick={() => {
-          setUpdateValue(rowData);
-          setVisibleUpdate(true);
+          setUpdateExamCodeValue(rowData)
+          setVisibleUpdateExamCode(true)
         }}
       />
       <Button
@@ -65,31 +67,33 @@ export default function ExamCode({
         className="text-red-600 shadow-none"
         onClick={() => {
           confirmDelete(rowData.id);
+          console.log("Hello");
         }}
       />
     </div>
   );
 
-  
   const deleteExamCode = async (id) => {
     console.log(id);
-    await restClient({ url: `api/examcode/deleteexamcodebyid/${id}`, method: "DELETE" })
+    await restClient({
+      url: `api/examcode/deleteexamcodebyid/${id}`,
+      method: "DELETE",
+    })
       .then((res) => {
         fetchData();
+        visibleDelete = false;
         ACCEPT(toast, "Xóa thành công");
-        setVisibleDelete(false);
       })
       .catch((err) => {
         REJECT(toast, "Xảy ra lỗi khi xóa đề thi này");
       })
       .finally(() => {
-        setVisibleDelete(false);
+        visibleDelete = false;
       });
   };
 
-
   const confirmDelete = (id) => {
-    setVisibleDelete(true);
+    visibleDelete = false;
     confirmDialog({
       message: "Bạn có chắc chắn muốn xóa đề thi này?",
       header: "Delete Confirmation",
@@ -98,6 +102,14 @@ export default function ExamCode({
       acceptClassName: "p-button-danger",
       footer: (
         <>
+          <Button
+            label="Hủy"
+            icon="pi pi-times"
+            className="p-2 bg-red-500 text-white mr-2"
+            onClick={() => {
+              visibleDelete = false;
+            }}
+          />
           <Button
             label="Xóa"
             icon="pi pi-check"
@@ -126,7 +138,6 @@ export default function ExamCode({
   };
   return (
     <>
- 
       <Toast ref={toast} />
       <Dialog
         header={setTitle}
@@ -141,6 +152,14 @@ export default function ExamCode({
           addExamCodeValue={examCodeValue?.id}
           fetchData={fetchData}
         />
+        <UpdateExamCode
+        visible={visibleUpdateExamCode}
+        setVisibleUpdateExamCode={setVisibleUpdateExamCode}
+        toast={toast}
+        updateExamCodeValue={updateExamCodeValue}
+        addExamCodeValue={examCodeValue?.id}
+        fetchData={fetchData}
+      />
         <AnswerExam
           visibleExam={visibleExam}
           setVisibleExam={setVisibleExam}
@@ -174,25 +193,40 @@ export default function ExamCode({
               header="#"
               body={indexBodyTemplate}
               className="border-b-2 border-t-2"
-              style={{ width: "5%" }}
+              style={{ width: "10%" }}
             />
 
             <Column
               field="code"
               header="Mã Đề"
               className="border-b-2 border-t-2"
-              style={{ width: "15%" }}
+              style={{ width: "20%" }}
             />
             <Column
               header="Đáp án"
               className="border-b-2 border-t-2"
-              style={{ width: "15%" }}
+              style={{ width: "20%" }}
               body={anwserTemple}
             />
             <Column
-              header="Hoạt Động"
+              field="createdDate"
+              header="Ngày tạo"
+              className="border-b-2 border-t-2"
+              style={{ width: "20%" }}
+              body={(rowData) => formatDate(rowData.createdDate)}
+            />
+
+            <Column
+              field="lastModifiedDate"
+              header="Ngày cập nhật"
+              className="border-b-2 border-t-2"
+              style={{ width: "20%" }}
+              body={(rowData) => formatDate(rowData.lastModifiedDate)}
+            />
+            <Column
               className="border-b-2 border-t-2"
               body={actionBodyTemplate}
+              style={{ width: "10%" }}
             />
           </DataTable>
         )}
