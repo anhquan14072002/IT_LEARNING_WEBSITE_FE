@@ -46,12 +46,15 @@ function PostAnswer({ post }) {
   useEffect(() => {
     fetchPost();
   }, [fetchPost]);
-
-  const onSubmitAnswer = async (values) => {
+  function checkUser() {
+    console.log("checked", user?.sub);
     if (!user?.sub) {
       ACCEPT(toast, "Bạn chưa đăng nhập ?");
       return;
     }
+  }
+  const onSubmitAnswer = async (values) => {
+    checkUser();
     let postComment = {
       content: values?.content,
       postId: post?.id,
@@ -83,7 +86,6 @@ function PostAnswer({ post }) {
       loading={loading}
       setLoading={setLoading}
       onSubmitAnswer={onSubmitAnswer}
-      user={user}
       ref={toast}
     />
   );
@@ -96,13 +98,14 @@ function PostAnswer({ post }) {
           <Answer
             key={comment.id}
             id={comment.id}
-            avatar={comment.avatar}
+            avatar={comment.avatar || user?.picture}
             fullName={comment.fullName}
             createdDate={comment.createdDate}
             content={comment.content}
             fetchPost={fetchPost}
             likeCount={comment.correctVote || 0} // Assuming correctVote indicates likes
             post={post}
+            checkUser={checkUser}
           />
         );
       })}
@@ -130,10 +133,14 @@ const Answer = ({
   content,
   likeCount,
   fetchPost,
+  checkUser,
   post,
 }) => {
-  const { createVoteComment } = useContext(PostContext);
+  const [loading, setLoading] = useState(false);
+  const { createVoteComment, createResponseAnswer } = useContext(PostContext);
   const [isChangeInput, setIsChangeInput] = useState(false);
+  const toast = useRef(null);
+  const user = useSelector((state) => state.user.value);
   // Format the created date
   const formattedDate = new Date(createdDate).toLocaleString("vi-VN", {
     hour: "2-digit",
@@ -146,6 +153,22 @@ const Answer = ({
   function voteComment() {
     createVoteComment(id, fetchPost);
   }
+  function responseAnswer() {
+    checkUser();
+    setIsChangeInput(true);
+  }
+  const onSubmitAnswer = async (values) => {
+    checkUser();
+    let postComment = {
+      content: values?.content,
+      postId: post?.id,
+      userId: user?.sub,
+      parentId: id,
+    };
+    console.log(postComment);
+    setIsChangeInput(false);
+    await createResponseAnswer(postComment);
+  };
   return (
     <div className="flex flex-col gap-4 border-stone-200 border-b-2 pb-4">
       <p>
@@ -176,16 +199,21 @@ const Answer = ({
           <span> Đúng ({likeCount}) </span>
         </span>
         <span>
-          <a href="#" onClick={() => setIsChangeInput(true)}>
-            Phản hồi
-          </a>
+          <a onClick={responseAnswer}>Phản hồi</a>
         </span>
       </p>
       <p>
         {" "}
         {isChangeInput && (
           // có parent id của cái mk comment
-          <SendAnswer setIsChangeInput={setIsChangeInput} className="ml-14" />
+          <SendAnswer
+            className="ml-14"
+            setIsChangeInput={setIsChangeInput}
+            loading={loading}
+            setLoading={setLoading}
+            onSubmitAnswer={onSubmitAnswer}
+            ref={toast}
+          />
         )}{" "}
       </p>
     </div>
@@ -196,10 +224,10 @@ const validationSchema = Yup.object({
   content: Yup.string().required("Câu trả lời không được bỏ trống"),
 });
 const SendAnswer = forwardRef(function SendAnswer(
-  { setIsChangeInput, onSubmitAnswer, loading, setLoading, user, ...props },
+  { setIsChangeInput, onSubmitAnswer, loading, setLoading, ...props },
   ref
 ) {
-  console.log(user);
+  const user = useSelector((state) => state.user.value);
   const initialValues = {
     content: "",
   };
@@ -219,18 +247,20 @@ const SendAnswer = forwardRef(function SendAnswer(
         >
           {(formik) => (
             <Form>
-              <div className="flex gap-2 justify-between">
+              <div className="flex">
                 <span>
                   <img
-                    src={image} // Provide a default avatar if null
+                    src={user?.picture || image} // Provide a default avatar if null
                     alt="Ảnh người dùng"
                     width="30px"
                     style={{ borderRadius: "25px" }}
                   />
                 </span>
-                <CustomEditor name="content" id="content">
-                  <ErrorMessage name="content" component="div" />
-                </CustomEditor>
+                <div style={{ flexGrow: 1, marginLeft: "10px" }}>
+                  <CustomEditor name="content" id="content" height="200">
+                    <ErrorMessage name="content" component="div" />
+                  </CustomEditor>
+                </div>
               </div>
 
               <div className="flex justify-end gap-2">

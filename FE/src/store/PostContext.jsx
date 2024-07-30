@@ -93,6 +93,22 @@ export const PostProvider = ({ children }) => {
         setLoading(false);
       });
   };
+  const createResponseAnswer = (contentPost) => {
+    restClient({
+      url: "api/postcomment/createpostcomment",
+      method: "POST",
+      data: contentPost,
+    })
+      .then((res) => {
+        SUCCESS(toast, "Phản hồi câu trả lời thành công");
+        // fetchPost();
+        setLoading(false);
+      })
+      .catch((err) => {
+        REJECT(toast, err.message);
+        setLoading(false);
+      });
+  };
   const createVoteComment = (id, fetchPost) => {
     restClient({
       url: `api/postcomment/votepostcomment/${id}`,
@@ -136,6 +152,7 @@ export const PostProvider = ({ children }) => {
         createPost,
         createPostComment,
         createVoteComment,
+        createResponseAnswer,
       }}
     >
       <Toast ref={toast} />

@@ -6,11 +6,11 @@ import PostContext from "../../store/PostContext";
 import { Formik, Form, ErrorMessage, Field } from "formik";
 import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
 import { Button } from "primereact/button";
-import CustomEditor from "../../shared/CustomEditor";
 import { Toast } from "primereact/toast";
 import { ACCEPT, containsRudeWords, SUCCESS } from "../../utils";
 import { useSelector } from "react-redux";
 import LoadingScreen from "../LoadingScreen";
+import UncontrolledEditor from "../../shared/CustomEditorSecond";
 function PostContent(props) {
   const [isCompose, setIsCompose] = useState(false);
   return (
@@ -28,13 +28,13 @@ function PostContent(props) {
 }
 
 export default PostContent;
+
 const validationSchema = Yup.object({
-  description: Yup.string().required("Mô tả không được bỏ trống"),
-  // grade: Yup.object()
-  //   .test("is-not-empty", "Không được để trống trường này", (value) => {
-  //     return value && Object.keys(value).length !== 0; // Check if object is not empty
-  //   })
-  //   .required("Không bỏ trống trường này"),
+  grade: Yup.object()
+    .test("is-not-empty", "Không được để trống trường này", (value) => {
+      return Object.keys(value).length !== 0; // Check if object is not empty
+    })
+    .required("Không bỏ trống trường này"),
 });
 
 function PostWrite({ setIsCompose }) {
@@ -46,16 +46,19 @@ function PostWrite({ setIsCompose }) {
   } = useContext(PostContext);
   const user = useSelector((state) => state.user.value);
   const toast = useRef(null);
-
-  const initialValues = {
+  const [initialValues, setInitialValues] = useState({
     grade: {},
-    description: "",
-  };
+  });
+  const [description, setDescription] = useState("");
 
+  const handleEditorChange = (htmlContent) => {
+    setDescription(htmlContent);
+  };
   const onSubmit = (values) => {
-    console.log(values.description);
-    const { grade, description } = values;
-    if (containsRudeWords(description)) {
+    console.log(containsRudeWords(description));
+    const { grade } = values;
+    let isCheckWord = containsRudeWords(description);
+    if (isCheckWord === true) {
       ACCEPT(toast, "Câu hỏi của bạn chứa những từ không hợp lệ ");
       return;
     }
@@ -65,10 +68,11 @@ function PostWrite({ setIsCompose }) {
     }
 
     const descriptionPost = {
-      description: description,
+      content: description,
       userId: user?.sub,
       gradeId: grade?.id,
     };
+    console.log(descriptionPost);
     createPost(descriptionPost);
     setIsCompose((prevValue) => !prevValue);
   };
@@ -104,13 +108,22 @@ function PostWrite({ setIsCompose }) {
                 options={gradeList}
               />
               <div>
-                <CustomEditor
-                  label="Soạn câu hỏi"
+                <UncontrolledEditor onChange={handleEditorChange} />
+                {/* <CustomEditor
+                  label="Thông tin chi tiết"
                   name="description"
                   id="description"
                 >
                   <ErrorMessage name="description" component="div" />
-                </CustomEditor>
+                </CustomEditor> */}
+                {/* <CustomEditor
+                  label="Soạn câu hỏi"
+                  name="description"
+                  id="description"
+                  height="200"
+                >
+                  <ErrorMessage name="description" component="div" />
+                </CustomEditor> */}
               </div>
 
               <div className="flex justify-end gap-2">
