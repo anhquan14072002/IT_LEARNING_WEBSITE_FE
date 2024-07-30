@@ -23,7 +23,7 @@ export default function Home() {
     if (fixedDivRef.current) {
       setFixedDivHeight(fixedDivRef.current.offsetHeight);
     }
-  }, [fixedDivRef, loading]);
+  }, [fixedDivRef.current]);
 
   useEffect(() => {
     getAllGrade(setLoading, setListClass);

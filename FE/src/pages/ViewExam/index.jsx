@@ -23,12 +23,13 @@ const Index = () => {
   const [competition, setCompetition] = useState("");
   const [yearList, setYearList] = useState([]);
   const [year, setYear] = useState("");
- 
+
   const fetchData = async () => {
     setLoading(true);
     try {
+      console.log(competition);
       const res = await restClient({
-        url: `api/exam/searchbyexampagination?PageIndex=${page}&PageSize=${rows}&Size=6&Province=${selectedProvince}&Year=${year}`,
+        url: `api/exam/searchbyexampagination?PageIndex=${page}&PageSize=${rows}&Size=6&Province=${selectedProvince}&Year=${year}&CompetitionId=${competition}`,
         method: "GET",
       });
       const paginationData = JSON.parse(res.headers["x-pagination"]);
@@ -45,14 +46,13 @@ const Index = () => {
     fetchData();
   }, []);
 
-
   useEffect(() => {
     if (province?.data) {
-      setProvinceList(province.data);
+      setProvinceList(province?.data);
     }
     if (years) {
-        setYearList(years);
-      }
+      setYearList(years);
+    }
     const fetchDataCompetition = async () => {
       try {
         const response = await restClient({
@@ -67,16 +67,28 @@ const Index = () => {
         console.log("error");
       }
     };
-  
+
     fetchDataCompetition();
-  }, [province,years]);
+  }, [province, years]);
   const onPageChange = (event) => {
     const { page, rows, first } = event;
     setRows(rows);
     setPage(page + 1);
     setFirst(first);
   };
-
+  const handleProvince = async (e) => {
+    setSelectedProvince(e.value?.name);
+    await fetchData();
+  };
+  const handleCompetition = async (e) => {
+    setCompetition(e.value?.id);
+    await fetchData();
+    console.log(e.value?.id);
+  };
+  const handleYear = async (e) => {
+    setYear(e.value?.year);
+    await fetchData();
+  };
   return (
     <>
       <Header />
@@ -89,32 +101,31 @@ const Index = () => {
             <div className="card flex justify-content-center">
               <Dropdown
                 value={selectedProvince}
-                onChange={(e) => setSelectedProvince(e.value?.name)}
+                onChange={handleProvince}
                 options={provinceList}
                 optionLabel="name"
                 editable
                 placeholder="Tỉnh"
                 className="border border-black rounded-xl flex items-center w-2/3 py-2 gap-2.5 shadow-none custom-dropdown"
                 filter
-                
               />
             </div>
             <div>
               <Dropdown
                 value={competition}
-                onChange={(e) => setCompetition(e.value)}
+                onChange={handleCompetition}
                 options={competitionList}
                 optionLabel="title"
                 editable
                 placeholder="Cuộc Thi"
-                 className="border border-black rounded-xl flex items-center w-2/3 py-2 gap-2.5 shadow-none custom-dropdown"
+                className="border border-black rounded-xl flex items-center w-2/3 py-2 gap-2.5 shadow-none custom-dropdown"
                 filter
               />
             </div>
             <div>
               <Dropdown
                 value={year}
-                onChange={(e) => setYear(e.value?.year)}
+                onChange={handleYear}
                 options={yearList}
                 optionLabel="year"
                 editable
