@@ -17,6 +17,8 @@ import FlashCard from './pages/FlashCard';
 import TestQuizPage from './pages/TestQuizPage';
 import ExamDetail from './pages/ExamDetail';
 import ExamResult from './pages/ExamResult';
+import ManageQuestionOfQuizlist from './pages/ManageQuestionOfQuizlist';
+import AddQuestionOfQuizlist from './pages/AddQuestionOfQuizlist';
 
 
 function App() {
@@ -42,6 +44,8 @@ function App() {
         <Route path="/changepassword" element={<ChangePassword />} />
         <Route path="/examdetail/:id" element={<ExamDetail />} />
         <Route path="/examresult/:id" element={<ExamResult />} />
+        <Route path="/dashboard/quiz/managequestionofquizlist/:id" element={<ManageQuestionOfQuizlist />}/>
+        <Route path="/dashboard/quiz/addquestionofquizlist/:id" element={<AddQuestionOfQuizlist/>}/>
         </Routes>
     </Router>
   );

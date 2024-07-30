@@ -4,6 +4,7 @@ import { Button } from "primereact/button";
 import { Image } from "primereact/image";
 import parse from "html-react-parser";
 import "./index.css";
+import { useSelector } from "react-redux";
 
 const CustomImage = ({ src, alt, width }) => {
   const zoomIcon = () => {
@@ -38,6 +39,12 @@ const ViewQuestionInTest = ({ quizData, quizDetail }) => {
   const [timeLeft, setTimeLeft] = useState(300);
   const [quizCompleted, setQuizCompleted] = useState(false);
   const questionRefs = useRef([]);
+  const user = useSelector((state) => state.user.value);
+
+  useEffect(() => {
+    setQuizCompleted(false);
+    setTimeLeft(quizData?.length * 30);
+  }, [quizData]);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -53,7 +60,7 @@ const ViewQuestionInTest = ({ quizData, quizDetail }) => {
     return () => {
       clearInterval(timer);
     };
-  }, []);
+  }, [quizData]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -150,29 +157,25 @@ const ViewQuestionInTest = ({ quizData, quizDetail }) => {
   };
 
   const handleSubmitQuiz = () => {
-    // Prepare data in the required format before submitting
     const questionAnswerDto = Object.keys(selectedAnswers).map(
       (questionId) => ({
         type: 1,
-        questionId: parseInt(questionId), // Ensure questionId is converted to number
-        answerId: [selectedAnswers[questionId]], // Convert answerId to array as expected
+        questionId: parseInt(questionId),
+        answerId: [selectedAnswers[questionId]],
       })
     );
 
-    const quizId = quizDetail?.id; // Assuming quizDetail has an id field
-    const userId = "string"; // Replace with actual user ID if available
+    const quizId = quizDetail?.id; 
+    const userId = user?.sub;
 
-    // Example object to be sent
     const dataToSend = {
       questionAnswerDto,
       quizId,
       userId,
     };
 
-    // Here you can perform an API call to submit dataToSend
     console.log("Data to send:", dataToSend);
 
-    // For demonstration purposes, reset selectedAnswers after submission
     setSelectedAnswers({});
   };
 
@@ -255,7 +258,7 @@ const ViewQuestionInTest = ({ quizData, quizDetail }) => {
           {quizData?.map((question, index) => (
             <li
               key={question.id}
-              onClick={()=>scrollToQuestion(index)}
+              onClick={() => scrollToQuestion(index)}
               className={`w-1/4 rounded-full text-center ${
                 isAnswerSelected(question.id)
                   ? "border-black border"

@@ -2,8 +2,6 @@ import debounce from "lodash.debounce";
 import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
 import React, { useEffect, useRef, useState } from "react";
-import AddTopicDialog from "../AddTopicDialog";
-import UpdateTopicDialog from "../UpdateTopicDialog";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Paginator } from "primereact/paginator";
@@ -11,20 +9,23 @@ import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 import restClient from "../../services/restClient";
-import Loading from "../Loading";
 import {
   ACCEPT,
   formatDate,
   getTokenFromLocalStorage,
   REJECT,
+  removeVietnameseTones,
 } from "../../utils";
 import { InputSwitch } from "primereact/inputswitch";
-import AddQuizLesson from "../AddQuizLesson";
-import UpdateQuizLesson from "../UpdateQuizLesson";
-import AddQuestion from "../AddQuestion";
-import UpdateQuestion from "../UpdateQuestion";
+import Header from "../../components/Header";
+import Menu from "../../components/Menu";
+import Footer from "../../components/Footer";
+import { useNavigate, useParams } from "react-router-dom";
 
-export default function ManageQuestionQuiz() {
+export default function AddQuestionOfQuizlist() {
+  const {id} = useParams()
+  const fixedDivRef = useRef(null);
+  const [fixedDivHeight, setFixedDivHeight] = useState(0);
   const toast = useRef(null);
   const dropDownRef1 = useRef(null);
   const dropDownRef2 = useRef(null);
@@ -38,6 +39,8 @@ export default function ManageQuestionQuiz() {
   const [visibleDelete, setVisibleDelete] = useState(false);
   const [loading, setLoading] = useState(false);
   const [textSearch, setTextSearch] = useState("");
+  const navigate = useNavigate()
+
   //pagination
   const [first, setFirst] = useState(0);
   const [page, setPage] = useState(1);
@@ -69,25 +72,25 @@ export default function ManageQuestionQuiz() {
   };
 
   const fetchData = () => {
-    // if (textSearch.trim()) {
-    //   setLoading(true);
-    //   restClient({
-    //     url: `api/topic/searchbytopicpagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}`,
-    //     method: "GET",
-    //   })
-    //     .then((res) => {
-    //       const paginationData = JSON.parse(res.headers["x-pagination"]);
-    //       setTotalPage(paginationData.TotalPages);
-    //       setProducts(Array.isArray(res.data.data) ? res.data.data : []);
-    //     })
-    //     .catch((err) => {
-    //       console.error("Error fetching data:", err);
-    //       setProducts([]);
-    //     })
-    //     .finally(() => setLoading(false));
-    // } else {
-    pagination(page, rows);
-    // }
+    if (textSearch.trim()) {
+      setLoading(true);
+      restClient({
+        url: `api/quizquestion/searchquizquestionpagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}`,
+        method: "GET",
+      })
+        .then((res) => {
+          const paginationData = JSON.parse(res.headers["x-pagination"]);
+          setTotalPage(paginationData.TotalPages);
+          setProducts(Array.isArray(res.data.data) ? res.data.data : []);
+        })
+        .catch((err) => {
+          console.error("Error fetching data:", err);
+          setProducts([]);
+        })
+        .finally(() => setLoading(false));
+    } else {
+      pagination(page, rows);
+    }
   };
 
   const onPageChange = (event) => {
@@ -104,84 +107,6 @@ export default function ManageQuestionQuiz() {
 
   const content = (rowData, { rowIndex }) => {
     return <span dangerouslySetInnerHTML={{ __html: rowData?.content }}></span>;
-  };
-
-  const cities = [
-    { name: "New York", code: "NY" },
-    { name: "Rome", code: "RM" },
-    { name: "London", code: "LDN" },
-    { name: "Istanbul", code: "IST" },
-    { name: "Paris", code: "PRS" },
-  ];
-
-  const actionBodyTemplate = (rowData) => {
-    return (
-      <div style={{ display: "flex" }}>
-        <Button
-          icon="pi pi-pencil"
-          className="text-blue-600 p-mr-2 shadow-none"
-          onClick={() => {
-            setUpdateValue(rowData);
-            setVisibleUpdate(true);
-          }}
-        />
-        <Button
-          icon="pi pi-trash"
-          className="text-red-600 shadow-none"
-          onClick={() => {
-            confirmDelete(rowData.id);
-          }}
-        />
-      </div>
-    );
-  };
-
-  const confirmDelete = (id) => {
-    setVisibleDelete(true);
-    confirmDialog({
-      message: "Bạn có chắc chắn muốn bài quiz này?",
-      header: "Delete Confirmation",
-      icon: "pi pi-info-circle",
-      defaultFocus: "reject",
-      acceptClassName: "p-button-danger",
-      footer: (
-        <>
-          <Button
-            label="Hủy"
-            icon="pi pi-times"
-            className="p-2 bg-red-500 text-white mr-2"
-            onClick={() => {
-              setVisibleDelete(false);
-            }}
-          />
-          <Button
-            label="Xóa"
-            icon="pi pi-check"
-            className="p-2 bg-blue-500 text-white"
-            onClick={() => {
-              deleteDocument(id);
-            }}
-          />
-        </>
-      ),
-    });
-  };
-
-  const deleteDocument = (id) => {
-    restClient({
-      url: `api/quizquestion/deletequizquestion/${id}`,
-      method: "DELETE",
-    })
-      .then((res) => {
-        fetchData();
-        ACCEPT(toast, "Xóa thành công");
-      })
-      .catch((err) => {
-        REJECT(toast, "Xảy ra lỗi khi xóa câu hỏi này");
-      })
-      .finally(() => {
-        setVisibleDelete(false);
-      });
   };
 
   const handleSearchInput = debounce((text) => {
@@ -215,98 +140,98 @@ export default function ManageQuestionQuiz() {
     );
   };
 
+  const updateFixedDivHeight = () => {
+    if (fixedDivRef && fixedDivRef.current) {
+      setFixedDivHeight(fixedDivRef.current.offsetHeight);
+    }
+  };
+
+  useEffect(() => {
+    updateFixedDivHeight();
+
+    window.addEventListener("resize", updateFixedDivHeight);
+
+    return () => {
+      window.removeEventListener("resize", updateFixedDivHeight);
+    };
+  }, []);
+
+  const handleAdd = () => {
+    if (!selectedProduct) {
+      REJECT(toast, "Chưa có câu hỏi nào được chọn");
+    } else {
+      const ids = selectedProduct?.map((item) => item?.id) || [];
+      restClient({url:'api/quizquestionrelation/createquizquestionrelation',
+        method: 'POST',
+        data : {
+          quizId : id,
+          quizQuestionIds : ids
+        }
+      }).then((res)=>{
+        ACCEPT(toast,"Thêm thành công")
+        navigate('/dashboard/quiz/managequestionofquizlist/'+id)
+      }).catch((err)=>{
+        REJECT(toast,"Xảy ra lỗi khi thêm")
+      })
+    }
+  };
+
   return (
-    <div>
-      <Toast ref={toast} />
-      <ConfirmDialog visible={visibleDelete} />
-      <AddQuestion
-        visible={visible}
-        setVisible={setVisible}
-        toast={toast}
-        fetchData={fetchData}
-      />
-      <UpdateQuestion
-        visibleUpdate={visibleUpdate}
-        setVisibleUpdate={setVisibleUpdate}
-        updateValue={updateValue}
-        toast={toast}
-        fetchData={fetchData}
-      />
-      <div>
-        <div className="flex justify-between pt-1">
-          <h1 className="font-bold text-3xl">Câu hỏi quiz</h1>
-          <div>
-            <Button
-              label="Thêm mới"
-              icon="pi pi-plus-circle"
-              severity="info"
-              className="bg-blue-600 text-white p-2 text-sm font-normal"
-              onClick={() => setVisible(true)}
-            />
-            {/* <Button
-              label="Xóa"
-              icon="pi pi-trash"
-              disabled={!selectedProduct || selectedProduct.length === 0}
-              severity="danger"
-              className="bg-red-600 text-white p-2 text-sm font-normal ml-3"
-              onClick={() => {
-                console.log("product list ::", selectedProduct);
-              }}
-            /> */}
+    <div className="min-h-screen flex flex-col gap-20">
+      <div ref={fixedDivRef} className="fixed top-0 w-full z-50">
+        <Header />
+        <Menu />
+      </div>
+      <div style={{ paddingTop: `${fixedDivHeight + 30}px` }}>
+        <Toast ref={toast} />
+        <div>
+          <div className="flex justify-between pt-1">
+            <h1 className="font-bold text-3xl">Danh sách câu hỏi</h1>
           </div>
-        </div>
 
-        <div className="border-2 rounded-md mt-2">
-          <div className="mb-10 flex flex-wrap items-center p-2">
-            <div className="border-2 rounded-md p-2">
-              <InputText
-                onChange={(e) => {
-                  handleSearchInput(removeVietnameseTones(e.target.value));
-                }}
-                placeholder="Search"
-                className="flex-1 focus:outline-none w-36 focus:ring-0"
-              />
-              <Button
-                icon="pi pi-search"
-                className="p-button-warning focus:outline-none focus:ring-0 flex-shrink-0"
-              />
-            </div>
+          <div className="border-2 rounded-md mt-2">
+            <div className="mb-10 flex flex-wrap items-center justify-between p-2">
+              <div className="border-2 rounded-md p-2">
+                <InputText
+                  onChange={(e) => {
+                    handleSearchInput(removeVietnameseTones(e.target.value));
+                  }}
+                  placeholder="Search"
+                  className="flex-1 focus:outline-none w-36 focus:ring-0"
+                />
+                <Button
+                  icon="pi pi-search"
+                  className="p-button-warning focus:outline-none focus:ring-0 flex-shrink-0"
+                />
+              </div>
 
-            <div className="flex-1 flex flex-wrap gap-3 justify-end">
-              <div className="border-2 rounded-md mt-4">
-                <Dropdown
-                  filter
-                  ref={dropDownRef2}
-                  value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.value)}
-                  options={cities}
-                  optionLabel="name"
-                  showClear
-                  placeholder="Tài liệu"
-                  className="w-full md:w-14rem shadow-none h-full"
+              <div>
+                <Button
+                  label="Thêm"
+                  icon="pi pi-plus-circle"
+                  severity="info"
+                  disabled={!selectedProduct || selectedProduct.length === 0}
+                  className="bg-blue-600 text-white p-2 text-sm font-normal"
+                  onClick={handleAdd}
                 />
               </div>
             </div>
-          </div>
-          {loading ? (
-            <Loading />
-          ) : (
             <>
               <DataTable
                 value={products}
                 loading={loading}
                 className="border-t-2"
-                tableStyle={{ minHeight: "30rem" }}
+                tableStyle={{ minHeight: "50rem" }}
                 selection={selectedProduct}
                 onSelectionChange={(e) => setSelectedProduct(e.value)}
                 scrollable
-                scrollHeight="30rem"
+                scrollHeight="50rem"
               >
-                {/* <Column
+                <Column
                   selectionMode="multiple"
                   headerStyle={{ width: "3rem" }}
                   className="border-b-2 border-t-2 custom-checkbox-column"
-                ></Column> */}
+                ></Column>
                 <Column
                   field="#"
                   header="#"
@@ -316,20 +241,20 @@ export default function ManageQuestionQuiz() {
                 <Column
                   header="Nội dung"
                   className="border-b-2 border-t-2"
-                  style={{ minWidth: '35rem' }}
+                  style={{ minWidth: "35rem" }}
                   body={content}
                 />
                 <Column
                   field="type"
                   header="Loại câu hỏi"
                   className="border-b-2 border-t-2"
-                  style={{ minWidth: '15rem' }}
+                  style={{ minWidth: "15rem" }}
                 />
                 <Column
                   field="questionLevel"
                   header="Mức độ"
                   className="border-b-2 border-t-2"
-                  style={{ minWidth: '15rem' }}
+                  style={{ minWidth: "15rem" }}
                 />
                 {/* <Column
                   field="score"
@@ -341,7 +266,7 @@ export default function ManageQuestionQuiz() {
                   header="Trạng thái"
                   className="border-b-2 border-t-2"
                   body={status}
-                  style={{ minWidth: '15rem' }}
+                  style={{ minWidth: "15rem" }}
                 ></Column>
                 {/* <Column
                   field="createdDate"
@@ -357,11 +282,6 @@ export default function ManageQuestionQuiz() {
                   style={{ width: "10%" }}
                   body={(rowData) => formatDate(rowData.lastModifiedDate)}
                 /> */}
-                <Column
-                  className="border-b-2 border-t-2"
-                  body={actionBodyTemplate}
-                  style={{ minWidth: '15rem' }}
-                />
               </DataTable>
               <Paginator
                 first={first}
@@ -372,9 +292,10 @@ export default function ManageQuestionQuiz() {
                 className="custom-paginator mx-auto"
               />
             </>
-          )}
+          </div>
         </div>
       </div>
+      <Footer />
     </div>
   );
 }

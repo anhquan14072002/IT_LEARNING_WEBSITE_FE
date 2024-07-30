@@ -14,7 +14,7 @@ const QuizResult = ({ totalQuestions, quizData }) => {
   // const realScore = ((calculateScore() / totalQuestions) * 10).toFixed(2);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-gray-100 py-10">
       <div className="bg-white w-3/4 rounded shadow-md h-4/5 p-20">
         <div className="text-center">
           <h2 className="text-xl font-bold mb-4">Quiz Completed!</h2>
@@ -49,7 +49,7 @@ const QuizResult = ({ totalQuestions, quizData }) => {
           <div className="mt-8">
             {quizData.map((question, index) => (
               <div key={question.id} className="mb-4">
-                <h3 className="text-lg font-bold">{question.content}</h3>
+                <h3 className="text-lg font-bold" dangerouslySetInnerHTML={{__html: question?.content}}></h3>
                 <ul className="mt-2 space-y-1">
                   {question.quizAnswers.map((answer) => (
                     <li

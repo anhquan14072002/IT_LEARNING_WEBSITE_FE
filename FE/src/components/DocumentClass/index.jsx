@@ -33,8 +33,8 @@ export default function DocumentClass({ display }) {
         <div
           className={`fixed w-[15%] ${
             display
-              ? "transition duration-200 ease-in-out opacity-0"
-              : "transition duration-200 ease-in-out opacity-100"
+              ? "transition duration-200 ease-in-out hidden"
+              : "transition duration-200 ease-in-out block"
           }`}
         >
           <h1 className="font-bold text-xl pt-2 pl-2">Danh mục các lớp</h1>

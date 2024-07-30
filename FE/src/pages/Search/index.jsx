@@ -165,7 +165,7 @@ export default function Search() {
             textSearchProps={textSearch}
             settextSearchProps={setTextSearch}
           />
-          <Menu />
+          <Menu />  
         </div>
         <div
           style={{ paddingTop: `${fixedDivHeight}px` }}
@@ -184,7 +184,7 @@ export default function Search() {
                   placeholder="Search"
                   className="flex-1 focus:outline-none w-36 focus:ring-0"
                   onChange={(e) => {
-                    // setTextSearch(e.target.value)
+                    setTextSearch(e.target.value)
                     setParams({...Object.fromEntries(params.entries()),text:encodeURIComponent(e.target.value)})
                   }} // Update textSearch state and params
                 />
