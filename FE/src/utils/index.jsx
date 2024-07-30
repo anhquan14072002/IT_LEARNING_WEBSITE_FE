@@ -661,5 +661,13 @@ export const containsRudeWords = (content) => {
     "tiên sư bố",
     "tổ sư",
   ]; // Add more words as needed
-  return rudeWords.some((word) => content.includes(word));
+  const sentenceWords = content.split(" ");
+  console.log(content);
+  for (let word of sentenceWords) {
+    if (rudeWords.includes(word)) {
+      console.log(word);
+      return true;
+    }
+  }
+  return false;
 };

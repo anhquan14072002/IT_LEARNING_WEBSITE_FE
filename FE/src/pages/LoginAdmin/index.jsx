@@ -71,7 +71,7 @@ export default function About() {
             placeholder="Nhập tài khoản"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full border-gray-300 border-solid border rounded-md py-2 px-3"
+            className="w-full border-gray-300 border-solid border shadow-none rounded-md py-2 px-3"
           />
           {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
         </div>
@@ -90,7 +90,7 @@ export default function About() {
             placeholder="Nhập mật khẩu"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full border-gray-300 border-solid border rounded-md py-2 px-3"
+            className="w-full border-gray-300 border-solid border rounded-md shadow-none py-2 px-3"
           />
           {passwordError && <p className="text-red-500 text-sm mt-1">{passwordError}</p>}
         </div>

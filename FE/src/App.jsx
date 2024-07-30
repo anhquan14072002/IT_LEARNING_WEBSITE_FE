@@ -25,6 +25,8 @@ import ImportStepThree from "./components/Quiz/ImportStepThree";
 import Post from "./pages/Post/Post";
 import ManageQuestionQuiz from "./components/ManageQuestionQuiz";
 
+import ViewExam from "./pages/ViewExam";
+
 function App() {
   return (
     <Router>
@@ -55,6 +57,7 @@ function App() {
         <Route path="/examcodedetail/:id" element={<ExamCodeDetail />} />
         <Route path="/examdetail/:id" element={<ExamDetail />} />
         <Route path="/examresult/:id" element={<ExamResult />} />
+        <Route path="/viewexam" element={<ViewExam />} />
       </Routes>
     </Router>
   );
