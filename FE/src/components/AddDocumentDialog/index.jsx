@@ -12,7 +12,6 @@ import { REJECT, SUCCESS } from "../../utils";
 import restClient from "../../services/restClient";
 import Loading from "../Loading";
 import CustomDropdown from "../../shared/CustomDropdown";
-import CustomMultiSelectValue from "../../shared/CustomMultiSelectValue";
 
 const validationSchema = Yup.object({
   title: Yup.string().required("Tiêu đề không được bỏ trống"),
@@ -166,8 +165,6 @@ export default function AddDocumentDialog({
                 id="grade"
                 options={gradeList}
               />
-              
-              <CustomMultiSelectValue />
 
               {/* // */}
               <CustomDropdown

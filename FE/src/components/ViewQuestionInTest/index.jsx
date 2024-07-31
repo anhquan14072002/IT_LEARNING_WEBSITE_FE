@@ -116,7 +116,7 @@ const ViewQuestionInTest = ({ quizData, quizDetail }) => {
   const scrollToQuestion = (index) => {
     const element = questionRefs.current[index];
     if (element) {
-      element.scrollIntoView({ behavior: "smooth", block: "start" });
+      element.scrollIntoView({ behavior: "smooth", block: "end" });
     }
   };
 

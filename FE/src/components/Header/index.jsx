@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import avatar from "../../assets/img/icons8-male-user-50.png";
-import logo from "../../assets/logo.png";
+import logo from "../../assets/app-logo.svg";
 import arrowDown from "../../assets/img/icons8-sort-down-50.png";
 import "./index.css";
 import { Tooltip } from "primereact/tooltip";
@@ -85,10 +85,6 @@ export default function Header({ params, setParams, textSearchProps }) {
   useEffect(() => {
     setTextSearch("");
   }, [textSearchProps]);
-
-  const toggleMenu = () => {
-    setMenuOpen(!menuOpen);
-  };
 
   return (
     <>
@@ -180,7 +176,7 @@ export default function Header({ params, setParams, textSearchProps }) {
                   <div className="ml-2 flex items-center">
                     <img
                       className="h-[40px] w-[40px] rounded-full"
-                      src={user.picture}
+                      src={user?.picture}
                     />
                     <Menu
                       model={items}
