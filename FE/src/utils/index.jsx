@@ -110,6 +110,21 @@ export function removeVietnameseTones(str) {
   return str;
 }
 
+// export const decodeToken = (token) => {
+//   if (!token) {
+//     throw new Error("Invalid token");
+//   }
+
+//   try {
+//     return jwtDecode(token);
+//   } catch (error) {
+//     throw new Error("Error decoding token");
+//   } finally {
+//     // Ensure token is deleted or cleared regardless of the try/catch outcome
+//     token = null; // Clearing the token variable
+//   }
+// };
+
 export const decodeToken = (token) => {
   if (!token) {
     throw new Error("Invalid token");
@@ -119,11 +134,9 @@ export const decodeToken = (token) => {
     return jwtDecode(token);
   } catch (error) {
     throw new Error("Error decoding token");
-  } finally {
-    // Ensure token is deleted or cleared regardless of the try/catch outcome
-    token = null; // Clearing the token variable
   }
 };
+
 
 export const getTokenFromLocalStorage = () => {
   try {
