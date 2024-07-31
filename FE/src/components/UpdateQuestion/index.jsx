@@ -29,15 +29,14 @@ const UpdateQuestion = ({
     content: "",
     type: {},
     questionLevel: {},
-    quiz: {},
     QuestionTrueFalse: undefined, // Initialize QuestionTrueFalse
     hint: "",
   });
 
+
   const [typeList, settypeList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [questionLevel, setquestionLevelList] = useState([]);
-  const [quizList, setquizListList] = useState([]);
   const [typeQuestion, setTypeQuestion] = useState(updateValue?.type || "");
   const [loadingForm, setLoadingForm] = useState(false);
 
@@ -72,8 +71,7 @@ const UpdateQuestion = ({
 
   useEffect(() => {
     const fetchFormData = async () => {
-
-      console.log("updatevalue::",updateValue);
+      console.log("typeQuestion::", typeQuestion);
       setLoading(true);
 
       updateValue?.quizAnswers.forEach((answer) => console.log(answer));
@@ -99,17 +97,9 @@ const UpdateQuestion = ({
           levelName: item.value,
         }));
 
-        // Fetch quiz list
-        const quizListRes = await restClient({
-          url: "api/quiz/getallquiz",
-          method: "GET",
-        });
-        const quizListData = quizListRes?.data?.data;
-
         // Update state with fetched data
         settypeList(typeData);
         setquestionLevelList(questionLevelData);
-        setquizListList(quizListData);
 
         // Check if updateValue is available and typeList and questionLevel are populated
         if (
@@ -128,10 +118,6 @@ const UpdateQuestion = ({
               );
 
               setInitialValues({
-                quiz: quizListData?.find(
-                  (item, index) =>
-                    item?.id === updateValue?.quizQuestionRelations[0]?.quizId
-                ),
                 content: updateValue.keyWord || "",
                 type: typeObject || {},
                 questionLevel:
@@ -156,10 +142,6 @@ const UpdateQuestion = ({
               );
 
               setInitialValues({
-                quiz: quizListData?.find(
-                  (item, index) =>
-                    item?.id === updateValue?.quizQuestionRelations[0]?.quizId
-                ),
                 content: updateValue?.content || "",
                 type: typeObject || {},
                 questionLevel:
@@ -187,10 +169,6 @@ const UpdateQuestion = ({
               );
 
               setInitialValues({
-                quiz: quizListData?.find(
-                  (item, index) =>
-                    item?.id === updateValue?.quizQuestionRelations[0]?.quizId
-                ),
                 content: updateValue?.content || "",
                 type: typeObject || {},
                 questionLevel:
@@ -479,7 +457,6 @@ const UpdateQuestion = ({
     //     return Object.keys(value).length !== 0;
     //   })
     //   .required("Không bỏ trống trường này"),
-    quiz: Yup.object(),
   });
 
   const handleNumberAnswer = (e) => {
@@ -533,15 +510,7 @@ const UpdateQuestion = ({
         >
           {(formik) => (
             <Form>
-              <CustomDropdown
-                title="Bài quiz"
-                label="Bài quiz"
-                name="quiz"
-                id="quiz"
-                isNotRequired={true}
-                options={quizList}
-              />
-
+              
               <CustomDropdown
                 title="Mức độ"
                 label="Mức độ"

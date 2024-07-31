@@ -11,14 +11,14 @@ export default function QuizManagement() {
   return (
     <div>
       {/* menubar */}
-      <div className="flex justify-start border-b-2 mb-5 border-[#D1F7FF]">
+      {/* <div className="flex justify-start border-b-2 mb-5 border-[#D1F7FF]">
         <h1
           className={classNames("p-5 cursor-pointer hover:bg-[#D1F7FF]", {
             "bg-[#D1F7FF] font-bold": navIndex === 1,
           })}
           onClick={() => setNavIndex(1)}
         >
-          Các bài quiz
+          Bộ câu hỏi
         </h1>
         <h1
           className={classNames("p-5 cursor-pointer hover:bg-[#D1F7FF]", {
@@ -28,9 +28,9 @@ export default function QuizManagement() {
         >
           Câu hỏi quiz
         </h1>
-      </div>
+      </div> */}
       {navIndex === 1 && <ManagementQuizLesson />}
-      {navIndex === 2 && <ManageQuestionQuiz />}
+      {/* {navIndex === 2 && <ManageQuestionQuiz />} */}
     </div>
   );
 }

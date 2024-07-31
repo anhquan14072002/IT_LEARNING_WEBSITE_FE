@@ -10,7 +10,7 @@ export const handleMultipleContent = (answers) => {
 export const handleMultipleCorrect = (answers) => {
   const correctAnswers = answers.filter((answer) => answer.isCorrect);
 
-  return correctAnswers.length <= 1;
+  return correctAnswers.length == 1
 };
 
 export const hasEmptyContent = (answers) => {
