@@ -18,12 +18,11 @@ import {
 } from "../../utils";
 import CustomTextInput from "../../shared/CustomTextInput";
 
-const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
+const AddQuestion = ({ visible, setVisible, toast, fetchData, id }) => {
   const [initialValues, setInitialValues] = useState({
     content: "",
     type: {},
     questionLevel: {},
-    quiz: {},
     QuestionTrueFalse: undefined, // Initialize QuestionTrueFalse
     hint: "",
   });
@@ -31,7 +30,6 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
   const [typeList, settypeList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [questionLevel, setquestionLevelList] = useState([]);
-  const [quizList, setquizListList] = useState([]);
   const [typeQuestion, setTypeQuestion] = useState("");
 
   //answer of four answers
@@ -85,19 +83,11 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
           levelName: item.value,
         }));
 
-        const quizListRes = await restClient({
-          url: "api/quiz/getallquiz",
-          method: "GET",
-        });
-        const quizListData = quizListRes?.data?.data;
-
         settypeList(typeData);
         setquestionLevelList(questionLevelData);
-        setquizListList(quizListData);
       } catch (e) {
         settypeList([]);
         setquestionLevelList([]);
-        setquizListList([]);
       } finally {
         setLoading(false);
       }
@@ -124,9 +114,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
         formData.append("isActive", true); // Assuming isActive is a boolean
         formData.append("questionLevel", values?.questionLevel?.levelName);
         formData.append("IsShuffle", values?.shuffle?.valueTitle);
-        if (values?.quiz && values?.quiz?.id) {
-          formData.append("quizId", values?.quiz?.id);
-        }
+        formData.append("quizId", id);
         formData.append("hint", values?.hint);
 
         // [
@@ -170,6 +158,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
             REJECT(toast, err.message);
           })
           .finally(() => {
+            setTypeQuestion("");
             setVisible(false);
             setLoading(false);
           });
@@ -192,9 +181,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
         formData.append("isActive", true); // Assuming isActive is a boolean
         formData.append("questionLevel", values?.questionLevel?.levelName);
         formData.append("IsShuffle", values?.shuffle?.valueTitle);
-        if (values?.quiz && values?.quiz?.id) {
-          formData.append("quizId", values?.quiz?.id);
-        }
+        formData.append("quizId", id);
         formData.append("hint", values?.hint);
 
         fourAnswer.forEach((obj, index) => {
@@ -216,6 +203,13 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
             REJECT(toast, err.message);
           })
           .finally(() => {
+            setTypeQuestion("");
+            setFourAnswer([
+              { content: "", isCorrect: false },
+              { content: "", isCorrect: false },
+              { content: "", isCorrect: false },
+              { content: "", isCorrect: false },
+            ]);
             setVisible(false);
             setLoading(false);
           });
@@ -238,9 +232,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
         formData.append("isActive", true); // Assuming isActive is a boolean
         formData.append("questionLevel", values?.questionLevel?.levelName);
         formData.append("IsShuffle", values?.shuffle?.valueTitle);
-        if (values?.quiz && values?.quiz?.id) {
-          formData.append("quizId", values?.quiz?.id);
-        }
+        formData.append("quizId", id);
         formData.append("hint", values?.hint);
 
         multipleAnswer.forEach((obj, index) => {
@@ -262,6 +254,8 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
             REJECT(toast, err.message);
           })
           .finally(() => {
+            setTypeQuestion("");
+            setMultipleAnswer([]);
             setVisible(false);
             setLoading(false);
           });
@@ -364,7 +358,6 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
     //     return Object.keys(value).length !== 0;
     //   })
     //   .required("Không bỏ trống trường này"),
-    quiz: Yup.object(),
   });
 
   const handleNumberAnswer = (e) => {
@@ -418,15 +411,6 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData }) => {
         >
           {(formik) => (
             <Form>
-              <CustomDropdown
-                title="Bài quiz"
-                label="Bài quiz"
-                name="quiz"
-                id="quiz"
-                isNotRequired={true}
-                options={quizList}
-              />
-
               <CustomDropdown
                 title="Mức độ"
                 label="Mức độ"

@@ -1,0 +1,32 @@
+/* styles.css */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px; /* width of the scrollbar */
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent; /* color of the track */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #888; /* color of the scrollbar */
+  border-radius: 4px; /* roundness of the scrollbar */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #555; /* color of the scrollbar on hover */
+}
+
+.resizable-panel {
+  display: flex;
+}
+
+.panel-content {
+  overflow: auto;
+}
+
+.resizer {
+  cursor: ew-resize;
+  background: rgb(110, 12, 12);
+  height: 100%;
+  display: inline-block;
+}

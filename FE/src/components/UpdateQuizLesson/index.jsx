@@ -71,6 +71,7 @@ export default function AddQuizLesson({
   const [typeList, setTypeList] = useState([]);
 
   useEffect(() => {
+
     const fetchInitialData = async () => {
       setLoading(true);
       try {
@@ -119,7 +120,7 @@ export default function AddQuizLesson({
         const documentByIdData = documentById.data?.data || {};
 
         const gradeById = await restClient({
-          url: `api/grade/getgradebyid/${selectTopicById.documentId}`,
+          url: `api/grade/getgradebyid/${documentByIdData.gradeId}`,
           method: "GET",
         });
         const gradeByIdData = gradeById.data?.data || {};
@@ -375,6 +376,7 @@ export default function AddQuizLesson({
                 name="lesson"
                 id="lesson"
                 touched={false}
+                isNotRequired={true}
                 clearTopic={clearLesson}
                 setClearTopic={setClearLesson}
                 disabled={!lessonList || lessonList.length === 0}

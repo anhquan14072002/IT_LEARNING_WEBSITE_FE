@@ -21,6 +21,8 @@ import ExamResult from './pages/ExamResult';
 import ManageQuestionOfQuizlist from './pages/ManageQuestionOfQuizlist';
 import AddQuestionOfQuizlist from './pages/AddQuestionOfQuizlist';
 import ViewExam from './pages/ViewExam';
+import ExampleAddQuizQuestion from './components/ExampleAddQuizQuestion';
+import CodeEditor from './pages/CodeEditor';
 
 
 function App() {
@@ -50,6 +52,8 @@ function App() {
         <Route path="/dashboard/quiz/managequestionofquizlist/:id" element={<ManageQuestionOfQuizlist />}/>
         <Route path="/dashboard/quiz/addquestionofquizlist/:id" element={<AddQuestionOfQuizlist/>}/>
         <Route path="/viewexam" element={<ViewExam />} />
+        <Route path="/exampleAddQuizQuestion" element={<ExampleAddQuizQuestion />} />
+        <Route path="/codeEditor/:id" element={<CodeEditor />} />
         </Routes>
     </Router>
   );
