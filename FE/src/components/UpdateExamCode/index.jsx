@@ -11,19 +11,21 @@ import restClient from "../../services/restClient";
 
 const validationSchema = Yup.object({
   code: Yup.string().required("Không được bỏ trống"),
-  files: Yup.array().min(1, "Bắt buộc phải có file"),
+  files: Yup.array()
 });
 
-export default function AddExamCode({
+export default function UpdateExamCode({
   visible,
-  setVisibleAddExamCode,
+  setVisibleUpdateExamCode,
+  toast,
+  updateExamCodeValue,
   addExamCodeValue,
   fetchData,
-  toast,
 }) {
   const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(false);
-
+  console.log(updateExamCodeValue.id);
+  console.log(addExamCodeValue);
   const initialValues = {
     code: "",
     files: [],
@@ -33,18 +35,19 @@ export default function AddExamCode({
     setLoading(true);
     const formData = new FormData();
     formData.append("Code", values.code);
+    formData.append("Id", updateExamCodeValue.id);
     formData.append("ExamId", addExamCodeValue);
     formData.append("ExamFileUpload", files[0]);
 
     try {
       await restClient({
-        url: "api/examcode/createexamcode",
-        method: "POST",
+        url: "api/examcode/updateexamcode",
+        method: "PUT",
         data: formData,
         headers: { "Content-Type": "multipart/form-data" },
       });
 
-      SUCCESS(toast, "Thêm đề thi thành công");
+      SUCCESS(toast, "Cập nhật đề thi thành công");
       resetForm();
       fetchData();
     } catch (error) {
@@ -52,7 +55,7 @@ export default function AddExamCode({
       REJECT(toast, error.message);
     } finally {
       setLoading(false);
-      setVisibleAddExamCode(false);
+      setVisibleUpdateExamCode(false);
     }
   };
 
@@ -62,10 +65,10 @@ export default function AddExamCode({
 
   return (
     <Dialog
-      header="Thêm Đề Thi"
+      header="Sửa Đề Thi"
       visible={visible}
       style={{ width: "50vw" }}
-      onHide={() => setVisibleAddExamCode(false)}
+      onHide={() => setVisibleUpdateExamCode(false)}
     >
       {loading ? (
         <Loading />
@@ -89,7 +92,9 @@ export default function AddExamCode({
                 type="text"
               />
 
-              <h1>File Đề Bài   <span style={{ color: "red" }}>*</span></h1>
+              <h1>
+                File Đề Bài <span style={{ color: "red" }}>*</span>
+              </h1>
               <Field name="files">
                 {({ field }) => (
                   <FileUpload

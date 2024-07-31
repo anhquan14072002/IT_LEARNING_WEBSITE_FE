@@ -231,3 +231,4 @@ export const TYPE = [
 export const getTypeByCode = (code) => {
   return TYPE.find((type) => type.code === code);
 };
+
