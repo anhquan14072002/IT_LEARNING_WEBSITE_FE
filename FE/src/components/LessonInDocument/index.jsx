@@ -69,8 +69,7 @@ export default function LessonInDocument({
       >
 
         <div
-          className="overflow-y-auto custom-scrollbar"
-          style={{ height: getHeight() }}
+          className="overflow-y-auto custom-scrollbar h-[80vh]"
           ref={scrollContainerRef}
         >
           {documentList &&

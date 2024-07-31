@@ -55,7 +55,7 @@ export default function AddQuestionOfQuizlist() {
     setLoading(true);
 
     restClient({
-      url: `api/quizquestion/getallquizquestionpagination?PageIndex=${page}&PageSize=${rows}`,
+      url: `api/quizquestion/searchquizquestionpagination?PageIndex=${page}&PageSize=${rows}`,
       method: "GET",
     })
       .then((res) => {
