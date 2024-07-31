@@ -61,12 +61,9 @@ const ExamDetail = () => {
     event.preventDefault();
 
     const countAnswers = Object.keys(answers).length;
-    console.log("Answers state:", countAnswers);
-    console.log("Answers state:", answers);
-    console.log(data?.numberQuestion);
-    if (countAnswers !== data?.numberQuestion) {
-      REJECT(toast, "Vui lòng trả lời tất cả các câu hỏi trước khi nộp bài.");
-      return;
+    const numberQuestion =data?.numberQuestion
+    if (numberQuestion !== 0) {
+      window.confirm(`Bạn còn ${numberQuestion-countAnswers} câu hỏi chưa trả lời.Bạn chắc chắn muốn nộp bài chứ?`)
     }
 
     const formattedAnswers = Object.keys(answers).map((key) => ({
