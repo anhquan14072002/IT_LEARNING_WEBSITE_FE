@@ -27,9 +27,9 @@ const Index = () => {
   }, [id]);
   console.log(openResult);
   return (
-    <div className="text-center h-screen font-sans m-5 p-5 border border-gray-300 rounded-lg shadow-lg bg-gray-200">
-      <h1 className="text-2xl text-gray-800 mb-4">Điểm của bạn</h1>
-      <p className="text-lg text-gray-600 mb-6"> {score}</p>
+    <div className="text-center h-screen font-sans  border border-gray-300 rounded-lg ">
+      <h1 className="text-3xl text-gray-800 mb-4">Điểm của bạn</h1>
+      <p className="text-3xl mb-6 text-red-600 font-bold"> {score}</p>
       {openResult ? (
         <button
           className="bg-blue-600 text-white p-2 text-sm font-normal"
@@ -43,7 +43,7 @@ const Index = () => {
             <h1 className="text-2xl text-gray-800 mb-4">Chi tiết kết quả</h1>
             <div className="flex flex-col items-center">
               <div className="overflow-x-auto h-1/3">
-                <table className="w-full bg-white">
+                <table className="w-full bg-white border border-gray-400">
                   <thead>
                     <tr>
                       <th className="py-2 px-4 border-b">Câu hỏi số</th>
