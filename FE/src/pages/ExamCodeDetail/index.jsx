@@ -118,7 +118,7 @@ const ExamDetail = () => {
               options={examList}
               optionLabel="code"
               placeholder={data?.code}
-              className="w-fit md:w-14rem border border-black  items-center shadow-none "
+              className="w-fit md:w-14rem border border-gray-500  items-center shadow-none custom-dropdown1 "
             />
           )}
         </div>

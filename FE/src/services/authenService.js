@@ -77,6 +77,7 @@ export function registerUser({
   firstname,
   lastname,
   password,
+  phoneNumber
 }) {
   return restClient({
     url: "api/user/registeruser",
@@ -87,7 +88,7 @@ export function registerUser({
       firstName: firstname,
       lastName: lastname,
       password: password,
-      phoneNumber: "0987654321",
+      phoneNumber:phoneNumber,
     },
   });
 }

@@ -1,6 +1,6 @@
 /* Tùy chỉnh CSS cho Dropdown */
 .custom-dropdown {
-    border: 2px solid #007bff; /* Đổi màu border thành xanh dương */
+    border: 10px solid #0a0f14; /* Đổi màu border thành xanh dương */
     border-radius: 0.5rem; /* Bo tròn các góc của Dropdown */
     width: 100%; /* Đảm bảo chiều rộng là 100% của phần tử chứa */
     max-width: 400px; /* Đặt chiều rộng tối đa cho Dropdown */
@@ -11,7 +11,8 @@
   
   /* Định dạng cho placeholder */
   .custom-dropdown .p-dropdown-label {
-    color: #6c757d; /* Màu sắc của placeholder (màu xám nhạt) */
+    color: #020303; /* Màu sắc của placeholder (màu xám nhạt) */
+    
   }
   
   /* Định dạng cho icon dropdown */
@@ -21,12 +22,12 @@
   
   /* Tùy chỉnh màu sắc và kiểu chữ cho các item trong dropdown */
   .custom-dropdown .p-dropdown-items .p-dropdown-item {
-    color: #495057; /* Màu chữ item (xám đậm) */
+    color: #0c0d0e; /* Màu chữ item (xám đậm) */
   }
   
   /* Tùy chỉnh màu nền khi item được chọn */
   .custom-dropdown .p-dropdown-items .p-dropdown-item.p-highlight {
-    background-color: #007bff; /* Màu nền khi item được chọn */
+    background-color: #1685f5; /* Màu nền khi item được chọn */
     color: #ffffff; /* Màu chữ khi item được chọn */
   }
   

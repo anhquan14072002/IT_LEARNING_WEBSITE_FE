@@ -28,7 +28,6 @@ const Index = () => {
   const fetchData = async () => {
     setLoading(true);
     try {
-     
       const res = await restClient({
         url: `api/exam/searchbyexampagination?PageIndex=${page}&PageSize=${rows}&Size=6&Province=${selectedProvince}&Year=${year}&CompetitionId=${competitionSearch}`,
         method: "GET",
@@ -36,17 +35,18 @@ const Index = () => {
       const paginationData = JSON.parse(res.headers["x-pagination"]);
       setTotalPage(paginationData.TotalPages);
       setExamList(Array.isArray(res.data.data) ? res.data.data : []);
-      setLoading(false);
     } catch (err) {
       console.error("Error fetching data:", err);
       setExamList([]);
+    } finally {
       setLoading(false);
     }
   };
+  
   useEffect(() => {
     fetchData();
-  }, []);
-
+  }, [page, rows, selectedProvince, year, competitionSearch]);
+  
   useEffect(() => {
     if (province?.data) {
       setProvinceList(province?.data);
@@ -68,31 +68,30 @@ const Index = () => {
         console.log("error");
       }
     };
-
+  
     fetchDataCompetition();
   }, [province, years]);
+  
   const onPageChange = (event) => {
     const { page, rows, first } = event;
     setRows(rows);
     setPage(page + 1);
     setFirst(first);
   };
-  const handleProvince = async (e) => {
+  
+  const handleProvince = (e) => {
     setSelectedProvince(e.value?.name);
-
-    await fetchData();
   };
-  const handleCompetition = async (e) => {
-    console.log(e.value);
+  
+  const handleCompetition = (e) => {
     setCompetition(e.value?.title);
     setCompetitionSearch(e.value?.id);
-    await fetchData();
-    console.log(e.value?.id);
   };
-  const handleYear = async (e) => {
+  
+  const handleYear = (e) => {
     setYear(e.value?.year);
-    await fetchData();
   };
+  
   return (
     <>
       <Header />
@@ -110,7 +109,7 @@ const Index = () => {
                 optionLabel="name"
                 editable
                 placeholder="Tỉnh"
-                className="border border-gray-500 rounded-xl flex items-center w-2/3 py-2 gap-2.5  custom-dropdown"
+                className="border border-gray-500 rounded-xl flex items-center w-fit py-2 gap-2.5  custom-dropdown"
                 filter
               />
             </div>

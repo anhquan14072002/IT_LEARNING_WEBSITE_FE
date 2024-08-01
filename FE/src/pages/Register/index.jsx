@@ -89,7 +89,8 @@ const Index = () => {
   };
 
   const onSubmit = async (data) => {
-    const { firstname, lastname, username, password } = data;
+    const { firstname, lastname, username, password,phoneNumber } = data;
+    console.log(data);
     const classValues = selectClass.map((item) => item.class);
     const gradeId = classValues.join(",");
     try {
@@ -99,6 +100,7 @@ const Index = () => {
         firstname,
         lastname,
         password,
+        phoneNumber
       });
       const userId = response?.data?.data?.id;
       await createUserGrade({ userId, gradeId });
@@ -188,19 +190,19 @@ const Index = () => {
                 <div className="mb-4 w-full max-w-[calc(50%-0.5rem)]">
                   <label htmlFor="username" className="cursor-pointer">
                     <h4 className="text-xl text-black font-medium">
-                      Tên tài khoản <span className="text-red-500">*</span>
+                    Tài khoản <span className="text-red-500">*</span>
                     </h4>
                   </label>
                   <Controller
                     name="username"
                     defaultValue=""
                     control={control}
-                    rules={{ required: "Tên tài khoản không được để trống" }}
+                    rules={{ required: "Tài khoản không được để trống" }}
                     render={({ field }) => (
                       <InputText
                         id="username"
                         type="text"
-                        className="w-full h-12 text-black-800 border border-solid  border-gray-500 pb-2 pl-1 rounded-md shadow-none focus:border-blue-400"
+                        className="w-full h-12 text-black-800 border border-solid  border-gray-500 pb-2 pl-1 rounded-md shadow-none"
                         placeholder="Nhập tên tài khoản"
                         {...field}
                       />
@@ -227,7 +229,8 @@ const Index = () => {
                       optionLabel="class"
                       placeholder="Chọn lớp"
                       maxSelectedLabels={12}
-                      className="w-full shadow-none custom-multiselect"
+                      className="w-full   custom-multiselect h-12 text-black-800 border border-solid  border-gray-300 pb-2 pl-1 rounded-md shadow-none p-multiselect-token" 
+
                       display="chip"
                     />
                   </div>
@@ -238,7 +241,40 @@ const Index = () => {
                   )}
                 </div>
               </div>
-
+              <div className="mb-4">
+                <label htmlFor="phoneNumber" className="cursor-pointer">
+                  <h4 className="text-xl text-black font-medium">
+                    Số Điện Thoại <span className="text-red-500">*</span>
+                  </h4>
+                </label>
+                <Controller
+                  name="phoneNumber"
+                  defaultValue=""
+                  control={control}
+                  rules={{
+                    required: "Số điện thoại không được để trống",
+                    pattern: {
+                      value: /^0\d{9}$/,
+                      message: "Số điện thoại chưa chính xác",
+                    },
+                  }}
+                  render={({ field }) => (
+                    <InputText
+                      id="phoneNumber"
+                      type="text"
+                      className="w-full h-12 text-black-800 border border-solid  border-gray-500 pb-1 pl-1 rounded-md shadow-none"
+                      placeholder="Nhập mật khẩu"
+                      {...field}
+                    />
+                  )}
+                />
+                <br />
+                {errors.phoneNumber && (
+                  <span className="text-red-500 text-sm">
+                    {errors.phoneNumber.message}
+                  </span>
+                )}
+              </div>
               <div className="mb-4">
                 <label htmlFor="password" className="cursor-pointer">
                   <h4 className="text-xl text-black font-medium">
@@ -255,7 +291,7 @@ const Index = () => {
                       value:
                         /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/,
                       message:
-                        "Mật khẩu cần ít nhất 8 ký tự, bao gồm chữ cái đầu viết hoa, số và ký tự đặc biệt",
+                        "Mật khẩu cần chứa 8 ký tự, chữ cái đầu viết hoa, số và ký tự đặc biệt",
                     },
                   }}
                   render={({ field }) => (
@@ -286,7 +322,7 @@ const Index = () => {
                   defaultValue=""
                   control={control}
                   rules={{
-                    required: "Mật khẩu không được để trống",
+                  
                     validate: (value) =>
                       value === getValues("password") ||
                       "Mật khẩu nhập lại không khớp",
