@@ -1,29 +1,37 @@
 import React, { useState } from "react";
-import { EditorState, convertToRaw } from "draft-js";
-import { Editor } from "react-draft-wysiwyg";
-import { stateToHTML } from "draft-js-export-html";
-import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css"; // Import Quill's CSS
+import "./UncontrollEditor.css"; // Import your custom CSS
 
 const UncontrolledEditor = ({ onChange }) => {
-  const [editorState, setEditorState] = useState(EditorState.createEmpty());
+  const [editorHtml, setEditorHtml] = useState("");
 
-  const onEditorStateChange = (newEditorState) => {
-    setEditorState(newEditorState);
-    const contentState = newEditorState.getCurrentContent();
-    const htmlContent = stateToHTML(contentState);
-    onChange(htmlContent);
+  const handleChange = (value) => {
+    setEditorHtml(value);
+    onChange(value); // Call onChange with the updated content
   };
 
   return (
-    <div className="demo-wrapper border-2 h-72">
-      <Editor
-        editorState={editorState}
-        wrapperClassName="demo-wrapper"
-        editorClassName="demo-editor"
-        onEditorStateChange={onEditorStateChange}
-      />
-    </div>
+    <ReactQuill
+      value={editorHtml}
+      onChange={handleChange}
+      modules={editorModules}
+      theme="snow"
+    />
   );
+};
+
+// Optional: Configure the editor modules and toolbar
+const editorModules = {
+  toolbar: [
+    [{ header: "1" }, { header: "2" }],
+    [{ list: "ordered" }, { list: "bullet" }],
+    ["bold", "italic", "underline"],
+    ["link", "image"],
+    [{ color: [] }, { background: [] }],
+    [{ align: [] }],
+    ["clean"],
+  ],
 };
 
 export default UncontrolledEditor;

@@ -661,7 +661,14 @@ export const containsRudeWords = (content) => {
     "tiên sư bố",
     "tổ sư",
   ]; // Add more words as needed
-  const sentenceWords = content.split(" ");
+  const parser = new DOMParser();
+  // Parse the HTML string into a document
+  const doc = parser.parseFromString(content, "text/html");
+  // Extract the text content from the document
+  const textContent = doc.body.textContent || "";
+
+  // Split the text content into individual words
+  const sentenceWords = textContent.split(/\s+/);
   console.log(content);
   for (let word of sentenceWords) {
     if (rudeWords.includes(word)) {

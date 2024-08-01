@@ -21,8 +21,7 @@ const tabsData = [
   },
   {
     label: "Câu hỏi của tôi",
-    content:
-      "Fugiat dolor et quis in incididunt aute. Ullamco voluptate consectetur dolor officia sunt est dolor sint.",
+    content: <PostContentItemList myQuestion={true} />,
   },
 ];
 function PostContentItem(props) {
@@ -32,35 +31,41 @@ function PostContentItem(props) {
   const [activeTabIndex, setActiveTabIndex] = useState(0);
   return (
     <div>
-      <div className="flex space-x-9 border-b">
-        {/* Loop through tab data and render button for each. */}
-        {tabsData.map((tab, idx) => {
-          return (
-            <button
-              key={idx}
-              className={`py-2 border-b-4 transition-colors duration-300 ${
+      <ul className="flex flex-wrap text-sm font-medium text-center text-gray-500 border-b border-gray-200 dark:border-gray-700 dark:text-gray-400">
+        {tabsData.map((tab, idx) => (
+          <li key={idx} className="me-2">
+            <a
+              href="#"
+              className={`inline-block p-4 rounded-t-lg ${
                 idx === activeTabIndex
-                  ? "border-blue-600"
-                  : "border-transparent hover:border-gray-200"
+                  ? "text-blue-600 font-bold bg-gray-100 active dark:bg-gray-800 dark:text-blue-500"
+                  : "hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300"
               }`}
-              // Change the active tab on click.
-              onClick={() => {
+              onClick={(e) => {
+                e.preventDefault();
                 if (idx === 0) {
-                  {
-                    setItemSidebar(0);
-                  }
+                  setItemSidebar({
+                    itemSelected: undefined,
+                  });
+                } else if (idx === 3) {
+                  setItemSidebar({
+                    itemSelected: "myQuestion",
+                  });
                 }
                 setActiveTabIndex(idx);
               }}
+              tabindex={idx === activeTabIndex ? "0" : "-1"}
+              aria-selected={idx === activeTabIndex}
             >
               {tab.label}
-            </button>
-          );
-        })}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <div className="mt-4">
+        {/* Render the content of the active tab */}
+        {tabsData[activeTabIndex].content}
       </div>
-      {/* Show active tab content. */}
-      <div className="py-4">{tabsData[activeTabIndex].content}</div>
-
       <Paginator
         first={first}
         rows={rows}

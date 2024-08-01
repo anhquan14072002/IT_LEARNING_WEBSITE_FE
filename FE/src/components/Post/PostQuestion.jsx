@@ -1,12 +1,30 @@
-import React, { useEffect } from "react";
+import React, { useContext, useEffect } from "react";
 import image from "../../assets/img/image.png";
-import message from "../../assets/Icons/message.png";
+import message from "../../assets/Icons/message2.png";
 import { Button } from "primereact/button";
-import restClient from "../../services/restClient";
+import { useSelector } from "react-redux";
+import PostContext from "../../store/PostContext";
 function PostQuestion({ post }) {
-  const { content, userName, avatar, createdDate, gradeTitle } = post;
+  const user = useSelector((state) => state.user.value);
+  const { deletePost, checkUser, setItemSidebar } = useContext(PostContext);
+  const {
+    content,
+    userName,
+    avatar,
+    createdDate,
+    gradeTitle,
+    gradeId,
+    userId,
+    id,
+    numberOfComment,
+  } = post;
+
   let contentJsx = <div dangerouslySetInnerHTML={{ __html: content }} />;
-  // Format the date to a readable format
+  function responseAnswer() {
+    if (checkUser()) {
+      deletePost(id);
+    }
+  }
   const formattedDate = new Date(createdDate).toLocaleString("vi-VN", {
     hour: "2-digit",
     minute: "2-digit",
@@ -15,9 +33,14 @@ function PostQuestion({ post }) {
     month: "2-digit",
     year: "numeric",
   });
+  function handleChooseGrade() {
+    setItemSidebar({
+      itemSelected: gradeId,
+    });
+  }
   return (
     <div className="border-stone-200 border-b-2 ">
-      <div className="rounded p-5 flex flex-col gap-3">
+      <div className="rounded p-5 flex flex-col gap-2">
         <p className="flex justify-between items-center">
           <span className="flex gap-3">
             <span className="flex items-center">
@@ -39,20 +62,42 @@ function PostQuestion({ post }) {
 
           <i
             className="pi pi-search"
-            style={{ fontSize: "1.1rem", color: "#708090" }}
+            style={{ fontSize: "0.9 rem", color: "#708090" }}
           ></i>
         </p>
         <p className="text-xl">{contentJsx}</p>
         <p>
           <Button
-            label={`# Tin học ${gradeTitle}`}
+            label={` #Tin học ${gradeTitle}`}
             severity="warning"
             style={{ backgroundColor: "#FAA500" }}
-            className="text-white px-5 py-2 rounded-3xl"
+            onClick={handleChooseGrade}
+            className="text-white px-2 py-1 rounded-3xl text-sm"
           />
         </p>
-        <p>
-          <img src={message} alt="Ảnh tin nhắn" width="24px" />
+        <p className="flex gap-4 mt-1 items-center">
+          <i
+            className="pi pi-bookmark"
+            style={{ fontSize: "1.2rem", color: "#708090" }}
+          ></i>
+          {/* <i
+            className="pi  pi-exclamation-triangle"
+            style={{ fontSize: "1.4rem", color: "#708090" }}
+          ></i> */}
+          <span class="relative inline-flex items-center">
+            <span class="absolute top-0 right-0 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5">
+              {numberOfComment}
+            </span>
+            <img src={message} alt="Ảnh tin nhắn" class="w-6 h-6 text-black" />
+          </span>
+
+          {userId === user?.sub && (
+            <span>
+              <a className="cursor-pointer" onClick={responseAnswer}>
+                Thu hồi
+              </a>
+            </span>
+          )}
         </p>
       </div>
     </div>
