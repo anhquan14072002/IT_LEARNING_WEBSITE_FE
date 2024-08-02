@@ -40,7 +40,7 @@ const PostAnswer = ({ post }) => {
     setViewAnswer(true);
     try {
       const response = await restClient({
-        url: `api/postcomment/getallcommentbypostid?postId=${id}`,
+        url: `api/postcomment/getallcommentbypostidpagination?postId=${id}`,
         method: "GET",
       });
       setAnswers(response.data.data);
@@ -75,7 +75,7 @@ const PostAnswer = ({ post }) => {
       userReceiveName: fullName,
       description: `${user?.name} đã phản hồi bài viết của bạn`,
       notificationTime: new Date(),
-      isRead: true,
+      isRead: false,
       link: "string",
     };
     createPostNotification(body);
@@ -177,7 +177,7 @@ const Answer = ({
 
   const voteComment = () => {
     createVoteComment(id, fetchPost);
-    notifyPersonal();
+    notifyPersonal(" đã thích bài viết của bạn");
   };
 
   const deleteAnswer = () => {
@@ -201,10 +201,10 @@ const Answer = ({
       };
       setIsChangeInput(false);
       await createResponseAnswer(postComment, fetchPost);
-      notifyPersonalResponse();
+      notifyPersonalResponse(" đã phản hồi bài viết của bạn");
     }
   };
-  function notifyPersonalResponse() {
+  function notifyPersonalResponse(msg) {
     /* solution: Where is the origin of action from ? 
           - pass body in request :  */
     const body = {
@@ -213,30 +213,13 @@ const Answer = ({
       userSendName: user?.name,
       userReceiveId: userId,
       userReceiveName: fullName,
-      description: `${user?.name} đã phản hồi bài viết của bạn`,
+      description: `${user?.name} ${msg}`,
       notificationTime: new Date(),
-      isRead: true,
+      isRead: false,
       link: "string",
     };
     createPostNotification(body);
   }
-  function notifyPersonal() {
-    /* solution: Where is the origin of action from ? 
-          - pass body in request :  */
-    const body = {
-      notificationType: 2,
-      userSendId: user?.sub,
-      userSendName: user?.name,
-      userReceiveId: userId,
-      userReceiveName: fullName,
-      description: `${user?.name} đã thích bài viết của bạn`,
-      notificationTime: new Date(),
-      isRead: true,
-      link: "string",
-    };
-    createPostNotification(body);
-  }
-
   return (
     <div {...props}>
       <div className="flex flex-col gap-4 border-stone-200 border-b-2 pb-4">

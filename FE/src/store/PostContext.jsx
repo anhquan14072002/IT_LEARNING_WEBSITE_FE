@@ -255,8 +255,9 @@ export const PostProvider = ({ children }) => {
       });
   };
   const createVoteComment = (id, fetchPost) => {
+    // ?commentId=46&userId=9418ea16-370b-44e2-910c-9f0d2f50be7f'
     restClient({
-      url: `api/postcomment/votepostcomment/${id}`,
+      url: `api/postcomment/votepostcomment?commentId=${id}`,
       method: "POST",
     })
       .then((res) => {

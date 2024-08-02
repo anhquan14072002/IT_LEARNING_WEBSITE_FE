@@ -99,17 +99,19 @@ function PostWrite({ setIsCompose }) {
         >
           {(formik) => (
             <Form className="flex flex-col">
-              <CustomDropdownInSearch
-                isNotRequired
-                title="lớp"
-                name="grade"
-                id="grade"
-                isClear={true}
-                handleOnChange={(e, helpers, setTouchedState, props) =>
-                  handleOnChangeGrade(e, helpers, setTouchedState, props)
-                }
-                options={gradeList}
-              />
+              <div className="w-40">
+                <CustomDropdownInSearch
+                  isNotRequired
+                  title="Chọn Lớp"
+                  name="grade"
+                  id="grade"
+                  isClear={true}
+                  handleOnChange={(e, helpers, setTouchedState, props) =>
+                    handleOnChangeGrade(e, helpers, setTouchedState, props)
+                  }
+                  options={gradeList}
+                />
+              </div>
               <div>
                 <UncontrolledEditor onChange={handleEditorChange} />
                 <ErrorMessage name="description" component="div" />
