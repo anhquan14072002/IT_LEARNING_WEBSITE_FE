@@ -70,7 +70,7 @@ export default function AddTag({
             <Form>
       
               <CustomTextInput
-                  label={<><span>Tiêu đề</span><span style={{ color: 'red' }}>*</span></>}
+                  label="Tiêu đề"
                 name="title"
                 type="text"
                 id="title"

@@ -71,7 +71,7 @@ export default function AddCompetition({
                 label={
                   <>
                     <span>Tiêu đề</span>
-                    <span style={{ color: "red" }}>*</span>
+                  
                   </>
                 }
                 name="title"
@@ -82,7 +82,7 @@ export default function AddCompetition({
                 label={
                   <>
                     <span>Thông tin chi tiết</span>
-                    <span style={{ color: "red" }}>*</span>
+                  
                   </>
                 }
                 id="description"

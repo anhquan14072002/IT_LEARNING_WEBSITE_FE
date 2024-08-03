@@ -139,18 +139,19 @@ export default function AddExam({
   const onFileSolutionSelect = (e) => {
     setFileSolution(e.files);
   };
-  const validationSchema = types === 2
-    ? baseValidationSchema.shape({
-        numberQuestion: Yup.number().required("Không được bỏ trống"),
-      })
-    : baseValidationSchema
+  const validationSchema =
+    types === 2
+      ? baseValidationSchema.shape({
+          numberQuestion: Yup.number().required("Không được bỏ trống"),
+        })
+      : baseValidationSchema;
 
   return (
     <Dialog
       header="Thêm Đề Thi"
       visible={visible}
       style={{ width: "50vw" }}
-      onHide={() => (setVisible(false),setTag([]))}
+      onHide={() => (setVisible(false), setTag([]))}
     >
       {loading ? (
         <Loading />
@@ -166,7 +167,6 @@ export default function AddExam({
                 label={
                   <>
                     <span>Tiêu đề</span>
-                    <span style={{ color: "red" }}>*</span>
                   </>
                 }
                 id="title"
@@ -178,7 +178,6 @@ export default function AddExam({
                 label={
                   <>
                     <span>Cuộc Thi</span>
-                    <span style={{ color: "red" }}>*</span>
                   </>
                 }
                 customTitle="title"
@@ -192,7 +191,6 @@ export default function AddExam({
                 label={
                   <>
                     <span>Tỉnh</span>
-                    <span style={{ color: "red" }}>*</span>
                   </>
                 }
                 customTitle="name"
@@ -202,8 +200,7 @@ export default function AddExam({
               />
               <div>
                 <>
-                  <span>Tag</span>
-                  <span style={{ color: "red" }}>*</span>
+                  <span>Tag <span style={{ color: 'red' }}>*</span></span>
                 </>
                 <MultiSelect
                   value={tag}
@@ -219,7 +216,6 @@ export default function AddExam({
                 label={
                   <>
                     <span>Năm</span>
-                    <span style={{ color: "red" }}>*</span>
                   </>
                 }
                 id="year"
@@ -231,7 +227,6 @@ export default function AddExam({
                   label={
                     <>
                       <span>Số lượng câu hỏi</span>
-                      <span style={{ color: "red" }}>*</span>
                     </>
                   }
                   id="numberQuestion"
@@ -244,7 +239,6 @@ export default function AddExam({
                 label={
                   <>
                     <span>Thông tin chi tiết</span>
-                    <span style={{ color: "red" }}>*</span>
                   </>
                 }
                 id="description"
