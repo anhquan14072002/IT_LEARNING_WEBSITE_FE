@@ -50,7 +50,7 @@ export default function ManageExam() {
 
   const pagination = (page, rows) => {
     setLoading(true);
-
+ const title = "title"
     restClient({
       url: `api/competition/searchcompetitionpagination?PageIndex=${page}&PageSize=${rows}`,
       method: "GET",
