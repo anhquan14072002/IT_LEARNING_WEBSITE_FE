@@ -74,7 +74,7 @@ export default function ManageQuestionOfQuizlist() {
     setLoading(true);
 
     restClient({
-      url: `api/quizquestion/searchquizquestionpagination?QuizId=${id}&PageIndex=${page}&PageSize=${rows}`,
+      url: `api/quizquestion/getallquizquestionpagination?QuizId=${id}&PageIndex=${page}&PageSize=${rows}`,
       method: "GET",
     })
       .then((res) => {
@@ -419,12 +419,12 @@ export default function ManageQuestionOfQuizlist() {
                         className="border-b-2 border-t-2"
                         style={{ minWidth: "15rem" }}
                       />
-                      {/* <Column
-                  field="score"
-                  header="Điểm"
-                  className="border-b-2 border-t-2"
-                  style={{ width: "15%" }}
-                /> */}
+                      <Column
+                        field="score"
+                        header="Điểm"
+                        className="border-b-2 border-t-2"
+                        style={{ width: "15%" }}
+                      />
                       <Column
                         header="Trạng thái"
                         className="border-b-2 border-t-2"

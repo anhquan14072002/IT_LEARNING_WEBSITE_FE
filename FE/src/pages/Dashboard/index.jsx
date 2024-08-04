@@ -11,6 +11,7 @@ import ManageExam from "../../components/ManageExam";
 import ManageTag from "../../components/ManageTag";
 import ManageAccount from "../../components/ManageAccount";
 import { useNavigate, useParams } from "react-router-dom";
+import ManageCodeOnline from "../../components/ManageCodeOnline"
 
 const Dashboard = () => {
   const [open, setOpen] = useState(true);
@@ -26,6 +27,7 @@ const Dashboard = () => {
     { title: "Quản lí câu hỏi ôn tập ", src: "Folder", index: "quiz" },
     { title: "Quản lí đề thi", src: "Folder", index: "test" },
     { title: "Quản lí tag ", src: "Folder", index: "tag" },
+    { title: "Quản lí bài thực hành", src: "Folder", index: "codeeditor" },
   ];
 
   return (
@@ -86,6 +88,7 @@ const Dashboard = () => {
               {typeId === "quiz" && <QuizManagement />}
               {typeId === "test" && <ManageExam />}
               {typeId === "tag" && <ManageTag />}
+              {typeId === "codeeditor" && <ManageCodeOnline />}
             </div>
           </div>
         </>

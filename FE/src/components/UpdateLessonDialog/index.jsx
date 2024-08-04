@@ -149,8 +149,6 @@ export default function UpdateLessonDialog({
   }, [visibleUpdate, modelUpdate]);
 
   const onSubmit = async (values, { setSubmitting }) => {
-    setIsLoadingAddUpdate(true);
-
     const formData = new FormData();
     formData.append("Id", modelUpdate.id);
     formData.append("Title", values.title);
@@ -161,6 +159,10 @@ export default function UpdateLessonDialog({
     formData.append("IsActive", false);
 
     if (!inputContent) {
+      if (files.length === 0) {
+        REJECT(toast, "Vui lòng chọn file để tải lên");
+        return;
+      }
       if (files.some((file) => file.size > 10485760)) {
         REJECT(toast, "Vui lòng chọn file nhỏ hơn hoặc bằng 10mb");
         return;
@@ -175,6 +177,7 @@ export default function UpdateLessonDialog({
     }
 
     try {
+      setIsLoadingAddUpdate(true);
       await restClient({
         url: "api/lesson/updatelesson",
         method: "PUT",

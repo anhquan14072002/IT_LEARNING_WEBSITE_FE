@@ -49,7 +49,7 @@ export default function ManagementQuizLesson() {
     setLoading(true);
 
     restClient({
-      url: `api/quiz/getallquizpagination?PageIndex=${page}&PageSize=${rows}`,
+      url: `api/quiz/getallquizpagination?Custom=false&PageIndex=${page}&PageSize=${rows}`,
       method: "GET",
     })
       .then((res) => {

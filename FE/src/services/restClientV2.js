@@ -1,8 +1,8 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:8000";
+const BASE_URL = "http://localhost:2358";
 
-export default function restClient({
+export default function restClientV2({
   url,
   method = "GET",
   params,
