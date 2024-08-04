@@ -20,9 +20,11 @@ export default function Home() {
   const [loadingGet, setLoadingGet] = useState(false);
 
   useEffect(() => {
-    if (fixedDivRef.current) {
-      setFixedDivHeight(fixedDivRef.current.offsetHeight);
-    }
+    setTimeout(()=>{
+      if (fixedDivRef.current) {
+        setFixedDivHeight(fixedDivRef.current.offsetHeight);
+      }
+    },500)
   }, [fixedDivRef.current]);
 
   useEffect(() => {

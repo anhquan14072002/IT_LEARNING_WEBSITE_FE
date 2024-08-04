@@ -10,8 +10,98 @@ export const handleMultipleContent = (answers) => {
 export const handleMultipleCorrect = (answers) => {
   const correctAnswers = answers.filter((answer) => answer.isCorrect);
 
-  return correctAnswers.length == 1
+  return correctAnswers.length == 1;
 };
+
+export function encodeBase64(str) {
+  // Encode the string as base64
+  return btoa(unescape(encodeURIComponent(str)));
+}
+
+export function processInput(inputStr) {
+  // Ensure inputStr is a string
+  if (typeof inputStr !== 'string') {
+      console.error('Invalid input: inputStr must be a string');
+      return {
+          arrayItems: [],
+          targetValue: null,
+          isTargetInArray: false
+      };
+  }
+
+  // Split the input string into an array of strings
+  const parts = inputStr.split(' ');
+
+  // Ensure there are enough parts in the input
+  if (parts.length < 2) {
+      console.error('Invalid input: Not enough parts in the input string');
+      return {
+          arrayItems: [],
+          targetValue: "",
+          isTargetInArray: false
+      };
+  }
+
+  // Extract the length of the array
+  const arrayLength = parseInt(parts[0], 10);
+
+  // Check if arrayLength is a valid number
+  if (isNaN(arrayLength) || arrayLength < 0) {
+      console.error('Invalid input: arrayLength must be a non-negative number');
+      return {
+          arrayItems: [],
+          targetValue: "",
+          isTargetInArray: false
+      };
+  }
+
+  // Extract the array items
+  const arrayItems = parts.slice(1, 1 + arrayLength).map(Number);
+
+  // Check if target value is present
+  const targetValue = parseInt(parts[1 + arrayLength], 10);
+
+  // Check if the target value is a valid number
+  if (isNaN(targetValue)) {
+      console.error('Invalid input: targetValue must be a number');
+      return {
+          arrayItems,
+          targetValue: "",
+          isTargetInArray: false
+      };
+  }
+
+  // Check if the target value is in the array
+  const isTargetInArray = arrayItems.includes(targetValue);
+
+  return {
+      arrayItems,
+      targetValue,
+      isTargetInArray
+  };
+}
+
+// utils.js
+export function decodeBase64(base64String) {
+  try {
+    // Decode Base64 to binary string
+    const binaryString = atob(base64String);
+
+    // Convert binary string to a Uint8Array
+    const len = binaryString.length;
+    const bytes = new Uint8Array(len);
+    for (let i = 0; i < len; i++) {
+      bytes[i] = binaryString.charCodeAt(i);
+    }
+
+    // Convert Uint8Array to a UTF-8 string
+    const decoder = new TextDecoder("utf-8");
+    return decoder.decode(bytes);
+  } catch (error) {
+    console.error("Failed to decode Base64 string:", error);
+    return "";
+  }
+}
 
 export const hasEmptyContent = (answers) => {
   return answers.some(
@@ -137,7 +227,6 @@ export const decodeToken = (token) => {
   }
 };
 
-
 export const getTokenFromLocalStorage = () => {
   try {
     const token = localStorage.getItem("accessToken");
@@ -231,4 +320,3 @@ export const TYPE = [
 export const getTypeByCode = (code) => {
   return TYPE.find((type) => type.code === code);
 };
-

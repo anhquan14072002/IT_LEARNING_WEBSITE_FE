@@ -8,7 +8,6 @@ import { Paginator } from "primereact/paginator";
 import { Toast } from "primereact/toast";
 import { ProductService } from "../../services/ProductService";
 import { Button } from "primereact/button";
-import "./index.css";
 import AddLessonDialog from "../AddLessonDialog";
 import UpdateLessonDialog from "../UpdateLessonDialog";
 import UpdateDocumentDialog from "../UpdateDocumentDialog";
@@ -23,30 +22,26 @@ import {
 } from "../../utils";
 import Loading from "../Loading";
 import restClient from "../../services/restClient";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import debounce from "lodash.debounce";
 import { InputSwitch } from "primereact/inputswitch";
 import { Tooltip } from "primereact/tooltip";
 import { Dialog } from "primereact/dialog";
 import { Editor } from "primereact/editor";
 
-export default function Lesson() {
+export default function ManageCodeOnline() {
   const toast = useRef(null);
-  const dropDownRef1 = useRef(null);
-  const dropDownRef2 = useRef(null);
-  const [selectedCity, setSelectedCity] = useState(null);
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const cm = useRef(null);
-  const [visible, setVisible] = useState(false);
-  const [visibleUpdate, setVisibleUpdate] = useState(false);
-  const [visibleDelete, setVisibleDelete] = useState(false);
   const [loading, setLoading] = useState(false);
   const [modelUpdate, setModelUpdate] = useState({});
   const [textSearch, setTextSearch] = useState("");
   const [loadingDeleteMany, setLoadingDeleteMany] = useState(false);
   const [visibleDialog, setVisibleDialog] = useState(false);
   const [content, setContent] = useState("");
+  const [visibleDelete, setVisibleDelete] = useState(false);
+  const navigate = useNavigate();
 
   //pagination
   const [first, setFirst] = useState(0);
@@ -66,7 +61,7 @@ export default function Lesson() {
     if (textSearch.trim()) {
       setLoading(true);
       restClient({
-        url: `api/lesson/searchbylessonpagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}`,
+        url: `api/problem/getallproblempagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}`,
         method: "GET",
       })
         .then((res) => {
@@ -83,7 +78,7 @@ export default function Lesson() {
       setLoading(true);
 
       restClient({
-        url: `api/lesson/getalllessonpagination?PageIndex=${page}&PageSize=${rows}`,
+        url: `api/problem/getallproblempagination?PageIndex=${page}&PageSize=${rows}`,
         method: "GET",
       })
         .then((res) => {
@@ -107,10 +102,6 @@ export default function Lesson() {
         <Button
           icon="pi pi-pencil"
           className="text-blue-600 p-mr-2 shadow-none"
-          onClick={() => {
-            setModelUpdate(rowData);
-            setVisibleUpdate(true);
-          }}
         />
         <Button
           icon="pi pi-trash"
@@ -143,16 +134,6 @@ export default function Lesson() {
     const index = (page - 1) * rows + (rowIndex + 1);
     return <span>{index}</span>;
   };
-  const file = (rowData, { rowIndex }) => {
-    return (
-      <Link
-        className="p-2 bg-blue-500 text-white rounded-md"
-        to={`${rowData.urlDownload}`}
-      >
-        Tải về
-      </Link>
-    );
-  };
 
   const changeStatusLesson = (value, id) => {
     restClient({
@@ -172,16 +153,7 @@ export default function Lesson() {
   };
 
   const status = (rowData, { rowIndex }) => {
-    return (
-      <InputSwitch
-        checked={rowData.isActive}
-        tooltip={
-          rowData.isActive
-            ? "Bài học này đã được duyệt"
-            : "Bài học chưa được duyệt"
-        }
-      />
-    );
+    return <InputSwitch checked={rowData.isActive} />;
   };
 
   // modal delete
@@ -217,67 +189,8 @@ export default function Lesson() {
     });
   };
 
-  const confirmDeleteMany = () => {
-    setVisibleDelete(true);
-    confirmDialog({
-      message: "Do you want to delete this record?",
-      header: "Delete Confirmation",
-      icon: "pi pi-info-circle",
-      defaultFocus: "reject",
-      acceptClassName: "p-button-danger",
-      footer: (
-        <>
-          <Button
-            label="Hủy"
-            icon="pi pi-times"
-            className="p-2 bg-red-500 text-white mr-2"
-            onClick={() => {
-              setVisibleDelete(false);
-              REJECT(toast);
-            }}
-          />
-          <Button
-            label="Xóa"
-            icon="pi pi-check"
-            className="p-2 bg-blue-500 text-white"
-            onClick={handleDeleteMany}
-          />
-        </>
-      ),
-    });
-  };
-
-  const handleDeleteMany = () => {
-    setLoadingDeleteMany(true);
-    const arrayId = selectedProduct.map((p, index) => p.id);
-    restClient({
-      url: `api/lesson/deleterangelesson`,
-      method: "DELETE",
-      data: arrayId,
-    })
-      .then((res) => {
-        ACCEPT(toast, "Xóa thành công");
-        setSelectedProduct([]);
-        getData();
-      })
-      .catch((err) => {
-        REJECT(toast, "Xảy ra lỗi khi xóa");
-      })
-      .finally(() => {
-        setLoadingDeleteMany(false);
-        setVisibleDelete(false);
-      });
-  };
-
-  const view = (rowData, { rowIndex }) => {
-    return (
-      <Button
-        label="Chi tiết"
-        icon="pi pi-info-circle"
-        className="text-white p-2 shadow-none bg-blue-600 hover:bg-blue-400"
-        onClick={() => handleOpenDialog(rowData?.content)}
-      />
-    );
+  const description = (rowData, { rowIndex }) => {
+    return <p dangerouslySetInnerHTML={{ __html: rowData?.description }}></p>;
   };
 
   const handleOpenDialog = (content) => {
@@ -323,37 +236,16 @@ export default function Lesson() {
         />
       </Dialog>
       <ConfirmDialog visible={visibleDelete} />
-      <AddLessonDialog
-        visible={visible}
-        setVisible={setVisible}
-        toast={toast}
-        getData={getData}
-      />
-      <UpdateLessonDialog
-        visibleUpdate={visibleUpdate}
-        setVisibleUpdate={setVisibleUpdate}
-        toast={toast}
-        getData={getData}
-        modelUpdate={modelUpdate}
-      />
       <div>
         <div className="flex justify-between pt-1">
-          <h1 className="font-bold text-3xl">Bài học</h1>
+          <h1 className="font-bold text-3xl">Quản lí các bài thực hành</h1>
           <div>
             <Button
               label="Thêm mới"
               icon="pi pi-plus-circle"
               severity="info"
               className="bg-blue-600 text-white p-2 text-sm font-normal"
-              onClick={() => setVisible(true)}
-            />
-            <Button
-              label="Xóa"
-              icon="pi pi-trash"
-              severity="danger"
-              disabled={!selectedProduct || selectedProduct.length === 0}
-              className="bg-red-600 text-white p-2 text-sm font-normal ml-3"
-              onClick={confirmDeleteMany}
+              onClick={() => navigate("/dashboard/createproblem")}
             />
           </div>
         </div>
@@ -431,11 +323,6 @@ export default function Lesson() {
               scrollHeight="30rem"
             >
               <Column
-                selectionMode="multiple"
-                headerStyle={{ width: "3rem" }}
-                className="border-b-2 border-t-2 custom-checkbox-column"
-              ></Column>
-              <Column
                 field="#"
                 header="#"
                 body={indexBodyTemplate}
@@ -450,15 +337,15 @@ export default function Lesson() {
                 style={{ minWidth: "12rem" }}
               ></Column>
               <Column
-                field="topicTitle"
-                header="Chủ đề"
+                body={description}
+                header="Nội dung"
                 className="border-b-2 border-t-2"
                 style={{ minWidth: "12rem" }}
               ></Column>
               <Column
-                header="File tài liệu"
+                header="Độ khó"
                 className="border-b-2 border-t-2"
-                body={file}
+                field="difficulty"
                 style={{ minWidth: "12rem" }}
               ></Column>
               <Column
@@ -466,27 +353,6 @@ export default function Lesson() {
                 className="border-b-2 border-t-2"
                 body={status}
                 style={{ minWidth: "10rem" }}
-              ></Column>
-              <Column
-                field="createdDate"
-                header="Ngày tạo"
-                body={(rowData) => formatDate(rowData.createdDate)}
-                className="border-b-2 border-t-2"
-                style={{ minWidth: "20rem" }}
-              ></Column>
-              <Column
-                field="lastModifiedDate"
-                header="Ngày cập nhật"
-                body={(rowData) => formatDate(rowData.lastModifiedDate)}
-                className="border-b-2 border-t-2"
-                style={{ minWidth: "20rem" }}
-              ></Column>
-              <Column
-                field="info"
-                header=""
-                style={{ minWidth: "12rem" }}
-                body={view}
-                className="border-b-2 border-t-2"
               ></Column>
               <Column
                 className="border-b-2 border-t-2"

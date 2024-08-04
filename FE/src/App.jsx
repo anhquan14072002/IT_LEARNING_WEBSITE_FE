@@ -23,6 +23,7 @@ import AddQuestionOfQuizlist from './pages/AddQuestionOfQuizlist';
 import ViewExam from './pages/ViewExam';
 import ExampleAddQuizQuestion from './components/ExampleAddQuizQuestion';
 import CodeEditor from './pages/CodeEditor';
+import CreateProblem from './components/CreateProblem';
 
 
 function App() {
@@ -54,6 +55,8 @@ function App() {
         <Route path="/viewexam" element={<ViewExam />} />
         <Route path="/exampleAddQuizQuestion" element={<ExampleAddQuizQuestion />} />
         <Route path="/codeEditor/:id" element={<CodeEditor />} />
+        <Route path="/dashboard/createproblem" element={<CreateProblem />} />
+
         </Routes>
     </Router>
   );
