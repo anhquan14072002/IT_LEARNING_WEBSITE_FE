@@ -9,6 +9,7 @@ import QuizManagement from "../../components/QuizManagement";
 import { Tooltip } from "primereact/tooltip";
 import ManageExam from "../../components/ManageExam";
 import ManageTag from "../../components/ManageTag";
+import ManageAccount from "../../components/ManageAccount";
 import { useNavigate, useParams } from "react-router-dom";
 
 const Dashboard = () => {
@@ -79,6 +80,7 @@ const Dashboard = () => {
           </div>
           <div className="ml-20 mt-16 p-7">
             <div className="h-screen">
+            {typeId === "user" && <ManageAccount />}
               {typeId === "adminManageDocument" && <ManageDocument />}
               {typeId === "lesson" && <ContentLesson />}
               {typeId === "quiz" && <QuizManagement />}

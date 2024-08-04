@@ -45,9 +45,9 @@ export default function ManagementQuizLesson() {
 
   useEffect(() => {
     fetchData();
-  }, []);
-
-  const pagination = (page, rows, textSearch) => {
+  }, [page, rows, textSearch]);
+  
+  const fetchData = () => {
     setLoading(true);
     const title = "title";
     restClient({
@@ -55,10 +55,9 @@ export default function ManagementQuizLesson() {
       method: "GET",
     })
       .then((res) => {
-        const paginationData = res.headers["x-pagination"] 
-          ? JSON.parse(res.headers["x-pagination"]) 
+        const paginationData = res.headers["x-pagination"]
+          ? JSON.parse(res.headers["x-pagination"])
           : { TotalPages: 0 };
-  
         setTotalPage(paginationData.TotalPages);
         setProducts(Array.isArray(res.data.data) ? res.data.data : []);
         setLoading(false);
@@ -70,31 +69,18 @@ export default function ManagementQuizLesson() {
       });
   };
   
-
-  const fetchData = () => {
-    pagination(page, rows, textSearch);
-  };
-
   const onPageChange = (event) => {
     const { page, rows, first } = event;
     setRows(rows);
     setPage(page + 1);
     setFirst(first);
   };
-
+  
   const indexBodyTemplate = (rowData, { rowIndex }) => {
     const index = (page - 1) * rows + (rowIndex + 1);
     return <span>{index}</span>;
   };
-
-  const cities = [
-    { name: "New York", code: "NY" },
-    { name: "Rome", code: "RM" },
-    { name: "London", code: "LDN" },
-    { name: "Istanbul", code: "IST" },
-    { name: "Paris", code: "PRS" },
-  ];
-
+  
   const actionBodyTemplate = (rowData) => {
     return (
       <div style={{ display: "flex" }}>
@@ -116,7 +102,7 @@ export default function ManagementQuizLesson() {
       </div>
     );
   };
-
+  
   const confirmDelete = (id) => {
     setVisibleDelete(true);
     confirmDialog({
@@ -147,9 +133,9 @@ export default function ManagementQuizLesson() {
       ),
     });
   };
-
-  const deleteTag = (id) => {
-    restClient({ url: `api/tag/deletetag/${id}`, method: "DELETE" })
+  
+  const deleteTag = async (id) => {
+    await restClient({ url: `api/tag/deletetag/${id}`, method: "DELETE" })
       .then((res) => {
         fetchData();
         ACCEPT(toast, "Xóa thành công");
@@ -161,12 +147,12 @@ export default function ManagementQuizLesson() {
         setVisibleDelete(false);
       });
   };
-
+  
   const handleSearchInput = debounce((text) => {
     console.log(text);
     setTextSearch(text);
   }, 300);
-
+  
   const changeStatusTag = async (value, id) => {
     console.log(value, id);
     await restClient({
@@ -184,6 +170,7 @@ export default function ManagementQuizLesson() {
         REJECT(toast, "Lỗi khi thay đổi trạng thái");
       });
   };
+  
   const status = (rowData, { rowIndex }) => {
     return (
       <InputSwitch
@@ -193,6 +180,7 @@ export default function ManagementQuizLesson() {
       />
     );
   };
+  
 
   return (
     <div>

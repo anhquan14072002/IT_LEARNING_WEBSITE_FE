@@ -50,16 +50,16 @@ export default function ManageExam() {
     fetchData();
   }, [page, rows, textSearch]);
 
-  const pagination = (page, rows) => {
+  const fetchData = ()=> {
     setLoading(true);
-
+      const title = "title"
     restClient({
-      url: `api/exam/searchbyexampagination?PageIndex=${page}&PageSize=${rows}&Type=2`,
+      url: `api/exam/searchbyexampagination?PageIndex=${page}&PageSize=${rows}&Type=2&Key=${title}&Value=${textSearch}`,
       method: "GET",
     })
       .then((res) => {
         const paginationData = JSON.parse(res.headers["x-pagination"]);
-        setTotalPage(paginationData.TotalPages);
+         setTotalPage(paginationData.TotalPages);
         setProducts(Array.isArray(res.data.data) ? res.data.data : []);
         console.log(res.data.data);
         setLoading(false);
@@ -71,10 +71,6 @@ export default function ManageExam() {
       });
   };
 
-  const fetchData = () => {
-    pagination(page, rows);
-
-  };
 
   const onPageChange = (event) => {
     const { page, rows, first } = event;
@@ -232,6 +228,7 @@ export default function ManageExam() {
         setVisibleUpdate={setVisibleUpdate}
         updateValue={updateValue}
         toast={toast}
+        types = {2}
         fetchData={fetchData}
       />
 
