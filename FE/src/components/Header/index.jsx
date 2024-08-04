@@ -40,6 +40,8 @@ export default function Header({ params, setParams, textSearchProps }) {
     numberOfNotification = 0,
     notifications,
     fetchListNotificationByUserId,
+    markallasreadasync,
+    deleteallnotificationbyuser,
   } = useContext(NotificationContext);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showOptionNotifications, setShowOptionNotifications] = useState(false);
@@ -72,7 +74,20 @@ export default function Header({ params, setParams, textSearchProps }) {
     { id: 3, message: "Reminder: Your subscription expires tomorrow." },
     { id: 4, message: "New comment on your post." },
   ];
-  const options = [{ id: 1, message: "Đánh dấu tất cả đã đọc" }];
+  const options = [
+    {
+      id: 1,
+      message: "Đánh dấu tất cả đã đọc",
+      icon: "pi pi-check",
+      action: handleOption1,
+    },
+    {
+      id: 2,
+      message: "Xóa tất cả thông báo",
+      icon: "pi pi-delete-left",
+      action: handleOption2,
+    },
+  ];
   useEffect(() => {
     if (!user || Object.keys(user).length === 0) {
       console.log("User is empty or not initialized");
@@ -86,12 +101,19 @@ export default function Header({ params, setParams, textSearchProps }) {
         dispatch(retmoveUser());
       }
     }
-  }, []); // Add user to the dependency array to monitor changes
+  }, []);
+  function handleOption1() {
+    markallasreadasync();
+  }
+  function handleOption2() {
+    deleteallnotificationbyuser();
+  }
+  // Add user to the dependency array to monitor changes
   const handleBellClick = () => {
     setShowNotifications(!showNotifications);
     fetchListNotificationByUserId();
   };
-  console.log(notifications);
+
   const handleKeyDown = (e) => {
     const trimmedText = e.target.value.trim();
     const encodedText = encodeURIComponent(trimmedText);
@@ -208,7 +230,7 @@ export default function Header({ params, setParams, textSearchProps }) {
                     </g>
                   </svg>
                   {showNotifications && (
-                    <div className="absolute top-10 -right-16 min-w-72 pb-3 bg-white shadow-lg rounded-lg border border-gray-200 ">
+                    <div className="absolute top-10 z-10 -right-16 min-w-72 pb-3 bg-white shadow-lg rounded-lg border border-gray-200 ">
                       <div className="p-4 font-bold text-xl flex justify-between items-center ">
                         <span>Thông báo</span>
                         <span
@@ -229,11 +251,12 @@ export default function Header({ params, setParams, textSearchProps }) {
                                     options.map((notification) => (
                                       <tr
                                         key={notification.id}
-                                        className="hover:bg-stone-100"
+                                        className="hover:bg-stone-100 "
+                                        onClick={notification.action}
                                       >
                                         <td className="p-2 text-center hover:bg-stone-100 rounded-l-lg">
                                           <i
-                                            className="pi pi-check"
+                                            className={notification.icon}
                                             style={{
                                               fontSize: "0.9 rem",
                                               color: "#708090",
@@ -297,7 +320,7 @@ export default function Header({ params, setParams, textSearchProps }) {
                                     <img
                                       src={notification.userSendImage || image}
                                       alt="Ảnh người dùng"
-                                      width="50px"
+                                      width="40px"
                                       className="rounded-full"
                                       onError={(e) => (e.target.src = image)}
                                     />
@@ -306,7 +329,11 @@ export default function Header({ params, setParams, textSearchProps }) {
                                       src={notification.userSendImage || image}
                                     /> */}
                                   </td>
-                                  <td className="p-2 hover:bg-stone-100 rounded-r-lg">
+                                  <td
+                                    className={`p-2 hover:bg-stone-100 rounded-r-lg ${
+                                      notification.isRead ? "text-red-500" : ""
+                                    }`}
+                                  >
                                     {notification.description}
                                   </td>
                                 </tr>
@@ -323,13 +350,17 @@ export default function Header({ params, setParams, textSearchProps }) {
                             )}
                           </tbody>
                         </table>
-                        <Button
-                          label="Xem thêm thông báo trước đó"
-                          text
-                          raised
-                          className="w-full mt-3 bg-stone-200 hover:bg-stone-100 text-stone-700 p-2 text-sm font-normal"
-                        />
                       </div>
+                      <p className="pt-2 flex justify-center">
+                        {notifications.length > 0 && (
+                          <Button
+                            label="Xem thêm thông báo trước đó"
+                            text
+                            raised
+                            className="w-64 bg-stone-200 absolute bottom-2  hover:bg-stone-100 text-stone-700 p-2 text-sm font-normal"
+                          />
+                        )}
+                      </p>
                     </div>
                   )}
                 </div>

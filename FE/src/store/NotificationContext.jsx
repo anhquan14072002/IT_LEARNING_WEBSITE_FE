@@ -7,7 +7,9 @@ export const NotificationContext = createContext();
 export default function NotifyProvider({ children }) {
   const [numberOfNotification, setNumberOfNotification] = useState(0);
   const [notifications, setNotifications] = useState([]);
+  const [refresh, setRefresh] = useState();
   const user = useSelector((state) => state.user.value);
+
   const fetchNumberNotificationByUserId = useCallback(() => {
     if (user?.sub) {
       restClient({
@@ -30,15 +32,51 @@ export default function NotifyProvider({ children }) {
       })
         .then((res) => {
           setNotifications(res.data.data);
+          console.log(res.data.data);
         })
         .catch((err) => {
           console.error("Error fetching data:", err);
         });
     }
-  }, [user]);
+  }, [user?.sub, refresh]);
+  const deleteallnotificationbyuser = useCallback(() => {
+    if (user?.sub) {
+      restClient({
+        url: `api/notifications/deleteallnotificationbyuser/${user?.sub}`,
+        method: "DELETE",
+      })
+        .then((res) => {
+          setNotifications(res.data.data);
+          console.log(res.data.data);
+        })
+        .catch((err) => {
+          console.error("Error fetching data:", err);
+        });
+    }
+  }, [user?.sub, refresh]);
+  async function success() {
+    setRefresh(new Date());
+  }
+  const markallasreadasync = () => {
+    if (user?.sub) {
+      restClient({
+        url: `api/notifications/markallasreadasync?userId=${user?.sub}`,
+        method: "POST",
+      })
+        .then((res) => {
+          success();
+        })
+        .catch((err) => {
+          console.error("Error fetching data:", err);
+        });
+    }
+  };
   useEffect(() => {
     fetchNumberNotificationByUserId();
   }, [fetchNumberNotificationByUserId]);
+  useEffect(() => {
+    fetchListNotificationByUserId();
+  }, [fetchListNotificationByUserId]);
   return (
     <NotificationContext.Provider
       value={{
@@ -46,6 +84,8 @@ export default function NotifyProvider({ children }) {
         numberOfNotification,
         fetchListNotificationByUserId,
         notifications,
+        markallasreadasync,
+        deleteallnotificationbyuser,
       }}
     >
       {children}

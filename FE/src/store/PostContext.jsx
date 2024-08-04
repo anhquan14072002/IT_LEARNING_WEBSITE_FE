@@ -1,5 +1,11 @@
 // FormDataContext.js
-import React, { createContext, useContext, useEffect, useRef, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useRef,
+  useState,
+} from "react";
 import restClient from "../services/restClient";
 import { ACCEPT, REJECT, SUCCESS } from "../utils";
 import { Toast } from "primereact/toast";
@@ -22,7 +28,7 @@ export const PostProvider = ({ children }) => {
   const user = useSelector((state) => state.user.value);
   const [itemSidebar, setItemSidebar] = useState({
     gradeIdSelected: undefined,
-    itemTab: undefined
+    itemTab: undefined,
   });
   const toast = useRef(null);
   const [refresh, setRefresh] = useState();
@@ -30,8 +36,7 @@ export const PostProvider = ({ children }) => {
   const [isConnect, setIsConnect] = useState(false);
   const [listNotification, setListNotification] = useState(false);
   const hasFetched = useRef(false);
-  console.log(refresh);
-const {fetchNumberNotificationByUserId} = useContext(NotificationContext)
+  const { fetchNumberNotificationByUserId } = useContext(NotificationContext);
   useEffect(() => {
     // if (hasFetched.current) return; // Prevent fetching if already done
     const notification = async () => {
@@ -46,7 +51,7 @@ const {fetchNumberNotificationByUserId} = useContext(NotificationContext)
         conn.on("ReceivedNotification", (message) => {
           // SUCCESS(toast, message);
           setRefresh(new Date());
-          fetchNumberNotificationByUserId()
+          fetchNumberNotificationByUserId();
         });
 
         conn.on(
@@ -54,7 +59,7 @@ const {fetchNumberNotificationByUserId} = useContext(NotificationContext)
           (message, userReceiveId, userSendId) => {
             setRefresh(new Date());
             if (userReceiveId !== userSendId) {
-              fetchNumberNotificationByUserId()
+              fetchNumberNotificationByUserId();
             }
           }
         );
@@ -75,7 +80,7 @@ const {fetchNumberNotificationByUserId} = useContext(NotificationContext)
         console.error("Connection failed: ", error);
       }
     };
-    if(user?.sub ){
+    if (user?.sub) {
       notification();
     }
     // hasFetched.current = true; // Mark fetch as done
@@ -104,32 +109,29 @@ const {fetchNumberNotificationByUserId} = useContext(NotificationContext)
   };
   useEffect(() => {
     console.log("refresh nhé ");
-    if (itemSidebar.itemTab === undefined && itemSidebar.gradeIdSelected === undefined) {
+    if (
+      itemSidebar.itemTab === undefined &&
+      itemSidebar.gradeIdSelected === undefined
+    ) {
       fetchData();
     } else if (itemSidebar.itemTab === "myQuestion") {
       fetchDataByUserId();
     } else if (itemSidebar.itemTab === "notAnswer") {
-     
       fetchDataByNotAnswer();
-    }
-     else if (itemSidebar.itemTab === "goodQuestion") {
-     
+    } else if (itemSidebar.itemTab === "goodQuestion") {
       fetchFavoriteByUserId();
-    }
-    else if (itemSidebar.gradeIdSelected !== undefined) {
+    } else if (itemSidebar.gradeIdSelected !== undefined) {
       fetchDataById();
     }
-  }, [page, rows, itemSidebar.itemTab,itemSidebar.gradeIdSelected, refresh]);
+  }, [page, rows, itemSidebar.itemTab, itemSidebar.gradeIdSelected, refresh]);
   const fetchDataByUserId = () => {
     setLoading(true);
-    let url; 
-    if(itemSidebar?.gradeIdSelected){
-      url= `api/post/getallpostbyuserandgradepagination?userId=${user?.sub}&gradeId=${itemSidebar?.gradeIdSelected}&PageIndex=${page}&PageSize=${rows}`
-     
-    }else{
-      url= `api/post/getallpostbyuserpagination?userId=${user?.sub}&PageIndex=${page}&PageSize=${rows}`
-     
-    };
+    let url;
+    if (itemSidebar?.gradeIdSelected) {
+      url = `api/post/getallpostbyuserandgradepagination?userId=${user?.sub}&gradeId=${itemSidebar?.gradeIdSelected}&PageIndex=${page}&PageSize=${rows}`;
+    } else {
+      url = `api/post/getallpostbyuserpagination?userId=${user?.sub}&PageIndex=${page}&PageSize=${rows}`;
+    }
     restClient({
       url: url,
       method: "GET",
@@ -180,7 +182,7 @@ const {fetchNumberNotificationByUserId} = useContext(NotificationContext)
       })
       .finally(() => setLoading(false));
   };
-  
+
   const fetchFavoriteByUserId = () => {
     setLoading(true);
     restClient({
@@ -265,7 +267,7 @@ const {fetchNumberNotificationByUserId} = useContext(NotificationContext)
       data: contentPost,
     })
       .then((res) => {
-        SUCCESS(toast, "Tạo bài post thành công");
+        // SUCCESS(toast, "Tạo bài post thành công");
         setRefresh(new Date());
         setLoading(false);
       })
@@ -322,7 +324,7 @@ const {fetchNumberNotificationByUserId} = useContext(NotificationContext)
         setLoading(false);
       });
   };
-  const createVoteComment = (id,isLike, fetchPost) => {
+  const createVoteComment = (id, isLike, fetchPost) => {
     let text = isLike ? "thích" : "không thích";
     restClient({
       url: `api/postcomment/votepostcomment?commentId=${id}&userId=${user?.sub}`,
@@ -377,7 +379,7 @@ const {fetchNumberNotificationByUserId} = useContext(NotificationContext)
         deletePostComment,
         fetchPostCommentById,
         createPostNotification,
-        createFavoritePost
+        createFavoritePost,
       }}
     >
       <Toast ref={toast} />
