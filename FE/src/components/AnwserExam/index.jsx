@@ -163,7 +163,7 @@ export default function AnswerExam({
                   id={`answer-${questionIndex}`}
                   value={answers[questionIndex]}
                   onChange={(e) => handleSelectChange(e, questionIndex)}
-                  className="border border-black text-black"
+                  className="border border-gray-600 rounded-md w-fit text-black"
                 >
                   <option value="" disabled>
                     Chọn đáp án
@@ -185,11 +185,13 @@ export default function AnswerExam({
 
   return (
     <Dialog
-      header="Đáp án"
+    header={<span style={{ color: 'black', fontSize:'30px' }}>Đáp án</span>}
+      className="text-l text-black"
       visible={visibleExam}
       style={{ width: "75vw" }}
       onHide={() => setVisibleExam(false)}
     >
+      
       {loading ? (
         <Loading />
       ) : (

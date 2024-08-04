@@ -27,13 +27,19 @@ const Index = () => {
 
   const fetchData = async () => {
     setLoading(true);
+    const province = selectedProvince ? selectedProvince : ""
+    const years = year ? year : ""
+    const competition = competitionSearch ? competitionSearch : ""
+    const id ="id"
     try {
       const res = await restClient({
-        url: `api/exam/searchbyexampagination?PageIndex=${page}&PageSize=${rows}&Size=6&Province=${selectedProvince}&Year=${year}&CompetitionId=${competitionSearch}`,
+        url: `api/exam/searchbyexampagination?PageIndex=${page}&PageSize=${rows}&Size=10&Province=${province}&Year=${years}&CompetitionId=${competition}&OrderBy=${id}&IsAscending=false`,
         method: "GET",
       });
       const paginationData = JSON.parse(res.headers["x-pagination"]);
       setTotalPage(paginationData.TotalPages);
+      console.log(paginationData.TotalPages);
+      
       setExamList(Array.isArray(res.data.data) ? res.data.data : []);
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -109,7 +115,7 @@ const Index = () => {
                 optionLabel="name"
                 editable
                 placeholder="Tỉnh"
-                className="border border-gray-500 rounded-xl flex items-center w-fit py-2 gap-2.5  custom-dropdown"
+                className="border border-black  rounded-xl  flex items-center w-fit py-2 gap-2.5 shadow-l custom-dropdown"
                 filter
               />
             </div>
@@ -121,8 +127,7 @@ const Index = () => {
                 optionLabel="title"
                 editable
                 placeholder="Cuộc Thi"
-                className="border border-gray-500 rounded-xl flex items-center w-fit py-2 gap-2.5  custom-dropdown"
-
+                className="border border-black  rounded-xl  flex items-center w-fit py-2 gap-2.5 shadow-l custom-dropdown"
                 filter
               />
             </div>
@@ -134,7 +139,7 @@ const Index = () => {
                 optionLabel="year"
                 editable
                 placeholder="Năm"
-                className="border border-gray-500 rounded-xl flex items-center w-fit py-2 gap-2.5  custom-dropdown"
+                className="border border-black  rounded-xl  flex items-center w-fit py-2 gap-2.5 shadow-l custom-dropdown"
                 filter
               />
             </div>
@@ -157,7 +162,7 @@ const Index = () => {
    
         
       )}
-        {examList.length > 6 && (
+        {examList.length > 0 && (
               <>
                 <div className="flex-grow"></div>
                 <div>

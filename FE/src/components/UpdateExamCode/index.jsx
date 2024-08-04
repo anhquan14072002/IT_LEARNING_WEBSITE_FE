@@ -84,7 +84,7 @@ export default function UpdateExamCode({
                 label={
                   <>
                     <span>Code</span>
-                    <span style={{ color: "red" }}>*</span>
+               
                   </>
                 }
                 id="code"
@@ -93,7 +93,7 @@ export default function UpdateExamCode({
               />
 
               <h1>
-                File Đề Bài <span style={{ color: "red" }}>*</span>
+                File Đề Bài 
               </h1>
               <Field name="files">
                 {({ field }) => (
