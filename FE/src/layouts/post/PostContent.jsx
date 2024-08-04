@@ -4,9 +4,9 @@ import { Formik, Form, ErrorMessage, Field } from "formik";
 import * as Yup from "yup";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
-import PostContentItem from "./PostContentItem";
+import PostContentItem from "../../components/Post/PostContentItem";
 import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
-import LoadingScreen from "../LoadingScreen";
+import LoadingScreen from "../../components/LoadingScreen";
 import UncontrolledEditor from "../../shared/CustomEditorSecond";
 import PostContext from "../../store/PostContext";
 import { ACCEPT, containsRudeWords } from "../../utils";
@@ -42,7 +42,7 @@ function PostContent() {
 }
 
 function PostWrite({ setIsCompose }) {
-  const { createPost, loading, setLoading } = useContext(PostContext);
+  const { createPost, loading, setLoading, createPostNotification, setRefresh } = useContext(PostContext);
   const user = useSelector((state) => state.user.value);
   const toast = useRef(null);
   const [initialValues] = useState({ grade: {} });
@@ -74,9 +74,26 @@ function PostWrite({ setIsCompose }) {
       userId: user?.sub,
       gradeId: values.grade?.id,
     };
+    notifyPersonalResponse()
     createPost(descriptionPost);
     setIsCompose(false);
   };
+  function notifyPersonalResponse() {
+    /* solution: Where is the origin of action from ? 
+          - pass body in request :  */
+    const body = {
+      notificationType: 1,
+      userSendId: user?.sub,
+      userSendName: user?.name,
+      userReceiveId: user?.sub,
+      userReceiveName: user?.name,
+      description: `Bạn vừa tạo bài post thành công`,
+      notificationTime: new Date(),
+      isRead: false,
+      link: "string",
+    };
+    createPostNotification(body);
+  }
 
   const handleOnChangeGrade = (e, helpers, setTouchedState, props) => {
     helpers.setValue(e.value);
@@ -99,7 +116,7 @@ function PostWrite({ setIsCompose }) {
         >
           {(formik) => (
             <Form className="flex flex-col">
-              <div className="w-40">
+              <div className="w-80">
                 <CustomDropdownInSearch
                   isNotRequired
                   title="Chọn Lớp"

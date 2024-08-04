@@ -1,5 +1,5 @@
 // FormDataContext.js
-import React, { createContext, useEffect, useRef, useState } from "react";
+import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import restClient from "../services/restClient";
 import { ACCEPT, REJECT, SUCCESS } from "../utils";
 import { Toast } from "primereact/toast";
@@ -9,6 +9,7 @@ import {
   HubConnectionBuilder,
   LogLevel,
 } from "@microsoft/signalr";
+import { NotificationContext } from "./NotificationContext";
 const PostContext = createContext();
 
 export const PostProvider = ({ children }) => {
@@ -20,7 +21,8 @@ export const PostProvider = ({ children }) => {
   const [totalPage, setTotalPage] = useState(0);
   const user = useSelector((state) => state.user.value);
   const [itemSidebar, setItemSidebar] = useState({
-    itemSelected: undefined,
+    gradeIdSelected: undefined,
+    itemTab: undefined
   });
   const toast = useRef(null);
   const [refresh, setRefresh] = useState();
@@ -28,7 +30,8 @@ export const PostProvider = ({ children }) => {
   const [isConnect, setIsConnect] = useState(false);
   const [listNotification, setListNotification] = useState(false);
   const hasFetched = useRef(false);
-
+  console.log(refresh);
+const {fetchNumberNotificationByUserId} = useContext(NotificationContext)
   useEffect(() => {
     // if (hasFetched.current) return; // Prevent fetching if already done
     const notification = async () => {
@@ -41,20 +44,18 @@ export const PostProvider = ({ children }) => {
           .configureLogging(LogLevel.Information)
           .build();
         conn.on("ReceivedNotification", (message) => {
-          SUCCESS(toast, message);
+          // SUCCESS(toast, message);
+          setRefresh(new Date());
+          fetchNumberNotificationByUserId()
         });
 
         conn.on(
           "ReceivedPersonalNotification",
           (message, userReceiveId, userSendId) => {
-            console.log(userReceiveId, userSendId);
+            setRefresh(new Date());
             if (userReceiveId !== userSendId) {
-              //23b457e4-76ce-431e-9232-d53a090418ca  23b457e4-76ce-431e-9232-d53a090418ca  23b457e4-76ce-431e-9232-d53a090418ca
-              console.log(1234);
-              SUCCESS(toast, message);
-              setRefresh(new Date());
+              fetchNumberNotificationByUserId()
             }
-            // }
           }
         );
         conn.onclose(() => {
@@ -74,14 +75,16 @@ export const PostProvider = ({ children }) => {
         console.error("Connection failed: ", error);
       }
     };
-    notification();
+    if(user?.sub ){
+      notification();
+    }
     // hasFetched.current = true; // Mark fetch as done
     return () => {
       if (conn) {
         conn.stop();
       }
     };
-  }, [user]);
+  }, [user?.sub, fetchNumberNotificationByUserId]);
 
   const createPostNotification = (contentPost) => {
     restClient({
@@ -98,24 +101,54 @@ export const PostProvider = ({ children }) => {
         REJECT(toast, err.message);
         setLoading(false);
       });
-    // conn.on("Send", (username, msg) => {
-    //   console.log("msg" + username + msg);
-    //   setMessage((messages) => [...messages, { username, msg }]);
-    // });
   };
   useEffect(() => {
-    if (itemSidebar.itemSelected === undefined) {
+    console.log("refresh nhé ");
+    if (itemSidebar.itemTab === undefined && itemSidebar.gradeIdSelected === undefined) {
       fetchData();
-    } else if (itemSidebar.itemSelected === "myQuestion") {
+    } else if (itemSidebar.itemTab === "myQuestion") {
       fetchDataByUserId();
-    } else if (itemSidebar.itemSelected !== undefined) {
+    } else if (itemSidebar.itemTab === "notAnswer") {
+     
+      fetchDataByNotAnswer();
+    }
+     else if (itemSidebar.itemTab === "goodQuestion") {
+     
+      fetchFavoriteByUserId();
+    }
+    else if (itemSidebar.gradeIdSelected !== undefined) {
       fetchDataById();
     }
-  }, [page, rows, itemSidebar.itemSelected, refresh]);
+  }, [page, rows, itemSidebar.itemTab,itemSidebar.gradeIdSelected, refresh]);
   const fetchDataByUserId = () => {
     setLoading(true);
+    let url; 
+    if(itemSidebar?.gradeIdSelected){
+      url= `api/post/getallpostbyuserandgradepagination?userId=${user?.sub}&gradeId=${itemSidebar?.gradeIdSelected}&PageIndex=${page}&PageSize=${rows}`
+     
+    }else{
+      url= `api/post/getallpostbyuserpagination?userId=${user?.sub}&PageIndex=${page}&PageSize=${rows}`
+     
+    };
     restClient({
-      url: `api/post/getallpostbyuserpagination?userId=${user?.sub}&PageIndex=${page}&PageSize=${rows}`,
+      url: url,
+      method: "GET",
+    })
+      .then((res) => {
+        setPosts(Array.isArray(res.data.data) ? res.data.data : []);
+        const paginationData = JSON.parse(res.headers["x-pagination"]);
+        setTotalPage(paginationData.TotalPages);
+      })
+      .catch((err) => {
+        console.error("Error fetching data:", err);
+        setPosts([]);
+      })
+      .finally(() => setLoading(false));
+  };
+  const fetchDataByNotAnswer = () => {
+    setLoading(true);
+    restClient({
+      url: `api/post/getallpostnotanswerbygradepagination?gradeId=${itemSidebar?.gradeIdSelected}&PageIndex=${page}&PageSize=${rows}`,
       method: "GET",
     })
       .then((res) => {
@@ -130,9 +163,28 @@ export const PostProvider = ({ children }) => {
       .finally(() => setLoading(false));
   };
   const fetchDataById = () => {
+    console.log("fetchDataById");
     setLoading(true);
     restClient({
-      url: `api/post/getallpostbygradepagination?gradeId=${itemSidebar.itemSelected}&PageIndex=${page}&PageSize=${rows}`,
+      url: `api/post/getallpostbygradepagination?gradeId=${itemSidebar.gradeIdSelected}&PageIndex=${page}&PageSize=${rows}`,
+      method: "GET",
+    })
+      .then((res) => {
+        setPosts(Array.isArray(res.data.data) ? res.data.data : []);
+        const paginationData = JSON.parse(res.headers["x-pagination"]);
+        setTotalPage(paginationData.TotalPages);
+      })
+      .catch((err) => {
+        console.error("Error fetching data:", err);
+        setPosts([]);
+      })
+      .finally(() => setLoading(false));
+  };
+  
+  const fetchFavoriteByUserId = () => {
+    setLoading(true);
+    restClient({
+      url: `api/post/getallfavoritepostbyuserpagination?userId=${user?.sub}&PageIndex=${page}&PageSize=${rows}`,
       method: "GET",
     })
       .then((res) => {
@@ -222,6 +274,22 @@ export const PostProvider = ({ children }) => {
         setLoading(false);
       });
   };
+  const createFavoritePost = (postId) => {
+    // ?userId=1&postId=2
+    restClient({
+      url: `api/post/votefavoritepost?userId=${user?.sub}&postId=${postId}`,
+      method: "POST",
+    })
+      .then((res) => {
+        // SUCCESS(toast, "Thích bài post thành công");
+        setRefresh(new Date());
+        setLoading(false);
+      })
+      .catch((err) => {
+        REJECT(toast, err.message);
+        setLoading(false);
+      });
+  };
   const createPostComment = (contentPost, fetchPost) => {
     restClient({
       url: "api/postcomment/createpostcomment",
@@ -254,14 +322,13 @@ export const PostProvider = ({ children }) => {
         setLoading(false);
       });
   };
-  const createVoteComment = (id, fetchPost) => {
-    // ?commentId=46&userId=9418ea16-370b-44e2-910c-9f0d2f50be7f'
+  const createVoteComment = (id,isLike, fetchPost) => {
+    let text = isLike ? "thích" : "không thích";
     restClient({
-      url: `api/postcomment/votepostcomment?commentId=${id}`,
+      url: `api/postcomment/votepostcomment?commentId=${id}&userId=${user?.sub}`,
       method: "POST",
     })
       .then((res) => {
-        SUCCESS(toast, "Bạn đã vote thành công");
         fetchPost();
         setLoading(false);
       })
@@ -299,6 +366,7 @@ export const PostProvider = ({ children }) => {
         itemSidebar,
         setItemSidebar,
         onPageChange,
+
         totalPage,
         createPost,
         createPostComment,
@@ -309,6 +377,7 @@ export const PostProvider = ({ children }) => {
         deletePostComment,
         fetchPostCommentById,
         createPostNotification,
+        createFavoritePost
       }}
     >
       <Toast ref={toast} />

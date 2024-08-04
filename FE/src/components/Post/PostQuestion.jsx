@@ -1,12 +1,12 @@
-import React, { useContext, useEffect } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import image from "../../assets/img/image.png";
 import message from "../../assets/Icons/message2.png";
 import { Button } from "primereact/button";
 import { useSelector } from "react-redux";
 import PostContext from "../../store/PostContext";
-function PostQuestion({ post }) {
+function PostQuestion({ post, isFavoritePost }) {
   const user = useSelector((state) => state.user.value);
-  const { deletePost, checkUser, setItemSidebar } = useContext(PostContext);
+  const { deletePost, checkUser, setItemSidebar, createFavoritePost,createPostNotification } = useContext(PostContext);
   const {
     content,
     userName,
@@ -17,13 +17,31 @@ function PostQuestion({ post }) {
     userId,
     id,
     numberOfComment,
+    
   } = post;
-
+  const [isFavorite, setIsFavorite] = useState(isFavoritePost);
   let contentJsx = <div dangerouslySetInnerHTML={{ __html: content }} />;
   function responseAnswer() {
     if (checkUser()) {
       deletePost(id);
+      notifyPersonalResponse()
     }
+  }
+  function notifyPersonalResponse() {
+    /* solution: Where is the origin of action from ? 
+          - pass body in request :  */
+    const body = {
+      notificationType: 1,
+      userSendId: user?.sub,
+      userSendName: user?.name,
+      userReceiveId: user?.sub,
+      userReceiveName: user?.name,
+      description: `Bạn vừa thu hồi bài post thành công`,
+      notificationTime: new Date(),
+      isRead: false,
+      link: "string",
+    };
+    createPostNotification(body);
   }
   const formattedDate = new Date(createdDate).toLocaleString("vi-VN", {
     hour: "2-digit",
@@ -34,13 +52,20 @@ function PostQuestion({ post }) {
     year: "numeric",
   });
   function handleChooseGrade() {
-    setItemSidebar({
-      itemSelected: gradeId,
-    });
+   
+    setItemSidebar((preValue) => {
+      return {...preValue, gradeIdSelected: gradeId};
+    })
+
   }
+  function createFavoritePostEvent() {
+   setIsFavorite(preValue => !preValue)
+  createFavoritePost(id)
+  }
+  
   return (
     <div className="border-stone-200 border-b-2 ">
-      <div className="rounded p-5 flex flex-col gap-2">
+      <div className="rounded p-5 flex flex-col gap-3">
         <p className="flex justify-between items-center">
           <span className="flex gap-3">
             <span className="flex items-center">
@@ -60,10 +85,10 @@ function PostQuestion({ post }) {
             </span>
           </span>
 
-          <i
+          {/* <i
             className="pi pi-search"
             style={{ fontSize: "0.9 rem", color: "#708090" }}
-          ></i>
+          ></i> */}
         </p>
         <p className="text-xl">{contentJsx}</p>
         <p>
@@ -77,8 +102,9 @@ function PostQuestion({ post }) {
         </p>
         <p className="flex gap-4 mt-1 items-center">
           <i
+          onClick={createFavoritePostEvent}
             className="pi pi-bookmark"
-            style={{ fontSize: "1.2rem", color: "#708090" }}
+            style={{ fontSize: "1.2rem", color: !isFavorite ? "#708090" : "rgb(250, 165, 0)" }}
           ></i>
           {/* <i
             className="pi  pi-exclamation-triangle"

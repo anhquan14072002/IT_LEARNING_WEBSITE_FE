@@ -15,10 +15,11 @@ import restClient from "../../services/restClient";
 import PostContext from "../../store/PostContext";
 import image from "../../assets/img/image.png";
 import like from "../../assets/Icons/like.png";
+import likeBlue from "../../assets/Icons/likeBlue.png";
 import UncontrolledEditor from "../../shared/CustomEditorSecond";
 import LoadingScreen from "../LoadingScreen";
 import { InputText } from "primereact/inputtext";
-import { ACCEPT } from "../../utils";
+import { ACCEPT, containsRudeWords } from "../../utils";
 
 const validationSchema = Yup.object({
   content: Yup.string().required("Câu trả lời không được bỏ trống"),
@@ -32,24 +33,28 @@ const PostAnswer = ({ post }) => {
   const user = useSelector((state) => state.user.value);
   const { createPostComment, checkUser, refresh, createPostNotification } =
     useContext(PostContext);
-  const { id, userId, fullName } = post;
+  const { id, userId, fullName,numberOfComment } = post;
+  const [numberOfCommentFake, setNumberOfCommentFake] = useState(numberOfComment || 0)
   const toast = useRef(null);
 
   const fetchPost = useCallback(async () => {
-    setLoading(true);
-    setViewAnswer(true);
-    try {
-      const response = await restClient({
-        url: `api/postcomment/getallcommentbypostidpagination?postId=${id}`,
-        method: "GET",
-      });
-      setAnswers(response.data.data);
-    } catch {
-      setAnswers([]);
-    } finally {
-      setLoading(false);
+
+    if( numberOfCommentFake > 0){
+      setLoading(true);
+      setViewAnswer(true);
+      try {
+        const response = await restClient({
+          url: `api/postcomment/getallcommentbypostidpagination?postId=${id}`,
+          method: "GET",
+        });
+        setAnswers(response.data.data);
+      } catch {
+        setAnswers([]);
+      } finally {
+        setLoading(false);
+      }
     }
-  }, [refresh]);
+  }, [refresh, id, numberOfCommentFake]);
 
   useEffect(() => {
     fetchPost();
@@ -59,6 +64,7 @@ const PostAnswer = ({ post }) => {
     if (checkUser()) {
       const postComment = { content, postId: post?.id, userId: user?.sub };
       setIsChangeInput(false);
+      setNumberOfCommentFake(preValue => preValue + 1)
       await createPostComment(postComment, fetchPost);
       notifyPersonalResponse();
     }
@@ -123,6 +129,7 @@ const PostAnswer = ({ post }) => {
             likeCount={comment.correctVote || 0}
             post={post}
             checkUser={checkUser}
+            isVoteComment = {comment?.voteComments?.findIndex(e => e.userId === user?.sub) !== -1}
             postCommentChilds={comment?.postCommentChilds}
           />
         ))}
@@ -151,13 +158,17 @@ const Answer = ({
   userId,
   post,
   response,
+  isVoteComment,
   postCommentChilds,
   ...props
 }) => {
   const [loading, setLoading] = useState(false);
   const [isChangeInput, setIsChangeInput] = useState(false);
   const [isViewMore, setIsViewMore] = useState(false);
+  const [isLike, setIsLike] = useState(isVoteComment);
+ 
   const toast = useRef(null);
+
   const user = useSelector((state) => state.user.value);
   const {
     createVoteComment,
@@ -175,9 +186,12 @@ const Answer = ({
     year: "numeric",
   });
 
-  const voteComment = () => {
-    createVoteComment(id, fetchPost);
-    notifyPersonal(" đã thích bài viết của bạn");
+  const voteComment = (isLike) => {
+    setIsLike(preValue => !preValue)
+    createVoteComment(id, isLike, fetchPost);
+    if(user?.sub !== userId && !isLike){
+      notifyPersonalResponse(" đã thích bài viết của bạn");
+    }
   };
 
   const deleteAnswer = () => {
@@ -246,9 +260,10 @@ const Answer = ({
         <p className="flex items-center gap-3">
           <span
             className="flex items-center gap-2 cursor-pointer"
-            onClick={voteComment}
+            onClick={() => voteComment(isLike)}
           >
-            <img src={like} width="16" alt="Like" />
+           {isLike ? <img src={likeBlue} width="18" alt="Like" /> :  
+            <img src={  like} width="16" alt="Like" /> }
             <span> Đúng ({likeCount}) </span>
           </span>
 
@@ -329,6 +344,10 @@ const SendAnswer = forwardRef(function SendAnswer(
     if (content.trim() === "") {
       console.log(1234);
       ACCEPT(ref, "Bạn cần nhập nội dung câu trả lời ? ");
+      return;
+    }
+    if (containsRudeWords(content.trim())) {
+      ACCEPT(ref, "Câu hỏi của bạn chứa những từ không hợp lệ");
       return;
     }
     onSubmitAnswer(content);

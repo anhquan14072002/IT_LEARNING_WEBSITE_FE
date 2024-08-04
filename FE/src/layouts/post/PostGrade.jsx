@@ -1,9 +1,8 @@
 import React, { useContext, useEffect, useState } from "react";
-import LoadingScreen from "../LoadingScreen";
-import PostGradeItem from "./PostIGradetem";
+import LoadingScreen from "../../components/LoadingScreen";
+import PostGradeItem from "../../components/Post/PostIGradetem";
 import PostContext from "../../store/PostContext";
 import { getAllGrade } from "../../services/grade.api";
-import "./post.css";
 function PostGrade(props) {
   const { itemSidebar, setItemSidebar } = useContext(PostContext);
   const [loading, setLoading] = useState(true);
@@ -27,10 +26,10 @@ function PostGrade(props) {
                 <PostGradeItem
                   key={item.id}
                   item={item}
-                  active={itemSidebar.itemSelected === item.id}
+                  active={itemSidebar.gradeIdSelected === item.id}
                   onClick={() =>
                     setItemSidebar((preValue) => {
-                      return { itemSelected: item.id };
+                      return {...preValue, gradeIdSelected: item.id };
                     })
                   }
                 />
