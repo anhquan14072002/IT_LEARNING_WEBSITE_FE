@@ -9,7 +9,7 @@ import { CHECKMAIL, REJECT } from "../../utils";
 import { Toast } from "primereact/toast";
 import Menu from "../../components/Menu";
 import { InputText } from "primereact/inputtext";
-
+import { assets } from "../../assets/assets";
 const Index = () => {
   const toast= useRef(null)
   const [checked, setChecked] = useState(false);
@@ -73,7 +73,7 @@ const Index = () => {
         <div className="w-1/2">
           <div className="w-auto h-full">
             <img
-              src="src/assets/OIG4.jpg"
+              src={assets.image}
               alt=""
               className="w-full h-full"
             />
