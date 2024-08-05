@@ -32,7 +32,7 @@ export default function Quiz() {
     setLoading(true);
     try {
       const quizResponse = await restClient({
-        url: `api/quizquestion/getallquizquestionbyquizidpractice/${id}`,
+        url: `api/quizquestion/getallquizquestionbyquizid?QuizId=${id}`,
         method: "GET",
       });
       if (Array.isArray(quizResponse.data?.data)) {
