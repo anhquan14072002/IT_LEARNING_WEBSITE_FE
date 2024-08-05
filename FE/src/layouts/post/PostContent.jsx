@@ -42,7 +42,13 @@ function PostContent() {
 }
 
 function PostWrite({ setIsCompose }) {
-  const { createPost, loading, setLoading, createPostNotification, setRefresh } = useContext(PostContext);
+  const {
+    createPost,
+    loading,
+    setLoading,
+    createPostNotification,
+    setRefresh,
+  } = useContext(PostContext);
   const user = useSelector((state) => state.user.value);
   const toast = useRef(null);
   const [initialValues] = useState({ grade: {} });
@@ -74,7 +80,7 @@ function PostWrite({ setIsCompose }) {
       userId: user?.sub,
       gradeId: values.grade?.id,
     };
-    notifyPersonalResponse()
+    notifyPersonalResponse();
     createPost(descriptionPost);
     setIsCompose(false);
   };
@@ -116,7 +122,7 @@ function PostWrite({ setIsCompose }) {
         >
           {(formik) => (
             <Form className="flex flex-col">
-              <div className="w-80">
+              <div className="w-80 ">
                 <CustomDropdownInSearch
                   isNotRequired
                   title="Chọn Lớp"
@@ -135,14 +141,17 @@ function PostWrite({ setIsCompose }) {
               </div>
               <div className="flex justify-end gap-2 mt-[3rem]">
                 <Button
-                  className="p-2 bg-red-500 text-white"
+                  className="px-3 border-2 hover:bg-gray-100 "
                   type="button"
                   severity="danger"
                   onClick={() => setIsCompose(false)}
                 >
                   Hủy
                 </Button>
-                <Button className="p-2 bg-blue-500 text-white" type="submit">
+                <Button
+                  className="p-2 bg-blue-600 hover:bg-blue-500 text-white font-bold"
+                  type="submit"
+                >
                   Tạo bài đăng
                 </Button>
               </div>

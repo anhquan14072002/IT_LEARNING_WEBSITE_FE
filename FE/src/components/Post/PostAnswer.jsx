@@ -33,38 +33,46 @@ const PostAnswer = ({ post }) => {
   const user = useSelector((state) => state.user.value);
   const { createPostComment, checkUser, refresh, createPostNotification } =
     useContext(PostContext);
-  const { id, userId, fullName,numberOfComment } = post;
-  const [numberOfCommentFake, setNumberOfCommentFake] = useState(numberOfComment || 0)
+  const { id, userId, fullName, numberOfComment } = post;
+  const [numberOfCommentFake, setNumberOfCommentFake] =
+    useState(numberOfComment);
   const toast = useRef(null);
+  const [visibleCount, setVisibleCount] = useState(3);
 
+  const handleLoadMore = () => {
+    setVisibleCount((prevCount) => Math.min(prevCount + 3, answers.length));
+  };
   const fetchPost = useCallback(async () => {
-
-    if( numberOfCommentFake > 0){
-      setLoading(true);
-      setViewAnswer(true);
-      try {
-        const response = await restClient({
-          url: `api/postcomment/getallcommentbypostidpagination?postId=${id}`,
-          method: "GET",
-        });
-        setAnswers(response.data.data);
-      } catch {
-        setAnswers([]);
-      } finally {
-        setLoading(false);
-      }
+    // console.log(numberOfCommentFake);
+    // console.log(numberOfComment);
+    // setTimeout(async () => {
+    // if (numberOfComment > 0) {
+    setLoading(true);
+    setViewAnswer(true);
+    try {
+      const response = await restClient({
+        url: `api/postcomment/getallcommentbypostidpagination?postId=${id}`,
+        method: "GET",
+      });
+      setAnswers(response.data.data);
+    } catch {
+      setAnswers([]);
+    } finally {
+      setLoading(false);
     }
+    // }
+    // }, 1000);
   }, [refresh, id, numberOfCommentFake]);
 
   useEffect(() => {
     fetchPost();
-  }, [fetchPost, refresh]);
+  }, [fetchPost]);
 
   const onSubmitAnswer = async (content) => {
     if (checkUser()) {
       const postComment = { content, postId: post?.id, userId: user?.sub };
       setIsChangeInput(false);
-      setNumberOfCommentFake(preValue => preValue + 1)
+      setNumberOfCommentFake((preValue) => preValue + 1);
       await createPostComment(postComment, fetchPost);
       notifyPersonalResponse();
     }
@@ -74,7 +82,7 @@ const PostAnswer = ({ post }) => {
     /* solution: Where is the origin of action from ? 
           - pass body in request :  */
     const body = {
-      notificationType: 2,
+      notificationType: 1,
       userSendId: user?.sub,
       userSendName: user?.name,
       userReceiveId: userId,
@@ -116,7 +124,7 @@ const PostAnswer = ({ post }) => {
             ref={toast}
           />
         )}
-        {answers.map((comment) => (
+        {answers.slice(0, visibleCount).map((comment) => (
           <Answer
             key={comment.id}
             id={comment.id}
@@ -126,18 +134,24 @@ const PostAnswer = ({ post }) => {
             createdDate={comment.createdDate}
             content={comment.content}
             fetchPost={fetchPost}
-            likeCount={comment.correctVote || 0}
+            likeCount={comment.correctVote}
             post={post}
             checkUser={checkUser}
-            isVoteComment = {comment?.voteComments?.findIndex(e => e.userId === user?.sub) !== -1}
+            isVoteComment={
+              comment?.voteComments?.findIndex(
+                (e) => e.userId === user?.sub
+              ) !== -1
+            }
             postCommentChilds={comment?.postCommentChilds}
           />
         ))}
-        {answers.length > 0 && (
+
+        {visibleCount < answers.length && (
           <Button
             label="Xem thêm câu trả lời"
             text
             raised
+            onClick={handleLoadMore}
             className="w-full bg-blue-600 text-white p-2 text-sm font-normal"
           />
         )}
@@ -166,7 +180,7 @@ const Answer = ({
   const [isChangeInput, setIsChangeInput] = useState(false);
   const [isViewMore, setIsViewMore] = useState(false);
   const [isLike, setIsLike] = useState(isVoteComment);
- 
+
   const toast = useRef(null);
 
   const user = useSelector((state) => state.user.value);
@@ -187,9 +201,9 @@ const Answer = ({
   });
 
   const voteComment = (isLike) => {
-    setIsLike(preValue => !preValue)
+    setIsLike((preValue) => !preValue);
     createVoteComment(id, isLike, fetchPost);
-    if(user?.sub !== userId && !isLike){
+    if (user?.sub !== userId && !isLike) {
       notifyPersonalResponse(" đã thích bài viết của bạn");
     }
   };
@@ -201,6 +215,7 @@ const Answer = ({
   };
   const responseAnswer = () => {
     if (checkUser()) {
+      // setIsViewMore(true);
       setIsChangeInput(true);
     }
   };
@@ -262,8 +277,11 @@ const Answer = ({
             className="flex items-center gap-2 cursor-pointer"
             onClick={() => voteComment(isLike)}
           >
-           {isLike ? <img src={likeBlue} width="18" alt="Like" /> :  
-            <img src={  like} width="16" alt="Like" /> }
+            {isLike ? (
+              <img src={likeBlue} width="18" alt="Like" />
+            ) : (
+              <img src={like} width="16" alt="Like" />
+            )}
             <span> Đúng ({likeCount}) </span>
           </span>
 
@@ -361,8 +379,8 @@ const SendAnswer = forwardRef(function SendAnswer(
       ) : (
         <Formik initialValues={{}} validationSchema={validationSchema}>
           {() => (
-            <Form>
-              <div className="flex">
+            <Form className="flex flex-col">
+              <div className="flex ">
                 <span>
                   <img
                     src={user?.picture || image}
@@ -378,14 +396,16 @@ const SendAnswer = forwardRef(function SendAnswer(
               </div>
               <div className="flex justify-end gap-2 mt-12">
                 <Button
-                  className="p-2 bg-red-500 text-white"
+                  className="px-3 border-2 hover:bg-gray-100 "
                   type="button"
+                  severity="danger"
                   onClick={() => setIsChangeInput(false)}
                 >
                   Hủy
                 </Button>
                 <Button
-                  className="p-2 bg-blue-500 text-white"
+                  className="p-2 bg-blue-600 hover:bg-blue-500 text-white font-bold"
+                  type="submit"
                   onClick={onSubmit}
                 >
                   Gửi câu trả lời

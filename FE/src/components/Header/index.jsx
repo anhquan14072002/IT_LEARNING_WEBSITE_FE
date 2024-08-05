@@ -17,16 +17,7 @@ import { addUser, retmoveUser } from "../../redux/userr/userSlice";
 import { Menu } from "primereact/menu";
 import { NotificationContext } from "../../store/NotificationContext";
 import image from "../../assets/img/image.png";
-const tabsData = [
-  {
-    label: " Tất cả",
-    content: "Hello ",
-  },
-  {
-    label: "Chưa đọc",
-    content: "Hello ",
-  },
-];
+
 export default function Header({ params, setParams, textSearchProps }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -42,10 +33,13 @@ export default function Header({ params, setParams, textSearchProps }) {
     fetchListNotificationByUserId,
     markallasreadasync,
     deleteallnotificationbyuser,
+    setRows,
+    setTabIndex,
+    activeTabIndex,
   } = useContext(NotificationContext);
   const [showNotifications, setShowNotifications] = useState(false);
   const [showOptionNotifications, setShowOptionNotifications] = useState(false);
-  const [activeTabIndex, setActiveTabIndex] = useState(0);
+  // const [activeTabIndex, setActiveTabIndex] = useState(0);
 
   const handleLogout = () => {
     dispatch(retmoveUser());
@@ -137,6 +131,20 @@ export default function Header({ params, setParams, textSearchProps }) {
   const toggleMenu = () => {
     setMenuOpen(!menuOpen);
   };
+  const tabsData = [
+    {
+      label: " Tất cả",
+      content: (
+        <NotificationList notifications={notifications} setRows={setRows} />
+      ),
+    },
+    {
+      label: "Chưa đọc",
+      content: (
+        <NotificationList notifications={notifications} setRows={setRows} />
+      ),
+    },
+  ];
 
   return (
     <>
@@ -244,14 +252,14 @@ export default function Header({ params, setParams, textSearchProps }) {
                             style={{ fontSize: "0.9 rem", color: "#708090" }}
                           ></i>
                           {showOptionNotifications && (
-                            <div className="absolute top-10 -right-4 min-w-72  bg-white shadow-lg rounded-lg border border-gray-200">
+                            <div className="absolute top-10 -right-4 min-w-60  bg-white shadow-lg rounded-lg border border-gray-200">
                               <table className="w-full mt-1">
                                 <tbody>
                                   {options.length > 0 ? (
                                     options.map((notification) => (
                                       <tr
                                         key={notification.id}
-                                        className="hover:bg-stone-100 "
+                                        className="hover:bg-stone-100 cursor-pointer "
                                         onClick={notification.action}
                                       >
                                         <td className="p-2 text-center hover:bg-stone-100 rounded-l-lg">
@@ -285,8 +293,8 @@ export default function Header({ params, setParams, textSearchProps }) {
                         </span>
                       </div>
 
-                      <div className="px-3 overflow-auto h-96">
-                        <ul className="flex flex-wrap text-sm font-medium text-center text-gray-500  dark:text-gray-400">
+                      <div className="px-3 overflow-auto max-h-[58vh] ">
+                        <ul className="flex flex-wrap text-sm font-medium text-center text-gray-500  dark:text-gray-400 ">
                           {tabsData.map((tab, idx) => (
                             <li key={idx} className="me-2">
                               <a
@@ -298,7 +306,7 @@ export default function Header({ params, setParams, textSearchProps }) {
                                 }`}
                                 onClick={(e) => {
                                   e.preventDefault();
-                                  setActiveTabIndex(idx);
+                                  setTabIndex(idx);
                                 }}
                                 tabindex={idx === activeTabIndex ? "0" : "-1"}
                                 aria-selected={idx === activeTabIndex}
@@ -308,59 +316,23 @@ export default function Header({ params, setParams, textSearchProps }) {
                             </li>
                           ))}
                         </ul>
-                        <table className="w-full mt-1 ">
-                          <tbody>
-                            {notifications.length > 0 ? (
-                              notifications.map((notification) => (
-                                <tr
-                                  key={notification.id}
-                                  className="hover:bg-stone-100"
-                                >
-                                  <td className="p-2 text-center hover:bg-stone-100 rounded-l-lg">
-                                    <img
-                                      src={notification.userSendImage || image}
-                                      alt="Ảnh người dùng"
-                                      width="40px"
-                                      className="rounded-full"
-                                      onError={(e) => (e.target.src = image)}
-                                    />
-                                    {/* <img
-                                      className="h-[40px] w-[40px] rounded-full"
-                                      src={notification.userSendImage || image}
-                                    /> */}
-                                  </td>
-                                  <td
-                                    className={`p-2 hover:bg-stone-100 rounded-r-lg ${
-                                      notification.isRead ? "text-red-500" : ""
-                                    }`}
-                                  >
-                                    {notification.description}
-                                  </td>
-                                </tr>
-                              ))
-                            ) : (
-                              <tr>
-                                <td
-                                  colSpan="2"
-                                  className="p-2 text-center text-gray-500"
-                                >
-                                  No notifications
-                                </td>
-                              </tr>
+                        {tabsData[activeTabIndex].content}
+                        <p className="pb-1">
+                          {" "}
+                          {notifications.length >= 6 &&
+                            notifications.length < numberOfNotification && (
+                              <Button
+                                label="Xem thêm thông báo trước đó"
+                                text
+                                raised
+                                onClick={() =>
+                                  setRows((preValue) => preValue + 6)
+                                }
+                                className="w-full  bg-stone-100  hover:bg-stone-100 text-stone-600 p-2 text-sm font-normal"
+                              />
                             )}
-                          </tbody>
-                        </table>
+                        </p>
                       </div>
-                      <p className="pt-2 flex justify-center">
-                        {notifications.length > 0 && (
-                          <Button
-                            label="Xem thêm thông báo trước đó"
-                            text
-                            raised
-                            className="w-64 bg-stone-200 absolute bottom-2  hover:bg-stone-100 text-stone-700 p-2 text-sm font-normal"
-                          />
-                        )}
-                      </p>
                     </div>
                   )}
                 </div>
@@ -411,5 +383,47 @@ export default function Header({ params, setParams, textSearchProps }) {
         </div>
       </div>
     </>
+  );
+}
+
+function NotificationList({ notifications }) {
+  return (
+    <table className="w-full mt-1 ">
+      <tbody>
+        {notifications.length > 0 ? (
+          notifications.map((notification) => (
+            <tr key={notification.id} className="hover:bg-stone-100">
+              <td className="p-2 text-center hover:bg-stone-100 rounded-l-lg">
+                <img
+                  src={notification?.userSendImage || image}
+                  alt="Ảnh người dùng"
+                  width="40px"
+                  className="rounded-full"
+                  onError={(e) => (e.target.src = image)}
+                />
+                {console.log(notification?.userSendImage)}
+                {/* <img
+                className="h-[40px] w-[40px] rounded-full"
+                src={notification.userSendImage || image}
+              /> */}
+              </td>
+              <td
+                className={`p-2 hover:bg-stone-100 rounded-r-lg ${
+                  notification.isRead ? "text-gray-500" : ""
+                }`}
+              >
+                {notification.description}
+              </td>
+            </tr>
+          ))
+        ) : (
+          <tr>
+            <td colSpan="2" className="p-2 text-center text-gray-500">
+              Chưa có thông báo nào
+            </td>
+          </tr>
+        )}
+      </tbody>
+    </table>
   );
 }

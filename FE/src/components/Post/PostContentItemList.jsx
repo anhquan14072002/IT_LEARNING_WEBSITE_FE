@@ -18,7 +18,7 @@ function PostContentItemList() {
             className="border-stone-200 border-2 flex flex-col rounded"
             key={post.id}
           >
-            <PostQuestion post={post} isFavoritePost={post?.favoritePosts?.findIndex(e => e?.userId === user?.sub) !== -1} />
+            <PostQuestion post={post} />
             <PostAnswer post={post} />
           </div>
         ))

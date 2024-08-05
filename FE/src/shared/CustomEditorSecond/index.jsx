@@ -17,6 +17,7 @@ const UncontrolledEditor = ({ onChange }) => {
       onChange={handleChange}
       modules={editorModules}
       theme="snow"
+      className="h-36"
     />
   );
 };

@@ -9,7 +9,8 @@ export default function NotifyProvider({ children }) {
   const [notifications, setNotifications] = useState([]);
   const [refresh, setRefresh] = useState();
   const user = useSelector((state) => state.user.value);
-
+  const [rows, setRows] = useState(6);
+  const [activeTabIndex, setTabIndex] = useState(0);
   const fetchNumberNotificationByUserId = useCallback(() => {
     if (user?.sub) {
       restClient({
@@ -23,11 +24,11 @@ export default function NotifyProvider({ children }) {
           console.error("Error fetching data:", err);
         });
     }
-  }, [user]);
+  }, [user, refresh]);
   const fetchListNotificationByUserId = useCallback(() => {
     if (user?.sub) {
       restClient({
-        url: `api/notifications/getallnotificationbyuser/${user?.sub}`,
+        url: `api/notifications/getallnotificationbyuser/${user?.sub}?PageIndex=1&PageSize=${rows}`,
         method: "GET",
       })
         .then((res) => {
@@ -38,12 +39,12 @@ export default function NotifyProvider({ children }) {
           console.error("Error fetching data:", err);
         });
     }
-  }, [user?.sub, refresh]);
-  const deleteallnotificationbyuser = useCallback(() => {
+  }, [user?.sub, refresh, rows]);
+  const fetchListNotificationNotRead = useCallback(() => {
     if (user?.sub) {
       restClient({
-        url: `api/notifications/deleteallnotificationbyuser/${user?.sub}`,
-        method: "DELETE",
+        url: `api/notifications/getallnotificationnotreadbyuser?userId=${user?.sub}&PageIndex=1&PageSize=${rows}`,
+        method: "GET",
       })
         .then((res) => {
           setNotifications(res.data.data);
@@ -53,10 +54,23 @@ export default function NotifyProvider({ children }) {
           console.error("Error fetching data:", err);
         });
     }
+  }, [user?.sub, refresh, rows]);
+  const deleteallnotificationbyuser = useCallback(() => {
+    if (user?.sub) {
+      restClient({
+        url: `api/notifications/deleteallnotificationbyuser/${user?.sub}`,
+        method: "DELETE",
+      })
+        .then((res) => {
+          setNotifications(res.data.data);
+          setRefresh(new Date());
+          console.log(res.data.data);
+        })
+        .catch((err) => {
+          console.error("Error fetching data:", err);
+        });
+    }
   }, [user?.sub, refresh]);
-  async function success() {
-    setRefresh(new Date());
-  }
   const markallasreadasync = () => {
     if (user?.sub) {
       restClient({
@@ -64,7 +78,7 @@ export default function NotifyProvider({ children }) {
         method: "POST",
       })
         .then((res) => {
-          success();
+          setRefresh(new Date());
         })
         .catch((err) => {
           console.error("Error fetching data:", err);
@@ -75,8 +89,12 @@ export default function NotifyProvider({ children }) {
     fetchNumberNotificationByUserId();
   }, [fetchNumberNotificationByUserId]);
   useEffect(() => {
-    fetchListNotificationByUserId();
-  }, [fetchListNotificationByUserId]);
+    if (activeTabIndex === 0) {
+      fetchListNotificationByUserId();
+    } else {
+      fetchListNotificationNotRead();
+    }
+  }, [fetchListNotificationByUserId, activeTabIndex]);
   return (
     <NotificationContext.Provider
       value={{
@@ -86,6 +104,10 @@ export default function NotifyProvider({ children }) {
         notifications,
         markallasreadasync,
         deleteallnotificationbyuser,
+        fetchListNotificationNotRead,
+        setRows,
+        setTabIndex,
+        activeTabIndex,
       }}
     >
       {children}

@@ -223,7 +223,7 @@ export const PostProvider = ({ children }) => {
       method: "DELETE",
     })
       .then((res) => {
-        SUCCESS(toast, "Thu hôi bài post thành công");
+        // SUCCESS(toast, "Thu hôi bài post thành công");
         setRefresh(new Date());
       })
       .catch((err) => {
@@ -268,7 +268,7 @@ export const PostProvider = ({ children }) => {
     })
       .then((res) => {
         // SUCCESS(toast, "Tạo bài post thành công");
-        setRefresh(new Date());
+        // setRefresh(new Date());
         setLoading(false);
       })
       .catch((err) => {
@@ -276,6 +276,7 @@ export const PostProvider = ({ children }) => {
         setLoading(false);
       });
   };
+
   const createFavoritePost = (postId) => {
     // ?userId=1&postId=2
     restClient({
@@ -300,8 +301,8 @@ export const PostProvider = ({ children }) => {
     })
       .then((res) => {
         SUCCESS(toast, "Bình luận bài đăng thành công");
-        fetchPost();
         setLoading(false);
+        fetchPost();
       })
       .catch((err) => {
         REJECT(toast, err.message);
