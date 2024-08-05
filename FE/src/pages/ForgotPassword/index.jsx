@@ -5,6 +5,8 @@ import Header from "../../components/Header";
 import { useLocation } from "react-router-dom";
 import {  resetPassword } from "../../services/authenService";
 import { InputText } from "primereact/inputtext";
+import { assets } from "../../assets/assets";
+
 function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
@@ -39,7 +41,7 @@ const index = () => {
       <div className="flex h-screen">
         <div className="w-1/2">
           <div className="w-auto h-full">
-          <img src="src/assets/OIG4.jpg" alt="" className="w-full h-full" />
+          <img   src={assets.image} alt="" className="w-full h-full" />
           </div>
         </div>
 
