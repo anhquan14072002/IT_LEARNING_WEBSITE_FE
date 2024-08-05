@@ -27,12 +27,14 @@ export default function Header({ params, setParams, textSearchProps }) {
     navigate('/login')
   }
 
+
   const items = [
     {
       items: [
         {
           label: "Quản lí",
           icon: "pi pi-chart-bar",
+          command: (e) => navigate('/dashboard/static'),
         },
         {
           label: "Đăng xuất",
