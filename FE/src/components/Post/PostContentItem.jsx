@@ -10,13 +10,13 @@ const tabsData = [
     content: <PostContentItemList />,
   },
   {
-    label: " Câu hỏi hay",
-  
-      content:<PostContentItemList goodQuestion={true} />,
+    label: " Câu hỏi ưa thích",
+
+    content: <PostContentItemList goodQuestion={true} />,
   },
   {
     label: "Chưa trả lời",
-    content:<PostContentItemList notAnswer={true} />,
+    content: <PostContentItemList notAnswer={true} />,
   },
   {
     label: "Câu hỏi của tôi",
@@ -43,22 +43,27 @@ function PostContentItem(props) {
               onClick={(e) => {
                 e.preventDefault();
                 if (idx === 0) {
-                  setItemSidebar( (preValue) => {
-                    return {gradeIdSelected: undefined,  itemTab: undefined,};
+                  setItemSidebar((preValue) => {
+                    return { gradeIdSelected: undefined, itemTab: undefined };
                   });
                 } else if (idx === 3) {
-                  setItemSidebar(preValue => {return {gradeIdSelected: undefined,
-                    itemTab: "myQuestion",
-                  }});
-              
+                  setItemSidebar((preValue) => {
+                    return {
+                      gradeIdSelected: undefined,
+                      itemTab: "myQuestion",
+                    };
+                  });
                 } else if (idx === 2) {
-                  setItemSidebar(preValue => {return {gradeIdSelected: undefined,
-                    itemTab: "notAnswer",
-                  }});
-                }else if (idx === 1) {
-                  setItemSidebar(preValue => {return {gradeIdSelected: undefined,
-                    itemTab: "goodQuestion",
-                  }});
+                  setItemSidebar((preValue) => {
+                    return { gradeIdSelected: undefined, itemTab: "notAnswer" };
+                  });
+                } else if (idx === 1) {
+                  setItemSidebar((preValue) => {
+                    return {
+                      gradeIdSelected: undefined,
+                      itemTab: "goodQuestion",
+                    };
+                  });
                 }
                 setActiveTabIndex(idx);
               }}

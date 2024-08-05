@@ -10,6 +10,7 @@ import { Tooltip } from "primereact/tooltip";
 import ManageExam from "../../components/ManageExam";
 import ManageTag from "../../components/ManageTag";
 import { useNavigate, useParams } from "react-router-dom";
+import NotifyProvider from "../../store/NotificationContext";
 
 const Dashboard = () => {
   const [open, setOpen] = useState(true);
@@ -20,7 +21,11 @@ const Dashboard = () => {
   const Menus = [
     { title: "Thống kê", src: "Chart_fill", index: "statistic" },
     { title: "Quản lí tài khoản", src: "User", index: "user" },
-    { title: "Quản lí tài liệu/chủ đề/bài học ", src: "Folder", index: "adminManageDocument" },
+    {
+      title: "Quản lí tài liệu/chủ đề/bài học ",
+      src: "Folder",
+      index: "adminManageDocument",
+    },
     { title: "Quản lí bài học ", src: "Folder", index: "lesson" },
     { title: "Quản lí câu hỏi ôn tập ", src: "Folder", index: "quiz" },
     { title: "Quản lí đề thi", src: "Folder", index: "test" },
@@ -32,7 +37,7 @@ const Dashboard = () => {
       {loading ? (
         <LoadingScreen setLoading={setLoading} />
       ) : (
-        <>
+        <NotifyProvider>
           <div className="fixed top-0 w-full z-30">
             <Header />
           </div>
@@ -67,9 +72,16 @@ const Dashboard = () => {
                       navigate(`/dashboard/${Menu.index}`);
                     }}
                   >
-                    <Tooltip target={`menu-${Menu.index}`} content={Menu.title} />
+                    <Tooltip
+                      target={`menu-${Menu.index}`}
+                      content={Menu.title}
+                    />
                     <img src={`/src/assets/${Menu.src}.png`} alt={Menu.title} />
-                    <span className={`${!open ? "hidden" : ""} origin-left duration-200`}>
+                    <span
+                      className={`${
+                        !open ? "hidden" : ""
+                      } origin-left duration-200`}
+                    >
                       {Menu.title}
                     </span>
                   </li>
@@ -86,7 +98,7 @@ const Dashboard = () => {
               {typeId === "tag" && <ManageTag />}
             </div>
           </div>
-        </>
+        </NotifyProvider>
       )}
     </>
   );

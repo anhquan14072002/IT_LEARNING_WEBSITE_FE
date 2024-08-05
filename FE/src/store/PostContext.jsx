@@ -32,6 +32,7 @@ export const PostProvider = ({ children }) => {
   });
   const toast = useRef(null);
   const [refresh, setRefresh] = useState();
+  const [refresh2, setRefresh2] = useState();
   const [conn, setConnection] = useState();
   const [isConnect, setIsConnect] = useState(false);
   const [listNotification, setListNotification] = useState(false);
@@ -51,6 +52,7 @@ export const PostProvider = ({ children }) => {
         conn.on("ReceivedNotification", (message) => {
           // SUCCESS(toast, message);
           setRefresh(new Date());
+          setRefresh2(new Date());
           fetchNumberNotificationByUserId();
         });
 
@@ -58,6 +60,7 @@ export const PostProvider = ({ children }) => {
           "ReceivedPersonalNotification",
           (message, userReceiveId, userSendId) => {
             setRefresh(new Date());
+            setRefresh2(new Date());
             if (userReceiveId !== userSendId) {
               fetchNumberNotificationByUserId();
             }
@@ -75,7 +78,7 @@ export const PostProvider = ({ children }) => {
 
         await conn.invoke("SaveUserConnection", user?.sub);
 
-        console.log(conn); // Logging the connection object
+        // console.log(conn); // Logging the connection object
       } catch (error) {
         console.error("Connection failed: ", error);
       }
@@ -108,7 +111,6 @@ export const PostProvider = ({ children }) => {
       });
   };
   useEffect(() => {
-    console.log("refresh nhé ");
     if (
       itemSidebar.itemTab === undefined &&
       itemSidebar.gradeIdSelected === undefined
@@ -123,10 +125,12 @@ export const PostProvider = ({ children }) => {
     } else if (itemSidebar.gradeIdSelected !== undefined) {
       fetchDataById();
     }
-  }, [page, rows, itemSidebar.itemTab, itemSidebar.gradeIdSelected, refresh]);
+  }, [page, rows, itemSidebar.itemTab, itemSidebar.gradeIdSelected, refresh2]);
   const fetchDataByUserId = () => {
     setLoading(true);
     let url;
+    console.log(itemSidebar?.gradeIdSelected);
+
     if (itemSidebar?.gradeIdSelected) {
       url = `api/post/getallpostbyuserandgradepagination?userId=${user?.sub}&gradeId=${itemSidebar?.gradeIdSelected}&PageIndex=${page}&PageSize=${rows}`;
     } else {
@@ -149,6 +153,12 @@ export const PostProvider = ({ children }) => {
   };
   const fetchDataByNotAnswer = () => {
     setLoading(true);
+    let url;
+    if (itemSidebar?.gradeIdSelected) {
+      url = `api/post/getallpostnotanswerbygradepagination?gradeId=${itemSidebar?.gradeIdSelected}&PageIndex=${page}&PageSize=${rows}`;
+    } else {
+      url = `api/post/getallpostbyuserpagination?userId=${user?.sub}&PageIndex=${page}&PageSize=${rows}`;
+    }
     restClient({
       url: `api/post/getallpostnotanswerbygradepagination?gradeId=${itemSidebar?.gradeIdSelected}&PageIndex=${page}&PageSize=${rows}`,
       method: "GET",
@@ -224,7 +234,7 @@ export const PostProvider = ({ children }) => {
     })
       .then((res) => {
         // SUCCESS(toast, "Thu hôi bài post thành công");
-        setRefresh(new Date());
+        setRefresh2(new Date());
       })
       .catch((err) => {
         REJECT(toast, "Xảy ra lỗi khi xóa đề thi này");
@@ -260,6 +270,7 @@ export const PostProvider = ({ children }) => {
       })
       .finally(() => setLoading(false));
   };
+
   const createPost = (contentPost) => {
     restClient({
       url: "api/post/createpost",
@@ -268,7 +279,7 @@ export const PostProvider = ({ children }) => {
     })
       .then((res) => {
         // SUCCESS(toast, "Tạo bài post thành công");
-        // setRefresh(new Date());
+        setRefresh2(new Date());
         setLoading(false);
       })
       .catch((err) => {
@@ -285,7 +296,7 @@ export const PostProvider = ({ children }) => {
     })
       .then((res) => {
         // SUCCESS(toast, "Thích bài post thành công");
-        setRefresh(new Date());
+        setRefresh2(new Date());
         setLoading(false);
       })
       .catch((err) => {

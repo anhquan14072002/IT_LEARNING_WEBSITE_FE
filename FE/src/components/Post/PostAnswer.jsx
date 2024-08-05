@@ -203,7 +203,7 @@ const Answer = ({
   const voteComment = (isLike) => {
     setIsLike((preValue) => !preValue);
     createVoteComment(id, isLike, fetchPost);
-    if (user?.sub !== userId && !isLike) {
+    if (user?.sub !== userId) {
       notifyPersonalResponse(" đã thích bài viết của bạn");
     }
   };
@@ -338,6 +338,11 @@ const Answer = ({
               post={post}
               checkUser={checkUser}
               postCommentChilds={comment?.postCommentChilds}
+              isVoteComment={
+                comment?.voteComments?.findIndex(
+                  (e) => e.userId === user?.sub
+                ) !== -1
+              }
               response={false}
               className="ml-9"
             />
