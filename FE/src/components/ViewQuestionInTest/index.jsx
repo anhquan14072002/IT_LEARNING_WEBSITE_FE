@@ -183,6 +183,16 @@ const ViewQuestionInTest = ({ quizData, quizDetail }) => {
     return <QuizResult totalQuestions={quizData.length} quizData={quizData} />;
   }
 
+  useEffect(()=>{
+    console.log('====================================');
+    console.log("answer::",quizData?.map((question,index)=>{
+      console.log('====================================');
+      console.log("answer::",question?.quizAnswers);
+      console.log('====================================');
+    }));
+    console.log('====================================');
+  },[])
+
   return (
     <div className="flex justify-center flex-wrap" id="question">
       {/* Question Box */}
