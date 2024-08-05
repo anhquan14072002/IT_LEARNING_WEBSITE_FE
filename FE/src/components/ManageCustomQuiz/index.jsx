@@ -323,6 +323,12 @@ export default function ManageCustomQuiz() {
                   style={{ minWidth: '15rem' }}
                 />
                 <Column
+                  field="type"
+                  header="Thể loại"
+                  className="border-b-2 border-t-2"
+                  style={{ minWidth: '15rem' }}
+                />
+                <Column
                   header="Trạng thái"
                   className="border-b-2 border-t-2"
                   body={status}

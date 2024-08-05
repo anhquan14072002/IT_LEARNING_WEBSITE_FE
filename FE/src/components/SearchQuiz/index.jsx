@@ -7,14 +7,12 @@ import CustomCard from "../../components/CustomCard";
 import { Paginator } from "primereact/paginator";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
-import "./index.css";
 import { Dropdown } from "primereact/dropdown";
 import { useSearchParams, useLocation, useNavigate } from "react-router-dom";
-import debounce from "lodash.debounce";
-import Loading from "../../components/Loading";
 import restClient from "../../services/restClient";
+import CustomQuiz from "../../components/CustomQuiz";
 
-export default function Search() {
+export default function SearchQuiz() {
   const footerRef = useRef(null);
   const fixedDivRef = useRef(null);
   const dropDownRef1 = useRef(null);
@@ -28,9 +26,6 @@ export default function Search() {
   //document
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [classId, setClassId] = useState(
-    Object.fromEntries(params.entries()).classId || ""
-  );
   const [textSearch, setTextSearch] = useState(
     Object.fromEntries(params.entries()).text || ""
   );
@@ -41,7 +36,7 @@ export default function Search() {
   const [rows, setRows] = useState(10);
   const [totalPage, setTotalPage] = useState(0);
 
-  const cities = [{ name: "Bộ câu hỏi", code: "searchQuiz" }];
+  const cities = [{ name: "Tài liệu", code: "search" }];
 
   useEffect(() => {
     if (params) {
@@ -49,7 +44,6 @@ export default function Search() {
         Object.fromEntries(params.entries()).text || ""
       );
       setTextSearch(decodedText);
-      setClassId(Object.fromEntries(params.entries()).classId || "");
     }
   }, [params]);
 
@@ -101,17 +95,13 @@ export default function Search() {
     });
   };
 
-  const handleOnChange =(e)=>{
-    navigate(`/${e?.value?.code}?text=${textSearch}`)
-  }
-
   //pagination and search
   useEffect(() => {
     fetchData();
-  }, [page, rows, textSearch, classId]);
+  }, [page, rows, textSearch]);
 
   const fetchData = () => {
-    let url = "api/document/searchbydocumentpagination?";
+    let url = "api/quiz/getallquizpagination?";
     const params = new URLSearchParams();
 
     if (textSearch) {
@@ -124,10 +114,6 @@ export default function Search() {
 
     if (rows) {
       params.append("PageSize", rows.toString());
-    }
-
-    if (classId) {
-      params.append("GradeId", classId);
     }
 
     url += params.toString();
@@ -156,6 +142,10 @@ export default function Search() {
     setFirst(first);
   };
 
+  const handleOnChange =(e)=>{
+    navigate(`/${e?.value?.code}?text=${textSearch}`)
+  }
+
   return (
     <>
       <div className="min-h-screen">
@@ -172,11 +162,6 @@ export default function Search() {
           style={{ paddingTop: `${fixedDivHeight}px` }}
           className="flex gap-5"
         >
-          <CategoryOfClass
-            display={isFooterVisible}
-            params={params}
-            setParams={setParams}
-          />
           <div className="flex-1 w-[98%] pt-5">
             <div className="m-4 mb-10 flex flex-wrap items-center">
               <div className="border-2 rounded-md p-2">
@@ -221,8 +206,8 @@ export default function Search() {
                     onChange={handleOnChange}
                     options={cities}
                     optionLabel="name"
-                    showClear={false}
-                    placeholder="Tài liệu"
+                    showClear
+                    placeholder="Bộ câu hỏi"
                     className="w-full md:w-14rem shadow-none h-full"
                   />
                 </div>
@@ -245,7 +230,7 @@ export default function Search() {
             <div className="flex flex-wrap justify-start">
               {products &&
                 products?.map((p, index) => {
-                  return <CustomCard document={p} key={index} />;
+                  return <CustomQuiz document={p} key={index} />;
                 })}
             </div>
 

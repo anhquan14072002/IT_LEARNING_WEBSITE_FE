@@ -24,6 +24,7 @@ import ViewExam from './pages/ViewExam';
 import ExampleAddQuizQuestion from './components/ExampleAddQuizQuestion';
 import CodeEditor from './pages/CodeEditor';
 import CreateProblem from './components/CreateProblem';
+import SearchQuiz from './components/SearchQuiz';
 
 
 function App() {
@@ -35,11 +36,12 @@ function App() {
         <Route path="/loginAdmin" element={<LoginAdmin />} />
         <Route path="/dashboard/:typeId" element={<Dashboard />} />
         <Route path="/search" element={<Search />} />
+        <Route path="/searchQuiz" element={<SearchQuiz />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
         <Route path="/document/:id" element={<Document />} />
         <Route path="/topic/:id" element={<Topic />} />
-        <Route path="/quiz/:id" element={<Quiz />} />
+        {/* <Route path="/quiz/:id" element={<Quiz />} /> */}
         <Route path="/testquiz/:id" element={<TestQuizPage />} />
         <Route path="/document/lesson/:id" element={<Lesson />} />
         <Route path="/flashcard/:id" element={<FlashCard />} />

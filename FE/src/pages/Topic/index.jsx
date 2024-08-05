@@ -212,13 +212,13 @@ export default function Topic() {
                     className="flex items-center bg-blue-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
-                    Previous
+                    Trang trước
                   </button>
                   <button
                     className="flex items-center bg-blue-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
                     onClick={handleNext}
                   >
-                    Next
+                    Trang sau
                     <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
                   </button>
                 </div>
