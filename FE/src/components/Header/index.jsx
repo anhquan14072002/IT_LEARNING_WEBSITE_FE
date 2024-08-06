@@ -34,7 +34,7 @@ export default function Header({ params, setParams, textSearchProps }) {
         {
           label: "Quản lí",
           icon: "pi pi-chart-bar",
-          command: (e) => navigate('/dashboard/static'),
+          command: (e) => navigate('/dashboard/statistic'),
         },
         {
           label: "Đăng xuất",
