@@ -34,6 +34,12 @@ const Dashboard = () => {
     { title: "Quản lí bài thực hành",  src:assets.folder, index: "codeeditor" },
   ];
 
+  useEffect(()=>{
+     if(!Menus.some((item,index)=> item.index === typeId)){
+      navigate("/notfound")
+     }
+  },[])
+
   return (
     <>
       {loading ? (
