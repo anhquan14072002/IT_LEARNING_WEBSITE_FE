@@ -3,7 +3,10 @@ import "./index.css";
 
 const Footer = forwardRef((props, ref) => {
   return (
-    <div ref={ref} className="bg-[#F0FCFF] text-[#1976D2] p-12 h-auto mt-auto z-20">
+    <div
+      ref={ref}
+      className="bg-[#F0FCFF] text-[#1976D2] p-12 h-auto mt-auto z-20"
+    >
       <h1 className="font-semibold text-xl text-center mb-10">Liên hệ</h1>
       <div className="flex items-center justify-center flex-wrap gap-20">
         <div className="flex items-center gap-2">

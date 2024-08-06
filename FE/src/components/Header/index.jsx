@@ -7,25 +7,28 @@ import { Tooltip } from "primereact/tooltip";
 import { useNavigate, useLocation } from "react-router-dom"; // Import useLocation
 import { Button } from "primereact/button";
 import { useDispatch, useSelector } from "react-redux";
-import { decodeToken, getTokenFromLocalStorage, isLoggedIn, logout } from "../../utils";
+import {
+  decodeToken,
+  getTokenFromLocalStorage,
+  isLoggedIn,
+  logout,
+} from "../../utils";
 import { addUser, retmoveUser } from "../../redux/userr/userSlice";
-import { Menu } from 'primereact/menu';
+import { Menu } from "primereact/menu";
 
 export default function Header({ params, setParams, textSearchProps }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const [textSearch, setTextSearch] = useState(textSearchProps || '');
-  const [menuOpen, setMenuOpen] = useState(false); // State to track menu open/close
+  const [textSearch, setTextSearch] = useState(textSearchProps || "");
   const user = useSelector((state) => state.user.value);
   const dispatch = useDispatch();
-  const menuLeft = useRef(null);
   const menuRight = useRef(null);
 
-  const handleLogout = () =>{
-    dispatch(retmoveUser())
-    logout()
-    navigate('/login')
-  }
+  const handleLogout = () => {
+    dispatch(retmoveUser());
+    logout();
+    navigate("/login");
+  };
 
   const items = [
     {
@@ -44,7 +47,7 @@ export default function Header({ params, setParams, textSearchProps }) {
   ];
 
   useEffect(() => {
-    console.log("picture::",user.picture);
+    console.log("picture::", user.picture);
     console.log("Running useEffect");
     console.log("User state:", user);
 
@@ -53,7 +56,7 @@ export default function Header({ params, setParams, textSearchProps }) {
       try {
         const token = getTokenFromLocalStorage();
         const decodedToken = decodeToken(token);
-        
+
         dispatch(addUser(decodedToken));
       } catch (error) {
         console.error("Error decoding token:", error);
@@ -176,7 +179,7 @@ export default function Header({ params, setParams, textSearchProps }) {
                   <div className="ml-2 flex items-center">
                     <img
                       className="h-[40px] w-[40px] rounded-full"
-                      src={user?.picture}
+                      src={user?.picture} 
                     />
                     <Menu
                       model={items}
