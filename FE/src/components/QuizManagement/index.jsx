@@ -19,7 +19,7 @@ export default function QuizManagement() {
           })}
           onClick={() => setNavIndex(1)}
         >
-          Bộ câu hỏi
+          Bộ đề
         </h1>
         <h1
           className={classNames("p-5 cursor-pointer hover:bg-[#D1F7FF]", {

@@ -18,6 +18,7 @@ import { Menu } from "primereact/menu";
 import { NotificationContext } from "../../store/NotificationContext";
 import image from "../../assets/img/image.png";
 
+
 export default function Header({ params, setParams, textSearchProps }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -25,7 +26,6 @@ export default function Header({ params, setParams, textSearchProps }) {
   const [menuOpen, setMenuOpen] = useState(false); // State to track menu open/close
   const user = useSelector((state) => state.user.value);
   const dispatch = useDispatch();
-  const menuLeft = useRef(null);
   const menuRight = useRef(null);
   const {
     numberOfNotification = 0,
@@ -340,7 +340,7 @@ export default function Header({ params, setParams, textSearchProps }) {
                   <div className="ml-2 flex items-center">
                     <img
                       className="h-[40px] w-[40px] rounded-full"
-                      src={user?.picture}
+                      src={user?.picture} 
                     />
                     <Menu
                       model={items}
