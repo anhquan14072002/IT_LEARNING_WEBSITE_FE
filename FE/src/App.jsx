@@ -25,6 +25,7 @@ import ExampleAddQuizQuestion from './components/ExampleAddQuizQuestion';
 import CodeEditor from './pages/CodeEditor';
 import CreateProblem from './components/CreateProblem';
 import SearchQuiz from './components/SearchQuiz';
+import NotFound from './pages/NotFound';
 
 
 function App() {
@@ -55,6 +56,7 @@ function App() {
         <Route path="/dashboard/quiz/managequestionofquizlist/:id" element={<ManageQuestionOfQuizlist />}/>
         <Route path="/dashboard/quiz/addquestionofquizlist/:id" element={<AddQuestionOfQuizlist/>}/>
         <Route path="/viewexam" element={<ViewExam />} />
+        <Route path="*" element={<NotFound />} />
         <Route path="/exampleAddQuizQuestion" element={<ExampleAddQuizQuestion />} />
         <Route path="/codeEditor/:id" element={<CodeEditor />} />
         <Route path="/dashboard/createproblem" element={<CreateProblem />} />
