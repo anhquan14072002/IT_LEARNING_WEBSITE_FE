@@ -9,6 +9,7 @@ import { CHECKMAIL, REJECT } from "../../utils";
 import { Toast } from "primereact/toast";
 import Menu from "../../components/Menu";
 import { InputText } from "primereact/inputtext";
+import NotifyProvider from "../../store/NotificationContext";
 
 const Index = () => {
   const toast= useRef(null)
@@ -66,6 +67,7 @@ const Index = () => {
   };
 
   return (
+    <NotifyProvider>
     <div className="min-h-screen ">
       <Header />
       <Menu />
@@ -229,6 +231,7 @@ const Index = () => {
       </div>
       <Toast ref={toast}/>
     </div>
+    </NotifyProvider>
   );
 };
 

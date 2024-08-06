@@ -11,7 +11,8 @@ import ManageExam from "../../components/ManageExam";
 import ManageTag from "../../components/ManageTag";
 import ManageAccount from "../../components/ManageAccount";
 import { useNavigate, useParams } from "react-router-dom";
-import ManageCodeOnline from "../../components/ManageCodeOnline"
+import NotifyProvider from "../../store/NotificationContext";
+import ManageCodeOnline from "../../components/ManageCodeOnline";
 
 const Dashboard = () => {
   const [open, setOpen] = useState(true);
@@ -22,7 +23,11 @@ const Dashboard = () => {
   const Menus = [
     { title: "Thống kê", src: "Chart_fill", index: "statistic" },
     { title: "Quản lí tài khoản", src: "User", index: "user" },
-    { title: "Quản lí tài liệu/chủ đề/bài học ", src: "Folder", index: "adminManageDocument" },
+    {
+      title: "Quản lí tài liệu/chủ đề/bài học ",
+      src: "Folder",
+      index: "adminManageDocument",
+    },
     { title: "Quản lí bài học ", src: "Folder", index: "lesson" },
     { title: "Quản lí câu hỏi ôn tập ", src: "Folder", index: "quiz" },
     { title: "Quản lí đề thi", src: "Folder", index: "test" },
@@ -30,18 +35,18 @@ const Dashboard = () => {
     { title: "Quản lí bài thực hành", src: "Folder", index: "codeeditor" },
   ];
 
-  useEffect(()=>{
-     if(!Menus.some((item,index)=> item.index === typeId)){
-      navigate("/notfound")
-     }
-  },[])
+  useEffect(() => {
+    if (!Menus.some((item, index) => item.index === typeId)) {
+      navigate("/notfound");
+    }
+  }, []);
 
   return (
     <>
       {loading ? (
         <LoadingScreen setLoading={setLoading} />
       ) : (
-        <>
+        <NotifyProvider>
           <div className="fixed top-0 w-full z-30">
             <Header />
           </div>
@@ -76,9 +81,16 @@ const Dashboard = () => {
                       navigate(`/dashboard/${Menu.index}`);
                     }}
                   >
-                    <Tooltip target={`menu-${Menu.index}`} content={Menu.title} />
+                    <Tooltip
+                      target={`menu-${Menu.index}`}
+                      content={Menu.title}
+                    />
                     <img src={`/src/assets/${Menu.src}.png`} alt={Menu.title} />
-                    <span className={`${!open ? "hidden" : ""} origin-left duration-200`}>
+                    <span
+                      className={`${
+                        !open ? "hidden" : ""
+                      } origin-left duration-200`}
+                    >
                       {Menu.title}
                     </span>
                   </li>
@@ -88,7 +100,7 @@ const Dashboard = () => {
           </div>
           <div className="ml-20 mt-16 p-7">
             <div className="h-screen">
-            {typeId === "user" && <ManageAccount />}
+              {typeId === "user" && <ManageAccount />}
               {typeId === "adminManageDocument" && <ManageDocument />}
               {typeId === "lesson" && <ContentLesson />}
               {typeId === "quiz" && <QuizManagement />}
@@ -97,7 +109,7 @@ const Dashboard = () => {
               {typeId === "codeeditor" && <ManageCodeOnline />}
             </div>
           </div>
-        </>
+        </NotifyProvider>
       )}
     </>
   );

@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import avatar from "../../assets/img/icons8-male-user-50.png";
 import logo from "../../assets/app-logo.svg";
 import arrowDown from "../../assets/img/icons8-sort-down-50.png";
@@ -7,25 +7,45 @@ import { Tooltip } from "primereact/tooltip";
 import { useNavigate, useLocation } from "react-router-dom"; // Import useLocation
 import { Button } from "primereact/button";
 import { useDispatch, useSelector } from "react-redux";
-import { decodeToken, getTokenFromLocalStorage, isLoggedIn, logout } from "../../utils";
+import {
+  decodeToken,
+  getTokenFromLocalStorage,
+  isLoggedIn,
+  logout,
+} from "../../utils";
 import { addUser, retmoveUser } from "../../redux/userr/userSlice";
-import { Menu } from 'primereact/menu';
+import { Menu } from "primereact/menu";
+import { NotificationContext } from "../../store/NotificationContext";
+import image from "../../assets/img/image.png";
 
 export default function Header({ params, setParams, textSearchProps }) {
   const navigate = useNavigate();
   const location = useLocation();
-  const [textSearch, setTextSearch] = useState(textSearchProps || '');
+  const [textSearch, setTextSearch] = useState(textSearchProps || "");
   const [menuOpen, setMenuOpen] = useState(false); // State to track menu open/close
   const user = useSelector((state) => state.user.value);
   const dispatch = useDispatch();
   const menuLeft = useRef(null);
   const menuRight = useRef(null);
+  const {
+    numberOfNotification = 0,
+    notifications,
+    fetchListNotificationByUserId,
+    markallasreadasync,
+    deleteallnotificationbyuser,
+    setRows,
+    setTabIndex,
+    activeTabIndex,
+  } = useContext(NotificationContext);
+  const [showNotifications, setShowNotifications] = useState(false);
+  const [showOptionNotifications, setShowOptionNotifications] = useState(false);
+  // const [activeTabIndex, setActiveTabIndex] = useState(0);
 
-  const handleLogout = () =>{
-    dispatch(retmoveUser())
-    logout()
-    navigate('/login')
-  }
+  const handleLogout = () => {
+    dispatch(retmoveUser());
+    logout();
+    navigate("/login");
+  };
 
   const items = [
     {
@@ -42,33 +62,55 @@ export default function Header({ params, setParams, textSearchProps }) {
       ],
     },
   ];
-
+  const fakeNotifications = [
+    { id: 1, message: "You have a new message from John Doe." },
+    { id: 2, message: "Your order #1234 has been shipped." },
+    { id: 3, message: "Reminder: Your subscription expires tomorrow." },
+    { id: 4, message: "New comment on your post." },
+  ];
+  const options = [
+    {
+      id: 1,
+      message: "Đánh dấu tất cả đã đọc",
+      icon: "pi pi-check",
+      action: handleOption1,
+    },
+    {
+      id: 2,
+      message: "Xóa tất cả thông báo",
+      icon: "pi pi-delete-left",
+      action: handleOption2,
+    },
+  ];
   useEffect(() => {
-    console.log("picture::",user.picture);
-    console.log("Running useEffect");
-    console.log("User state:", user);
-
     if (!user || Object.keys(user).length === 0) {
       console.log("User is empty or not initialized");
       try {
         const token = getTokenFromLocalStorage();
         const decodedToken = decodeToken(token);
-        
+
         dispatch(addUser(decodedToken));
       } catch (error) {
         console.error("Error decoding token:", error);
         dispatch(retmoveUser());
       }
     }
-  }, []); // Add user to the dependency array to monitor changes
+  }, []);
+  function handleOption1() {
+    markallasreadasync();
+  }
+  function handleOption2() {
+    deleteallnotificationbyuser();
+  }
+  // Add user to the dependency array to monitor changes
+  const handleBellClick = () => {
+    setShowNotifications(!showNotifications);
+    fetchListNotificationByUserId();
+  };
 
   const handleKeyDown = (e) => {
     const trimmedText = e.target.value.trim();
     const encodedText = encodeURIComponent(trimmedText);
-    console.log("====================================");
-    console.log(location.pathname);
-    console.log("====================================");
-
     if (e.key === "Enter") {
       if (location.pathname === "/search") {
         setParams({
@@ -86,16 +128,34 @@ export default function Header({ params, setParams, textSearchProps }) {
     setTextSearch("");
   }, [textSearchProps]);
 
+  const toggleMenu = () => {
+    setMenuOpen(!menuOpen);
+  };
+  const tabsData = [
+    {
+      label: " Tất cả",
+      content: (
+        <NotificationList notifications={notifications} setRows={setRows} />
+      ),
+    },
+    {
+      label: "Chưa đọc",
+      content: (
+        <NotificationList notifications={notifications} setRows={setRows} />
+      ),
+    },
+  ];
+
   return (
     <>
       <div className="w-full">
         <div className="bg-[#1976D2] flex justify-between py-4 px-16">
           <div className="flex items-center">
-            <img
-              className="h-[50px] w-[50px] cursor-pointer"
-              src={logo}
-              onClick={() => navigate("/")}
-            />
+            {/* <img
+                className="h-[50px] w-[50px] cursor-pointer"
+                src={logo}
+                onClick={() => navigate("/")}
+              /> */}
           </div>
           <div className="flex">
             <div className="border border-white rounded-3xl flex items-center px-2.5 py-2 gap-2.5">
@@ -140,8 +200,13 @@ export default function Header({ params, setParams, textSearchProps }) {
 
             {/* login */}
             {isLoggedIn() && (
-              <div className="ml-10 flex items-center gap-5 my-auto">
-                <div>
+              <div className="ml-10 flex items-center gap-3 my-auto">
+                <div class="relative inline-flex items-center ">
+                  {numberOfNotification > 0 && (
+                    <span class="absolute top-2 right-1 transform translate-x-1/2 -translate-y-1/2 bg-red-500 text-white text-xs font-bold rounded-full px-1.5 py-0.5">
+                      {numberOfNotification}
+                    </span>
+                  )}
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
                     x="0px"
@@ -150,6 +215,7 @@ export default function Header({ params, setParams, textSearchProps }) {
                     height="30"
                     viewBox="0, 0, 300, 150"
                     className="fill-white"
+                    onClick={handleBellClick}
                   >
                     <g
                       fillRule="nonzero"
@@ -171,6 +237,104 @@ export default function Header({ params, setParams, textSearchProps }) {
                       </g>
                     </g>
                   </svg>
+                  {showNotifications && (
+                    <div className="absolute top-10 z-10 -right-16 min-w-72 pb-3 bg-white shadow-lg rounded-lg border border-gray-200 ">
+                      <div className="p-4 font-bold text-xl flex justify-between items-center ">
+                        <span>Thông báo</span>
+                        <span
+                          className="relative inline-flex items-center"
+                          onClick={() =>
+                            setShowOptionNotifications((preValue) => !preValue)
+                          }
+                        >
+                          <i
+                            className="pi pi-ellipsis-v hover:bg-stone-200 hover: p-1 rounded-3xl"
+                            style={{ fontSize: "0.9 rem", color: "#708090" }}
+                          ></i>
+                          {showOptionNotifications && (
+                            <div className="absolute top-10 -right-4 min-w-60  bg-white shadow-lg rounded-lg border border-gray-200">
+                              <table className="w-full mt-1">
+                                <tbody>
+                                  {options.length > 0 ? (
+                                    options.map((notification) => (
+                                      <tr
+                                        key={notification.id}
+                                        className="hover:bg-stone-100 cursor-pointer "
+                                        onClick={notification.action}
+                                      >
+                                        <td className="p-2 text-center hover:bg-stone-100 rounded-l-lg">
+                                          <i
+                                            className={notification.icon}
+                                            style={{
+                                              fontSize: "0.9 rem",
+                                              color: "#708090",
+                                            }}
+                                          ></i>
+                                        </td>
+                                        <td className="p-2 hover:bg-stone-100 rounded-r-lg text-sm ">
+                                          {notification.message}
+                                        </td>
+                                      </tr>
+                                    ))
+                                  ) : (
+                                    <tr>
+                                      <td
+                                        colSpan="2"
+                                        className="p-2 text-center text-gray-500"
+                                      >
+                                        No notifications
+                                      </td>
+                                    </tr>
+                                  )}
+                                </tbody>
+                              </table>
+                            </div>
+                          )}
+                        </span>
+                      </div>
+
+                      <div className="px-3 overflow-auto max-h-[58vh] ">
+                        <ul className="flex flex-wrap text-sm font-medium text-center text-gray-500  dark:text-gray-400 ">
+                          {tabsData.map((tab, idx) => (
+                            <li key={idx} className="me-2">
+                              <a
+                                href="#"
+                                className={`inline-block p-3 rounded-lg ${
+                                  idx === activeTabIndex
+                                    ? "text-blue-600 font-bold bg-gray-100 active dark:bg-gray-800 dark:text-blue-500"
+                                    : "hover:text-gray-600 hover:bg-gray-50 dark:hover:bg-gray-800 dark:hover:text-gray-300"
+                                }`}
+                                onClick={(e) => {
+                                  e.preventDefault();
+                                  setTabIndex(idx);
+                                }}
+                                tabindex={idx === activeTabIndex ? "0" : "-1"}
+                                aria-selected={idx === activeTabIndex}
+                              >
+                                {tab.label}
+                              </a>
+                            </li>
+                          ))}
+                        </ul>
+                        {tabsData[activeTabIndex].content}
+                        <p className="pb-1">
+                          {" "}
+                          {notifications.length >= 6 &&
+                            notifications.length < numberOfNotification && (
+                              <Button
+                                label="Xem thêm thông báo trước đó"
+                                text
+                                raised
+                                onClick={() =>
+                                  setRows((preValue) => preValue + 6)
+                                }
+                                className="w-full  bg-stone-100  hover:bg-stone-100 text-stone-600 p-2 text-sm font-normal"
+                              />
+                            )}
+                        </p>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div>
                   <div className="ml-2 flex items-center">
@@ -219,5 +383,47 @@ export default function Header({ params, setParams, textSearchProps }) {
         </div>
       </div>
     </>
+  );
+}
+
+function NotificationList({ notifications }) {
+  return (
+    <table className="w-full mt-1 ">
+      <tbody>
+        {notifications.length > 0 ? (
+          notifications.map((notification) => (
+            <tr key={notification.id} className="hover:bg-stone-100">
+              <td className="p-2 text-center hover:bg-stone-100 rounded-l-lg">
+                <img
+                  src={notification?.userSendImage || image}
+                  alt="Ảnh người dùng"
+                  width="40px"
+                  className="rounded-full"
+                  onError={(e) => (e.target.src = image)}
+                />
+                {console.log(notification?.userSendImage)}
+                {/* <img
+                className="h-[40px] w-[40px] rounded-full"
+                src={notification.userSendImage || image}
+              /> */}
+              </td>
+              <td
+                className={`p-2 hover:bg-stone-100 rounded-r-lg ${
+                  notification.isRead ? "text-gray-500" : ""
+                }`}
+              >
+                {notification.description}
+              </td>
+            </tr>
+          ))
+        ) : (
+          <tr>
+            <td colSpan="2" className="p-2 text-center text-gray-500">
+              Chưa có thông báo nào
+            </td>
+          </tr>
+        )}
+      </tbody>
+    </table>
   );
 }
