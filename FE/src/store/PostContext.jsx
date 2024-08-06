@@ -157,10 +157,10 @@ export const PostProvider = ({ children }) => {
     if (itemSidebar?.gradeIdSelected) {
       url = `api/post/getallpostnotanswerbygradepagination?gradeId=${itemSidebar?.gradeIdSelected}&PageIndex=${page}&PageSize=${rows}`;
     } else {
-      url = `api/post/getallpostbyuserpagination?userId=${user?.sub}&PageIndex=${page}&PageSize=${rows}`;
+      url = `api/post/getallpostnotanswerbygradepagination?gradeId=0&PageIndex=${page}&PageSize=${rows}`;
     }
     restClient({
-      url: `api/post/getallpostnotanswerbygradepagination?gradeId=${itemSidebar?.gradeIdSelected}&PageIndex=${page}&PageSize=${rows}`,
+      url: url,
       method: "GET",
     })
       .then((res) => {
