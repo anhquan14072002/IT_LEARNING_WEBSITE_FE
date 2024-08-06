@@ -19,7 +19,7 @@ import likeBlue from "../../assets/Icons/likeBlue.png";
 import UncontrolledEditor from "../../shared/CustomEditorSecond";
 import LoadingScreen from "../LoadingScreen";
 import { InputText } from "primereact/inputtext";
-import { ACCEPT, containsRudeWords } from "../../utils";
+import { ACCEPT, containsRudeWords, isLoggedIn } from "../../utils";
 
 const validationSchema = Yup.object({
   content: Yup.string().required("Câu trả lời không được bỏ trống"),
@@ -152,7 +152,7 @@ const PostAnswer = ({ post }) => {
             text
             raised
             onClick={handleLoadMore}
-            className="w-full bg-blue-600 text-white p-2 text-sm font-normal"
+            className="w-full bg-blue-600 text-white p-2 text-sm font-bold"
           />
         )}
       </div>
@@ -189,6 +189,8 @@ const Answer = ({
     createResponseAnswer,
     deletePostComment,
     createPostNotification,
+    fetchPostCommentById,
+    // postCommentChilds,
   } = useContext(PostContext);
 
   const formattedDate = new Date(createdDate).toLocaleString("vi-VN", {
@@ -201,10 +203,12 @@ const Answer = ({
   });
 
   const voteComment = (isLike) => {
-    setIsLike((preValue) => !preValue);
-    createVoteComment(id, isLike, fetchPost);
-    if (user?.sub !== userId) {
-      notifyPersonalResponse(" đã thích bài viết của bạn");
+    if (checkUser()) {
+      setIsLike((preValue) => !preValue);
+      createVoteComment(id, isLike, fetchPost);
+      if (user?.sub !== userId) {
+        notifyPersonalResponse(" đã thích bài viết của bạn");
+      }
     }
   };
 
@@ -277,7 +281,7 @@ const Answer = ({
             className="flex items-center gap-2 cursor-pointer"
             onClick={() => voteComment(isLike)}
           >
-            {isLike ? (
+            {isLike && isLoggedIn() ? (
               <img src={likeBlue} width="18" alt="Like" />
             ) : (
               <img src={like} width="16" alt="Like" />
@@ -285,31 +289,34 @@ const Answer = ({
             <span> Đúng ({likeCount}) </span>
           </span>
 
-          {response != false && (
+          {/* {response != false && (
             <span>
               <a onClick={responseAnswer} className="cursor-pointer">
                 Phản hồi
               </a>
             </span>
-          )}
+          )} */}
 
-          {userId === user?.sub && (
+          {userId === user?.sub && isLoggedIn() && (
             <span>
               <a className="cursor-pointer" onClick={deleteAnswer}>
                 Thu hồi
               </a>
             </span>
           )}
-          {postCommentChilds?.length > 0 && (
+          {/* {postCommentChilds?.length > 0 && (
             <span>
               <a
                 className="cursor-pointer"
-                onClick={() => setIsViewMore((preValue) => !preValue)}
+                onClick={() => {
+                  setIsViewMore((preValue) => !preValue);
+                  fetchPostCommentById(id);
+                }}
               >
                 {!isViewMore ? " Xem thêm phản hồi" : "Thu gọn phản hồi"}
               </a>
             </span>
-          )}
+          )} */}
         </p>
         {isChangeInput && (
           <SendAnswer
@@ -322,7 +329,7 @@ const Answer = ({
           />
         )}
 
-        {isViewMore &&
+        {/* {isViewMore &&
           postCommentChilds?.length > 0 &&
           postCommentChilds.map((comment) => (
             <Answer
@@ -346,7 +353,7 @@ const Answer = ({
               response={false}
               className="ml-9"
             />
-          ))}
+          ))} */}
       </div>
     </div>
   );

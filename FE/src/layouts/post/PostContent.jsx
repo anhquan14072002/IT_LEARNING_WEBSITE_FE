@@ -9,10 +9,10 @@ import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
 import LoadingScreen from "../../components/LoadingScreen";
 import UncontrolledEditor from "../../shared/CustomEditorSecond";
 import PostContext from "../../store/PostContext";
-import { ACCEPT, containsRudeWords } from "../../utils";
+import { ACCEPT, containsRudeWords, isLoggedIn } from "../../utils";
 import "../../shared/CustomDropdown/index.css";
 import { getAllGrade } from "../../services/grade.api";
-
+import image from "../../assets/img/image.png";
 const validationSchema = Yup.object({
   grade: Yup.object()
     .test("is-not-empty", "Không được để trống trường này", (value) => {
@@ -26,7 +26,7 @@ function PostContent() {
 
   return (
     <div
-      className="w-[80%] mt-4 h-screen flex flex-col gap-5 flex-grow "
+      className="w-[80%] mt-4  flex flex-col gap-5 flex-grow "
       // className="w-[80%] mt-4 h-screen flex flex-col gap-5 flex-grow ml-[18%]"
     >
       {!isCompose ? (
@@ -70,7 +70,7 @@ function PostWrite({ setIsCompose }) {
       ACCEPT(toast, "Câu hỏi của bạn chứa những từ không hợp lệ");
       return;
     }
-    if (!user?.sub) {
+    if (!isLoggedIn()) {
       ACCEPT(toast, "Bạn chưa đăng nhập?");
       return;
     }
@@ -171,7 +171,7 @@ function ComposeComment({ ...props }) {
       {...props}
     >
       <p className="flex gap-3 items-center">
-        {user?.picture ? (
+        {isLoggedIn() ? (
           <span className="flex items-center">
             <img
               src={user?.picture}
@@ -181,10 +181,18 @@ function ComposeComment({ ...props }) {
             />
           </span>
         ) : (
-          <i className="pi pi-user" style={{ color: "slateblue" }}></i>
+          // <i className="pi pi-user" style={{ color: "slateblue" }}></i>
+          <span className="flex items-center">
+            <img
+              src={image}
+              alt="Ảnh người dùng"
+              width="30px"
+              style={{ borderRadius: "25px" }}
+            />
+          </span>
         )}
 
-        <span className="font-bold">{user?.name ?? "Khách"}</span>
+        <span className="font-bold">{isLoggedIn() ? user?.name : "Khách"}</span>
       </p>
       <p className="text-stone-500">Hãy nhập câu hỏi của bạn vào đây</p>
     </header>
