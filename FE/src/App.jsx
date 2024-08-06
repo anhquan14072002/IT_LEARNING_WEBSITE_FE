@@ -18,6 +18,12 @@ import TestQuizPage from "./pages/TestQuizPage";
 import ExamCodeDetail from "./pages/ExamCodeDetail";
 import ExamDetail from "./pages/ExamDetail";
 import ExamResult from "./pages/ExamResult";
+import ImportQuiz from "./pages/Quiz/ImportQuiz";
+import ImportStepOne from "./components/Quiz/ImportStepOne";
+import ImportStepTwo from "./components/Quiz/ImportStepTwo";
+import ImportStepThree from "./components/Quiz/ImportStepThree";
+import Post from "./pages/Post/Post";
+import ManageQuestionQuiz from "./components/ManageQuestionQuiz";
 import ManageQuestionOfQuizlist from "./pages/ManageQuestionOfQuizlist";
 import AddQuestionOfQuizlist from "./pages/AddQuestionOfQuizlist";
 import ViewExam from "./pages/ViewExam";
@@ -33,11 +39,18 @@ function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/loginAdmin" element={<LoginAdmin />} />
+        <Route path="/importQuiz" element={<ImportQuiz />}>
+          <Route path="stepOne" element={<ImportStepOne />} />
+          <Route path="stepTwo" element={<ImportStepTwo />} />
+          <Route path="stepThree" element={<ImportStepThree />} />
+        </Route>
         <Route path="/dashboard/:typeId" element={<Dashboard />} />
+        <Route path="/question/:quizId" element={<ManageQuestionQuiz />} />
         <Route path="/search" element={<Search />} />
         <Route path="/searchQuiz" element={<SearchQuiz />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/post" element={<Post />} />
         <Route path="/document/:id" element={<Document />} />
         <Route path="/topic/:id" element={<Topic />} />
         {/* <Route path="/quiz/:id" element={<Quiz />} /> */}

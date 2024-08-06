@@ -1,5 +1,6 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
+import "../init.js";
 import App from "./App.jsx";
 import "./index.css";
 import { PrimeReactProvider } from "primereact/api";

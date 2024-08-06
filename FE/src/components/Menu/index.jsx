@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react";
 import Loading from "../Loading";
 import restClient from "../../services/restClient";
+import { Link } from "react-router-dom";
 
 function Menu() {
   const [listClast, setListClass] = useState([]);
   const [loading, setLoading] = useState(false);
-
   useEffect(() => {
     setLoading(true);
     restClient({
@@ -48,7 +48,7 @@ function Menu() {
               </div>
             ))}
           <div className="p-2 flex items-center justify-center cursor-pointer hover:bg-[#D1F7FF] flex-1">
-            Hỏi bài
+           <Link to="/post"> Hỏi bài</Link>
           </div>
           <div className="p-2 flex items-center justify-center cursor-pointer hover:bg-[#D1F7FF] flex-1">
             Thực hành
