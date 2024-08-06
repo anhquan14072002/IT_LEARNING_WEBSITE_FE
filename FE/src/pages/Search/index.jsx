@@ -9,7 +9,7 @@ import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import "./index.css";
 import { Dropdown } from "primereact/dropdown";
-import { useSearchParams, useLocation } from "react-router-dom";
+import { useSearchParams, useLocation, useNavigate } from "react-router-dom";
 import debounce from "lodash.debounce";
 import Loading from "../../components/Loading";
 import restClient from "../../services/restClient";
@@ -23,13 +23,17 @@ export default function Search() {
   const [isFooterVisible, setIsFooterVisible] = useState(false);
   const [selectedCity, setSelectedCity] = useState(null);
   const [params, setParams] = useSearchParams();
+  const navigate = useNavigate()
 
   //document
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [classId, setClassId] = useState(Object.fromEntries(params.entries()).classId || "");
-  const [textSearch, setTextSearch] = useState(Object.fromEntries(params.entries()).text || "");
-
+  const [classId, setClassId] = useState(
+    Object.fromEntries(params.entries()).classId || ""
+  );
+  const [textSearch, setTextSearch] = useState(
+    Object.fromEntries(params.entries()).text || ""
+  );
 
   //pagination
   const [first, setFirst] = useState(0);
@@ -37,13 +41,7 @@ export default function Search() {
   const [rows, setRows] = useState(10);
   const [totalPage, setTotalPage] = useState(0);
 
-  const cities = [
-    { name: "New York", code: "NY" },
-    { name: "Rome", code: "RM" },
-    { name: "London", code: "LDN" },
-    { name: "Istanbul", code: "IST" },
-    { name: "Paris", code: "PRS" },
-  ];
+  const cities = [{ name: "Bộ câu hỏi", code: "searchQuiz" }];
 
   useEffect(() => {
     if (params) {
@@ -103,50 +101,53 @@ export default function Search() {
     });
   };
 
+  const handleOnChange =(e)=>{
+    navigate(`/${e?.value?.code}?text=${textSearch}`)
+  }
+
   //pagination and search
   useEffect(() => {
     fetchData();
   }, [page, rows, textSearch, classId]);
 
   const fetchData = () => {
-    let url = 'api/document/searchbydocumentpagination?';
+    let url = "api/document/searchbydocumentpagination?";
     const params = new URLSearchParams();
-  
+
     if (textSearch) {
-      params.append('Value', decodeURIComponent(textSearch));
+      params.append("Value", decodeURIComponent(textSearch));
     }
-  
+
     if (page) {
-      params.append('PageIndex', page.toString());
+      params.append("PageIndex", page.toString());
     }
-  
+
     if (rows) {
-      params.append('PageSize', rows.toString());
+      params.append("PageSize", rows.toString());
     }
-  
+
     if (classId) {
-      params.append('GradeId', classId);
+      params.append("GradeId", classId);
     }
-  
+
     url += params.toString();
-  
+
     setLoading(true);
     restClient({
       url,
-      method: 'GET',
+      method: "GET",
     })
       .then((res) => {
-        const paginationData = JSON.parse(res.headers['x-pagination']);
+        const paginationData = JSON.parse(res.headers["x-pagination"]);
         setTotalPage(paginationData.TotalPages);
         setProducts(Array.isArray(res.data.data) ? res.data.data : []);
       })
       .catch((err) => {
-        console.error('Error fetching data:', err);
+        console.error("Error fetching data:", err);
         setProducts([]);
       })
       .finally(() => setLoading(false));
   };
-  
 
   const onPageChange = (event) => {
     const { page, rows, first } = event;
@@ -184,8 +185,11 @@ export default function Search() {
                   placeholder="Search"
                   className="flex-1 focus:outline-none w-36 focus:ring-0"
                   onChange={(e) => {
-                    // setTextSearch(e.target.value)
-                    setParams({...Object.fromEntries(params.entries()),text:encodeURIComponent(e.target.value)})
+                    setTextSearch(e.target.value);
+                    setParams({
+                      ...Object.fromEntries(params.entries()),
+                      text: encodeURIComponent(e.target.value),
+                    });
                   }} // Update textSearch state and params
                 />
                 <Button
@@ -214,10 +218,10 @@ export default function Search() {
                     filter
                     ref={dropDownRef2}
                     value={selectedCity}
-                    onChange={(e) => setSelectedCity(e.value)}
+                    onChange={handleOnChange}
                     options={cities}
                     optionLabel="name"
-                    showClear
+                    showClear={false}
                     placeholder="Tài liệu"
                     className="w-full md:w-14rem shadow-none h-full"
                   />
@@ -239,22 +243,24 @@ export default function Search() {
             ) : (
               <> */}
             <div className="flex flex-wrap justify-start">
-            {products &&
-              products?.map((p, index) => {
-                return <CustomCard document={p} key={index}/>;
-              })}
+              {products &&
+                products?.map((p, index) => {
+                  return <CustomCard document={p} key={index} />;
+                })}
             </div>
 
-            {Array.isArray(products) && products.length > 0　&& totalPage > 1  && (
-              <Paginator
-                first={first}
-                rows={rows}
-                totalRecords={totalPage}
-                onPageChange={onPageChange}
-                rowsPerPageOptions={[10, 20, 30]}
-                className="custom-paginator mx-auto"
-              />
-            )}
+            {Array.isArray(products) &&
+              products.length > 0 &&
+              totalPage > 1 && (
+                <Paginator
+                  first={first}
+                  rows={rows}
+                  totalRecords={totalPage}
+                  onPageChange={onPageChange}
+                  rowsPerPageOptions={[10, 20, 30]}
+                  className="custom-paginator mx-auto"
+                />
+              )}
             {/* </>
             )} */}
           </div>

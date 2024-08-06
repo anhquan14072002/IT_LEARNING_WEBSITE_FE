@@ -59,10 +59,14 @@ export default function Document() {
 
   const pagination = (page, rows) => {
     setLoading(true);
+    const pageIndex = page || 1;
+    const pageSize = rows || 10;
+    const gradeId = filterClass?.id ? `&GradeId=${filterClass.id}` : "";
+
+    const url = `api/document/searchbydocumentpagination?PageIndex=${pageIndex}&PageSize=${pageSize}${gradeId}`;
+
     restClient({
-      url: `api/document/searchbydocumentpagination?PageIndex=${page}&PageSize=${rows}&${
-        filterClass?.id && `GradeId=${filterClass?.id}`
-      }`,
+      url,
       method: "GET",
     })
       .then((res) => {
@@ -80,10 +84,13 @@ export default function Document() {
   const fetchData = () => {
     if (textSearch.trim()) {
       setLoading(true);
+      const pageIndex = page || 1;
+      const pageSize = rows || 10;
+      const gradeId = filterClass?.id ? `&GradeId=${filterClass.id}` : "";
+
+      const url = `api/document/searchbydocumentpagination?Value=${textSearch}&PageIndex=${pageIndex}&PageSize=${pageSize}${gradeId}`;
       restClient({
-        url: `api/document/searchbydocumentpagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}&${
-          filterClass?.id && `GradeId=${filterClass?.id}`
-        }`,
+        url,
         method: "GET",
       })
         .then((res) => {
@@ -263,49 +270,49 @@ export default function Document() {
                   header="#"
                   body={indexBodyTemplate}
                   className="border-b-2 border-t-2"
-                  style={{ minWidth: '5rem' }}
+                  style={{ minWidth: "5rem" }}
                 />
                 <Column
                   field="title"
                   header="Tiêu đề"
-                  style={{ minWidth: '12rem' }}
+                  style={{ minWidth: "12rem" }}
                   className="border-b-2 border-t-2"
                 />
                 <Column
                   field="gradeTitle"
                   header="Lớp"
-                  style={{ minWidth: '12rem' }}
+                  style={{ minWidth: "12rem" }}
                   className="border-b-2 border-t-2"
                 />
                 <Column
                   field="bookCollection"
                   header="Bộ sưu tập sách"
-                  style={{ minWidth: '12rem' }}
+                  style={{ minWidth: "12rem" }}
                   className="border-b-2 border-t-2"
                 />
                 <Column
                   field="typeOfBook"
                   header="Loại sách"
-                  style={{ minWidth: '12rem' }}
+                  style={{ minWidth: "12rem" }}
                   className="border-b-2 border-t-2"
                 />
                 <Column
                   field="author"
                   header="Tác giả"
-                  style={{ minWidth: '12rem' }}
+                  style={{ minWidth: "12rem" }}
                   className="border-b-2 border-t-2"
                 />
                 <Column
                   field="createdDate"
                   header="Ngày tạo"
-                  style={{ minWidth: '12rem' }}
+                  style={{ minWidth: "12rem" }}
                   className="border-b-2 border-t-2"
                   body={(rowData) => formatDate(rowData.createdDate)}
                 />
                 <Column
                   field="lastModifiedDate"
                   header="Ngày cập nhật"
-                  style={{ minWidth: '12rem' }}
+                  style={{ minWidth: "12rem" }}
                   className="border-b-2 border-t-2"
                   body={(rowData) => formatDate(rowData.lastModifiedDate)}
                 />

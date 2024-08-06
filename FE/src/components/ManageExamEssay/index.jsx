@@ -50,13 +50,13 @@ export default function ManageExam() {
     fetchData();
   }, [page, rows, textSearch]);
 
-  const pagination = (page, rows) => {
+  const fetchData = () => {
     setLoading(true);
-
-    restClient({
-      url: `api/exam/searchbyexampagination?PageIndex=${page}&PageSize=${rows}&Type=1`,
-      method: "GET",
-    })
+    const title = "title"
+  restClient({
+    url: `api/exam/searchbyexampagination?PageIndex=${page}&PageSize=${rows}&Type=1&Key=${title}&Value=${textSearch}`,
+    method: "GET",
+  })
       .then((res) => {
         const paginationData = JSON.parse(res.headers["x-pagination"]);
         setTotalPage(paginationData.TotalPages);
@@ -71,10 +71,10 @@ export default function ManageExam() {
       });
   };
 
-  const fetchData = () => {
-    pagination(page, rows);
+  // const fetchData = () => {
+  //   pagination(page, rows);
 
-  };
+  // };
 
   const onPageChange = (event) => {
     const { page, rows, first } = event;
@@ -217,6 +217,7 @@ export default function ManageExam() {
         visibleUpdate={visibleUpdate}
         setVisibleUpdate={setVisibleUpdate}
         updateValue={updateValue}
+        types = {1}
         toast={toast}
         fetchData={fetchData}
       />
@@ -250,21 +251,7 @@ export default function ManageExam() {
               />
             </div>
 
-            <div className="flex-1 flex flex-wrap gap-3 justify-end">
-              <div className="border-2 rounded-md mt-4">
-                <Dropdown
-                  filter
-                  ref={dropDownRef2}
-                  value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.value)}
-                  options={cities}
-                  optionLabel="name"
-                  showClear
-                  placeholder="Tài liệu"
-                  className="w-full md:w-14rem shadow-none h-full"
-                />
-              </div>
-            </div>
+          
           </div>
           {loading ? (
             <Loading />

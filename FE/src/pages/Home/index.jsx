@@ -21,9 +21,11 @@ export default function Home() {
   const [loadingGet, setLoadingGet] = useState(false);
 
   useEffect(() => {
-    if (fixedDivRef.current) {
-      setFixedDivHeight(fixedDivRef.current.offsetHeight);
-    }
+    setTimeout(()=>{
+      if (fixedDivRef.current) {
+        setFixedDivHeight(fixedDivRef.current.offsetHeight);
+      }
+    },500)
   }, [fixedDivRef.current]);
 
   useEffect(() => {
@@ -42,6 +44,7 @@ export default function Home() {
             <Menu />
           </div>
 
+          <div className="min-h-screen">
           <div className="px-20" style={{ paddingTop: `${fixedDivHeight}px` }}>
             <h1 className="mt-10 text-2xl font-bold">
               Bộ sách
@@ -79,7 +82,8 @@ export default function Home() {
                   ))
                 )}
               </div>
-            </div>
+            </div> 
+          </div>
 
             <Footer />
         </div>

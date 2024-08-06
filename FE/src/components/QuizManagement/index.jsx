@@ -4,6 +4,7 @@ import Lesson from "../Lesson";
 import classNames from "classnames";
 import ManagementQuizLesson from "../ManagementQuizLesson";
 import ManageQuestionQuiz from "../ManageQuestionQuiz";
+import ManageCustomQuiz from "../ManageCustomQuiz";
 
 export default function QuizManagement() {
   const [navIndex, setNavIndex] = useState(1);
@@ -18,7 +19,7 @@ export default function QuizManagement() {
           })}
           onClick={() => setNavIndex(1)}
         >
-          Các bài quiz
+          Bộ câu hỏi
         </h1>
         <h1
           className={classNames("p-5 cursor-pointer hover:bg-[#D1F7FF]", {
@@ -26,10 +27,11 @@ export default function QuizManagement() {
           })}
           onClick={() => setNavIndex(2)}
         >
-          Câu hỏi quiz
+          Bộ câu hỏi theo chủ đề , bài học
         </h1>
       </div>
-      {navIndex === 1 && <ManagementQuizLesson />}
+      {navIndex === 1 && <ManageCustomQuiz />}
+      {navIndex === 2 && <ManagementQuizLesson />}
       {/* {navIndex === 2 && <ManageQuestionQuiz />} */}
     </div>
   );

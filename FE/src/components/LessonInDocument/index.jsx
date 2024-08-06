@@ -63,14 +63,13 @@ export default function LessonInDocument({
       <div
         className={`fixed w-[18%] ${
           display
-            ? "transition duration-200 ease-in-out opacity-0"
-            : "transition duration-200 ease-in-out opacity-100"
+            ? "transition duration-200 ease-in-out hidden"
+            : "transition duration-200 ease-in-out block"
         } `}
       >
 
         <div
-          className="overflow-y-auto custom-scrollbar"
-          style={{ height: getHeight() }}
+          className="overflow-y-auto custom-scrollbar h-[80vh]"
           ref={scrollContainerRef}
         >
           {documentList &&

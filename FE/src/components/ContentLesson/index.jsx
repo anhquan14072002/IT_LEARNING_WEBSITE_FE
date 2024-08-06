@@ -174,6 +174,7 @@ export default function Lesson() {
   const status = (rowData, { rowIndex }) => {
     return (
       <InputSwitch
+        checked={rowData.isActive}
         tooltip={
           rowData.isActive
             ? "Bài học này đã được duyệt"
@@ -439,51 +440,51 @@ export default function Lesson() {
                 header="#"
                 body={indexBodyTemplate}
                 className="border-b-2 border-t-2"
-                style={{ minWidth: '5rem' }}
+                style={{ minWidth: "5rem" }}
               />
 
               <Column
                 field="title"
                 header="Tiêu đề"
                 className="border-b-2 border-t-2"
-                style={{ minWidth: '12rem' }}
+                style={{ minWidth: "12rem" }}
               ></Column>
               <Column
                 field="topicTitle"
                 header="Chủ đề"
                 className="border-b-2 border-t-2"
-                style={{ minWidth: '12rem' }}
+                style={{ minWidth: "12rem" }}
               ></Column>
               <Column
                 header="File tài liệu"
                 className="border-b-2 border-t-2"
                 body={file}
-                style={{ minWidth: '12rem' }}
+                style={{ minWidth: "12rem" }}
               ></Column>
               <Column
                 header="Trạng thái"
                 className="border-b-2 border-t-2"
                 body={status}
-                style={{ minWidth: '10rem' }}
+                style={{ minWidth: "10rem" }}
               ></Column>
               <Column
                 field="createdDate"
                 header="Ngày tạo"
                 body={(rowData) => formatDate(rowData.createdDate)}
                 className="border-b-2 border-t-2"
-                style={{ minWidth: '20rem' }}
+                style={{ minWidth: "20rem" }}
               ></Column>
               <Column
                 field="lastModifiedDate"
                 header="Ngày cập nhật"
                 body={(rowData) => formatDate(rowData.lastModifiedDate)}
                 className="border-b-2 border-t-2"
-                style={{ minWidth: '20rem' }}
+                style={{ minWidth: "20rem" }}
               ></Column>
               <Column
                 field="info"
                 header=""
-                style={{ minWidth: '12rem' }}
+                style={{ minWidth: "12rem" }}
                 body={view}
                 className="border-b-2 border-t-2"
               ></Column>

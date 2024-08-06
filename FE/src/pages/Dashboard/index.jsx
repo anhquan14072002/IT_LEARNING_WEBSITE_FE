@@ -9,8 +9,10 @@ import QuizManagement from "../../components/QuizManagement";
 import { Tooltip } from "primereact/tooltip";
 import ManageExam from "../../components/ManageExam";
 import ManageTag from "../../components/ManageTag";
+import ManageAccount from "../../components/ManageAccount";
 import { useNavigate, useParams } from "react-router-dom";
 import NotifyProvider from "../../store/NotificationContext";
+import ManageCodeOnline from "../../components/ManageCodeOnline";
 
 const Dashboard = () => {
   const [open, setOpen] = useState(true);
@@ -30,7 +32,14 @@ const Dashboard = () => {
     { title: "Quản lí câu hỏi ôn tập ", src: "Folder", index: "quiz" },
     { title: "Quản lí đề thi", src: "Folder", index: "test" },
     { title: "Quản lí tag ", src: "Folder", index: "tag" },
+    { title: "Quản lí bài thực hành", src: "Folder", index: "codeeditor" },
   ];
+
+  useEffect(() => {
+    if (!Menus.some((item, index) => item.index === typeId)) {
+      navigate("/notfound");
+    }
+  }, []);
 
   return (
     <>
@@ -91,11 +100,13 @@ const Dashboard = () => {
           </div>
           <div className="ml-20 mt-16 p-7">
             <div className="h-screen">
+              {typeId === "user" && <ManageAccount />}
               {typeId === "adminManageDocument" && <ManageDocument />}
               {typeId === "lesson" && <ContentLesson />}
               {typeId === "quiz" && <QuizManagement />}
               {typeId === "test" && <ManageExam />}
               {typeId === "tag" && <ManageTag />}
+              {typeId === "codeeditor" && <ManageCodeOnline />}
             </div>
           </div>
         </NotifyProvider>

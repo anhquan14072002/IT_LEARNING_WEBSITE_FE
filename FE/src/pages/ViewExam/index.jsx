@@ -21,31 +21,38 @@ const Index = () => {
   const [selectedProvince, setSelectedProvince] = useState("");
   const [competitionList, setCompetitionList] = useState([]);
   const [competition, setCompetition] = useState("");
+  const [competitionSearch, setCompetitionSearch] = useState("");
   const [yearList, setYearList] = useState([]);
   const [year, setYear] = useState("");
 
   const fetchData = async () => {
     setLoading(true);
+    const province = selectedProvince ? selectedProvince : ""
+    const years = year ? year : ""
+    const competition = competitionSearch ? competitionSearch : ""
+    const id ="id"
     try {
-      console.log(competition);
       const res = await restClient({
-        url: `api/exam/searchbyexampagination?PageIndex=${page}&PageSize=${rows}&Size=6&Province=${selectedProvince}&Year=${year}&CompetitionId=${competition}`,
+        url: `api/exam/searchbyexampagination?PageIndex=${page}&PageSize=${rows}&Size=10&Province=${province}&Year=${years}&CompetitionId=${competition}&OrderBy=${id}&IsAscending=false`,
         method: "GET",
       });
       const paginationData = JSON.parse(res.headers["x-pagination"]);
       setTotalPage(paginationData.TotalPages);
+      console.log(paginationData.TotalPages);
+      
       setExamList(Array.isArray(res.data.data) ? res.data.data : []);
-      setLoading(false);
     } catch (err) {
       console.error("Error fetching data:", err);
       setExamList([]);
+    } finally {
       setLoading(false);
     }
   };
+  
   useEffect(() => {
     fetchData();
-  }, []);
-
+  }, [page, rows, selectedProvince, year, competitionSearch]);
+  
   useEffect(() => {
     if (province?.data) {
       setProvinceList(province?.data);
@@ -67,28 +74,30 @@ const Index = () => {
         console.log("error");
       }
     };
-
+  
     fetchDataCompetition();
   }, [province, years]);
+  
   const onPageChange = (event) => {
     const { page, rows, first } = event;
     setRows(rows);
     setPage(page + 1);
     setFirst(first);
   };
-  const handleProvince = async (e) => {
+  
+  const handleProvince = (e) => {
     setSelectedProvince(e.value?.name);
-    await fetchData();
   };
-  const handleCompetition = async (e) => {
-    setCompetition(e.value?.id);
-    await fetchData();
-    console.log(e.value?.id);
+  
+  const handleCompetition = (e) => {
+    setCompetition(e.value?.title);
+    setCompetitionSearch(e.value?.id);
   };
-  const handleYear = async (e) => {
+  
+  const handleYear = (e) => {
     setYear(e.value?.year);
-    await fetchData();
   };
+  
   return (
     <>
       <Header />
@@ -96,9 +105,9 @@ const Index = () => {
       {loading ? (
         <Loading />
       ) : (
-        <div className="flex flex-col">
-          <div className="flex w-2/3 justify-between items-center mx-auto m-4">
-            <div className="card flex justify-content-center">
+        <div className="flex flex-col ">
+          <div className=" w-2/3 flex justify-between items-center mx-auto m-4">
+            <div>
               <Dropdown
                 value={selectedProvince}
                 onChange={handleProvince}
@@ -106,7 +115,7 @@ const Index = () => {
                 optionLabel="name"
                 editable
                 placeholder="Tỉnh"
-                className="border border-black rounded-xl flex items-center w-2/3 py-2 gap-2.5 shadow-none custom-dropdown"
+                className="border border-black  rounded-xl  flex items-center w-fit py-2 gap-2.5 shadow-l custom-dropdown"
                 filter
               />
             </div>
@@ -118,7 +127,7 @@ const Index = () => {
                 optionLabel="title"
                 editable
                 placeholder="Cuộc Thi"
-                className="border border-black rounded-xl flex items-center w-2/3 py-2 gap-2.5 shadow-none custom-dropdown"
+                className="border border-black  rounded-xl  flex items-center w-fit py-2 gap-2.5 shadow-l custom-dropdown"
                 filter
               />
             </div>
@@ -130,50 +139,12 @@ const Index = () => {
                 optionLabel="year"
                 editable
                 placeholder="Năm"
-                className="border border-black rounded-xl flex items-center w-2/3 py-2 gap-2.5 shadow-none custom-dropdown"
+                className="border border-black  rounded-xl  flex items-center w-fit py-2 gap-2.5 shadow-l custom-dropdown"
                 filter
               />
             </div>
-            <div>
-              <div className="border border-black rounded-3xl flex items-center px-2.5 py-2 gap-2.5">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  x="0px"
-                  y="0px"
-                  width="22"
-                  height="22"
-                  viewBox="0,0,256,256"
-                  className="fill-black"
-                >
-                  <g
-                    fillRule="nonzero"
-                    stroke="none"
-                    strokeWidth="1"
-                    strokeLinecap="butt"
-                    strokeLinejoin="miter"
-                    strokeMiterlimit="10"
-                    strokeDasharray=""
-                    strokeDashoffset="0"
-                    fontFamily="none"
-                    fontWeight="none"
-                    fontSize="none"
-                    textAnchor="none"
-                    style={{ mixBlendMode: "normal" }}
-                  >
-                    <g transform="scale(5.12,5.12)">
-                      <path d="M21,3c-9.37891,0 -17,7.62109 -17,17c0,9.37891 7.62109,17 17,17c3.71094,0 7.14063,-1.19531 9.9375,-3.21875l13.15625,13.125l2.8125,-2.8125l-13,-13.03125c2.55469,-2.97656 4.09375,-6.83984 4.09375,-11.0625c0,-9.37891 -7.62109,-17 -17,-17zM21,5c8.29688,0 15,6.70313 15,15c0,8.29688 -6.70312,15 -15,15c-8.29687,0 -15,-6.70312 -15,-15c0,-8.29687 6.70313,-15 15,-15z"></path>
-                    </g>
-                  </g>
-                </svg>
-                <input
-                  id="search"
-                  placeholder="Tìm kiếm"
-                  className="border-none text-black focus:outline-none placeholder:text-white"
-                />
-              </div>
-            </div>
           </div>
-          <div className="flex flex-col items-center mx-auto w-4/6 h-screen bg-gray-100">
+        
             {examList.length > 0 ? (
               examList
                 .filter((exam) => exam.isActive)
@@ -181,9 +152,17 @@ const Index = () => {
                   <CardExam id={exam.id} title={exam.title} type={exam.type} />
                 ))
             ) : (
-              <p>No exams available</p>
+              <div className="h-screen flex justify-center items-center">
+              <p className="text-2xl font-bold text-blue-800">Hiện Tại Không Có Đề Thi</p>
+
+              </div>
             )}
-            {examList.length > 0 && (
+          
+          </div>
+   
+        
+      )}
+        {examList.length > 0 && (
               <>
                 <div className="flex-grow"></div>
                 <div>
@@ -197,10 +176,6 @@ const Index = () => {
                 </div>
               </>
             )}
-          </div>
-          <div className="mx-auto">Top 5</div>
-        </div>
-      )}
     </>
   );
 };

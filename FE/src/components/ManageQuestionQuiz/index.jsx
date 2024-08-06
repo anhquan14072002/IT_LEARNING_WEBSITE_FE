@@ -323,20 +323,20 @@ export default function ManageQuestionQuiz() {
                 <Column
                   header="Nội dung"
                   className="border-b-2 border-t-2"
-                  style={{ width: "30%" }}
+                  style={{ minWidth: '35rem' }}
                   body={content}
                 />
                 <Column
                   field="type"
                   header="Loại câu hỏi"
                   className="border-b-2 border-t-2"
-                  style={{ width: "20%" }}
+                  style={{ minWidth: '15rem' }}
                 />
                 <Column
                   field="questionLevel"
                   header="Mức độ"
                   className="border-b-2 border-t-2"
-                  style={{ width: "20%" }}
+                  style={{ minWidth: '15rem' }}
                 />
                 {/* <Column
                   field="score"
@@ -348,7 +348,7 @@ export default function ManageQuestionQuiz() {
                   header="Trạng thái"
                   className="border-b-2 border-t-2"
                   body={status}
-                  style={{ width: "10%" }}
+                  style={{ minWidth: '15rem' }}
                 ></Column>
                 {/* <Column
                   field="createdDate"
@@ -367,6 +367,7 @@ export default function ManageQuestionQuiz() {
                 <Column
                   className="border-b-2 border-t-2"
                   body={actionBodyTemplate}
+                  style={{ minWidth: '15rem' }}
                 />
               </DataTable>
               <Paginator

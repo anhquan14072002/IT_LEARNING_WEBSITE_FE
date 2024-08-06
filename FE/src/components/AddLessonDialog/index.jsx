@@ -77,11 +77,6 @@ export default function AddLessonDialog({
   }, []);
 
   const onSubmit = (values) => {
-    console.log("====================================");
-    console.log("files:" + files);
-    console.log("====================================");
-
-    setIsLoadingAddLesson(true);
 
     const formData = new FormData();
     formData.append("Title", values.title);
@@ -104,7 +99,7 @@ export default function AddLessonDialog({
         formData.append("FilePath", file);
       });
     }
-
+    setIsLoadingAddLesson(true);
     restClient({
       url: "api/lesson/createlesson",
       method: "POST",

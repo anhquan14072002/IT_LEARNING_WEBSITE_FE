@@ -47,31 +47,32 @@ export default function ManageExam() {
   useEffect(() => {
     fetchData();
   }, [page, rows, textSearch]);
-
-  const pagination = (page, rows) => {
+  
+  const fetchData = async () => {
     setLoading(true);
-
-    restClient({
-      url: `api/competition/searchcompetitionpagination?PageIndex=${page}&PageSize=${rows}`,
-      method: "GET",
-    })
-      .then((res) => {
-        const paginationData = JSON.parse(res.headers["x-pagination"]);
-        setTotalPage(paginationData.TotalPages);
-        setProducts(Array.isArray(res.data.data) ? res.data.data : []);
-        console.log(res.data.data);
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error("Error fetching data:", err);
-        setProducts([]);
-        setLoading(false);
+    const title = "title";
+    try {
+      const res = await restClient({
+        url: `api/competition/searchcompetitionpagination?PageIndex=${page}&PageSize=${rows}&Key=${title}&Value=${textSearch}`,
+        method: "GET",
       });
-  };
+  
+      const paginationData = JSON.parse(res.headers["x-pagination"]);
+      setTotalPage(paginationData.TotalPages);
+      console.log(paginationData.TotalPages);
 
-  const fetchData = () => {
-    pagination(page, rows);
+      setProducts(Array.isArray(res.data.data) ? res.data.data : []);
+      console.log(res.data.data);
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      setProducts([]);
+    } finally {
+      setLoading(false);
+    }
   };
+  
+
+
 
   const onPageChange = (event) => {
     const { page, rows, first } = event;
@@ -161,32 +162,39 @@ export default function ManageExam() {
 
   const changeStatusCompetition = async (value, id) => {
     console.log(value, id);
-
-    await restClient({
-      url: `api/competition/updatestatuscompetition/${id}`,
-      method: "PUT",
-      headers: {
-        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
-      },
-    })
-      .then((res) => {
-        ACCEPT(toast, "Thay đổi trạng thái thành công");
-        fetchData();
-      })
-      .catch((err) => {
-        REJECT(toast, "Lỗi khi thay đổi trạng thái");
+  
+    try {
+      const response = await restClient({
+        url: `api/competition/updatestatuscompetition/${id}`,
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+        },
       });
+  
+      console.log('Response:', response);
+      ACCEPT(toast, "Thay đổi trạng thái thành công");
+      await fetchData();
+    } catch (error) {
+      console.error('Error:', error);
+      REJECT(toast, "Lỗi khi thay đổi trạng thái");
+    }
   };
-
+  
+  
   const status = (rowData, { rowIndex }) => {
     return (
       <InputSwitch
         checked={rowData.isActive}
-        onChange={(e) => changeStatusCompetition(e.value, rowData.id)}
+        onChange={(e) => {
+          console.log('Status change event:', e.value, rowData.id);
+          changeStatusCompetition(e.value, rowData.id);
+        }}
         tooltip={rowData.isActive ? "Đã được duyệt" : "Chưa được duyệt"}
       />
     );
   };
+  
 
   return (
     <div>
