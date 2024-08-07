@@ -33,7 +33,7 @@ const Index = () => {
     const id ="id"
     try {
       const res = await restClient({
-        url: `api/exam/searchbyexampagination?PageIndex=${page}&PageSize=${rows}&Size=10&Province=${province}&Year=${years}&CompetitionId=${competition}&OrderBy=${id}&IsAscending=false`,
+        url: `api/exam/searchbyexampagination?PageIndex=${page}&PageSize=${rows}&Province=${province}&Year=${years}&CompetitionId=${competition}&OrderBy=${id}&IsAscending=false`,
         method: "GET",
       });
       const paginationData = JSON.parse(res.headers["x-pagination"]);
