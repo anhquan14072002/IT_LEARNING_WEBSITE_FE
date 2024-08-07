@@ -9,6 +9,7 @@ import { getAllGrade } from "../../services/grade.api";
 import { getAllDocument, getAllDocumentSortByAvg } from "../../services/document.api";
 import Loading from "../../components/Loading";
 import { useNavigate } from "react-router-dom";
+import NotifyProvider from "../../store/NotificationContext";
 
 export default function Home() {
   const navigate = useNavigate()
@@ -33,7 +34,7 @@ export default function Home() {
   }, []);
 
   return (
-    <>
+    <NotifyProvider>
       {loading ? (
         <LoadingScreen setLoading={setLoading} />
       ) : (
@@ -87,6 +88,6 @@ export default function Home() {
             <Footer />
         </div>
       )}
-    </>
+    </NotifyProvider>
   );
 }

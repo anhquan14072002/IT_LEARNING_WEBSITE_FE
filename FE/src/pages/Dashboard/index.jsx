@@ -13,6 +13,8 @@ import ManageAccount from "../../components/ManageAccount";
 import { useNavigate, useParams } from "react-router-dom";
 import ManageCodeOnline from "../../components/ManageCodeOnline";
 import { assets } from "../../assets/assets";
+import NotifyProvider from "../../store/NotificationContext";
+
 const Dashboard = () => {
   const [open, setOpen] = useState(true);
   const navigate = useNavigate();
@@ -34,18 +36,18 @@ const Dashboard = () => {
     { title: "Quản lí bài thực hành",  src:assets.folder, index: "codeeditor" },
   ];
 
-  useEffect(()=>{
-     if(!Menus.some((item,index)=> item.index === typeId)){
-      navigate("/notfound")
-     }
-  },[])
+  useEffect(() => {
+    if (!Menus.some((item, index) => item.index === typeId)) {
+      navigate("/notfound");
+    }
+  }, []);
 
   return (
     <>
       {loading ? (
         <LoadingScreen setLoading={setLoading} />
       ) : (
-        <>
+        <NotifyProvider>
           <div className="fixed top-0 w-full z-30">
             <Header />
           </div>
@@ -85,6 +87,7 @@ const Dashboard = () => {
                       content={Menu.title}
                     />
                     <img src={Menu.src} alt={Menu.title} />
+
                     <span
                       className={`${
                         !open ? "hidden" : ""
@@ -98,7 +101,9 @@ const Dashboard = () => {
             </div>
           </div>
           <div className="ml-20 mt-16 p-7">
+
             <div className="h-screen" onClick={(e)=>setOpen(false)}>
+
               {typeId === "user" && <ManageAccount />}
               {typeId === "adminManageDocument" && <ManageDocument />}
               {typeId === "lesson" && <ContentLesson />}
@@ -108,7 +113,7 @@ const Dashboard = () => {
               {typeId === "codeeditor" && <ManageCodeOnline />}
             </div>
           </div>
-        </>
+        </NotifyProvider>
       )}
     </>
   );

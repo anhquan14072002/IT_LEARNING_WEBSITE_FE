@@ -14,7 +14,7 @@ export default function restClient({
     method,
     params,
     data,
-    headers 
+    headers
   })
 }
 

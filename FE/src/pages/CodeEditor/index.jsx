@@ -11,7 +11,7 @@ import "./index.css";
 import DescriptionComponent from "../../components/DescriptionComponent";
 import { useParams } from "react-router-dom";
 import InstructionComponent from "../../components/InstructionComponent";
-import restClient from "../../services/restClient";
+import rclsestClient from "../../services/restClient";
 import {
   decodeBase64,
   encodeBase64,
@@ -21,6 +21,7 @@ import {
 } from "../../utils";
 import { Toast } from "primereact/toast";
 import { useSelector } from "react-redux";
+import restClient from "../../services/restClient";
 
 // Define test cases
 const testCases = [
@@ -42,12 +43,40 @@ const CodeEditor = () => {
   const [testCase, setTestCase] = useState();
   const [result, setResult] = useState();
   const user = useSelector((state) => state.user.value);
+  const [errorList, setErrorList] = useState([]);
+  const [typeError, setErrorType] = useState(null);
+
+  useEffect(() => {
+    console.log("testcase::", testCase?.isHidden);
+  }, [testCase]);
 
   const submit = () => {
     if (!isLoggedIn()) {
       REJECT(toast, "Vui lòng đăng nhập");
       return;
     }
+    let model = {
+      problemId: id,
+      languageId: language?.id,
+      sourceCode: encodeBase64(code),
+      userId: user?.sub,
+      submit: true,
+    };
+    restClient({
+      url: "api/submission/submitproblem",
+      method: "POST",
+      data: model,
+    })
+      .then((res) => {
+        console.log("====================================");
+        console.log("response::", res?.data?.data);
+        console.log("====================================");
+      })
+      .catch((err) => {
+        console.log("====================================");
+        console.log(err?.response?.data?.data);
+        console.log("====================================");
+      });
   };
 
   const runTestCases = () => {
@@ -70,10 +99,17 @@ const CodeEditor = () => {
     })
       .then((res) => {
         console.log("====================================");
-        console.log(res);
+        console.log("response::", res?.data?.data);
         console.log("====================================");
       })
-      .catch((err) => {});
+      .catch((err) => {
+        console.log("====================================");
+        console.log(err?.response?.data?.data);
+        console.log("====================================");
+        setErrorType(err?.response?.data?.message);
+        if (err?.response?.data?.message) {
+        }
+      });
   };
 
   useEffect(() => {
@@ -191,7 +227,7 @@ const CodeEditor = () => {
             {navIndex === 2 && <InstructionComponent id={id} />}
           </div>
 
-          <div className="min-w-[30%]">
+          <div className="min-w-[30%] bg-[#182537]">
             {/* Code Editor */}
             <div
               className="h-screen overflow-y-auto custom-scrollbar"
@@ -252,84 +288,10 @@ const CodeEditor = () => {
                   />
                 </div>
 
-                <div
-                  style={{ backgroundColor: "#182537", height: "auto" }}
-                  className="p-2"
-                >
-                  {/* Test Case Navigation Bar */}
-                  <nav className="flex space-x-4 mb-1">
-                    <button
-                      onClick={() => setSelectedTestCase(-1)}
-                      className={`py-2 px-4 rounded-lg ${
-                        selectedTestCase === -1
-                          ? "bg-blue-500 text-white"
-                          : "bg-gray-200 text-gray-700"
-                      } hover:bg-blue-600 transition-colors`}
-                    >
-                      Output
-                    </button>
-                    {testcaseList?.map((item, index) => (
-                      <button
-                        key={item.id} // Use a unique key if available
-                        onClick={() => {
-                          setSelectedTestCase(index);
-                          setTestCase(item);
-                        }}
-                        className={`py-2 px-4 rounded-lg ${
-                          selectedTestCase === index
-                            ? "bg-blue-500 text-white"
-                            : "bg-gray-200 text-gray-700"
-                        } hover:bg-blue-600 transition-colors`}
-                      >
-                        Test Case {index + 1}
-                        {/* Dynamically label the buttons */}
-                      </button>
-                    ))}
-                  </nav>
-
-                  {selectedTestCase === -1 && (
-                    <div className="border h-auto p-3 bg-white">
-                      {!result && "Bấm chạy code để kiểm tra kết quả"}
-                    </div>
-                  )}
-
-                  {selectedTestCase >= 0 && (
-                    <div
-                      style={{ backgroundColor: "#182537", height: "auto" }}
-                      className="p-2"
-                    >
-                      <table className="min-w-full bg-white border border-gray-300 rounded-lg shadow-md p-5">
-                        <thead className="bg-gray-100 border-b">
-                          <tr>
-                            <th className="py-3 px-4 text-left">Input</th>
-                            <th className="py-3 px-4 text-left">Target</th>
-                            <th className="py-3 px-4 text-left">Output</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          <tr className="border-b">
-                            <td className="py-3 px-4">
-                              {testCase
-                                ? `[${processInput(
-                                    testCase.input
-                                  )?.arrayItems.join(", ")}]`
-                                : "[]"}
-                            </td>
-
-                            <td className="py-3 px-4">
-                              {testCase
-                                ? `${processInput(testCase.input)?.targetValue}`
-                                : ""}
-                            </td>
-                            <td className="py-3 px-4">
-                              {testCase && testCase?.output}
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
+                <div>
+                  Split
                 </div>
+                
               </Split>
             </div>
           </div>

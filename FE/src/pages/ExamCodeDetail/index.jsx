@@ -13,6 +13,7 @@ import { REJECT, SUCCESS } from "../../utils";
 import restClient from "../../services/restClient";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
+import NotifyProvider from "../../store/NotificationContext";
 
 const ExamDetail = () => {
   const toast = useRef(null);
@@ -30,7 +31,6 @@ const ExamDetail = () => {
     const fetchData = async () => {
       try {
         const response = await getExamCodeById(id);
-        console.log(response?.data?.data?.length);
         setData(response?.data?.data[0]);
         setExamList(response?.data?.data);
         setViewPdf(response?.data?.data[0].examFile);
@@ -106,7 +106,7 @@ const ExamDetail = () => {
     }
   }, [selectedExamCode]);
   return (
-    <>
+    <NotifyProvider>
       <Toast ref={toast} />
       <Header />
       <div className="m-4 ">
@@ -272,7 +272,7 @@ const ExamDetail = () => {
           {/* Right frame containing the answer choices */}
         </div>
       </div>
-    </>
+    </NotifyProvider>
   );
 };
 

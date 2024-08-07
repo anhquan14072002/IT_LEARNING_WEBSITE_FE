@@ -1,6 +1,7 @@
 import React from 'react';
 import { Rating } from 'primereact/rating';
 import { useNavigate } from 'react-router-dom';
+import StarRating from '../StarVoting';
 
 export default function DocumentCard({ document }) {
   const navigate = useNavigate();
@@ -11,7 +12,7 @@ export default function DocumentCard({ document }) {
           <h1 className="font-bold text-xl mb-2 overflow-hidden text-center text-ellipsis">{document?.title}</h1>
         </div>
         <div className="px-6 py-2 flex items-center justify-center">
-          <Rating value={document?.averageRating} readOnly cancel={false} />
+          <StarRating stars={document?.averageRating}  />
           <span className="ml-1">{document?.totalReviewer}</span>
         </div>
       </div>
