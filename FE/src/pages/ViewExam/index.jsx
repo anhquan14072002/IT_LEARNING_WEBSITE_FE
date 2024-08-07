@@ -9,6 +9,7 @@ import restClient from "../../services/restClient";
 import "./index.css";
 import { province } from "../../services/province";
 import { years } from "../../services/year";
+import NotifyProvider from "../../store/NotificationContext";
 
 const Index = () => {
   const [first, setFirst] = useState(0);
@@ -33,7 +34,7 @@ const Index = () => {
     const id ="id"
     try {
       const res = await restClient({
-        url: `api/exam/searchbyexampagination?PageIndex=${page}&PageSize=${rows}&Size=10&Province=${province}&Year=${years}&CompetitionId=${competition}&OrderBy=${id}&IsAscending=false`,
+        url: `api/exam/searchbyexampagination?PageIndex=${page}&PageSize=${rows}&Province=${province}&Year=${years}&CompetitionId=${competition}&OrderBy=${id}&IsAscending=false`,
         method: "GET",
       });
       const paginationData = JSON.parse(res.headers["x-pagination"]);
@@ -99,7 +100,7 @@ const Index = () => {
   };
   
   return (
-    <>
+    <NotifyProvider>
       <Header />
       <Menu />
       {loading ? (
@@ -176,7 +177,7 @@ const Index = () => {
                 </div>
               </>
             )}
-    </>
+    </NotifyProvider>
   );
 };
 

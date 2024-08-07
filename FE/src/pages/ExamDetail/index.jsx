@@ -13,6 +13,7 @@ import { REJECT, SUCCESS } from "../../utils";
 import restClient from "../../services/restClient";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
+import NotifyProvider from "../../store/NotificationContext";
 
 const ExamDetail = () => {
   const toast = useRef(null);
@@ -35,7 +36,7 @@ const ExamDetail = () => {
   }, [id]);
 
   return (
-    <>
+    <NotifyProvider>
       <Toast ref={toast} />
       <Header />
       <div className="m-5 p-5 ">
@@ -58,7 +59,7 @@ const ExamDetail = () => {
         </div>
        
       </div>
-    </>
+    </NotifyProvider>
   );
 };
 
