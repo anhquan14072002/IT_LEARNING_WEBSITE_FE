@@ -9,6 +9,7 @@ import { getAllGrade } from "../../services/grade.api";
 import { getAllDocument, getAllDocumentSortByAvg } from "../../services/document.api";
 import Loading from "../../components/Loading";
 import { useNavigate } from "react-router-dom";
+import NotifyProvider from "../../store/NotificationContext";
 
 export default function Home() {
   const navigate = useNavigate()
@@ -33,7 +34,7 @@ export default function Home() {
   }, []);
 
   return (
-    <>
+    <NotifyProvider>
       {loading ? (
         <LoadingScreen setLoading={setLoading} />
       ) : (
@@ -43,6 +44,7 @@ export default function Home() {
             <Menu />
           </div>
 
+          <div className="min-h-screen">
           <div className="px-20" style={{ paddingTop: `${fixedDivHeight}px` }}>
             <h1 className="mt-10 text-2xl font-bold">
               Bộ sách
@@ -80,11 +82,12 @@ export default function Home() {
                   ))
                 )}
               </div>
-            </div>
+            </div> 
+          </div>
 
             <Footer />
         </div>
       )}
-    </>
+    </NotifyProvider>
   );
 }
