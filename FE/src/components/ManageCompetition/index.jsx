@@ -34,9 +34,6 @@ export default function ManageExam() {
   const [visibleDelete, setVisibleDelete] = useState(false);
   const [loading, setLoading] = useState(false);
   const [textSearch, setTextSearch] = useState("");
-  const [visibleExamCode, setVisibleExamCode] = useState(false);
-  const [examCodeValue, setExamCodeValue] = useState(false);
-  const [title, setTitle] = useState("");
 
   //pagination
   const [first, setFirst] = useState(0);

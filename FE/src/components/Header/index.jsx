@@ -47,12 +47,14 @@ export default function Header({ params, setParams, textSearchProps }) {
     navigate("/login");
   };
 
+
   const items = [
     {
       items: [
         {
           label: "Quản lí",
           icon: "pi pi-chart-bar",
+          command: (e) => navigate('/dashboard/statistic'),
         },
         {
           label: "Đăng xuất",
@@ -151,11 +153,11 @@ export default function Header({ params, setParams, textSearchProps }) {
       <div className="w-full">
         <div className="bg-[#1976D2] flex justify-between py-4 px-16">
           <div className="flex items-center">
-            {/* <img
+            <img
                 className="h-[50px] w-[50px] cursor-pointer"
                 src={logo}
                 onClick={() => navigate("/")}
-              /> */}
+              />
           </div>
           <div className="flex">
             <div className="border border-white rounded-3xl flex items-center px-2.5 py-2 gap-2.5">

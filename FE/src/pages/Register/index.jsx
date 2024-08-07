@@ -18,6 +18,8 @@ import "primereact/resources/primereact.min.css";
 import "primeicons/primeicons.css";
 import "./index.css";
 import { InputText } from "primereact/inputtext";
+import { assets } from "../../assets/assets";
+import NotifyProvider from "../../store/NotificationContext";
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -112,13 +114,14 @@ const Index = () => {
   };
 
   return (
+    <NotifyProvider>
     <div>
       <Header />
       <Menu />
       <div className="flex h-screen">
         <div className="w-1/2">
           <div className="w-auto h-full">
-            <img src="src/assets/OIG4.jpg" alt="" className="w-full h-full" />
+            <img   src={assets.image} alt="" className="w-full h-full" />
           </div>
         </div>
 
@@ -364,6 +367,7 @@ const Index = () => {
       </div>
       <Toast ref={toast} />
     </div>
+    </NotifyProvider>
   );
 };
 
