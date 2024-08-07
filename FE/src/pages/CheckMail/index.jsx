@@ -10,6 +10,7 @@ import { Toast } from "primereact/toast";
 import Menu from "../../components/Menu";
 import { InputText } from "primereact/inputtext";
 import { assets } from "../../assets/assets";
+import NotifyProvider from "../../store/NotificationContext";
 
 const Index = () => {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ const Index = () => {
     }
   };
 
-  return (
+  return (<NotifyProvider>
     <div className="min-h-screen overflow-hidden">
       <Header />
       <Menu />
@@ -108,6 +109,7 @@ const Index = () => {
       </div>
       <Toast ref={toast} />
     </div>
+    </NotifyProvider>
   );
 };
 
