@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from "react";
 import Loading from "../Loading";
 import restClient from "../../services/restClient";
+import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 function Menu() {
   const [listClast, setListClass] = useState([]);
   const [loading, setLoading] = useState(false);
+  const navigation = useNavigate()
   useEffect(() => {
     setLoading(true);
     restClient({
@@ -52,6 +54,9 @@ function Menu() {
           </div>
           <div className="p-2 flex items-center justify-center cursor-pointer hover:bg-[#D1F7FF] flex-1">
             Thực hành
+          </div>
+          <div className="p-2 flex items-center justify-center cursor-pointer hover:bg-[#D1F7FF] flex-1" onClick={(e)=>navigation('/viewexam')}>
+            Đề Thi
           </div>
         </>
       )}

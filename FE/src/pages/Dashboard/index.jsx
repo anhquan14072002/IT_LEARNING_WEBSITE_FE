@@ -11,8 +11,9 @@ import ManageExam from "../../components/ManageExam";
 import ManageTag from "../../components/ManageTag";
 import ManageAccount from "../../components/ManageAccount";
 import { useNavigate, useParams } from "react-router-dom";
-import NotifyProvider from "../../store/NotificationContext";
 import ManageCodeOnline from "../../components/ManageCodeOnline";
+import { assets } from "../../assets/assets";
+import NotifyProvider from "../../store/NotificationContext";
 
 const Dashboard = () => {
   const [open, setOpen] = useState(true);
@@ -21,18 +22,18 @@ const Dashboard = () => {
   const { typeId } = useParams();
 
   const Menus = [
-    { title: "Thống kê", src: "Chart_fill", index: "statistic" },
-    { title: "Quản lí tài khoản", src: "User", index: "user" },
+    { title: "Thống kê", src:assets.chart_fill, index: "statistic" },
+    { title: "Quản lí tài khoản", src:assets.user, index: "user" },
     {
       title: "Quản lí tài liệu/chủ đề/bài học ",
-      src: "Folder",
+      src:assets.folder,
       index: "adminManageDocument",
     },
-    { title: "Quản lí bài học ", src: "Folder", index: "lesson" },
-    { title: "Quản lí câu hỏi ôn tập ", src: "Folder", index: "quiz" },
-    { title: "Quản lí đề thi", src: "Folder", index: "test" },
-    { title: "Quản lí tag ", src: "Folder", index: "tag" },
-    { title: "Quản lí bài thực hành", src: "Folder", index: "codeeditor" },
+    { title: "Quản lí bài học ",  src:assets.folder, index: "lesson" },
+    { title: "Quản lí câu hỏi ôn tập ",  src:assets.folder, index: "quiz" },
+    { title: "Quản lí đề thi",  src:assets.folder, index: "test" },
+    { title: "Quản lí tag ",  src:assets.folder, index: "tag" },
+    { title: "Quản lí bài thực hành",  src:assets.folder, index: "codeeditor" },
   ];
 
   useEffect(() => {
@@ -57,7 +58,7 @@ const Dashboard = () => {
               } bg-dark-purple h-screen p-5 pt-8 duration-300`}
             >
               <img
-                src="/src/assets/control.png"
+                src={assets.control}
                 className={`absolute cursor-pointer -right-3 top-9 w-7 border-dark-purple
                border-2 rounded-full ${!open ? "rotate-180" : ""}`}
                 onClick={() => setOpen(!open)}
@@ -85,7 +86,8 @@ const Dashboard = () => {
                       target={`menu-${Menu.index}`}
                       content={Menu.title}
                     />
-                    <img src={`/src/assets/${Menu.src}.png`} alt={Menu.title} />
+                    <img src={Menu.src} alt={Menu.title} />
+
                     <span
                       className={`${
                         !open ? "hidden" : ""
@@ -99,7 +101,9 @@ const Dashboard = () => {
             </div>
           </div>
           <div className="ml-20 mt-16 p-7">
-            <div className="h-screen">
+
+            <div className="h-screen" onClick={(e)=>setOpen(false)}>
+
               {typeId === "user" && <ManageAccount />}
               {typeId === "adminManageDocument" && <ManageDocument />}
               {typeId === "lesson" && <ContentLesson />}

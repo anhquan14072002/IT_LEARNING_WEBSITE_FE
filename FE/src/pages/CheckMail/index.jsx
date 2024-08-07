@@ -5,30 +5,29 @@ import LoginComponent from "../../components/LoginComponent";
 import Header from "../../components/Header";
 import { useNavigate } from "react-router-dom";
 import { sendVerifyEmail } from "../../services/authenService";
-import { CHECKMAIL, REJECT} from "../../utils";
+import { CHECKMAIL, REJECT } from "../../utils";
 import { Toast } from "primereact/toast";
 import Menu from "../../components/Menu";
 import { InputText } from "primereact/inputtext";
+import { assets } from "../../assets/assets";
 
 const Index = () => {
   const navigate = useNavigate();
-  const toast= useRef(null)
+  const toast = useRef(null);
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm(); // Initialize useForm hook
 
- 
   const onSubmit = async (data) => {
     try {
       await sendVerifyEmail(data.email);
-      CHECKMAIL(toast); 
+      CHECKMAIL(toast);
     } catch (error) {
-      REJECT(toast,"Tài khoản đã tồn tại")
+      REJECT(toast, "Tài khoản đã tồn tại");
     }
   };
-
 
   return (
     <div className="min-h-screen overflow-hidden">
@@ -37,19 +36,15 @@ const Index = () => {
       <div className="flex h-screen  ">
         <div className="w-1/2">
           <div className="w-auto h-full">
-            <img
-                src="src/assets/OIG4.jpg"
-              alt=""
-              className="w-full h-full"
-            />
+            <img src={assets.image} alt="" className="w-full h-full" />
           </div>
         </div>
 
         <div className="w-1/2 h-full flex items-center justify-center">
           <div className="w-1/2 h-min">
-          <h1 className="text-left mb-4 font-bold text-black text-3xl">
-                Đăng kí
-              </h1>
+            <h1 className="text-left mb-4 font-bold text-black text-3xl">
+              Đăng kí
+            </h1>
             <form onSubmit={handleSubmit(onSubmit)}>
               <div className="mb-4">
                 <label htmlFor="email" className="cursor-pointer">
@@ -95,8 +90,6 @@ const Index = () => {
               </div>
             </form>
             <div className="w-full flex ">
-            
-
               <span
                 onClick={() => navigate("/login")}
                 className="text-blue-600 cursor-pointer"
@@ -113,7 +106,7 @@ const Index = () => {
           </div>
         </div>
       </div>
-      <Toast ref={toast}/>
+      <Toast ref={toast} />
     </div>
   );
 };
