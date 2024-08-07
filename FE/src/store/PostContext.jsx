@@ -38,6 +38,7 @@ export const PostProvider = ({ children }) => {
   const [isConnect, setIsConnect] = useState(false);
   const [listNotification, setListNotification] = useState(false);
   const hasFetched = useRef(false);
+  const isCheck = isLoggedIn();
   const { fetchNumberNotificationByUserId } = useContext(NotificationContext);
   useEffect(() => {
     // if (hasFetched.current) return; // Prevent fetching if already done
@@ -84,7 +85,7 @@ export const PostProvider = ({ children }) => {
         console.error("Connection failed: ", error);
       }
     };
-    if (user?.sub) {
+    if (user?.sub && isCheck) {
       notification();
     }
     // hasFetched.current = true; // Mark fetch as done
@@ -93,7 +94,7 @@ export const PostProvider = ({ children }) => {
         conn.stop();
       }
     };
-  }, [user?.sub, fetchNumberNotificationByUserId]);
+  }, [user?.sub, isCheck, fetchNumberNotificationByUserId]);
 
   const createPostNotification = (contentPost) => {
     restClient({
