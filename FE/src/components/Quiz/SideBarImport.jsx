@@ -8,7 +8,7 @@ function ItemSideBar({ Menu, index, indexMenu, step }) {
   let bgStep =
     "flex p-2 rounded cursor-pointer bg-[#e9eaea] border border-[#c5c7c7] text-sm items-center gap-x-4 ";
   if (step === Menu.path) {
-    bgStep += " bg-blue-400";
+    bgStep += " bg-blue-500";
   }
   return (
     <li

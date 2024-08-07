@@ -1,5 +1,4 @@
 import { Column } from "primereact/column";
-import { DataTable } from "primereact/datatable";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import FormDataContext from "../../store/FormDataContext";
 import axios from "axios";
@@ -161,7 +160,7 @@ function ImportStepTwo() {
           dòng không hợp lệ
         </span>
       </p>
-      <div className="card overflow-auto">
+      {/* <div className="card overflow-auto">
         <DataTable
           value={excelValidateResponse.quizQuestionImportDtos}
           scrollable
@@ -210,7 +209,8 @@ function ImportStepTwo() {
             className="border-b-2 border-t-2"
           />
         </DataTable>
-      </div>
+      </div> */}
+      <DataTable data={excelValidateResponse.quizQuestionImportDtos || []} />
       <p className="pt-2">
         Tải về tập tin chứa các dòng nhập liệu không thành công
         <a
@@ -225,4 +225,78 @@ function ImportStepTwo() {
   );
 }
 
+const DataTable = ({ data }) => {
+  return (
+    <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
+      <table className="min-w-[1500px] text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+        <thead className="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
+          <tr>
+            <th scope="col" className="px-6 py-3">
+              Question Level
+            </th>
+            <th scope="col" className="px-6 py-3 w-96">
+              Type
+            </th>
+            <th scope="col" className="px-6 py-3 w-96">
+              Content
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Hint
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Image
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Shuffle
+            </th>
+            <th scope="col" className="px-6 py-3">
+              Active
+            </th>
+            <th scope="col" className="px-6 py-3 w-96">
+              Answers
+            </th>
+            <th scope="col" className="px-6 py-3 w-[80vw]">
+              Errors
+            </th>{" "}
+            {/* Adjusted column width */}
+          </tr>
+        </thead>
+        <tbody>
+          {data.map((item, index) => (
+            <tr
+              key={index}
+              className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
+            >
+              <td className="px-6 py-4">{item.questionLevelName || ""}</td>
+              <td className="px-6 py-4 w-96">{item.typeName || ""}</td>
+              <td className="px-6 py-4 w-96">{item.content || ""}</td>
+              <td className="px-6 py-4">{item.hint || ""}</td>
+              <td className="px-6 py-4">{item.image || ""}</td>
+              <td className="px-6 py-4">{item.isShuffle ? "Yes" : "No"}</td>
+              <td className="px-6 py-4">{item.isActive ? "Yes" : "No"}</td>
+              <td className="px-6 py-4 w-[40vw]">
+                {item.quizAnswers && item.quizAnswers.length > 0
+                  ? item.quizAnswers.map((answer, ansIndex) => (
+                      <div key={ansIndex}>
+                        - {answer.content} (
+                        {answer.isCorrect ? "Correct" : "Incorrect"})
+                      </div>
+                    ))
+                  : "No Answers"}
+              </td>
+              <td className="px-6 py-4 text-red-600 w-[80vw]">
+                {item.errors && item.errors.length > 0
+                  ? item.errors.map((error, errorIndex) => (
+                      <div key={errorIndex}>- {error}</div>
+                    ))
+                  : "Hợp Lệ"}
+              </td>{" "}
+              {/* Adjusted column width */}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
 export default ImportStepTwo;
