@@ -19,6 +19,7 @@ import "primeicons/primeicons.css";
 import "./index.css";
 import { InputText } from "primereact/inputtext";
 import { assets } from "../../assets/assets";
+import NotifyProvider from "../../store/NotificationContext";
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -113,6 +114,7 @@ const Index = () => {
   };
 
   return (
+    <NotifyProvider>
     <div>
       <Header />
       <Menu />
@@ -365,6 +367,7 @@ const Index = () => {
       </div>
       <Toast ref={toast} />
     </div>
+    </NotifyProvider>
   );
 };
 

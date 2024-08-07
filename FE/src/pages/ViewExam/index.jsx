@@ -9,6 +9,7 @@ import restClient from "../../services/restClient";
 import "./index.css";
 import { province } from "../../services/province";
 import { years } from "../../services/year";
+import NotifyProvider from "../../store/NotificationContext";
 
 const Index = () => {
   const [first, setFirst] = useState(0);
@@ -99,7 +100,7 @@ const Index = () => {
   };
   
   return (
-    <>
+    <NotifyProvider>
       <Header />
       <Menu />
       {loading ? (
@@ -176,7 +177,7 @@ const Index = () => {
                 </div>
               </>
             )}
-    </>
+    </NotifyProvider>
   );
 };
 
