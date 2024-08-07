@@ -31,12 +31,15 @@ const CustomDropdownInSearch = ({
 
   const handleClear = () => {
     helpers.setValue(null); // Clear the field value
-    // setTouchedState(true); // Set touched state to true after clearing 
+    // setTouchedState(true); // Set touched state to true after clearing
   };
 
   return (
     <div className="mb-5 flex-1">
-      <label htmlFor={props.id || props.name}>{label}{" "}{!props?.isNotRequired && (<span className="text-red-500">*</span>)}</label>
+      <label htmlFor={props.id || props.name}>
+        {label}{" "}
+        {!props?.isNotRequired && <span className="text-red-500">*</span>}
+      </label>
       <Dropdown
         {...field}
         {...props}
@@ -55,11 +58,9 @@ const CustomDropdownInSearch = ({
           "border-gray-300": !meta.error || !(meta.touched || touchedState),
         })}
       />
-      {meta.error &&
-        (meta.touched || touchedState) && (
-          <div className="text-red-500">{meta.error}</div>
-        )
-      }
+      {meta.error && (meta.touched || touchedState) && (
+        <div className="text-red-500">{meta.error}</div>
+      )}
     </div>
   );
 };

@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { Rating } from "primereact/rating";
+import StarRating from "../StarVoting";
 
 const CustomCard = ({ document }) => {
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ const CustomCard = ({ document }) => {
           </p>
         </div>
         <div className="flex items-center mt-3">
-          <Rating value={document?.averageRating} readOnly cancel={false} className="custom-rating" />
+          <StarRating stars={document?.averageRating} />
           <span className="ml-1 text-gray-600">{document?.totalReviewer}</span>
         </div>
       </div>

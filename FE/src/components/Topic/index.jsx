@@ -58,7 +58,6 @@ export default function Topic() {
 
   const pagination = (page, rows) => {
     setLoading(true);
-
     restClient({
       url: `api/topic/getalltopicpagination?PageIndex=${page}&PageSize=${rows}`,
       method: "GET",
@@ -75,7 +74,6 @@ export default function Topic() {
         setLoading(false);
       });
   };
-
   const fetchData = () => {
     if (textSearch.trim()) {
       setLoading(true);
@@ -97,14 +95,12 @@ export default function Topic() {
       pagination(page, rows);
     }
   };
-
   const onPageChange = (event) => {
     const { page, rows, first } = event;
     setRows(rows);
     setPage(page + 1);
     setFirst(first);
   };
-
   const indexBodyTemplate = (rowData, { rowIndex }) => {
     const index = (page - 1) * rows + (rowIndex + 1);
     return <span>{index}</span>;
@@ -139,12 +135,11 @@ export default function Topic() {
       </div>
     );
   };
-
   const confirmDelete = (id) => {
     setVisibleDelete(true);
     confirmDialog({
       message: "Bạn có chắc chắn muốn chủ đề này?",
-      header: "Delete Confirmation",
+      header: "Thông báo",
       icon: "pi pi-info-circle",
       defaultFocus: "reject",
       acceptClassName: "p-button-danger",
@@ -170,7 +165,6 @@ export default function Topic() {
       ),
     });
   };
-
   const deleteDocument = (id) => {
     restClient({ url: `api/topic/deletetopic/${id}`, method: "DELETE" })
       .then((res) => {
@@ -229,7 +223,6 @@ export default function Topic() {
             /> */}
           </div>
         </div>
-
         <div className="border-2 rounded-md mt-2">
           <div className="mb-10 flex flex-wrap items-center p-2">
             <div className="border-2 rounded-md p-2">
@@ -299,38 +292,38 @@ export default function Topic() {
                   header="#"
                   body={indexBodyTemplate}
                   className="border-b-2 border-t-2"
-                  style={{ minWidth: '5rem' }}
+                  style={{ minWidth: "5rem" }}
                 />
                 <Column
                   field="title"
                   header="Tiêu đề"
                   className="border-b-2 border-t-2"
-                  style={{ minWidth: '12rem' }}
+                  style={{ minWidth: "12rem" }}
                 />
                 <Column
                   field="documentTitle"
                   header="Tài liệu"
                   className="border-b-2 border-t-2"
-                  style={{ minWidth: '12rem' }}
+                  style={{ minWidth: "12rem" }}
                 />
                 <Column
                   field="objectives"
                   header="Mục tiêu chủ đề"
                   className="border-b-2 border-t-2"
-                  style={{ minWidth: '15rem' }}
+                  style={{ minWidth: "15rem" }}
                 />
                 <Column
                   field="createdDate"
                   header="Ngày tạo"
                   className="border-b-2 border-t-2"
-                  style={{ minWidth: '20rem' }}
+                  style={{ minWidth: "20rem" }}
                   body={(rowData) => formatDate(rowData.createdDate)}
                 />
                 <Column
                   field="lastModifiedDate"
                   header="Ngày cập nhật"
                   className="border-b-2 border-t-2"
-                  style={{ minWidth: '20rem' }}
+                  style={{ minWidth: "20rem" }}
                   body={(rowData) => formatDate(rowData.lastModifiedDate)}
                 />
                 <Column

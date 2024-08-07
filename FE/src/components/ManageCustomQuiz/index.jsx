@@ -236,7 +236,7 @@ export default function ManageCustomQuiz() {
       />
       <div>
         <div className="flex justify-between pt-1">
-          <h1 className="font-bold text-3xl">Bộ câu hỏi</h1>
+          <h1 className="font-bold text-3xl">Bộ đề</h1>
           <div>
             <Button
               label="Thêm mới"

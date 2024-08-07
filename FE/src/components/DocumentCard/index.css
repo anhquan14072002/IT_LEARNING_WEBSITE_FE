@@ -1,0 +1,27 @@
+#root
+  > div
+  > div.min-h-screen
+  > div.px-20.mt-16.mb-10
+  > div.flex.flex-wrap.justify-between.gap-4.md\:gap-3
+  > div:nth-child(1)
+  > div
+  > div.px-6.py-2.flex.items-center.justify-center
+  > span.style-module_starRatingWrap__q-lJC
+  > span
+  > span.style-module_emptyIcons__Bg-FZ.empty-icons {
+  display: flex;
+}
+
+#root
+  > div
+  > div.min-h-screen
+  > div.px-20.mt-16.mb-10
+  > div.flex.flex-wrap.justify-between.gap-4.md\:gap-3
+  > div:nth-child(2)
+  > div
+  > div.px-6.py-2.flex.items-center.justify-center
+  > span.style-module_starRatingWrap__q-lJC
+  > span
+  > span.style-module_emptyIcons__Bg-FZ.empty-icons {
+  display: flex;
+}
