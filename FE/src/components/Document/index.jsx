@@ -63,7 +63,7 @@ export default function Document() {
     const pageSize = rows || 10;
     const gradeId = filterClass?.id ? `&GradeId=${filterClass.id}` : "";
 
-    const url = `api/document/searchbydocumentpagination?PageIndex=${pageIndex}&PageSize=${pageSize}${gradeId}`;
+    const url = `api/document/getalldocumentpagination?PageIndex=${pageIndex}&PageSize=${pageSize}${gradeId}`;
 
     restClient({
       url,
@@ -88,7 +88,7 @@ export default function Document() {
       const pageSize = rows || 10;
       const gradeId = filterClass?.id ? `&GradeId=${filterClass.id}` : "";
 
-      const url = `api/document/searchbydocumentpagination?Value=${textSearch}&PageIndex=${pageIndex}&PageSize=${pageSize}${gradeId}`;
+      const url = `api/document/getalldocumentpagination?PageIndex=${pageIndex}&PageSize=${pageSize}${gradeId}`;
       restClient({
         url,
         method: "GET",

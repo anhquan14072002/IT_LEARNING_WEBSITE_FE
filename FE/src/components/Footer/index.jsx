@@ -1,45 +1,45 @@
 import React, { forwardRef } from "react";
 import "./index.css";
+import logo from "../../assets/TNV.svg";
 
 const Footer = forwardRef((props, ref) => {
   return (
     <div
       ref={ref}
-      className="bg-[#efefef] text-stone-950 w-[100vw] p-12 h-auto mt-auto z-20"
+      className="bg-[#efefef] text-stone-950 w-[100vw] p-12 h-fit mt-auto z-20"
     >
       <footer class="footer-olm mt-4">
         <div class="footer-top">
+          <a href="https://www.facebook.com/people/SIE18/61562449373390/?notif_id=1721581073983834&notif_t=page_user_activity&ref=notif">
+            <img
+              width="100"
+              height="45"
+              alt="THV Logo"
+              title="Logo"
+              class="img-fluid lazyloaded"
+              src={logo}
+            />
+          </a>
           <div class="container">
             <div class="inner-content">
               <div class="row flex gap-5">
                 <div class="col-lg-6 col-md-4 col-sm-6 col-12">
                   <div class="footer-widget f-about">
-                    <div class="logo">
-                      <a href="https://olm.vn/gioi-thieu">
-                        <img
-                          data-src="https://rs.olm.vn/tentant/landingpage/assets/images/olm-logo.png?v=1722872169"
-                          width="122"
-                          height="45"
-                          alt="OLM Logo"
-                          title="Logo"
-                          class="img-fluid lazyloaded"
-                          src="https://rs.olm.vn/tentant/landingpage/assets/images/olm-logo.png?v=1722872169"
-                        />
-                      </a>
-                    </div>
+                    <div class="logo"></div>
                     <p>
-                      OLM là nền tảng giáo dục số. Với chương trình giảng dạy
-                      bám sát sách giáo khoa từ mẫu giáo đến lớp 12. Các bài học
-                      được cá nhân hoá và phân tích thời gian thực. OLM đáp ứng
-                      nhu cầu riêng của từng người học.
+                      TIN HOC VUI là nền tảng giáo dục Tin Học sáng tạo, cung
+                      cấp bài học tương tác và tài liệu học tập phong phú. Hướng
+                      đến sự phát triển toàn diện cho học sinh và hỗ trợ hiệu
+                      quả cho giáo viên, TIN HOC VUI mang đến trải nghiệm học
+                      tập thú vị và hiệu quả.
                     </p>
                     <p>
-                      Theo dõi OLM trên
+                      Theo dõi TNV trên
                       <a
                         aria-label="Facebook"
                         class="social-lk"
                         className="ml-3"
-                        href="https://www.facebook.com/profile.php?id=61560611572478"
+                        href="https://www.facebook.com/people/SIE18/61562449373390/?notif_id=1721581073983834&notif_t=page_user_activity&ref=notif"
                         target="_blank"
                         data-toggle="tooltip"
                         data-placement="bottom"
@@ -70,7 +70,7 @@ const Footer = forwardRef((props, ref) => {
                             href="https://www.facebook.com/profile.php?id=61560611572478"
                             title="Giới thiệu"
                           >
-                            Về OLM
+                            Về TNV
                           </a>
                         </li>
                         <li>
@@ -103,7 +103,7 @@ const Footer = forwardRef((props, ref) => {
                       <ul>
                         <li>
                           <a
-                            href="https://olm.vn/gioi-thieu/trung-tam-tro-giup"
+                             href="#"
                             title="Trung tâm trợ giúp"
                           >
                             Trung tâm trợ giúp
@@ -111,7 +111,7 @@ const Footer = forwardRef((props, ref) => {
                         </li>
                         <li>
                           <a
-                            href="https://olm.vn/gioi-thieu/docs"
+                           href="#"
                             title="Hướng dẫn sử dụng"
                           >
                             Hướng dẫn sử dụng
@@ -119,23 +119,23 @@ const Footer = forwardRef((props, ref) => {
                         </li>
                         <li>
                           <a
-                            href="https://olm.vn/gioi-thieu/feedback"
+                            href="#"
                             title="Nói với chúng tôi cái bạn nghĩ"
                           >
-                            Phản hồi với OLM
+                            Phản hồi với TNV
                           </a>
                         </li>
                         <li>
                           <a
-                            href="https://olm.vn/gioi-thieu/phan-hoi-khach-hang"
+                            href="#"
                             title="Phản hồi khách hàng"
                           >
-                            KH nói về OLM
+                            KH nói về TNV
                           </a>
                         </li>
                         <li>
                           <a
-                            href="https://olm.vn/gioi-thieu/lien-he"
+                          href="#"
                             title="Liên hệ"
                           >
                             Liên hệ
@@ -145,41 +145,7 @@ const Footer = forwardRef((props, ref) => {
                     </div>
                   </div>
                 </div>
-                {/* <div class="col-lg-2 col-md-2 col-sm-6 col-12">
-                  <div class="footer-widget f-link">
-                    <h5>Ứng dụng mobile</h5>
-                    <a
-                      href="https://apps.apple.com/vn/app/olm/id6497209326?l=vi"
-                      target="_blank"
-                      title="Tải ứng dụng trên App Store"
-                      data-tracking-id="app-store"
-                    >
-                      <img
-                        data-src="/images/footer-store-app.png?v=1722872169"
-                        width="150"
-                        height="45"
-                        title="OLM trên App Store"
-                        class="img-fluid lazyloaded"
-                        src="/images/footer-store-app.png?v=1722872169"
-                      />
-                    </a>
-                    <a
-                      href="https://play.google.com/store/apps/details?id=vn.olm.olmapp"
-                      target="_blank"
-                      title="Tải ứng dụng OLM trên Google Play"
-                      data-tracking-id="google-play"
-                    >
-                      <img
-                        data-src="/images/footer-google-app.png?v=1722872169"
-                        width="150"
-                        height="45"
-                        title="OLM trên Google Play"
-                        class="img-fluid mt-2 lazyloaded"
-                        src="/images/footer-google-app.png?v=1722872169"
-                      />
-                    </a>
-                  </div>
-                </div> */}
+
               </div>
             </div>
           </div>

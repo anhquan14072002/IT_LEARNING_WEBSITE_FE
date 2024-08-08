@@ -27,6 +27,8 @@ export default function ExamCode({
   const [visibleExam, setVisibleExam] = useState(false);
   const [examValue, setExamValue] = useState({});
   const [updateExamCodeValue, setUpdateExamCodeValue] = useState({});
+  const [visibleDelete, setVisibleDelete] = useState(false);
+
 
   useEffect(() => {
     fetchData();

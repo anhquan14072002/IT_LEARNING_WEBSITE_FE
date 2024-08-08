@@ -34,7 +34,7 @@ export default function Lesson() {
   const dropDownRef1 = useRef(null);
   const dropDownRef2 = useRef(null);
   const [selectedCity, setSelectedCity] = useState(null);
-  const [products, setLessons] = useState([]);
+  const [products, setProducts] = useState([]);
   const [selectedLesson, setSelectedLesson] = useState(null);
   const cm = useRef(null);
   const [visible, setVisible] = useState(false);
@@ -73,7 +73,7 @@ export default function Lesson() {
     if (textSearch.trim()) {
       setLoading(true);
       restClient({
-        url: `api/lesson/searchbylessonpagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}`,
+        url: `api/lesson/getalllessonpagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}`,
         method: "GET",
       })
         .then((res) => {
