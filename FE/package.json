@@ -1,8 +1,9 @@
 {
   "name": "fe",
-  "private": true,
   "version": "0.0.0",
   "type": "module",
+  "lockfileVersion": 3,
+  "requires": true,
   "scripts": {
     "dev": "vite",
     "build": "vite build",
