@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import avatar from "../../assets/img/icons8-male-user-50.png";
-import logo from "../../assets/app-logo.svg";
+import logo from "../../assets/TNV.svg";
 import arrowDown from "../../assets/img/icons8-sort-down-50.png";
 import "./index.css";
 import { Tooltip } from "primereact/tooltip";
@@ -17,7 +17,6 @@ import { addUser, retmoveUser } from "../../redux/userr/userSlice";
 import { Menu } from "primereact/menu";
 import { NotificationContext } from "../../store/NotificationContext";
 import image from "../../assets/img/image.png";
-
 
 export default function Header({ params, setParams, textSearchProps }) {
   const navigate = useNavigate();
@@ -47,14 +46,13 @@ export default function Header({ params, setParams, textSearchProps }) {
     navigate("/login");
   };
 
-
   const items = [
     {
       items: [
         {
           label: "Quản lí",
           icon: "pi pi-chart-bar",
-          command: (e) => navigate('/dashboard/statistic'),
+          command: (e) => navigate("/dashboard/statistic"),
         },
         {
           label: "Đăng xuất",
@@ -154,11 +152,12 @@ export default function Header({ params, setParams, textSearchProps }) {
         <div className="bg-[#1976D2] flex justify-between py-4 px-16">
           <div className="flex items-center">
             <img
-                className="h-[50px] w-[50px] cursor-pointer"
-                src={logo}
-                onClick={() => navigate("/")}
-              />
+              className="h-[50px] w-[50px] cursor-pointer"
+              src={logo}
+              onClick={() => navigate("/")}
+            />
           </div>
+
           <div className="flex">
             <div className="border border-white rounded-3xl flex items-center px-2.5 py-2 gap-2.5">
               <svg
@@ -342,7 +341,7 @@ export default function Header({ params, setParams, textSearchProps }) {
                   <div className="ml-2 flex items-center">
                     <img
                       className="h-[40px] w-[40px] rounded-full"
-                      src={user?.picture} 
+                      src={user?.picture}
                     />
                     <Menu
                       model={items}

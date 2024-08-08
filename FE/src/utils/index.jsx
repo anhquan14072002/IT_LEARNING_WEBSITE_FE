@@ -1,5 +1,6 @@
 import { jwtDecode } from "jwt-decode";
 import { province } from "../services/province";
+import { years } from "../services/year";
 
 export const handleMultipleContent = (answers) => {
   return answers.some(
@@ -312,6 +313,10 @@ export const getProvinceByName = (name) => {
   );
   return foundProvince;
 };
+export function getYearByYear(yearValue) {
+  return years.find(yearObj => yearObj.year === yearValue) || null;
+}
+
 export const TYPE = [
   { name: "Tự Luận", code: 1 },
   { name: "Trắc Nghiệm", code: 2 },
