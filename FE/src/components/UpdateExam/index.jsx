@@ -6,12 +6,20 @@ import CustomTextInput from "../../shared/CustomTextInput";
 import CustomEditor from "../../shared/CustomEditor";
 import { Button } from "primereact/button";
 import Loading from "../Loading";
-import { getProvinceByName, REJECT, SUCCESS, TYPE } from "../../utils";
+import {
+  getProvinceByName,
+  getYearByYear,
+  REJECT,
+  SUCCESS,
+  TYPE,
+} from "../../utils";
 import { FileUpload } from "primereact/fileupload";
 import CustomDropdown from "../../shared/CustomDropdown";
 import restClient from "../../services/restClient";
 import { province } from "../../services/province";
 import { MultiSelect } from "primereact/multiselect";
+import { Dropdown } from "primereact/dropdown";
+import { years } from "../../services/year";
 // import "./index.css";
 
 const baseValidationSchema = Yup.object({
@@ -27,11 +35,11 @@ const baseValidationSchema = Yup.object({
       return Object.keys(value).length !== 0;
     })
     .required("Không bỏ trống trường này"),
-  year: Yup.number()
-    .required("Năm không được bỏ trống")
-    .min(1900, "Năm phải lớn hơn 1900")
-    .integer("Năm phải là số nguyên")
-    .test("len", "Sai định dạng năm", (val) => val.toString().length === 4),
+  year: Yup.object()
+    .test("is-not-empty", "Không được để trống trường này", (value) => {
+      return Object.keys(value).length !== 0;
+    })
+    .required("Không bỏ trống trường này"),
 });
 
 export default function UpdateExam({
@@ -48,17 +56,22 @@ export default function UpdateExam({
   const [loading, setLoading] = useState(false);
   const [competitionList, setCompetitionList] = useState([]);
   const [competitionById, setCompetitionById] = useState([]);
+  const [gradeTitle, setGradeTitle] = useState([]);
   const [tagList, setTagList] = useState([]);
   const [tag, setTag] = useState(null);
-
+  const [gradeList, setGradeList] = useState([]);
+  const [seletedGrade, setSeletedGrade] = useState(updateValue.gradeId);
+  const [yearList, setYearList] = useState([]);
   const [initialValues, setInitialValues] = useState({
     competition: {},
     title: "",
     province: {},
     description: "",
-    year: "",
+    year: {},
     numberQuestion: "",
   });
+  console.log(updateValue);
+
   useEffect(() => {
     const fetchData = async () => {
       if (updateValue?.competitionId) {
@@ -74,78 +87,110 @@ export default function UpdateExam({
         }
       }
     };
-
+    const fetchDataGrade = async () => {
+      if (updateValue?.gradeId) {
+        try {
+          const response = await restClient({
+            url: `api/grade/getgradebyid/${updateValue?.gradeId}`,
+            method: "GET",
+          });
+          console.log(response?.data?.data);
+          setGradeTitle(response?.data?.data?.title || []);
+        } catch (error) {
+          console.error("Error fetching data:", error);
+        }
+      }
+    };
     fetchData();
+    fetchDataGrade();
   }, [updateValue]);
+  useEffect(() => {
+    if (years) {
+      setYearList(years);
+    }
+  });
 
   useEffect(() => {
     const province = getProvinceByName(updateValue?.province);
-    console.log(province);
-    console.log(competitionById);
+    const year = getYearByYear(updateValue?.year);
 
     if (province && updateValue) {
       setProvinceList(province.data || []);
+      setYearList(year ? [year] : []); // Ensure `setYearList` gets an array of year objects
       setInitialValues(() => ({
         competition: competitionById,
         title: updateValue?.title || "",
         province,
         description: updateValue?.description || "",
-        year: updateValue?.year || "",
+        year: year || {}, // Ensure `year` is set to an object or default to empty object
         numberQuestion: updateValue?.numberQuestion || "",
       }));
     }
   }, [competitionById, updateValue]);
   useEffect(() => {
-    if (province?.data) {
-      setProvinceList(province.data);
-    }
     const fetchData = async () => {
       try {
-        const response = await restClient({
+        // Fetch competition list
+        const competitionResponse = await restClient({
           url: "api/competition/getallcompetition",
           method: "GET",
         });
-        console.log(response?.data?.data);
+        console.log(competitionResponse?.data?.data);
         setCompetitionList(
-          Array.isArray(response?.data?.data) ? response?.data?.data : []
+          Array.isArray(competitionResponse?.data?.data)
+            ? competitionResponse?.data?.data
+            : []
         );
-      } catch (error) {
-        console.log("error");
-      }
-    };
 
-    const fetchDataTag = async () => {
-      try {
-        const response = await restClient({
+        // Fetch tag list
+        const tagResponse = await restClient({
           url: "api/tag/getalltag",
           method: "GET",
         });
-        console.log(response?.data?.data);
+        console.log(tagResponse?.data?.data);
         setTagList(
-          Array.isArray(response?.data?.data) ? response?.data?.data : []
+          Array.isArray(tagResponse?.data?.data) ? tagResponse?.data?.data : []
+        );
+
+        // Fetch grade list
+        const gradeResponse = await restClient({
+          url: "api/grade/getallgrade",
+          method: "GET",
+        });
+        console.log(gradeResponse?.data?.data);
+        setGradeList(
+          Array.isArray(gradeResponse?.data?.data)
+            ? gradeResponse?.data?.data
+            : []
         );
       } catch (error) {
-        console.log("error");
+        console.error("An error occurred:", error);
       }
     };
+    if (province?.data) {
+      setProvinceList(province.data);
+    }
+
+    // Call the fetchData function
     fetchData();
-    fetchDataTag();
   }, [province]);
 
   console.log(updateValue);
 
   const onSubmit = async (values, { resetForm }) => {
     setLoading(true);
+    console.log(values);
+
     const formData = new FormData();
     formData.append("Id", updateValue.id);
     formData.append("Type", types);
-    formData.append("CompetitionId", values.competition.id);
-    formData.append("Title", values.title);
-    formData.append("Province", values.province.name);
-    formData.append("Description", values.description);
-    formData.append("NumberQuestion", values.numberQuestion);
-    formData.append("Year", values.year);
-    formData.append("isActive", updateValue?.isActive);
+    formData.append("CompetitionId", values.competition.id || "");
+    formData.append("Title", values.title || "");
+    formData.append("Province", values.province.name|| "");
+    formData.append("Description", values.description || "");
+    formData.append("NumberQuestion", values.numberQuestion || "");
+    formData.append("Year", values.year.year || "");
+    formData.append("isActive", updateValue?.isActive );
     if (tag && tag.length > 0) {
       tag.forEach((item, index) => {
         formData.append(`tagValues[${index}]`, item.keyWord);
@@ -167,7 +212,7 @@ export default function UpdateExam({
     } catch (error) {
       console.error("Error adding exam:", error);
       setTag([]);
-      REJECT(toast, error.message);
+      REJECT(toast, "Sửa đề thi không thành công ");
     } finally {
       setLoading(false);
       setVisibleUpdate(false);
@@ -186,6 +231,11 @@ export default function UpdateExam({
           numberQuestion: Yup.number().required("Không được bỏ trống"),
         })
       : baseValidationSchema;
+
+  const handleGrade = (e) => {
+    setSeletedGrade(e.value.title);
+    setGradeValue(e.value.id);
+  };
 
   return (
     <Dialog
@@ -230,7 +280,18 @@ export default function UpdateExam({
                 name="competition"
                 options={competitionList}
               />
-
+              <span>Lớp</span>
+              <Dropdown
+                value={seletedGrade}
+                onChange={handleGrade}
+                options={gradeList}
+                optionLabel="title"
+                editable
+                placeholder={gradeTitle ? gradeTitle : "Lớp"}
+                className="border border-gray-300 shadow-none  flex items-center w-full py-2 gap-2.5 "
+                filter
+              />
+              {console.log(provinceList)}
               <CustomDropdown
                 title={updateValue.province ? updateValue.province : "Tỉnh"}
                 label={
@@ -260,15 +321,17 @@ export default function UpdateExam({
                   required
                 />
               </div>
-              <CustomTextInput
+              <CustomDropdown
+                title={updateValue?.year ? updateValue?.year : "Năm"}
                 label={
                   <>
                     <span>Năm</span>
                   </>
                 }
+                customTitle="year"
                 id="year"
                 name="year"
-                type="number"
+                options={yearList}
               />
               {types === 2 && (
                 <CustomTextInput
@@ -332,7 +395,7 @@ export default function UpdateExam({
                   Hủy
                 </Button>
                 <Button className="p-2 bg-blue-500 text-white" type="submit">
-                 Sửa
+                  Sửa
                 </Button>
               </div>
             </Form>

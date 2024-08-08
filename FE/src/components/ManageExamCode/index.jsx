@@ -53,8 +53,9 @@ export default function ManageExam() {
   const fetchData = ()=> {
     setLoading(true);
       const title = "title"
+      const id = "id"
     restClient({
-      url: `api/exam/searchbyexampagination?PageIndex=${page}&PageSize=${rows}&Type=2&Key=${title}&Value=${textSearch}`,
+      url: `api/exam/searchbyexampagination?PageIndex=${page}&PageSize=${rows}&Type=2&Key=${title}&Value=${textSearch}&OrderBy=${id}&IsAscending=false`,
       method: "GET",
     })
       .then((res) => {
@@ -269,21 +270,7 @@ export default function ManageExam() {
               />
             </div>
 
-            <div className="flex-1 flex flex-wrap gap-3 justify-end">
-              <div className="border-2 rounded-md mt-4">
-                <Dropdown
-                  filter
-                  ref={dropDownRef2}
-                  value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.value)}
-                  options={cities}
-                  optionLabel="name"
-                  showClear
-                  placeholder="Tài liệu"
-                  className="w-full md:w-14rem shadow-none h-full"
-                />
-              </div>
-            </div>
+            
           </div>
           {loading ? (
             <Loading />
