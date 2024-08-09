@@ -45,7 +45,7 @@ function PostQuestion({ post, isFavoritePost }) {
       description: `Bạn đã thu hồi bài post thành công`,
       notificationTime: new Date(),
       isRead: false,
-      link: "string",
+      link: "",
     };
     createPostNotification(body);
   }

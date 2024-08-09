@@ -21,28 +21,46 @@ export default function Class({ item, index }) {
   //   setContentHeight(toggle ? `${contentRef.current.scrollHeight}px` : "0px");
   // }, [toggle]);
   useEffect(() => {
-    setTimeout(()=>{
+    setTimeout(() => {
       // Function to update contentHeight based on toggle state
-    const updateContentHeight = () => {
-      setContentHeight(toggle ? `${contentRef?.current?.scrollHeight}px` : "0px");
-    };
+      const updateContentHeight = () => {
+        setContentHeight(
+          toggle ? `${contentRef?.current?.scrollHeight}px` : "0px"
+        );
+      };
 
-    // Call initially and on toggle change
-    updateContentHeight();
+      // Call initially and on toggle change
+      updateContentHeight();
 
-    // Listen to window resize events
-    window.addEventListener('resize', updateContentHeight);
+      // Listen to window resize events
+      window.addEventListener("resize", updateContentHeight);
 
-    // Cleanup function to remove event listener
-    return () => {
-      window.removeEventListener('resize', updateContentHeight);
-    };
-    },100)
+      // Cleanup function to remove event listener
+      return () => {
+        window.removeEventListener("resize", updateContentHeight);
+      };
+    }, 300);
   }, [toggle]);
 
   const handleToggle = () => {
-    setToggle(prevToggle => !prevToggle);
+    setToggle((prevToggle) => !prevToggle);
   };
+
+  // Helper function to extract quizzes by type
+  const extractQuizzesByType = (type) => {
+    return (documentList?.documents ?? []).flatMap((d) =>
+      (d.topics ?? []).flatMap((t) =>
+        [
+          ...(t.quizzes ?? []).filter((q) => q.type === type),
+          ...(t.lessons ?? []).flatMap((l) => (l.quizzes ?? []).filter((q) => q.type === type)),
+        ]
+      )
+    );
+  };
+
+  // Extract quizzes for both "Practice" and "Test"
+  const practiceQuizzes = extractQuizzesByType("Practice");
+  const testQuizzes = extractQuizzesByType("Test");
 
   return (
     <div>
@@ -50,7 +68,11 @@ export default function Class({ item, index }) {
         className="mt-4 flex items-center justify-between border-2 p-2 rounded-md cursor-pointer"
         onClick={handleToggle}
       >
-        <h1 className={`font-semibold ${toggle ? "text-blue-600 text-xl" : "text-lg"}`}>
+        <h1
+          className={`font-semibold ${
+            toggle ? "text-blue-600 text-xl" : "text-lg"
+          }`}
+        >
           {item?.title}
         </h1>
         <img
@@ -72,50 +94,120 @@ export default function Class({ item, index }) {
       >
         <div className="flex gap-20 flex-wrap">
           <div>
-            <h1 className="font-bold mb-3">Đề thi</h1>
-            <h1>Đề thi 1</h1>
-            <h1>Đề thi 2</h1>
-            <h1>Đề thi 3</h1>
-            <h1>Đề thi 4</h1>
-            <h1 className="text-sm text-blue-600 mt-3">Xem tất cả</h1>
-          </div>
-          <div>
-            <h1 className="font-bold mb-3">Bài tập</h1>
-            <h1>Bài tập 1</h1>
-            <h1>Bài tập 2</h1>
-            <h1>Bài tập 3</h1>
-            <h1>Bài tập 4</h1>
-            <h1 className="text-sm text-blue-600 mt-3 cursor-pointer">
-              Xem tất cả
-            </h1>
-          </div>
-          <div>
             <h1 className="font-bold mb-3">Các bộ sách</h1>
-            {documentList &&
-              documentList.map((d, i) => (
-                <h1
-                  key={d.id}
-                  className="cursor-pointer hover:opacity-85"
-                  onClick={() => navigate(`/document/${d.id}`)}
-                >
-                  {d.title}
-                </h1>
-              ))}
-            {documentList && documentList.length > 4 && (
-              <h1 className="text-sm text-blue-600 mt-3 cursor-pointer" onClick={()=>navigate('/search?classId='+item.id)}>
+            {documentList?.documents?.map((d) => (
+              <h1
+                key={d.id}
+                className="cursor-pointer hover:opacity-85"
+                onClick={() => navigate(`/document/${d.id}`)}
+              >
+                {d.title}
+              </h1>
+            ))}
+            {documentList?.documents?.length > 4 && (
+              <h1
+                className="text-sm text-blue-600 mt-3 cursor-pointer"
+                onClick={() => navigate(`/search?classId=${item.id}`)}
+              >
+                Xem tất cả
+              </h1>
+            )}
+          </div>
+
+          <div>
+        <h1 className="font-bold mb-3">Câu hỏi ôn tập flashcard</h1>
+        {practiceQuizzes.map((d) => (
+          <h1
+            key={d.id}
+            className="cursor-pointer hover:opacity-85"
+            onClick={() => navigate(`/flashcard/${d.id}`)}
+          >
+            {d.title}
+          </h1>
+        ))}
+        {practiceQuizzes.length > 4 && (
+          <h1
+            className="text-sm text-blue-600 mt-3 cursor-pointer"
+            onClick={() => navigate(`/searchquiz`)}
+          >
+            Xem tất cả
+          </h1>
+        )}
+      </div>
+
+      <div>
+        <h1 className="font-bold mb-3">Câu hỏi ôn tập trắc nghiệm</h1>
+        {testQuizzes.map((d) => (
+          <h1
+            key={d.id}
+            className="cursor-pointer hover:opacity-85"
+            onClick={() => navigate(`/testquiz/${d.id}`)}
+          >
+            {d.title}
+          </h1>
+        ))}
+        {testQuizzes.length > 4 && (
+          <h1
+            className="text-sm text-blue-600 mt-3 cursor-pointer"
+            onClick={() => navigate(`/searchquiz`)}
+          >
+            Xem tất cả
+          </h1>
+        )}
+      </div>
+    
+        
+          <div>
+            <h1 className="font-bold mb-3">Đề thi</h1>
+            {documentList?.exams?.map((exam) => (
+              <h1
+                key={exam.id}
+                className="cursor-pointer hover:opacity-85"
+                onClick={() => navigate(`/document/${exam.id}`)}
+              >
+                {exam.title}
+              </h1>
+            ))}
+            {documentList?.exams?.length > 4 && (
+              <h1
+                className="text-sm text-blue-600 mt-3 cursor-pointer"
+                onClick={() => navigate(`/search?classId=${item.id}`)}
+              >
                 Xem tất cả
               </h1>
             )}
           </div>
           <div>
-            <h1 className="font-bold mb-3">Câu hỏi ôn tập</h1>
-            <h1>Câu hỏi ôn tập 1</h1>
-            <h1>Câu hỏi ôn tập 2</h1>
-            <h1>Câu hỏi ôn tập 3</h1>
-            <h1>Câu hỏi ôn tập 4</h1>
-            <h1 className="text-sm text-blue-600 mt-3 cursor-pointer">
-              Xem tất cả
-            </h1>
+            <h1 className="font-bold mb-3">Bài tập</h1>
+            {documentList?.documents
+              ?.flatMap(
+                (d) =>
+                  d.topics?.flatMap(
+                    (t) => t.lessons?.flatMap((l) => l.problems) || []
+                  ) || []
+              )
+              ?.map((problem) => (
+                <h1
+                  key={problem.id}
+                  className="cursor-pointer hover:opacity-85"
+                  onClick={() => navigate(`/codeEditor/${problem.id}`)}
+                >
+                  {problem.title}
+                </h1>
+              ))}
+            {documentList?.documents?.flatMap(
+              (d) =>
+                d.topics?.flatMap(
+                  (t) => t.lessons?.flatMap((l) => l.problems) || []
+                ) || []
+            )?.length > 4 && (
+              <h1
+                className="text-sm text-blue-600 mt-3 cursor-pointer"
+                onClick={() => navigate(`/search?classId=${item.id}`)}
+              >
+                Xem tất cả
+              </h1>
+            )}
           </div>
         </div>
       </div>

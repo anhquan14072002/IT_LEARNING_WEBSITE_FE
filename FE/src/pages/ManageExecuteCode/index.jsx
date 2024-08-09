@@ -1,7 +1,7 @@
 import debounce from "lodash.debounce";
 import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
-import React, { useContext, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Paginator } from "primereact/paginator";
@@ -12,38 +12,33 @@ import restClient from "../../services/restClient";
 import Loading from "../../components/Loading";
 import {
   ACCEPT,
-  formatDate,
+  decodeBase64,
   getTokenFromLocalStorage,
   REJECT,
 } from "../../utils";
 import { InputSwitch } from "primereact/inputswitch";
-import AddQuizLesson from "../../components/AddQuizLesson";
-import UpdateQuizLesson from "../../components/UpdateQuizLesson";
-import AddQuestion from "../../components/AddQuestion";
-import UpdateQuestion from "../../components/UpdateQuestion";
 import { useNavigate, useParams } from "react-router-dom";
 import Header from "../../components/Header";
 import { Tooltip } from "primereact/tooltip";
-import ImportFromQuiz from "../../components/ImportFromQuiz";
-import NotifyProvider from "../../store/NotificationContext";
-import FormDataContext, { FormDataProvider } from "../../store/FormDataContext";
+import { Controlled as CodeMirror } from "react-codemirror2";
+import "codemirror/mode/javascript/javascript";
+import "codemirror/mode/python/python";
+import "codemirror/lib/codemirror.css";
+import "codemirror/theme/material.css";
 
-export function ManageQuestionOfQuizlistProvider() {
+export default function ManageExecuteCode() {
   const toast = useRef(null);
   const dropDownRef1 = useRef(null);
   const dropDownRef2 = useRef(null);
   const [selectedCity, setSelectedCity] = useState(null);
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
-  const cm = useRef(null);
-  const [visible, setVisible] = useState(false);
   const [visibleImport, setVisibleImport] = useState(false);
   const [updateValue, setUpdateValue] = useState({});
   const [visibleUpdate, setVisibleUpdate] = useState(false);
   const [visibleDelete, setVisibleDelete] = useState(false);
   const [loading, setLoading] = useState(false);
   const [textSearch, setTextSearch] = useState("");
-  const { setQuizId } = useContext(FormDataContext);
   const { id } = useParams();
 
   //pagination
@@ -70,23 +65,22 @@ export function ManageQuestionOfQuizlistProvider() {
   ];
 
   useEffect(() => {
-    setQuizId(id);
-  }, [id]);
-  useEffect(() => {
     fetchData();
   }, [page, rows, textSearch]);
 
-  const pagination = (page, rows) => {
+  const fetchData = () => {
     setLoading(true);
 
     restClient({
-      url: `api/quizquestion/getallquizquestionpagination?QuizId=${id}&PageIndex=${page}&PageSize=${rows}`,
+      url: `api/executecode/getallexecutecodebyproblemid/${id}`,
       method: "GET",
     })
       .then((res) => {
-        const paginationData = JSON.parse(res.headers["x-pagination"]);
-        setTotalPage(paginationData.TotalPages);
-        setProducts(Array.isArray(res.data.data) ? res.data.data : []);
+        const data = res.data.data;
+        setProducts(Array.isArray(data) ? data : []);
+        // Optional: handle pagination metadata if provided
+        // const paginationData = JSON.parse(res.headers["x-pagination"]);
+        // setTotalPage(paginationData.TotalPages);
         setLoading(false);
       })
       .catch((err) => {
@@ -94,28 +88,6 @@ export function ManageQuestionOfQuizlistProvider() {
         setProducts([]);
         setLoading(false);
       });
-  };
-
-  const fetchData = () => {
-    // if (textSearch.trim()) {
-    //   setLoading(true);
-    //   restClient({
-    //     url: `api/topic/searchbytopicpagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}`,
-    //     method: "GET",
-    //   })
-    //     .then((res) => {
-    //       const paginationData = JSON.parse(res.headers["x-pagination"]);
-    //       setTotalPage(paginationData.TotalPages);
-    //       setProducts(Array.isArray(res.data.data) ? res.data.data : []);
-    //     })
-    //     .catch((err) => {
-    //       console.error("Error fetching data:", err);
-    //       setProducts([]);
-    //     })
-    //     .finally(() => setLoading(false));
-    // } else {
-    pagination(page, rows);
-    // }
   };
 
   const onPageChange = (event) => {
@@ -130,17 +102,29 @@ export function ManageQuestionOfQuizlistProvider() {
     return <span>{index}</span>;
   };
 
-  const content = (rowData, { rowIndex }) => {
-    return <span dangerouslySetInnerHTML={{ __html: rowData?.content }}></span>;
+  const contentBodyTemplate = (rowData) => {
+    return (
+      <CodeMirror
+        value={decodeBase64(rowData?.mainCode)}
+        options={{
+          theme: "material",
+          lineNumbers: true,
+        }}
+      />
+    );
   };
 
-  const cities = [
-    { name: "New York", code: "NY" },
-    { name: "Rome", code: "RM" },
-    { name: "London", code: "LDN" },
-    { name: "Istanbul", code: "IST" },
-    { name: "Paris", code: "PRS" },
-  ];
+  const samplecode = (rowData) => {
+    return (
+      <CodeMirror
+        value={decodeBase64(rowData?.sampleCode)}
+        options={{
+          theme: "material",
+          lineNumbers: true,
+        }}
+      />
+    );
+  };
 
   const actionBodyTemplate = (rowData) => {
     return (
@@ -167,7 +151,7 @@ export function ManageQuestionOfQuizlistProvider() {
   const confirmDelete = (id) => {
     setVisibleDelete(true);
     confirmDialog({
-      message: "Bạn có chắc chắn muốn bài quiz này?",
+      message: "Bạn có chắc chắn muốn xóa mã thực thi này?",
       header: "Delete Confirmation",
       icon: "pi pi-info-circle",
       defaultFocus: "reject",
@@ -197,7 +181,7 @@ export function ManageQuestionOfQuizlistProvider() {
 
   const deleteDocument = (id) => {
     restClient({
-      url: `api/quizquestion/deletequizquestion/${id}`,
+      url: `api/executecode/delete/${id}`,
       method: "DELETE",
     })
       .then((res) => {
@@ -205,7 +189,7 @@ export function ManageQuestionOfQuizlistProvider() {
         ACCEPT(toast, "Xóa thành công");
       })
       .catch((err) => {
-        REJECT(toast, "Xảy ra lỗi khi xóa câu hỏi này");
+        REJECT(toast, "Xảy ra lỗi khi xóa mã thực thi này");
       })
       .finally(() => {
         setVisibleDelete(false);
@@ -218,7 +202,7 @@ export function ManageQuestionOfQuizlistProvider() {
 
   const changeStatusLesson = (value, id) => {
     restClient({
-      url: "api/quizquestion/updatestatusquizquestion?id=" + id,
+      url: `api/executecode/updatestatus/${id}`,
       method: "PUT",
       headers: {
         Authorization: `Bearer ${getTokenFromLocalStorage()}`,
@@ -233,7 +217,7 @@ export function ManageQuestionOfQuizlistProvider() {
       });
   };
 
-  const status = (rowData, { rowIndex }) => {
+  const statusBodyTemplate = (rowData) => {
     return (
       <InputSwitch
         checked={rowData?.isActive}
@@ -244,7 +228,7 @@ export function ManageQuestionOfQuizlistProvider() {
   };
 
   return (
-    <NotifyProvider>
+    <>
       <div className="fixed top-0 w-full z-30">
         <Header />
       </div>
@@ -260,7 +244,6 @@ export function ManageQuestionOfQuizlistProvider() {
                border-2 rounded-full ${!open ? "rotate-180" : ""}`}
             onClick={() => setOpen(!open)}
           />
-
           <ul className="pt-6">
             {Menus.map((Menu) => (
               <li
@@ -289,55 +272,17 @@ export function ManageQuestionOfQuizlistProvider() {
           <div>
             <Toast ref={toast} />
             <ConfirmDialog visible={visibleDelete} />
-            {/* <ImportFromQuiz
-              visible={visibleImport}
-              setVisible={setVisibleImport}
-              toast={toast}
-              fetchData={fetchData}
-              id={id}
-            /> */}
-            <AddQuestion
-              id={id}
-              visible={visible}
-              setVisible={setVisible}
-              toast={toast}
-              fetchData={fetchData}
-            />
-            <UpdateQuestion
-              visibleUpdate={visibleUpdate}
-              setVisibleUpdate={setVisibleUpdate}
-              updateValue={updateValue}
-              toast={toast}
-              fetchData={fetchData}
-            />
             <div>
               <div className="flex justify-between pt-1">
-                <h1 className="font-bold text-3xl">Câu hỏi quiz</h1>
+                <h1 className="font-bold text-3xl">Quản lý mã thực thi</h1>
                 <div className="flex gap-5">
                   <Button
-                    label="Import câu hỏi"
+                    label="Thêm mã thực thi"
                     icon="pi pi-plus-circle"
                     severity="info"
                     className="bg-blue-600 text-white p-2 text-sm font-normal"
-                    onClick={() => navigate("/importQuiz/stepOne")}
+                    onClick={() => navigate("/dashboard/createcode/"+id)}
                   />
-                  <Button
-                    label="Soạn câu hỏi mới"
-                    icon="pi pi-plus-circle"
-                    severity="info"
-                    className="bg-blue-600 text-white p-2 text-sm font-normal"
-                    onClick={() => setVisible(true)}
-                  />
-                  {/* <Button
-              label="Xóa"
-              icon="pi pi-trash"
-              disabled={!selectedProduct || selectedProduct.length === 0}
-              severity="danger"
-              className="bg-red-600 text-white p-2 text-sm font-normal ml-3"
-              onClick={() => {
-                console.log("product list ::", selectedProduct);
-              }}
-            /> */}
                 </div>
               </div>
 
@@ -346,9 +291,7 @@ export function ManageQuestionOfQuizlistProvider() {
                   <div className="border-2 rounded-md p-2">
                     <InputText
                       onChange={(e) => {
-                        handleSearchInput(
-                          removeVietnameseTones(e.target.value)
-                        );
+                        handleSearchInput(e.target.value);
                       }}
                       placeholder="Search"
                       className="flex-1 focus:outline-none w-36 focus:ring-0"
@@ -359,7 +302,7 @@ export function ManageQuestionOfQuizlistProvider() {
                     />
                   </div>
 
-                  <div className="flex-1 flex flex-wrap gap-3 justify-end">
+                  {/* <div className="flex-1 flex flex-wrap gap-3 justify-end">
                     <div className="border-2 rounded-md mt-4">
                       <Dropdown
                         filter
@@ -373,7 +316,7 @@ export function ManageQuestionOfQuizlistProvider() {
                         className="w-full md:w-14rem shadow-none h-full"
                       />
                     </div>
-                  </div>
+                  </div> */}
                 </div>
                 {loading ? (
                   <Loading />
@@ -384,16 +327,9 @@ export function ManageQuestionOfQuizlistProvider() {
                       loading={loading}
                       className="border-t-2"
                       tableStyle={{ minHeight: "30rem" }}
-                      selection={selectedProduct}
-                      onSelectionChange={(e) => setSelectedProduct(e.value)}
                       scrollable
                       scrollHeight="30rem"
                     >
-                      {/* <Column
-                  selectionMode="multiple"
-                  headerStyle={{ width: "3rem" }}
-                  className="border-b-2 border-t-2 custom-checkbox-column"
-                ></Column> */}
                       <Column
                         field="#"
                         header="#"
@@ -401,49 +337,29 @@ export function ManageQuestionOfQuizlistProvider() {
                         className="border-b-2 border-t-2"
                       />
                       <Column
-                        header="Nội dung"
+                        header="Mã chính"
+                        body={contentBodyTemplate}
                         className="border-b-2 border-t-2"
                         style={{ minWidth: "35rem" }}
-                        body={content}
                       />
                       <Column
-                        field="type"
-                        header="Loại câu hỏi"
+                        header="Mã mẫu"
+                        body={samplecode}
+                        className="border-b-2 border-t-2"
+                        style={{ minWidth: "35rem" }}
+                      />
+                      <Column
+                        header="Ngôn ngữ"
+                        field="languageId"
                         className="border-b-2 border-t-2"
                         style={{ minWidth: "15rem" }}
                       />
-                      <Column
-                        field="questionLevel"
-                        header="Mức độ"
-                        className="border-b-2 border-t-2"
-                        style={{ minWidth: "15rem" }}
-                      />
-                      <Column
-                        field="score"
-                        header="Điểm"
-                        className="border-b-2 border-t-2"
-                        style={{ width: "15%" }}
-                      />
-                      <Column
+                      {/* <Column
                         header="Trạng thái"
                         className="border-b-2 border-t-2"
-                        body={status}
+                        body={statusBodyTemplate}
                         style={{ minWidth: "15rem" }}
-                      ></Column>
-                      {/* <Column
-                  field="createdDate"
-                  header="Ngày tạo"
-                  className="border-b-2 border-t-2"
-                  style={{ width: "10%" }}
-                  body={(rowData) => formatDate(rowData.createdDate)}
-                />
-                <Column
-                  field="lastModifiedDate"
-                  header="Ngày cập nhật"
-                  className="border-b-2 border-t-2"
-                  style={{ width: "10%" }}
-                  body={(rowData) => formatDate(rowData.lastModifiedDate)}
-                /> */}
+                      ></Column> */}
                       <Column
                         className="border-b-2 border-t-2"
                         body={actionBodyTemplate}
@@ -465,13 +381,6 @@ export function ManageQuestionOfQuizlistProvider() {
           </div>
         </div>
       </div>
-    </NotifyProvider>
-  );
-}
-export default function ManageQuestionOfQuizlist() {
-  return (
-    <FormDataProvider>
-      <ManageQuestionOfQuizlistProvider />
-    </FormDataProvider>
+    </>
   );
 }

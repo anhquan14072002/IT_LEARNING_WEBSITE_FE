@@ -3,11 +3,11 @@ import restClient from "./restClient";
 export const getDocumentByGradeId = async (id, setLoading, setDocumentList) => {
     setLoading(true);
     await restClient({
-        url: `api/document/searchbydocumentpagination?PageSize=4&OrderBy=averageRating&IsAscending=false&GradeId=` + id,
+        url: `api/grade/getallgradepagination`,
         method: "GET",
     })
         .then((res) => {
-            setDocumentList(res.data.data || []);
+            setDocumentList(res?.data?.data?.find((item, index) => Number(item?.id) === Number(id)) || []);
             setLoading(false);
         })
         .catch((err) => {
@@ -52,7 +52,7 @@ export const getAllDocumentSortByAvg = async (setLoading, setDocumentList) => {
 export const getDocumentByTopicId = async (setLoading, setDocumentDetailArrayList, id) => {
     setLoading(true);
     await restClient({
-        url: `api/index/getalltopicindex/`+id,
+        url: `api/index/getalltopicindex/` + id,
         method: "GET",
     })
         .then((res) => {

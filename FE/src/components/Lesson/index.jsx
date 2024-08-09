@@ -6,6 +6,7 @@ import { Column } from "primereact/column";
 import { ContextMenu } from "primereact/contextmenu";
 import { Paginator } from "primereact/paginator";
 import { Toast } from "primereact/toast";
+import { ProductService } from "../../services/ProductService";
 import { Button } from "primereact/button";
 import "./index.css";
 import AddLessonDialog from "../AddLessonDialog";
@@ -35,12 +36,15 @@ export default function Lesson() {
   const dropDownRef2 = useRef(null);
   const [selectedCity, setSelectedCity] = useState(null);
   const [products, setProducts] = useState([]);
+
+  const [selectedProduct, setSelectedProduct] = useState(null);
+
   const [selectedLesson, setSelectedLesson] = useState(null);
+
   const cm = useRef(null);
   const [visible, setVisible] = useState(false);
   const [visibleUpdate, setVisibleUpdate] = useState(false);
   const [visibleDelete, setVisibleDelete] = useState(false);
-  const [deleteLessonsDialog, setDeleteLessonsDialog] = useState(false);
   const [loading, setLoading] = useState(false);
   const [modelUpdate, setModelUpdate] = useState({});
   const [textSearch, setTextSearch] = useState("");
@@ -57,13 +61,6 @@ export default function Lesson() {
   useEffect(() => {
     fetchData(page, rows);
   }, [page, rows, textSearch]);
-
-  const hideDeleteLessonsDialog = () => {
-    setDeleteLessonsDialog(false);
-  };
-  const confirmDeleteSelected = () => {
-    setDeleteLessonsDialog(true);
-  };
 
   const getData = () => {
     fetchData(page, rows);
@@ -123,7 +120,7 @@ export default function Lesson() {
           icon="pi pi-trash"
           className="text-red-600 shadow-none"
           onClick={() => {
-            // setVisibleDelete(true);
+            setVisibleDelete(true);
             confirm(rowData.id);
           }}
         />
@@ -196,8 +193,8 @@ export default function Lesson() {
   const confirm = (id) => {
     setVisibleDelete(true);
     confirmDialog({
-      message: "Bạn có chắc chắn muốn chủ đề này?",
-      header: "Thông báo",
+      message: "Do you want to delete this record?",
+      header: "Delete Confirmation",
       icon: "pi pi-info-circle",
       defaultFocus: "reject",
       acceptClassName: "p-button-danger",
@@ -209,6 +206,7 @@ export default function Lesson() {
             className="p-2 bg-red-500 text-white mr-2"
             onClick={() => {
               setVisibleDelete(false);
+              REJECT(toast);
             }}
           />
           <Button
@@ -306,43 +304,6 @@ export default function Lesson() {
       });
   };
 
-  const deleteRange = () => {
-    const newBody = selectedLesson.map((e) => {
-      return e.id;
-    });
-    restClient({
-      url: `api/lesson/deleterangelesson`,
-      method: "DELETE",
-      data: newBody,
-    })
-      .then((res) => {
-        getData();
-        ACCEPT(toast, "Xóa thành công");
-      })
-      .catch((err) => {
-        REJECT(toast, "Xảy ra lỗi khi xóa tài liệu này");
-      })
-      .finally(() => {
-        setDeleteLessonsDialog(false);
-        setSelectedLesson(null);
-      });
-  };
-  const deleteLessonsDialogFooter = (
-    <>
-      <Button
-        label="Hủy"
-        icon="pi pi-times"
-        className="p-2 bg-red-500 text-white mr-2"
-        onClick={hideDeleteLessonsDialog}
-      />
-      <Button
-        label="Xóa"
-        icon="pi pi-check"
-        className="p-2 bg-blue-500 text-white"
-        onClick={deleteRange}
-      />
-    </>
-  );
   const handleSearchInput = debounce((text) => {
     setTextSearch(text);
   }, 300);
@@ -367,21 +328,6 @@ export default function Lesson() {
         />
       </Dialog>
       <ConfirmDialog visible={visibleDelete} />
-      <Dialog
-        visible={deleteLessonsDialog}
-        style={{ width: "27rem" }}
-        breakpoints={{ "960px": "75vw", "641px": "90vw" }}
-        header="Thông báo"
-        modal
-        footer={deleteLessonsDialogFooter}
-        onHide={hideDeleteLessonsDialog}
-      >
-        <div className="confirmation-content flex items-center justify-start gap-2">
-          <i className="pi pi-info-circle" style={{ fontSize: "2rem" }} />
-
-          <span>Bạn có chắc chắn muốn xóa những bài học đã chọn ? </span>
-        </div>
-      </Dialog>
       <AddLessonDialog
         visible={visible}
         setVisible={setVisible}
@@ -410,7 +356,7 @@ export default function Lesson() {
               label="Xóa"
               icon="pi pi-trash"
               severity="danger"
-              disabled={!selectedLesson || selectedLesson.length === 0}
+              disabled={!selectedProduct || selectedProduct.length === 0}
               className="bg-red-600 text-white p-2 text-sm font-normal ml-3"
               onClick={confirmDeleteMany}
             />
@@ -482,8 +428,8 @@ export default function Lesson() {
             <DataTable
               value={products}
               onContextMenu={(e) => cm.current.show(e.originalEvent)}
-              selection={selectedLesson}
-              onSelectionChange={(e) => setSelectedLesson(e.value)}
+              selection={selectedProduct}
+              onSelectionChange={(e) => setSelectedProduct(e.value)}
               className="border-t-2"
               tableStyle={{ minHeight: "30rem" }}
               scrollable
@@ -499,51 +445,51 @@ export default function Lesson() {
                 header="#"
                 body={indexBodyTemplate}
                 className="border-b-2 border-t-2"
-                style={{ minWidth: "5rem" }}
+                style={{ minWidth: '5rem' }}
               />
 
               <Column
                 field="title"
                 header="Tiêu đề"
                 className="border-b-2 border-t-2"
-                style={{ minWidth: "12rem" }}
+                style={{ minWidth: '12rem' }}
               ></Column>
               <Column
                 field="topicTitle"
                 header="Chủ đề"
                 className="border-b-2 border-t-2"
-                style={{ minWidth: "12rem" }}
+                style={{ minWidth: '12rem' }}
               ></Column>
               <Column
                 header="File tài liệu"
                 className="border-b-2 border-t-2"
                 body={file}
-                style={{ minWidth: "12rem" }}
+                style={{ minWidth: '12rem' }}
               ></Column>
               <Column
                 header="Trạng thái"
                 className="border-b-2 border-t-2"
                 body={status}
-                style={{ minWidth: "10rem" }}
+                style={{ minWidth: '10rem' }}
               ></Column>
               <Column
                 field="createdDate"
                 header="Ngày tạo"
                 body={(rowData) => formatDate(rowData.createdDate)}
                 className="border-b-2 border-t-2"
-                style={{ minWidth: "20rem" }}
+                style={{ minWidth: '20rem' }}
               ></Column>
               <Column
                 field="lastModifiedDate"
                 header="Ngày cập nhật"
                 body={(rowData) => formatDate(rowData.lastModifiedDate)}
                 className="border-b-2 border-t-2"
-                style={{ minWidth: "20rem" }}
+                style={{ minWidth: '20rem' }}
               ></Column>
               <Column
                 field="info"
                 header=""
-                style={{ minWidth: "12rem" }}
+                style={{ minWidth: '12rem' }}
                 body={view}
                 className="border-b-2 border-t-2"
               ></Column>
