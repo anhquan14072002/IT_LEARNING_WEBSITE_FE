@@ -10,11 +10,14 @@ import { useNavigate } from "react-router-dom";
 import Loading from "../Loading";
 import { REJECT } from "../../utils";
 import { Toast } from "primereact/toast";
+import { DataTable } from "primereact/datatable";
+import { Dialog } from "primereact/dialog";
 function ImportStepTwo() {
   const [excelValidateResponse, setExcelValidateResponse] = useState([]);
   const { formData, file, checkRecord, idImportFail, quizId } =
     useContext(FormDataContext);
   const [visibleDelete, setVisibleDelete] = useState(false);
+  const [visible, setVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const toast = useRef(null);
@@ -65,11 +68,28 @@ function ImportStepTwo() {
           console.error("File upload failed:", response);
         }
       } catch (err) {
-        console.error("Error uploading file:", err);
-        REJECT(toast, "Xảy ra lỗi khi tải file excel này");
-        setTimeout(() => {
-          navigate("/importQuiz/stepOne");
-        }, 3000);
+        // handleUpload();
+        console.log(err.response.data.message);
+
+        setVisible(true);
+        confirmDialog({
+          message: "Please select a file.",
+          header: "Thông báo",
+          icon: "pi pi-info-circle",
+          defaultFocus: "reject",
+          acceptClassName: "p-button-danger",
+          footer: (
+            <Button
+              label="Quay lại"
+              className="p-2 bg-blue-500 text-white mr-2"
+              onClick={() => {
+                navigate("/importQuiz/stepOne");
+                setVisible(false);
+              }}
+            />
+          ),
+        });
+        return;
       } finally {
         setLoading(false);
       }
@@ -140,13 +160,50 @@ function ImportStepTwo() {
       </ul>
     );
   };
+  const headerElement = (
+    <div className="inline-flex align-items-center justify-content-center gap-2">
+      {/* <Avatar
+        image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png"
+        shape="circle"
+      />
+      <span className="font-bold white-space-nowrap">Amy Elsner</span> */}
+      <span className="font-bold white-space-nowrap ">Thông báo</span>
+    </div>
+  );
 
+  const footerContent = (
+    <div>
+      <Button
+        label="Ok"
+        className="bg-blue-500 px-4 py-1"
+        onClick={() => {
+          setVisible(false);
+          navigate("/importQuiz/stepOne");
+        }}
+        autoFocus
+      />
+    </div>
+  );
   return loading ? (
     <Loading />
   ) : (
     <article>
       <Toast ref={toast} />
       <ConfirmDialog visible={visibleDelete} className="w-96" />
+
+      <Dialog
+        visible={visible}
+        modal
+        header={headerElement}
+        footer={footerContent}
+        style={{ width: "20rem" }}
+        onHide={() => {
+          if (!visible) return;
+          setVisible(false);
+        }}
+      >
+        <p className="m-0">File tải phải có dạng excel</p>
+      </Dialog>
       <p className="pb-2">
         <span className="font-bold mr-28">
           {excelValidateResponse.countSuccess ?? 0} /{" "}
@@ -226,82 +283,4 @@ function ImportStepTwo() {
   );
 }
 
-// const DataTable = ({ data }) => {
-//   return (
-//     <div className="relative overflow-x-auto shadow-md sm:rounded-lg">
-//       <table className="min-w-[1500px] text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-//         <thead className="text-xs text-gray-700 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400">
-//           <tr>
-//             <th scope="col" className="px-6 py-3">
-//               Question Level
-//             </th>
-//             <th scope="col" className="px-6 py-3 w-96">
-//               Type
-//             </th>
-//             <th scope="col" className="px-6 py-3 w-96">
-//               Content
-//             </th>
-//             <th scope="col" className="px-6 py-3">
-//               Hint
-//             </th>
-//             <th scope="col" className="px-6 py-3">
-//               Image
-//             </th>
-//             <th scope="col" className="px-6 py-3">
-//               Shuffle
-//             </th>
-//             <th scope="col" className="px-6 py-3">
-//               Active
-//             </th>
-//             <th scope="col" className="px-6 py-3 w-96">
-//               Answers
-//             </th>
-//             <th scope="col" className="px-6 py-3 w-[80vw]">
-//               Errors
-//             </th>{" "}
-//             {/* Adjusted column width */}
-//           </tr>
-//         </thead>
-//         <tbody>
-//           {data.map((item, index) => (
-//             <tr
-//               key={index}
-//               className="bg-white border-b dark:bg-gray-800 dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
-//             >
-//               <td className="px-6 py-4">{item.questionLevelName || ""}</td>
-//               <td className="px-6 py-4 w-96">{item.typeName || ""}</td>
-//               <td className="px-6 py-4 w-96">{item.content || ""}</td>
-//               <td className="px-6 py-4">{item.hint || ""}</td>
-//               <td className="px-6 py-4">{item.image || ""}</td>
-//               <td className="px-6 py-4">{item.isShuffle ? "Yes" : "No"}</td>
-//               <td className="px-6 py-4">{item.isActive ? "Yes" : "No"}</td>
-//               <td className="px-6 py-4 w-[40vw]">
-//                 {item.quizAnswers && item.quizAnswers.length > 0
-//                   ? item.quizAnswers.map((answer, ansIndex) => (
-//                       <div key={ansIndex}>
-//                         - {answer.content} (
-//                         {answer.isCorrect ? "Correct" : "Incorrect"})
-//                       </div>
-//                     ))
-//                   : "No Answers"}
-//               </td>
-//               <td className="px-6 py-4  w-[80vw]">
-//                 {item.errors && item.errors.length > 0 ? (
-//                   item.errors.map((error, errorIndex) => (
-//                     <div className="text-red-600" key={errorIndex}>
-//                       - {error}
-//                     </div>
-//                   ))
-//                 ) : (
-//                   <span className="font-bold">Hợp Lệ</span>
-//                 )}
-//               </td>{" "}
-//               {/* Adjusted column width */}
-//             </tr>
-//           ))}
-//         </tbody>
-//       </table>
-//     </div>
-//   );
-// };
 export default ImportStepTwo;
