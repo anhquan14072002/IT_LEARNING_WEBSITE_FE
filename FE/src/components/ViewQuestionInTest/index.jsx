@@ -5,6 +5,7 @@ import { Image } from "primereact/image";
 import parse from "html-react-parser";
 import "./index.css";
 import { useSelector } from "react-redux";
+import restClient from "../../services/restClient";
 
 const CustomImage = ({ src, alt, width }) => {
   const zoomIcon = () => {
@@ -36,31 +37,34 @@ const CustomImage = ({ src, alt, width }) => {
 const ViewQuestionInTest = ({ quizData, quizDetail }) => {
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [showBackToTop, setShowBackToTop] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(300);
-  const [quizCompleted, setQuizCompleted] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(3);
   const questionRefs = useRef([]);
   const user = useSelector((state) => state.user.value);
+  const [isCompleted, setIsCompleted] = useState(false);
+  const [quizResult, setQuizResult] = useState(null);
 
   useEffect(() => {
-    setQuizCompleted(false);
-    setTimeLeft(quizData?.length * 30);
+    // setTimeLeft(quizData?.length * 30);
   }, [quizData]);
 
   useEffect(() => {
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => {
-        if (prevTime === 0) {
-          clearInterval(timer); // Stop the timer
-          handleQuizCompletion(); // Handle quiz completion when time runs out
-          return 0;
-        }
         return prevTime - 1;
       });
     }, 1000);
+
     return () => {
       clearInterval(timer);
     };
-  }, [quizData]);
+  }, []);
+
+  useEffect(() => {
+    console.log("timeLeft updated: ", timeLeft);
+    if (timeLeft === 0) {
+      handleSubmitQuiz();
+    }
+  }, [timeLeft]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -78,12 +82,6 @@ const ViewQuestionInTest = ({ quizData, quizDetail }) => {
     };
   }, []);
 
-  // const handleAnswerSelect = (questionId, answerId) => {
-  //   setSelectedAnswers((prevState) => ({
-  //     ...prevState,
-  //     [questionId]: answerId,
-  //   }));
-  // };
   const handleAnswerSelect = (questionId, answerId) => {
     setSelectedAnswers((prevState) => {
       // Check if the answerId is already in the array
@@ -127,10 +125,6 @@ const ViewQuestionInTest = ({ quizData, quizDetail }) => {
     });
   };
 
-  const handleQuizCompletion = () => {
-    setQuizCompleted(true);
-  };
-
   const renderHtmlContent = (content) => {
     // Replace <img> tags with CustomImage components
     const options = {
@@ -156,7 +150,7 @@ const ViewQuestionInTest = ({ quizData, quizDetail }) => {
     return selectedAnswers[questionId] === answerId;
   };
 
-  const handleSubmitQuiz = () => {
+  const handleSubmitQuiz = async () => {
     const questionAnswerDto = Object.keys(selectedAnswers).map(
       (questionId) => ({
         type: 1,
@@ -165,7 +159,7 @@ const ViewQuestionInTest = ({ quizData, quizDetail }) => {
       })
     );
 
-    const quizId = quizDetail?.id; 
+    const quizId = quizDetail?.id;
     const userId = user?.sub;
 
     const dataToSend = {
@@ -174,24 +168,38 @@ const ViewQuestionInTest = ({ quizData, quizDetail }) => {
       userId,
     };
 
-    console.log("Data to send:", dataToSend);
+    console.log("====================================");
+    console.log("Selected Answers: ", selectedAnswers);
+    console.log("Data to Send: ", dataToSend);
+    console.log("====================================");
+
+    await restClient({
+      url: "api/userquiz/submitquiz",
+      data: dataToSend,
+      method: "POST",
+    })
+      .then((res) => {
+        console.log("====================================");
+        console.log(res?.data?.data);
+        console.log("====================================");
+        setQuizResult(res?.data?.data); // Store the result data
+        setIsCompleted(true);
+      })
+      .catch((err) => {
+        alert("Xảy ra lỗi khi nộp bài");
+      });
 
     setSelectedAnswers({});
   };
 
-  if (quizCompleted) {
-    return <QuizResult totalQuestions={quizData.length} quizData={quizData} />;
+  if (isCompleted) {
+    return (
+      <QuizResult
+        totalQuestions={quizData.length}
+        historyQuizzes={quizResult?.historyQuizzes}
+      />
+    );
   }
-
-  useEffect(()=>{
-    console.log('====================================');
-    console.log("answer::",quizData?.map((question,index)=>{
-      console.log('====================================');
-      console.log("answer::",question?.quizAnswers);
-      console.log('====================================');
-    }));
-    console.log('====================================');
-  },[])
 
   return (
     <div className="flex justify-center flex-wrap" id="question">
@@ -209,9 +217,14 @@ const ViewQuestionInTest = ({ quizData, quizDetail }) => {
           >
             <p className="font-bold">Câu {`${questionIndex + 1}: `}</p>
             <div>{renderHtmlContent(question.content)}</div>
+            {(Number(question?.type) === 2 || Number(question?.type) === 1) && (
+              <p className="text-sm italic">Hãy chọn một đáp án đúng:</p>
+            )}
+            {Number(question?.type) === 3 && (
+              <p className="text-sm italic">Hãy chọn nhiều đáp án đúng:</p>
+            )}
             <ul className="flex flex-wrap gap-5 mt-5">
-              {(question?.type === "QuestionFourAnswer" ||
-                question?.type === "QuestionTrueFalse") &&
+              {(Number(question?.type) === 2 || Number(question?.type) === 1) &&
                 question?.quizAnswers?.map((answer, index) => (
                   <li key={answer?.id}>
                     <label>
@@ -229,7 +242,7 @@ const ViewQuestionInTest = ({ quizData, quizDetail }) => {
                   </li>
                 ))}
 
-              {question?.type === "QuestionMultiChoice" &&
+              {Number(question?.type) === 3 &&
                 question?.quizAnswers?.map((answer, index) => (
                   <li key={answer?.id}>
                     <label>
@@ -261,9 +274,14 @@ const ViewQuestionInTest = ({ quizData, quizDetail }) => {
           onClick={handleSubmitQuiz} // Call function to submit quiz
         />
         <div className="text-right text-red-600 underline">
-          Thời gian làm bài: {Math.floor(timeLeft / 60)}:
-          {timeLeft % 60 < 10 ? "0" + (timeLeft % 60) : timeLeft % 60}
+          Thời gian làm bài:{" "}
+          {timeLeft > 0
+            ? `${Math.floor(timeLeft / 60)}:${
+                timeLeft % 60 < 10 ? "0" + (timeLeft % 60) : timeLeft % 60
+              }`
+            : "0:00"}
         </div>
+
         <ul className="flex flex-wrap gap-2 border p-5 justify-center shadow-lg">
           {quizData?.map((question, index) => (
             <li

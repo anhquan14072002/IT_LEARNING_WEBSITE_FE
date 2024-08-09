@@ -1,19 +1,19 @@
 import axios from "axios";
 
-const BASE_URL = "https://localhost:7000";
+const BASE_URL = "http://localhost:8000";
 
 export default function restClient({
   url,
   method = "GET",
   params,
   data,
-  headers,
+  headers
 }) {
   return axios({
     url: `${BASE_URL}/${url}`,
     method,
     params,
     data,
-    headers,
-  });
+    headers 
+  })
 }

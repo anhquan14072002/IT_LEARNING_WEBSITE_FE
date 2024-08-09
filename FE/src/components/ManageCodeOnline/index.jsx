@@ -61,12 +61,12 @@ export default function ManageCodeOnline() {
     if (textSearch.trim()) {
       setLoading(true);
       restClient({
-        url: `api/problem/getallproblempagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}`,
+        url: `api/problem/getallproblem`,
         method: "GET",
       })
         .then((res) => {
-          const paginationData = JSON.parse(res.headers["x-pagination"]);
-          setTotalPage(paginationData.TotalPages);
+          // const paginationData = JSON.parse(res.headers["x-pagination"]);
+          // setTotalPage(paginationData.TotalPages);
           setProducts(Array.isArray(res.data.data) ? res.data.data : []);
         })
         .catch((err) => {
@@ -78,12 +78,12 @@ export default function ManageCodeOnline() {
       setLoading(true);
 
       restClient({
-        url: `api/problem/getallproblempagination?PageIndex=${page}&PageSize=${rows}`,
+        url: `api/problem/getallproblem`,
         method: "GET",
       })
         .then((res) => {
-          const paginationData = JSON.parse(res.headers["x-pagination"]);
-          setTotalPage(paginationData.TotalPages);
+          // const paginationData = JSON.parse(res.headers["x-pagination"]);
+          // setTotalPage(paginationData.TotalPages);
           setProducts(Array.isArray(res.data.data) ? res.data.data : []);
         })
         .catch((err) => {
@@ -95,6 +95,45 @@ export default function ManageCodeOnline() {
         });
     }
   };
+
+  // const fetchData = (page, rows) => {
+  //   if (textSearch.trim()) {
+  //     setLoading(true);
+  //     restClient({
+  //       url: `api/problem/getallproblempagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}`,
+  //       method: "GET",
+  //     })
+  //       .then((res) => {
+  //         const paginationData = JSON.parse(res.headers["x-pagination"]);
+  //         setTotalPage(paginationData.TotalPages);
+  //         setProducts(Array.isArray(res.data.data) ? res.data.data : []);
+  //       })
+  //       .catch((err) => {
+  //         console.error("Error fetching data:", err);
+  //         setProducts([]);
+  //       })
+  //       .finally(() => setLoading(false));
+  //   } else {
+  //     setLoading(true);
+
+  //     restClient({
+  //       url: `api/problem/getallproblempagination?PageIndex=${page}&PageSize=${rows}`,
+  //       method: "GET",
+  //     })
+  //       .then((res) => {
+  //         const paginationData = JSON.parse(res.headers["x-pagination"]);
+  //         setTotalPage(paginationData.TotalPages);
+  //         setProducts(Array.isArray(res.data.data) ? res.data.data : []);
+  //       })
+  //       .catch((err) => {
+  //         console.error("Error fetching data:", err);
+  //         setProducts([]);
+  //       })
+  //       .finally(() => {
+  //         setLoading(false);
+  //       });
+  //   }
+  // };
 
   const actionBodyTemplate = (rowData) => {
     return (
@@ -153,7 +192,12 @@ export default function ManageCodeOnline() {
   };
 
   const status = (rowData, { rowIndex }) => {
-    return <InputSwitch checked={rowData.isActive} />;
+    // return <InputSwitch checked={rowData.isActive} />;
+    return (
+      <button className="bg-blue-600 hover:bg-blue-400 text-white p-2 rounded-md" onClick={()=>navigate(`/dashboard/quiz/manageexecutecode/${rowData?.id}`)}>
+        Chỉnh sửa mã thực thi
+      </button>
+    );
   };
 
   // modal delete
@@ -349,7 +393,7 @@ export default function ManageCodeOnline() {
                 style={{ minWidth: "12rem" }}
               ></Column>
               <Column
-                header="Trạng thái"
+                // header="Trạng thái"
                 className="border-b-2 border-t-2"
                 body={status}
                 style={{ minWidth: "10rem" }}

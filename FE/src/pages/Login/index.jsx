@@ -11,7 +11,6 @@ import Menu from "../../components/Menu";
 import { InputText } from "primereact/inputtext";
 import { useDispatch } from "react-redux";
 import { addUser } from "../../redux/userr/userSlice";
-import NotifyProvider from "../../store/NotificationContext";
 
 const Index = () => {
   const toast = useRef(null);
@@ -68,7 +67,6 @@ const Index = () => {
   };
 
   return (
-    <NotifyProvider>
     <div className="min-h-screen ">
       <Header />
       <Menu />
@@ -227,7 +225,6 @@ const Index = () => {
       </div>
       <Toast ref={toast} />
     </div>
-    </NotifyProvider>
   );
 };
 
