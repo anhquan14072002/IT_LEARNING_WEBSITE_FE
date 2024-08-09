@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import StarRating from "../StarVoting";
+import { Tooltip } from "primereact/tooltip";
 
 const CustomCard = ({ document }) => {
   const navigate = useNavigate();
@@ -16,10 +17,15 @@ const CustomCard = ({ document }) => {
             {document?.title}
           </p>
         </div>
-        <div className="flex items-center mt-3">
+        <div
+          className="flex items-center mt-3"
+          data-pr-tooltip="Điểm đánh giá và số lượt đánh giá"
+          data-pr-position="top"
+        >
           <StarRating stars={document?.averageRating} />
           <span className="ml-1 text-gray-600">{document?.totalReviewer}</span>
         </div>
+        <Tooltip target=".flex.items-center.mt-3" />
       </div>
     </div>
   );

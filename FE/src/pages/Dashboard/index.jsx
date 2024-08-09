@@ -11,9 +11,11 @@ import ManageExam from "../../components/ManageExam";
 import ManageTag from "../../components/ManageTag";
 import ManageAccount from "../../components/ManageAccount";
 import { useNavigate, useParams } from "react-router-dom";
+
 import ManageCodeOnline from "../../components/ManageCodeOnline";
 import { assets } from "../../assets/assets";
 import NotifyProvider from "../../store/NotificationContext";
+
 
 const Dashboard = () => {
   const [open, setOpen] = useState(true);
@@ -22,8 +24,14 @@ const Dashboard = () => {
   const { typeId } = useParams();
 
   const Menus = [
+<<<<<<< HEAD
     { title: "Thống kê", src: assets.chart_fill, index: "statistic" },
     { title: "Quản lí tài khoản", src: assets.user, index: "user" },
+=======
+
+    { title: "Thống kê", src:assets.chart_fill, index: "statistic" },
+    { title: "Quản lí tài khoản", src:assets.user, index: "user" },
+>>>>>>> a7b5924b07d7455e4868268905c45b868b1c5b38
     {
       title: "Quản lí tài liệu/chủ đề/bài học ",
       src: assets.folder,
@@ -36,18 +44,18 @@ const Dashboard = () => {
     { title: "Quản lí bài thực hành", src: assets.folder, index: "codeeditor" },
   ];
 
-  useEffect(() => {
-    if (!Menus.some((item, index) => item.index === typeId)) {
-      navigate("/notfound");
-    }
-  }, []);
+  useEffect(()=>{
+     if(!Menus.some((item,index)=> item.index === typeId)){
+      navigate("/notfound")
+     }
+  },[])
 
   return (
     <>
       {loading ? (
         <LoadingScreen setLoading={setLoading} />
       ) : (
-        <NotifyProvider>
+        <>
           <div className="fixed top-0 w-full z-30">
             <Header />
           </div>
@@ -82,7 +90,11 @@ const Dashboard = () => {
                       navigate(`/dashboard/${Menu.index}`);
                     }}
                   >
+<<<<<<< HEAD
                     {console.log(index)}
+=======
+
+>>>>>>> a7b5924b07d7455e4868268905c45b868b1c5b38
                     <Tooltip
                       target={`menu-${Menu.index}`}
                       content={Menu.title}
@@ -102,7 +114,14 @@ const Dashboard = () => {
             </div>
           </div>
           <div className="ml-20 mt-16 p-7">
+<<<<<<< HEAD
             <div className="h-screen" onClick={(e) => setOpen(false)}>
+=======
+
+
+            <div className="h-screen" onClick={(e)=>setOpen(false)}>
+
+>>>>>>> a7b5924b07d7455e4868268905c45b868b1c5b38
               {typeId === "user" && <ManageAccount />}
               {typeId === "adminManageDocument" && <ManageDocument />}
               {typeId === "lesson" && <ContentLesson />}
@@ -112,7 +131,7 @@ const Dashboard = () => {
               {typeId === "codeeditor" && <ManageCodeOnline />}
             </div>
           </div>
-        </NotifyProvider>
+        </>
       )}
     </>
   );

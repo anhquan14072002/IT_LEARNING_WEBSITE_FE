@@ -56,11 +56,6 @@ const validationSchema = Yup.object({
       return Object.keys(value).length !== 0; // Check if object is not empty
     })
     .required("Không bỏ trống trường này"),
-  language: Yup.object()
-    .test("is-not-empty", "Không được để trống trường này", (value) => {
-      return Object.keys(value).length !== 0; // Check if object is not empty
-    })
-    .required("Không bỏ trống trường này"),
 });
 
 export default function CreateProblem() {
@@ -72,7 +67,6 @@ export default function CreateProblem() {
     lesson: {},
     grade: {},
     document: {},
-    language: {},
     titleInstruction: "",
     descriptionInstruction: "",
   });
@@ -89,15 +83,11 @@ export default function CreateProblem() {
   const [clearGrade, setClearGrade] = useState(false);
   const [clearLesson, setClearLesson] = useState(false);
   const [lessonList, setLessonList] = useState([]);
-  const [languagesList, setLanguagesList] = useState([]);
   const [testCase, setTestCaseList] = useState([]);
 
-  const [language, setLanguage] = useState("javascript");
-  const [codeMain, setCodeMain] = useState("");
-  const [codeSample, setCodeSample] = useState("");
   const [visible, setVisible] = useState(false);
 
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   useEffect(() => {
     setTimeout(() => {
@@ -116,17 +106,6 @@ export default function CreateProblem() {
           method: "GET",
         });
         setListGrade(gradeResponse?.data?.data || []);
-
-        //fetch languages
-        const languagesResponse = await restClientV2({
-          url: `languages`,
-          method: "GET",
-        });
-        const transformedV1 = languagesResponse?.data?.map((item) => ({
-          title: item?.name,
-          idBase: item?.id,
-        }));
-        setLanguagesList(transformedV1);
 
         // Fetch all grades
         const difficultResponse = await restClient({
@@ -148,14 +127,6 @@ export default function CreateProblem() {
   }, []);
 
   const onSubmit = async (values) => {
-    if (!codeMain || codeMain.trim() === "") {
-      REJECT(toast, "Vui lòng nhập main code");
-      return;
-    }
-    if (!codeSample || codeSample.trim() === "") {
-      REJECT(toast, "Vui lòng nhập sample code");
-      return;
-    }
     if (!testCase || testCase.length === 0) {
       REJECT(toast, "Vui lòng tạo test case");
       return;
@@ -179,55 +150,32 @@ export default function CreateProblem() {
         console.log("====================================");
         console.log(res.data?.data);
         console.log("====================================");
+
+        const programLanguage = res?.data?.data;
+
+        const formData = new FormData();
+        formData.append("Title", values?.titleInstruction);
+        formData.append("Description", values?.descriptionInstruction);
+        formData.append("ProblemId", problemData?.id);
         restClient({
-          url: "api/programlanguage/createprogramlanguage",
+          url: "api/editorial/createeditorial",
           method: "POST",
-          data: {
-            name: values?.language?.title,
-            baseId: values?.language?.idBase,
-            isActive: true,
-          },
+          data: formData,
         })
           .then((res) => {
-            const programLanguage = res?.data?.data;
-            restClient({
-              url: "api/executecode/createexecutecode",
-              method: "POST",
-              data: {
-                mainCode: encodeBase64(codeMain),
-                sampleCode: encodeBase64(codeSample),
-                problemId: problemData?.id,
-                languageId: programLanguage?.id,
-              },
-            })
-              .then((res) => {
-                const formData = new FormData();
-                formData.append("Title", values?.titleInstruction);
-                formData.append("Description", values?.descriptionInstruction);
-                formData.append("ProblemId", problemData?.id);
-                restClient({
-                  url: "api/editorial/createeditorial",
-                  method: "POST",
-                  data: formData,
-                }).then((res) => {
-                  testCase.forEach((item, index) => {
-                    restClient({
-                      url: "api/testcase/createtestcase",
-                      method: "POST",
-                      data: {
-                        input: encodeBase64(item?.input),
-                        output: encodeBase64(item?.output),
-                        isHidden: true,
-                        isActive: true,
-                        problemId: problemData?.id,
-                      },
-                    });
-                  });
-                });
-              })
-              .catch((err) => {
-                REJECT(toast, "Xảy ra lỗi khi thêm bài tập");
+            testCase.forEach((item, index) => {
+              restClient({
+                url: "api/testcase/createtestcase",
+                method: "POST",
+                data: {
+                  input: item?.input === null ? null : encodeBase64(item?.input),
+                  output: encodeBase64(item?.output),
+                  isHidden: item?.visible,
+                  isActive: true,
+                  problemId: problemData?.id,
+                },
               });
+            });
           })
           .catch((err) => {
             REJECT(toast, "Xảy ra lỗi khi thêm bài tập");
@@ -236,8 +184,9 @@ export default function CreateProblem() {
       .catch((err) => {
         REJECT(toast, "Xảy ra lỗi khi thêm bài tập");
         setLoading(false);
-      }).finally(()=>{
-        navigate('/dashboard/codeeditor')
+      })
+      .finally(() => {
+        navigate("/dashboard/codeeditor");
       });
   };
 
@@ -454,7 +403,7 @@ export default function CreateProblem() {
                       </CustomEditor>
                     </div>
 
-                    <CustomDropdown
+                    {/* <CustomDropdown
                       title="Ngôn ngữ"
                       label="Ngôn ngữ"
                       name="language"
@@ -501,7 +450,7 @@ export default function CreateProblem() {
                           editor.setSize(null, "calc(50vh - 5px)");
                         }}
                       />
-                    </div>
+                    </div> */}
 
                     <div>
                       <h1>
