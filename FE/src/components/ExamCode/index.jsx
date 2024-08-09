@@ -27,6 +27,8 @@ export default function ExamCode({
   const [visibleExam, setVisibleExam] = useState(false);
   const [examValue, setExamValue] = useState({});
   const [updateExamCodeValue, setUpdateExamCodeValue] = useState({});
+  // const [visibleDelete, setVisibleDelete] = useState(false);
+
 
   useEffect(() => {
     fetchData();
@@ -81,19 +83,19 @@ export default function ExamCode({
     })
       .then((res) => {
         fetchData();
-        visibleDelete = false;
+        // visibleDelete = false;
         ACCEPT(toast, "Xóa thành công");
       })
       .catch((err) => {
         REJECT(toast, "Xảy ra lỗi khi xóa đề thi này");
       })
       .finally(() => {
-        visibleDelete = false;
+        // visibleDelete = false;
       });
   };
 
   const confirmDelete = (id) => {
-    visibleDelete = false;
+    // visibleDelete = false;
     confirmDialog({
       message: "Bạn có chắc chắn muốn xóa đề thi này?",
       header: "Delete Confirmation",
@@ -107,7 +109,7 @@ export default function ExamCode({
             icon="pi pi-times"
             className="p-2 bg-red-500 text-white mr-2"
             onClick={() => {
-              visibleDelete = false;
+              // visibleDelete = false;
             }}
           />
           <Button
