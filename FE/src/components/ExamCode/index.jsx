@@ -29,7 +29,6 @@ export default function ExamCode({
   const [updateExamCodeValue, setUpdateExamCodeValue] = useState({});
   // const [visibleDelete, setVisibleDelete] = useState(false);
 
-
   useEffect(() => {
     fetchData();
   }, [examCodeValue]);
@@ -60,8 +59,8 @@ export default function ExamCode({
         icon="pi pi-pencil"
         className="text-blue-600 p-mr-2 shadow-none"
         onClick={() => {
-          setUpdateExamCodeValue(rowData)
-          setVisibleUpdateExamCode(true)
+          setUpdateExamCodeValue(rowData);
+          setVisibleUpdateExamCode(true);
         }}
       />
       <Button
@@ -155,13 +154,13 @@ export default function ExamCode({
           fetchData={fetchData}
         />
         <UpdateExamCode
-        visible={visibleUpdateExamCode}
-        setVisibleUpdateExamCode={setVisibleUpdateExamCode}
-        toast={toast}
-        updateExamCodeValue={updateExamCodeValue}
-        addExamCodeValue={examCodeValue?.id}
-        fetchData={fetchData}
-      />
+          visible={visibleUpdateExamCode}
+          setVisibleUpdateExamCode={setVisibleUpdateExamCode}
+          toast={toast}
+          updateExamCodeValue={updateExamCodeValue}
+          addExamCodeValue={examCodeValue?.id}
+          fetchData={fetchData}
+        />
         <AnswerExam
           visibleExam={visibleExam}
           setVisibleExam={setVisibleExam}
