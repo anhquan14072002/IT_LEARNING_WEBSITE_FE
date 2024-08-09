@@ -33,12 +33,16 @@ export default function About() {
 
     try {
       await validationSchema.validate({ email, password }, { abortEarly: false });
-      await loginWithRoleAdmin(email, password);
-      localStorage.setItem("accessToken", response.data.data.accessToken);
-      localStorage.setItem("refreshToken", response.data.data.refreshToken);
-      localStorage.setItem("userId", response.data.data.admin.id);
-      localStorage.setItem("userEmail", response.data.data.admin.email);
-      navigate("/dashboard/statistic");
+      const response = await loginWithRoleAdmin(email, password);
+      if (response.data) {
+        localStorage.setItem("accessToken", response.data.data.accessToken);
+        localStorage.setItem("refreshToken", response.data.data.refreshToken);
+        localStorage.setItem("userId", response.data.data.admin.id);
+        localStorage.setItem("userEmail", response.data.data.admin.email);
+        navigate("/dashboard/statistic");
+      } else {
+        REJECT(toast, "Sai tài khoản hoặc mật khẩu");
+      }
     } catch (error) {
       if (error.name === "ValidationError") {
         // Show validation error below the input fields
