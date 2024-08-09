@@ -90,7 +90,7 @@ const PostAnswer = ({ post }) => {
       description: `${user?.name} đã phản hồi bài viết của bạn`,
       notificationTime: new Date(),
       isRead: false,
-      link: "string",
+      link: post?.id,
     };
     createPostNotification(body);
   }
@@ -249,7 +249,7 @@ const Answer = ({
       description: `${user?.name} ${msg}`,
       notificationTime: new Date(),
       isRead: false,
-      link: "string",
+      link: post?.id,
     };
     createPostNotification(body);
   }

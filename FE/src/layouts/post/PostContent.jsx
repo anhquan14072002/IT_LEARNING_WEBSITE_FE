@@ -80,8 +80,8 @@ function PostWrite({ setIsCompose }) {
       userId: user?.sub,
       gradeId: values.grade?.id,
     };
-    notifyPersonalResponse();
     createPost(descriptionPost);
+    notifyPersonalResponse();
     setIsCompose(false);
   };
   function notifyPersonalResponse() {
@@ -96,7 +96,7 @@ function PostWrite({ setIsCompose }) {
       description: `Bạn vừa tạo bài post thành công`,
       notificationTime: new Date(),
       isRead: false,
-      link: "string",
+      link: "",
     };
     createPostNotification(body);
   }

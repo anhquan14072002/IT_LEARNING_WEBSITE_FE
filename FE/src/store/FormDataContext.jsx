@@ -48,6 +48,7 @@ export const FormDataProvider = ({ children }) => {
         checkRecord,
         setStep,
         quizId,
+        setQuizId,
       }}
     >
       {children}
