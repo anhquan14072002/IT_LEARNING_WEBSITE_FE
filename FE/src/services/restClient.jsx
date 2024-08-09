@@ -1,6 +1,7 @@
 import axios from "axios";
 
-export  const BASE_URL = "https://lw-api.azurewebsites.net";
+
+const BASE_URL = "http://localhost:8000";
 
 
 export default function restClient({
@@ -8,13 +9,13 @@ export default function restClient({
   method = "GET",
   params,
   data,
-  headers,
+  headers
 }) {
   return axios({
     url: `${BASE_URL}/${url}`,
     method,
     params,
     data,
-    headers,
-  });
+    headers 
+  })
 }

@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import TestQuiz from "../../components/TestQuiz";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Loading from "../../components/Loading";
 import restClient from "../../services/restClient";
 import ViewQuestionInTest from "../../components/ViewQuestionInTest";
@@ -8,6 +8,7 @@ import LazyComponent from "../../components/LazyComponent";
 import Header from "../../components/Header";
 import Menu from "../../components/Menu";
 import Footer from "../../components/Footer";
+import { isLoggedIn } from "../../utils";
 
 export default function TestQuizPage() {
   const [quizData, setQuizData] = useState([]);
@@ -15,7 +16,14 @@ export default function TestQuizPage() {
   const { id } = useParams();
   const [fixedDivHeight, setFixedDivHeight] = useState(0);
   const fixedDivRef = useRef(null);
-  const [quizDetail, setQuizDetail] = useState(null)
+  const [quizDetail, setQuizDetail] = useState(null);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!isLoggedIn()) {
+      navigate("/notfound");
+    }
+  }, []);
 
   useEffect(() => {
     if (fixedDivRef.current) {
@@ -65,8 +73,11 @@ export default function TestQuizPage() {
         <Menu />
       </div>
 
-      <div style={{ paddingTop: `${fixedDivHeight}px` }}>
-        <ViewQuestionInTest quizData={quizData} quizDetail={quizDetail}/>
+      <div
+        style={{ paddingTop: `${fixedDivHeight}px` }}
+        className="min-h-screen"
+      >
+        <ViewQuestionInTest quizData={quizData} quizDetail={quizDetail} />
       </div>
 
       <LazyComponent>

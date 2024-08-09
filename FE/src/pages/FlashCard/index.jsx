@@ -27,16 +27,23 @@ export default function Quiz() {
   const [quiz, setQuiz] = useState([]);
   const navigate = useNavigate();
   const [showAnswer, setShowAnswer] = useState(false);
+  const [quizDetails, setQuizDetails] = useState(null);
 
   const fetchData = async () => {
     setLoading(true);
     try {
+      const quizDetailRes = await restClient({
+        url: `api/quiz/getquizbyid/${id}`,
+        method: "GET",
+      });
+      setQuizDetails(quizDetailRes?.data?.data);
+
       const quizResponse = await restClient({
         url: `api/quizquestion/getallquizquestionbyquizid?QuizId=${id}`,
         method: "GET",
       });
       if (Array.isArray(quizResponse.data?.data)) {
-        setQuiz(quizResponse.data.data);
+        setQuiz(quizResponse?.data?.data);
       } else {
         setQuiz(null); // Set quiz to null if not found
       }
@@ -63,18 +70,19 @@ export default function Quiz() {
         <Header />
         <Menu />
       </div>
-      
+
       <div
         style={{ paddingTop: `${fixedDivHeight}px` }}
         className="flex flex-col justify-center items-center gap-5 h-screen bg-gray-100"
       >
-          {quiz && (
-         <div className="">
-         <p className="font-semibold">
-           {currentCardIndex + 1}/{quiz?.length}
-         </p>
-       </div>
-      )}
+        {quiz && (
+          <div className="text-center">
+            <p className="mb-3 font-bold text-xl">{quizDetails?.title}</p>
+            <p className="font-semibold">
+              {currentCardIndex + 1}/{quiz?.length}
+            </p>
+          </div>
+        )}
         <div
           className={`w-1/2 shadow-lg rounded-md bg-white h-4/5 p-5 flex items-center justify-center cursor-pointer overflow-y-auto ${
             showAnswer ? "flip" : ""

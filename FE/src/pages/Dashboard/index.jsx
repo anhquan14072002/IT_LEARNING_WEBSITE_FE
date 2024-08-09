@@ -11,9 +11,11 @@ import ManageExam from "../../components/ManageExam";
 import ManageTag from "../../components/ManageTag";
 import ManageAccount from "../../components/ManageAccount";
 import { useNavigate, useParams } from "react-router-dom";
+
 import ManageCodeOnline from "../../components/ManageCodeOnline";
 import { assets } from "../../assets/assets";
 import NotifyProvider from "../../store/NotificationContext";
+
 
 const Dashboard = () => {
   const [open, setOpen] = useState(true);
@@ -22,6 +24,7 @@ const Dashboard = () => {
   const { typeId } = useParams();
 
   const Menus = [
+
     { title: "Thống kê", src:assets.chart_fill, index: "statistic" },
     { title: "Quản lí tài khoản", src:assets.user, index: "user" },
     {
@@ -36,18 +39,18 @@ const Dashboard = () => {
     { title: "Quản lí bài thực hành",  src:assets.folder, index: "codeeditor" },
   ];
 
-  useEffect(() => {
-    if (!Menus.some((item, index) => item.index === typeId)) {
-      navigate("/notfound");
-    }
-  }, []);
+  useEffect(()=>{
+     if(!Menus.some((item,index)=> item.index === typeId)){
+      navigate("/notfound")
+     }
+  },[])
 
   return (
     <>
       {loading ? (
         <LoadingScreen setLoading={setLoading} />
       ) : (
-        <NotifyProvider>
+        <>
           <div className="fixed top-0 w-full z-30">
             <Header />
           </div>
@@ -82,6 +85,7 @@ const Dashboard = () => {
                       navigate(`/dashboard/${Menu.index}`);
                     }}
                   >
+
                     <Tooltip
                       target={`menu-${Menu.index}`}
                       content={Menu.title}
@@ -102,6 +106,7 @@ const Dashboard = () => {
           </div>
           <div className="ml-20 mt-16 p-7">
 
+
             <div className="h-screen" onClick={(e)=>setOpen(false)}>
 
               {typeId === "user" && <ManageAccount />}
@@ -113,7 +118,7 @@ const Dashboard = () => {
               {typeId === "codeeditor" && <ManageCodeOnline />}
             </div>
           </div>
-        </NotifyProvider>
+        </>
       )}
     </>
   );
