@@ -62,8 +62,6 @@ const ExamDetail = () => {
 
     const countAnswers = Object.keys(answers).length;
     const numberQuestion =data?.numberQuestion
-    console.log(numberQuestion);
-    
     if (numberQuestion-countAnswers !== 0) {
       window.confirm(`Bạn còn ${numberQuestion-countAnswers} câu hỏi chưa trả lời.Bạn chắc chắn muốn nộp bài chứ?`)
       return
