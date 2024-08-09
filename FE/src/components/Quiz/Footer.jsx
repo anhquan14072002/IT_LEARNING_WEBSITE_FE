@@ -73,7 +73,7 @@ function Footer({ Menus }) {
         <IconButton
           icon={cancel}
           title="Hủy bỏ"
-          onClick={() => navigate("/dashboard")}
+          onClick={() => navigate("/dashboard/quiz")}
         />
       </span>
     </footer>

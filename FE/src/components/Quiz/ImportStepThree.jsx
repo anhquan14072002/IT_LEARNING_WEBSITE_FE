@@ -16,7 +16,7 @@ function ImportStepThree(props) {
     didFetchRef.current = true;
     setLoading(true);
     restClient({
-      url: `api/quizquestion/ImportExcel/${idImport}/${quizId}`,
+      url: `api/quizquestion/ImportDatabase/${idImport}/${quizId}`,
       method: "GET",
     })
       .then((res) => {
