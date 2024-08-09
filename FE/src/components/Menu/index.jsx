@@ -1,14 +1,22 @@
 import React, { useEffect, useState } from "react";
 import Loading from "../Loading";
 import restClient from "../../services/restClient";
+import { useLocation, useNavigate } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 function Menu() {
   const [listClast, setListClass] = useState([]);
   const [loading, setLoading] = useState(false);
-  const navigation = useNavigate()
+
+  const location = useLocation()
+  const navigate = useNavigate()
+
+
+
   useEffect(() => {
+    console.log("location::", location.pathname);
+    
     setLoading(true);
     restClient({
       url: `api/grade/getallgrade`,
@@ -30,7 +38,7 @@ function Menu() {
         <Loading heightValue={"70px"} />
       ) : (
         <>
-          <div className="p-2 cursor-pointer bg-[#D1F7FF] hover:bg-[#D1F7FF] flex-1 flex justify-center">
+          <div className={`p-2 cursor-pointer ${location.pathname === "/" && "bg-[#D1F7FF]"}  hover:bg-[#D1F7FF] flex-1 flex justify-center`} onClick={()=>navigate("/")}> 
             <svg
               viewBox="0 0 576 512"
               xmlns="http://www.w3.org/2000/svg"
@@ -45,17 +53,18 @@ function Menu() {
               <div
                 className="p-2 flex items-center justify-center cursor-pointer hover:bg-[#D1F7FF] flex-1"
                 key={index}
+                onClick={()=>navigate("/detailclass/"+clast?.id)}
               >
                 {clast?.title}
               </div>
             ))}
           <div className="p-2 flex items-center justify-center cursor-pointer hover:bg-[#D1F7FF] flex-1">
-           <Link to="/post"> Hỏi bài</Link>
+            Hỏi bài
           </div>
           <div className="p-2 flex items-center justify-center cursor-pointer hover:bg-[#D1F7FF] flex-1">
             Thực hành
           </div>
-          <div className="p-2 flex items-center justify-center cursor-pointer hover:bg-[#D1F7FF] flex-1" onClick={(e)=>navigation('/viewexam')}>
+          <div className="p-2 flex items-center justify-center cursor-pointer hover:bg-[#D1F7FF] flex-1" onClick={(e)=>navigate('/viewexam')}>
             Đề Thi
           </div>
         </>

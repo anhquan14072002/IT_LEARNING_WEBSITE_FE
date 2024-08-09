@@ -194,20 +194,14 @@ const UpdateTopicDialog = ({
                 options={documentList}
               />
 
-              {/* <CustomTextarea
+              <CustomTextarea
                 label="Mục tiêu chủ đề"
                 name="objectives"
                 id="objectives"
               >
                 <ErrorMessage name="objectives" component="div" />
-              </CustomTextarea> */}
-              <CustomEditor
-                label="Thông tin chi tiết"
-                name="objectives"
-                id="objectives"
-              >
-                <ErrorMessage name="objectives" component="div" />
-              </CustomEditor>
+              </CustomTextarea>
+
               <div>
                 <CustomEditor
                   label="Thông tin chi tiết"
