@@ -13,8 +13,8 @@ function ItemSideBar({ Menu, index, indexMenu, step }) {
   return (
     <li
       className={`${bgStep}
-      ${index != 0 ? "mt-2" : ""}${
-        index === indexMenu ? "bg-light-white" : ""
+      ${index != 0 ? "mt-2 " : ""}${
+        index !== indexMenu ? "bg-light-white" : ""
       }`}
     >
       <Button disabled className="origin-left duration-200 opacity-100">
