@@ -13,6 +13,7 @@ import { REJECT, SUCCESS } from "../../utils";
 import restClient from "../../services/restClient";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
+import NotifyProvider from "../../store/NotificationContext";
 
 const ExamDetail = () => {
   const toast = useRef(null);
@@ -62,13 +63,14 @@ const ExamDetail = () => {
 
     const countAnswers = Object.keys(answers).length;
     const numberQuestion =data?.numberQuestion
-    if (numberQuestion !== 0) {
+    if (numberQuestion-countAnswers !== 0) {
       window.confirm(`Bạn còn ${numberQuestion-countAnswers} câu hỏi chưa trả lời.Bạn chắc chắn muốn nộp bài chứ?`)
+      return
     }
 
     const formattedAnswers = Object.keys(answers).map((key) => ({
       numberOfQuestion: parseInt(key.replace("question", ""), 10),
-      answer: answers[key],
+      answer: answers[key] ,
     }));
 
     console.log("Submitted answers:", formattedAnswers);
@@ -105,21 +107,26 @@ const ExamDetail = () => {
     }
   }, [selectedExamCode]);
   return (
-    <>
+    <NotifyProvider>
       <Toast ref={toast} />
       <Header />
       <div className="m-4 ">
         <div className="text-2xl font-semibold mb-4 flex flex-col  ">
           <div className="mb-5"> {data?.examTitle}</div>
           {examList?.length !== 1 && (
+            <>
+            <div className="flex gap-3">
+            <span> Mã đề</span>
             <Dropdown
               value={selectedExamCode}
               onChange={handleChangeExamCode}
               options={examList}
               optionLabel="code"
               placeholder={data?.code}
-              className="w-fit md:w-14rem border border-gray-500  items-center shadow-none custom-dropdown1 "
+              className="w-fit h-fit border border-gray-700  "
             />
+            </div>
+            </>
           )}
         </div>
         <div
@@ -271,7 +278,7 @@ const ExamDetail = () => {
           {/* Right frame containing the answer choices */}
         </div>
       </div>
-    </>
+    </NotifyProvider>
   );
 };
 

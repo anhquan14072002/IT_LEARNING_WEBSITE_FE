@@ -16,9 +16,9 @@ function PostGrade(props) {
         <LoadingScreen setLoading={loading} />
       ) : (
         <div
-          className="w-[17%] h-screen "
+          className="w-[17%]"
           // className="w-[17%] h-screen fixed top-[9rem] bottom-0 overflow-y-auto hide-scrollbar"
-          style={{ height: "calc(100vh - 9rem)" }}
+          // style={{ height: "calc(100vh - 9rem)" }}
         >
           {classList &&
             classList?.map((item, i) => {
@@ -29,7 +29,7 @@ function PostGrade(props) {
                   active={itemSidebar.gradeIdSelected === item.id}
                   onClick={() =>
                     setItemSidebar((preValue) => {
-                      return {...preValue, gradeIdSelected: item.id };
+                      return { ...preValue, gradeIdSelected: item.id };
                     })
                   }
                 />

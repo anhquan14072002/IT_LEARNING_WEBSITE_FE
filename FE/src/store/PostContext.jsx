@@ -7,7 +7,7 @@ import React, {
   useState,
 } from "react";
 import restClient from "../services/restClient";
-import { ACCEPT, REJECT, SUCCESS } from "../utils";
+import { ACCEPT, isLoggedIn, REJECT, SUCCESS } from "../utils";
 import { Toast } from "primereact/toast";
 import { useSelector } from "react-redux";
 import {
@@ -20,6 +20,7 @@ const PostContext = createContext();
 
 export const PostProvider = ({ children }) => {
   const [posts, setPosts] = useState([]);
+  const [postCommentChilds, setPostCommentChilds] = useState([]);
   const [loading, setLoading] = useState(true);
   const [first, setFirst] = useState(0);
   const [page, setPage] = useState(1);
@@ -37,6 +38,7 @@ export const PostProvider = ({ children }) => {
   const [isConnect, setIsConnect] = useState(false);
   const [listNotification, setListNotification] = useState(false);
   const hasFetched = useRef(false);
+  const isCheck = isLoggedIn();
   const { fetchNumberNotificationByUserId } = useContext(NotificationContext);
   useEffect(() => {
     // if (hasFetched.current) return; // Prevent fetching if already done
@@ -83,7 +85,7 @@ export const PostProvider = ({ children }) => {
         console.error("Connection failed: ", error);
       }
     };
-    if (user?.sub) {
+    if (user?.sub && isCheck) {
       notification();
     }
     // hasFetched.current = true; // Mark fetch as done
@@ -92,7 +94,7 @@ export const PostProvider = ({ children }) => {
         conn.stop();
       }
     };
-  }, [user?.sub, fetchNumberNotificationByUserId]);
+  }, [user?.sub, isCheck, fetchNumberNotificationByUserId]);
 
   const createPostNotification = (contentPost) => {
     restClient({
@@ -210,20 +212,20 @@ export const PostProvider = ({ children }) => {
       })
       .finally(() => setLoading(false));
   };
-  const fetchPostCommentById = () => {
+  const fetchPostCommentById = (id) => {
     setLoading(true);
     restClient({
-      url: `api/post/getpostcommentbyid/`,
+      url: `api/post/getpostcommentbyid/${id}`,
       method: "GET",
     })
       .then((res) => {
-        setPosts(Array.isArray(res.data.data) ? res.data.data : []);
+        setPostCommentChilds(Array.isArray(res.data.data) ? res.data.data : []);
         const paginationData = JSON.parse(res.headers["x-pagination"]);
         setTotalPage(paginationData.TotalPages);
       })
       .catch((err) => {
         console.error("Error fetching data:", err);
-        setPosts([]);
+        setPostCommentChilds([]);
       })
       .finally(() => setLoading(false));
   };
@@ -359,7 +361,8 @@ export const PostProvider = ({ children }) => {
   };
 
   const checkUser = () => {
-    if (!user?.sub) {
+    if (!user?.sub || !isLoggedIn()) {
+      // có user?.sub và token hết hạn
       ACCEPT(toast, "Bạn chưa đăng nhập ?");
       return false;
     }
@@ -380,7 +383,7 @@ export const PostProvider = ({ children }) => {
         itemSidebar,
         setItemSidebar,
         onPageChange,
-
+        postCommentChilds,
         totalPage,
         createPost,
         createPostComment,

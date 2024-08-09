@@ -13,6 +13,8 @@ import restClient from "../../services/restClient";
 import { province } from "../../services/province";
 import { MultiSelect } from "primereact/multiselect";
 import "./index.css";
+import { Dropdown } from "primereact/dropdown";
+import { years } from "../../services/year";
 
 const baseValidationSchema = Yup.object({
   competition: Yup.object()
@@ -27,11 +29,11 @@ const baseValidationSchema = Yup.object({
       return Object.keys(value).length !== 0;
     })
     .required("Không bỏ trống trường này"),
-  year: Yup.number()
-    .required("Năm không được bỏ trống")
-    .min(1900, "Năm phải lớn hơn 1900")
-    .integer("Năm phải là số nguyên")
-    .test("len", "Sai định dạng năm", (val) => val.toString().length === 4),
+  year: Yup.object()
+    .test("is-not-empty", "Không được để trống trường này", (value) => {
+      return Object.keys(value).length !== 0;
+    })
+    .required("Không bỏ trống trường này"),
 });
 
 export default function AddExam({
@@ -46,43 +48,59 @@ export default function AddExam({
   const [provinceList, setProvinceList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [competitionList, setCompetitionList] = useState([]);
+  const [seletedGrade, setSeletedGrade] = useState(null);
+  const [gradeValue, setGradeValue] = useState(null);
   const [tagList, setTagList] = useState([]);
+  const [gradeList, setGradeList] = useState([]);
   const [tag, setTag] = useState(null);
+  const [yearList, setYearList] = useState([]);
 
   useEffect(() => {
-    if (province?.data) {
-      setProvinceList(province.data);
-    }
     const fetchData = async () => {
       try {
-        const response = await restClient({
+        // Fetch competition list
+        const competitionResponse = await restClient({
           url: "api/competition/getallcompetition",
           method: "GET",
         });
-        console.log(response?.data?.data);
+        console.log(competitionResponse?.data?.data);
         setCompetitionList(
-          Array.isArray(response?.data?.data) ? response?.data?.data : []
+          Array.isArray(competitionResponse?.data?.data)
+            ? competitionResponse?.data?.data
+            : []
         );
-      } catch (error) {
-        console.log("error");
-      }
-    };
-    const fetchDataTag = async () => {
-      try {
-        const response = await restClient({
+
+        // Fetch tag list
+        const tagResponse = await restClient({
           url: "api/tag/getalltag",
           method: "GET",
         });
-        console.log(response?.data?.data);
+        console.log(tagResponse?.data?.data);
         setTagList(
-          Array.isArray(response?.data?.data) ? response?.data?.data : []
+          Array.isArray(tagResponse?.data?.data) ? tagResponse?.data?.data : []
+        );
+
+        // Fetch grade list
+        const gradeResponse = await restClient({
+          url: "api/grade/getallgrade",
+          method: "GET",
+        });
+        console.log(gradeResponse?.data?.data);
+        setGradeList(
+          Array.isArray(gradeResponse?.data?.data)
+            ? gradeResponse?.data?.data
+            : []
         );
       } catch (error) {
-        console.log("error");
+        console.error("An error occurred:", error);
       }
     };
+    if (province?.data) {
+      setProvinceList(province.data);
+    }
+
+    // Call the fetchData function
     fetchData();
-    fetchDataTag();
   }, [province]);
 
   const [initialValues, setInitialValues] = useState({
@@ -90,10 +108,18 @@ export default function AddExam({
     title: "",
     province: {},
     description: "",
-    year: "",
+    year: {},
     numberQuestion: "",
   });
-
+  useEffect(() => {
+    if (years) {
+      setYearList(years);
+    }
+  });
+  const handleGrade = (e) => {
+    setSeletedGrade(e.value.title);
+    setGradeValue(e.value.id);
+  };
   const onSubmit = async (values, { resetForm }) => {
     setLoading(true);
     const formData = new FormData();
@@ -102,9 +128,10 @@ export default function AddExam({
     formData.append("Title", values.title);
     formData.append("Province", values.province.name);
     formData.append("Description", values.description);
-    formData.append("NumberQuestion", values.numberQuestion);
-    formData.append("Year", values.year);
+    formData.append("NumberQuestion", values.numberQuestion|| 0);
+    formData.append("Year", values.year.year);
     formData.append("isActive", false);
+    formData.append("GradeId", gradeValue || "");
     if (tag && tag.length > 0) {
       tag.forEach((item, index) => {
         formData.append(`tagValues[${index}]`, item.keyWord);
@@ -121,12 +148,15 @@ export default function AddExam({
       });
       setTag([]);
       SUCCESS(toast, "Thêm đề thi thành công");
+      setSeletedGrade([]);
       resetForm(); // Reset form fields
       fetchData(); // Update the exam list
     } catch (error) {
       console.error("Error adding exam:", error);
       setTag([]);
-      REJECT(toast, error.message);
+      setSeletedGrade([]);
+      REJECT(toast, "Thêm đề thi không thành công ");
+
     } finally {
       setLoading(false);
       setVisible(false);
@@ -173,6 +203,7 @@ export default function AddExam({
                 name="title"
                 type="text"
               />
+
               <CustomDropdown
                 title="Chọn Cuộc Thi"
                 label={
@@ -185,7 +216,17 @@ export default function AddExam({
                 name="competition"
                 options={competitionList}
               />
-
+              <span>Lớp</span>
+              <Dropdown
+                value={seletedGrade}
+                onChange={handleGrade}
+                options={gradeList}
+                optionLabel="title"
+                editable
+                placeholder="Lớp"
+                className="border border-gray-300 shadow-none  flex items-center w-full py-2 gap-2.5 "
+                filter
+              />
               <CustomDropdown
                 title="Tỉnh"
                 label={
@@ -200,7 +241,9 @@ export default function AddExam({
               />
               <div>
                 <>
-                  <span>Tag <span style={{ color: 'red' }}>*</span></span>
+                  <span>
+                    Tag <span style={{ color: "red" }}>*</span>
+                  </span>
                 </>
                 <MultiSelect
                   value={tag}
@@ -210,17 +253,20 @@ export default function AddExam({
                   placeholder="Chọn Tag"
                   className="w-full shadow-none custom-multiselect border border-gray-300"
                   display="chip"
+                  filter
                 />
               </div>
-              <CustomTextInput
+              <CustomDropdown
+                title="Năm"
                 label={
                   <>
                     <span>Năm</span>
                   </>
                 }
+                customTitle="year"
                 id="year"
                 name="year"
-                type="number"
+                options={yearList}
               />
               {types === 2 && (
                 <CustomTextInput

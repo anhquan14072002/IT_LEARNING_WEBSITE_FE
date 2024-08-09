@@ -2,12 +2,17 @@ import React, { useEffect, useState } from "react";
 import Loading from "../Loading";
 import restClient from "../../services/restClient";
 import { useLocation, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 function Menu() {
   const [listClast, setListClass] = useState([]);
   const [loading, setLoading] = useState(false);
+
   const location = useLocation()
   const navigate = useNavigate()
+
+
 
   useEffect(() => {
     console.log("location::", location.pathname);
@@ -58,6 +63,9 @@ function Menu() {
           </div>
           <div className="p-2 flex items-center justify-center cursor-pointer hover:bg-[#D1F7FF] flex-1">
             Thực hành
+          </div>
+          <div className="p-2 flex items-center justify-center cursor-pointer hover:bg-[#D1F7FF] flex-1" onClick={(e)=>navigate('/viewexam')}>
+            Đề Thi
           </div>
         </>
       )}

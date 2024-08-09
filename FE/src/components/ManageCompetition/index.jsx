@@ -34,9 +34,6 @@ export default function ManageExam() {
   const [visibleDelete, setVisibleDelete] = useState(false);
   const [loading, setLoading] = useState(false);
   const [textSearch, setTextSearch] = useState("");
-  const [visibleExamCode, setVisibleExamCode] = useState(false);
-  const [examCodeValue, setExamCodeValue] = useState(false);
-  const [title, setTitle] = useState("");
 
   //pagination
   const [first, setFirst] = useState(0);
@@ -50,10 +47,11 @@ export default function ManageExam() {
   
   const fetchData = async () => {
     setLoading(true);
-    const title = "title";
+     const title = "title"
+    const id = "id"
     try {
       const res = await restClient({
-        url: `api/competition/searchcompetitionpagination?PageIndex=${page}&PageSize=${rows}&Key=${title}&Value=${textSearch}`,
+        url: `api/competition/searchcompetitionpagination?PageIndex=${page}&PageSize=${rows}&Key=${title}&Value=${textSearch}&OrderBy=${id}&IsAscending=false`,
         method: "GET",
       });
   

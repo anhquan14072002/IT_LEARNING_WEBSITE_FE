@@ -1,8 +1,9 @@
 {
   "name": "fe",
-  "private": true,
   "version": "0.0.0",
   "type": "module",
+  "lockfileVersion": 3,
+  "requires": true,
   "scripts": {
     "dev": "vite",
     "build": "vite build",
@@ -23,6 +24,8 @@
     "classnames": "^2.5.1",
     "codemirror": "^5.65.17",
     "date-fns": "^3.6.0",
+    "@microsoft/signalr": "^8.0.7",
+    "@million/lint": "^1.0.0-rc.84",
     "dompurify": "^3.1.5",
     "formik": "^2.4.6",
     "html-react-parser": "^5.1.10",

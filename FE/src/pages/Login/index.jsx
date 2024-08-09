@@ -9,6 +9,7 @@ import { CHECKMAIL, decodeToken, REJECT } from "../../utils";
 import { Toast } from "primereact/toast";
 import Menu from "../../components/Menu";
 import { InputText } from "primereact/inputtext";
+import { assets } from "../../assets/assets";
 import { useDispatch } from "react-redux";
 import { addUser } from "../../redux/userr/userSlice";
 
@@ -73,7 +74,13 @@ const Index = () => {
       <div className="flex h-screen  ">
         <div className="w-1/2">
           <div className="w-auto h-full">
-            <img src="src/assets/OIG4.jpg" alt="" className="w-full h-full" />
+
+            <img
+              src={assets.image}
+              alt=""
+              className="w-full h-full"
+            />
+
           </div>
         </div>
 

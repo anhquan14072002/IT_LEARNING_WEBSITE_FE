@@ -80,7 +80,7 @@ export default function Topic() {
     if (textSearch.trim()) {
       setLoading(true);
       restClient({
-        url: `api/topic/searchbytopicpagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}`,
+        url: `api/topic/getalltopicpagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}`,
         method: "GET",
       })
         .then((res) => {
@@ -341,7 +341,7 @@ export default function Topic() {
               <Paginator
                 first={first}
                 rows={rows}
-                rowsPerPageOptions={[1, 20, 30]}
+                rowsPerPageOptions={[10, 20, 30]}
                 totalRecords={totalPage * rows}
                 onPageChange={onPageChange}
                 className="custom-paginator mx-auto"
