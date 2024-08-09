@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import Loading from "../Loading";
 import restClient from "../../services/restClient";
 import { useLocation, useNavigate } from "react-router-dom";
-import { useNavigate } from "react-router-dom";
 import { Link } from "react-router-dom";
 
 function Menu() {
