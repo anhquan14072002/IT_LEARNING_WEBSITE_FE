@@ -22,18 +22,18 @@ const Dashboard = () => {
   const { typeId } = useParams();
 
   const Menus = [
-    { title: "Thống kê", src:assets.chart_fill, index: "statistic" },
-    { title: "Quản lí tài khoản", src:assets.user, index: "user" },
+    { title: "Thống kê", src: assets.chart_fill, index: "statistic" },
+    { title: "Quản lí tài khoản", src: assets.user, index: "user" },
     {
       title: "Quản lí tài liệu/chủ đề/bài học ",
-      src:assets.folder,
+      src: assets.folder,
       index: "adminManageDocument",
     },
-    { title: "Quản lí bài học ",  src:assets.folder, index: "lesson" },
-    { title: "Quản lí câu hỏi ôn tập ",  src:assets.folder, index: "quiz" },
-    { title: "Quản lí đề thi",  src:assets.folder, index: "test" },
-    { title: "Quản lí tag ",  src:assets.folder, index: "tag" },
-    { title: "Quản lí bài thực hành",  src:assets.folder, index: "codeeditor" },
+    { title: "Quản lí bài học ", src: assets.folder, index: "lesson" },
+    { title: "Quản lí câu hỏi ôn tập ", src: assets.folder, index: "quiz" },
+    { title: "Quản lí đề thi", src: assets.folder, index: "test" },
+    { title: "Quản lí tag ", src: assets.folder, index: "tag" },
+    { title: "Quản lí bài thực hành", src: assets.folder, index: "codeeditor" },
   ];
 
   useEffect(() => {
@@ -72,7 +72,7 @@ const Dashboard = () => {
                 />
               </div> */}
               <ul className="pt-6">
-                {Menus.map((Menu) => (
+                {Menus.map((Menu, index) => (
                   <li
                     key={Menu.index}
                     className={`flex rounded-md p-2 cursor-pointer hover:bg-light-white text-gray-300 text-sm items-center gap-x-4 mt-2 ${
@@ -82,6 +82,7 @@ const Dashboard = () => {
                       navigate(`/dashboard/${Menu.index}`);
                     }}
                   >
+                    {console.log(index)}
                     <Tooltip
                       target={`menu-${Menu.index}`}
                       content={Menu.title}
@@ -101,9 +102,7 @@ const Dashboard = () => {
             </div>
           </div>
           <div className="ml-20 mt-16 p-7">
-
-            <div className="h-screen" onClick={(e)=>setOpen(false)}>
-
+            <div className="h-screen" onClick={(e) => setOpen(false)}>
               {typeId === "user" && <ManageAccount />}
               {typeId === "adminManageDocument" && <ManageDocument />}
               {typeId === "lesson" && <ContentLesson />}
