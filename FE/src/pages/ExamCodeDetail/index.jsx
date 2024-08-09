@@ -31,6 +31,7 @@ const ExamDetail = () => {
     const fetchData = async () => {
       try {
         const response = await getExamCodeById(id);
+        console.log(response?.data?.data?.length);
         setData(response?.data?.data[0]);
         setExamList(response?.data?.data);
         setViewPdf(response?.data?.data[0].examFile);
@@ -62,8 +63,6 @@ const ExamDetail = () => {
 
     const countAnswers = Object.keys(answers).length;
     const numberQuestion =data?.numberQuestion
-    console.log(numberQuestion);
-    
     if (numberQuestion-countAnswers !== 0) {
       window.confirm(`Bạn còn ${numberQuestion-countAnswers} câu hỏi chưa trả lời.Bạn chắc chắn muốn nộp bài chứ?`)
       return

@@ -237,13 +237,6 @@ export default function ManageQuestionQuiz() {
           <h1 className="font-bold text-3xl">Câu hỏi quiz</h1>
           <div>
             <Button
-              label="Import"
-              icon="pi pi-plus-circle"
-              severity="info"
-              className="bg-blue-600 text-white p-2 text-sm font-normal"
-              onClick={() => setVisible(true)}
-            />
-            <Button
               label="Thêm mới"
               icon="pi pi-plus-circle"
               severity="info"

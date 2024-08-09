@@ -33,7 +33,6 @@ const UpdateQuestion = ({
     hint: "",
   });
 
-
   const [typeList, settypeList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [questionLevel, setquestionLevelList] = useState([]);
@@ -74,8 +73,6 @@ const UpdateQuestion = ({
       console.log("typeQuestion::", typeQuestion);
       setLoading(true);
 
-      updateValue?.quizAnswers.forEach((answer) => console.log(answer));
-
       try {
         // Fetch type list
         const typeListRes = await restClient({
@@ -110,9 +107,9 @@ const UpdateQuestion = ({
         ) {
           try {
             setLoadingForm(true);
-            setTypeQuestion(updateValue.type);
+            setTypeQuestion(updateValue?.type);
 
-            if (updateValue.type === "QuestionTrueFalse") {
+            if (Number(updateValue?.type) === 1) {
               const typeObject = typeData.find(
                 (item) => item?.title === "QuestionTrueFalse"
               );
@@ -136,7 +133,7 @@ const UpdateQuestion = ({
                 ),
                 hint: updateValue?.hint,
               });
-            } else if (updateValue.type === "QuestionFourAnswer") {
+            } else if (Number(updateValue?.type) === 2) {
               const typeObject = typeData.find(
                 (item) => item?.title === "QuestionFourAnswer"
               );
@@ -163,7 +160,7 @@ const UpdateQuestion = ({
 
               // Set the state with mappedFourAnswer
               setFourAnswer(mappedFourAnswer);
-            } else if (updateValue.type === "QuestionMultiChoice") {
+            } else if (Number(updateValue?.type) === 3) {
               const typeObject = typeData.find(
                 (item) => item?.title === "QuestionMultiChoice"
               );
@@ -212,7 +209,10 @@ const UpdateQuestion = ({
   }, [visibleUpdate, updateValue]);
 
   const onSubmit = (values) => {
-    if (typeQuestion === "QuestionTrueFalse") {
+    // console.log('====================================');
+    // console.log("checked::",typeQuestion === updateValue);
+    // console.log('====================================');
+    if (Number(typeQuestion) === 1) {
       if (!values.QuestionTrueFalse) {
         REJECT(toast, "Bạn phải chọn đáp án đúng");
       } else {
@@ -265,7 +265,7 @@ const UpdateQuestion = ({
             setLoading(false);
           });
       }
-    } else if (typeQuestion === "QuestionFourAnswer") {
+    } else if (Number(typeQuestion) === 2) {
       if (hasEmptyContent(fourAnswer)) {
         REJECT(
           toast,
@@ -312,7 +312,7 @@ const UpdateQuestion = ({
             setLoading(false);
           });
       }
-    } else if (typeQuestion === "QuestionMultiChoice") {
+    } else if (Number(typeQuestion) === 3) {
       if (handleMultipleContent(multipleAnswer)) {
         REJECT(
           toast,
@@ -363,7 +363,7 @@ const UpdateQuestion = ({
   };
 
   const handleChangeType = (e, helpers, setTouchedState, props) => {
-    setTypeQuestion(e?.value?.title); // Update typeQuestion based on selection
+    setTypeQuestion(e?.value?.typeName); // Update typeQuestion based on selection
 
     const selectedType = {
       title: e?.value?.title,
@@ -510,7 +510,6 @@ const UpdateQuestion = ({
         >
           {(formik) => (
             <Form>
-              
               <CustomDropdown
                 title="Mức độ"
                 label="Mức độ"
@@ -537,7 +536,7 @@ const UpdateQuestion = ({
                 options={typeList}
               />
 
-              {typeQuestion && typeQuestion === "QuestionTrueFalse" && (
+              {typeQuestion && Number(typeQuestion) === 1 && (
                 <>
                   <div className="my-4">
                     <label
@@ -575,7 +574,7 @@ const UpdateQuestion = ({
                 </>
               )}
 
-              {typeQuestion && typeQuestion === "QuestionFourAnswer" && (
+              {typeQuestion && Number(typeQuestion) === 2 && (
                 <>
                   <div className="my-4">
                     <label
@@ -612,7 +611,7 @@ const UpdateQuestion = ({
                 </>
               )}
 
-              {typeQuestion && typeQuestion === "QuestionMultiChoice" && (
+              {typeQuestion && Number(typeQuestion) === 3 && (
                 <>
                   <div className="mb-5">
                     <label
