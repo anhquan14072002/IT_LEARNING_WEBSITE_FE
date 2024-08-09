@@ -10,7 +10,9 @@ import { useNavigate } from "react-router-dom";
 import Loading from "../Loading";
 import { REJECT } from "../../utils";
 import { Toast } from "primereact/toast";
+
 import { DataTable } from "primereact/datatable";
+
 import { Dialog } from "primereact/dialog";
 function ImportStepTwo() {
   const [excelValidateResponse, setExcelValidateResponse] = useState([]);
@@ -21,6 +23,8 @@ function ImportStepTwo() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const toast = useRef(null);
+  const [visible, setVisible] = useState(false);
+
   useEffect(() => {
     const handleUpload = async () => {
       if (!file) {
@@ -68,6 +72,7 @@ function ImportStepTwo() {
           console.error("File upload failed:", response);
         }
       } catch (err) {
+
         // handleUpload();
         console.log(err.response.data.message);
 
@@ -90,6 +95,7 @@ function ImportStepTwo() {
           ),
         });
         return;
+
       } finally {
         setLoading(false);
       }
@@ -171,19 +177,23 @@ function ImportStepTwo() {
     </div>
   );
 
-  const footerContent = (
-    <div>
-      <Button
-        label="Ok"
-        className="bg-blue-500 px-4 py-1"
-        onClick={() => {
-          setVisible(false);
-          navigate("/importQuiz/stepOne");
-        }}
-        autoFocus
-      />
+
+  const headerElement = (
+    <div className="inline-flex align-items-center justify-content-center gap-2">
+        {/* <Avatar image="https://primefaces.org/cdn/primereact/images/avatar/amyelsner.png" shape="circle" /> */}
+        <span className="font-bold white-space-nowrap">Thông báo</span>
     </div>
-  );
+);
+
+const footerContent = (
+    <div>
+        <Button className="bg-blue-500 px-3 py-2 text-white font-bold" label="Đồng ý" icon="pi pi-check"    onClick={() => {
+                navigate("/importQuiz/stepOne");
+                setVisible(false);
+              }} autoFocus />
+    </div>
+);
+
   return loading ? (
     <Loading />
   ) : (
@@ -191,19 +201,12 @@ function ImportStepTwo() {
       <Toast ref={toast} />
       <ConfirmDialog visible={visibleDelete} className="w-96" />
 
-      <Dialog
-        visible={visible}
-        modal
-        header={headerElement}
-        footer={footerContent}
-        style={{ width: "20rem" }}
-        onHide={() => {
-          if (!visible) return;
-          setVisible(false);
-        }}
-      >
-        <p className="m-0">File tải phải có dạng excel</p>
-      </Dialog>
+      <Dialog visible={visible} modal header={headerElement} footer={footerContent} style={{ width: '20rem' }} onHide={() => {if (!visible) return; setVisible(false); }}>
+                <p className="m-0">
+                  File phải đúng định dang excel
+                </p>
+            </Dialog>
+
       <p className="pb-2">
         <span className="font-bold mr-28">
           {excelValidateResponse.countSuccess ?? 0} /{" "}
@@ -272,7 +275,6 @@ function ImportStepTwo() {
       <p className="pt-2">
         Tải về tập tin chứa các dòng nhập liệu không thành công
         <a
-          href="#"
           className="text-blue-700 font-medium"
           onClick={exportToExcel}
         >
