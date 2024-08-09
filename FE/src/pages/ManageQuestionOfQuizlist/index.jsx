@@ -1,7 +1,7 @@
 import debounce from "lodash.debounce";
 import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Paginator } from "primereact/paginator";
@@ -25,8 +25,10 @@ import { useNavigate, useParams } from "react-router-dom";
 import Header from "../../components/Header";
 import { Tooltip } from "primereact/tooltip";
 import ImportFromQuiz from "../../components/ImportFromQuiz";
+import NotifyProvider from "../../store/NotificationContext";
+import FormDataContext, { FormDataProvider } from "../../store/FormDataContext";
 
-export default function ManageQuestionOfQuizlist() {
+export function ManageQuestionOfQuizlistProvider() {
   const toast = useRef(null);
   const dropDownRef1 = useRef(null);
   const dropDownRef2 = useRef(null);
@@ -41,6 +43,7 @@ export default function ManageQuestionOfQuizlist() {
   const [visibleDelete, setVisibleDelete] = useState(false);
   const [loading, setLoading] = useState(false);
   const [textSearch, setTextSearch] = useState("");
+  const { setQuizId } = useContext(FormDataContext);
   const { id } = useParams();
 
   //pagination
@@ -66,6 +69,9 @@ export default function ManageQuestionOfQuizlist() {
     { title: "Quản lí tag ", src: "Folder", index: "tag" },
   ];
 
+  useEffect(() => {
+    setQuizId(id);
+  }, [id]);
   useEffect(() => {
     fetchData();
   }, [page, rows, textSearch]);
@@ -238,7 +244,7 @@ export default function ManageQuestionOfQuizlist() {
   };
 
   return (
-    <>
+    <NotifyProvider>
       <div className="fixed top-0 w-full z-30">
         <Header />
       </div>
@@ -254,14 +260,7 @@ export default function ManageQuestionOfQuizlist() {
                border-2 rounded-full ${!open ? "rotate-180" : ""}`}
             onClick={() => setOpen(!open)}
           />
-          {/* <div className="flex gap-x-4 items-center">
-                <img
-                  src="/src/assets/logo.png"
-                  className={`cursor-pointer duration-500 ${
-                    open ? "rotate-[360deg]" : ""
-                  }`}
-                />
-              </div> */}
+
           <ul className="pt-6">
             {Menus.map((Menu) => (
               <li
@@ -290,13 +289,13 @@ export default function ManageQuestionOfQuizlist() {
           <div>
             <Toast ref={toast} />
             <ConfirmDialog visible={visibleDelete} />
-            <ImportFromQuiz
+            {/* <ImportFromQuiz
               visible={visibleImport}
               setVisible={setVisibleImport}
               toast={toast}
               fetchData={fetchData}
               id={id}
-            />
+            /> */}
             <AddQuestion
               id={id}
               visible={visible}
@@ -316,18 +315,18 @@ export default function ManageQuestionOfQuizlist() {
                 <h1 className="font-bold text-3xl">Câu hỏi quiz</h1>
                 <div className="flex gap-5">
                   <Button
+                    label="Import câu hỏi"
+                    icon="pi pi-plus-circle"
+                    severity="info"
+                    className="bg-blue-600 text-white p-2 text-sm font-normal"
+                    onClick={() => navigate("/importQuiz/stepOne")}
+                  />
+                  <Button
                     label="Soạn câu hỏi mới"
                     icon="pi pi-plus-circle"
                     severity="info"
                     className="bg-blue-600 text-white p-2 text-sm font-normal"
                     onClick={() => setVisible(true)}
-                  />
-                  <Button
-                    label="Lấy câu hỏi từ các bộ ôn tập có sẵn"
-                    icon="pi pi-plus-circle"
-                    severity="info"
-                    className="bg-blue-600 text-white p-2 text-sm font-normal"
-                    onClick={() => setVisibleImport(true)}
                   />
                   {/* <Button
               label="Xóa"
@@ -466,6 +465,13 @@ export default function ManageQuestionOfQuizlist() {
           </div>
         </div>
       </div>
-    </>
+    </NotifyProvider>
+  );
+}
+export default function ManageQuestionOfQuizlist() {
+  return (
+    <FormDataProvider>
+      <ManageQuestionOfQuizlistProvider />
+    </FormDataProvider>
   );
 }
