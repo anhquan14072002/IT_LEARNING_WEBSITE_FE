@@ -36,8 +36,8 @@ export default function About() {
       await loginWithRoleAdmin(email, password);
       localStorage.setItem("accessToken", response.data.data.accessToken);
       localStorage.setItem("refreshToken", response.data.data.refreshToken);
-      localStorage.setItem("userId", response.data.data.userDto.id);
-      localStorage.setItem("userEmail", response.data.data.userDto.email);
+      localStorage.setItem("userId", response.data.data.admin.id);
+      localStorage.setItem("userEmail", response.data.data.admin.email);
       navigate("/dashboard/statistic");
     } catch (error) {
       if (error.name === "ValidationError") {
