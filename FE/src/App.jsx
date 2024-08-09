@@ -30,10 +30,12 @@ import ManageExecuteCode from "./pages/ManageExecuteCode";
 import CreateCode from "./pages/CreateCode";
 import DetailClass from "./pages/DetailClass";
 import ImportQuiz from "./pages/Quiz/ImportQuiz";
+import Post from "./pages/Post"
 import ImportStepOne from "./components/Quiz/ImportStepOne";
 import ImportStepTwo from "./components/Quiz/ImportStepTwo";
 import ImportStepThree from "./components/Quiz/ImportStepThree";
 import ManageQuestionQuiz from "./components/ManageQuestionQuiz";
+
 function App() {
   return (
     //     <Router>
