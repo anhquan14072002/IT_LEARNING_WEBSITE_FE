@@ -34,7 +34,11 @@ export default function About() {
     try {
       await validationSchema.validate({ email, password }, { abortEarly: false });
       await loginWithRoleAdmin(email, password);
-      navigate("/dashboard");
+      localStorage.setItem("accessToken", response.data.data.accessToken);
+      localStorage.setItem("refreshToken", response.data.data.refreshToken);
+      localStorage.setItem("userId", response.data.data.userDto.id);
+      localStorage.setItem("userEmail", response.data.data.userDto.email);
+      navigate("/dashboard/statistic");
     } catch (error) {
       if (error.name === "ValidationError") {
         // Show validation error below the input fields
