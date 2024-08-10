@@ -35,7 +35,6 @@ import ImportStepOne from "./components/Quiz/ImportStepOne";
 import ImportStepTwo from "./components/Quiz/ImportStepTwo";
 import ImportStepThree from "./components/Quiz/ImportStepThree";
 import ManageQuestionQuiz from "./components/ManageQuestionQuiz";
-
 function App() {
   return (
     //     <Router>
@@ -84,6 +83,7 @@ function App() {
     //         <Route path="/detailclass/:id" element={<DetailClass />} />
     //       </Routes>
     //     </Router>
+
     <>
       <Router>
         <Routes>

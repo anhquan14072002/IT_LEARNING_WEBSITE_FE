@@ -57,7 +57,7 @@ function Menu() {
                 {clast?.title}
               </div>
             ))}
-          <div className="p-2 flex items-center justify-center cursor-pointer hover:bg-[#D1F7FF] flex-1">
+          <div className="p-2 flex items-center justify-center cursor-pointer hover:bg-[#D1F7FF] flex-1" onClick={()=>navigate('/post')}>
             Hỏi bài
           </div>
           <div className="p-2 flex items-center justify-center cursor-pointer hover:bg-[#D1F7FF] flex-1">
