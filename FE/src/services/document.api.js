@@ -3,7 +3,7 @@ import restClient from "./restClient";
 export const getDocumentByGradeId = async (id, setLoading, setDocumentList) => {
     setLoading(true);
     await restClient({
-        url: `api/grade/getallgradepagination`,
+        url: `api/grade/getallgrade?isInclude=true`,
         method: "GET",
     })
         .then((res) => {
@@ -35,7 +35,7 @@ export const getAllDocument = async (setLoading, setDocumentList) => {
 export const getAllDocumentSortByAvg = async (setLoading, setDocumentList) => {
     setLoading(true);
     await restClient({
-        url: `api/document/searchbydocumentpagination?PageSize=5&OrderBy=averageRating&IsAscending=false`,
+        url: `api/document/getalldocumentpagination?PageSize=5&OrderBy=averageRating&IsAscending=false`,
         method: "GET",
     })
         .then((res) => {

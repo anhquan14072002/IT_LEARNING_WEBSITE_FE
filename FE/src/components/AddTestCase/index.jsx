@@ -162,7 +162,7 @@ const AddTestCase = ({
             setIsVisible(!isVisible)
           }}
         />
-        <label className="ml-2">Test case này có hiển thị không?</label>
+        <label className="ml-2">Test case này có ẩn không?</label>
       </div>
 
       <div className="flex justify-end gap-5">

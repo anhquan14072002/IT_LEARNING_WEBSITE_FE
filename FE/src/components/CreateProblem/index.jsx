@@ -102,7 +102,7 @@ export default function CreateProblem() {
       try {
         // Fetch all grades
         const gradeResponse = await restClient({
-          url: `api/grade/getallgrade`,
+          url: `api/grade/getallgrade?isInclude=false`,
           method: "GET",
         });
         setListGrade(gradeResponse?.data?.data || []);

@@ -111,7 +111,7 @@ export default function Search() {
   }, [page, rows, textSearch, classId]);
 
   const fetchData = () => {
-    let url = "api/document/searchbydocumentpagination?";
+    let url = "api/document/getalldocumentpagination?";
     const params = new URLSearchParams();
 
     if (textSearch) {

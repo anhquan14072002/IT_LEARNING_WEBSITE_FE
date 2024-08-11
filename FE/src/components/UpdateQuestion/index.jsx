@@ -111,7 +111,7 @@ const UpdateQuestion = ({
 
             if (Number(updateValue?.type) === 1) {
               const typeObject = typeData.find(
-                (item) => item?.title === "QuestionTrueFalse"
+                (item) => Number(item?.typeName) === 1
               );
 
               setInitialValues({
@@ -119,7 +119,7 @@ const UpdateQuestion = ({
                 type: typeObject || {},
                 questionLevel:
                   questionLevelData.find(
-                    (item) => item?.title === updateValue.questionLevel
+                    (item) => Number(item?.levelName) === Number(updateValue.questionLevel)
                   ) || {},
                 QuestionTrueFalse: String(
                   updateValue?.quizAnswers.some(
@@ -135,7 +135,7 @@ const UpdateQuestion = ({
               });
             } else if (Number(updateValue?.type) === 2) {
               const typeObject = typeData.find(
-                (item) => item?.title === "QuestionFourAnswer"
+                (item) => Number(item?.typeName) === 2
               );
 
               setInitialValues({
@@ -162,7 +162,7 @@ const UpdateQuestion = ({
               setFourAnswer(mappedFourAnswer);
             } else if (Number(updateValue?.type) === 3) {
               const typeObject = typeData.find(
-                (item) => item?.title === "QuestionMultiChoice"
+                (item) => Number(item?.typeName) === 3
               );
 
               setInitialValues({
@@ -234,11 +234,13 @@ const UpdateQuestion = ({
         formData.append("hint", values?.hint);
 
         [
-          {
+          { 
+            ...(Number(typeQuestion) === Number(updateValue?.type) && { id: updateValue?.quizAnswers[0]?.id }),
             content: "Đúng",
             isCorrect: QuestionTrueFalseValue === true,
           },
           {
+            ...(Number(typeQuestion) === Number(updateValue?.type) && { id: updateValue?.quizAnswers[1]?.id }),
             content: "Sai",
             isCorrect: QuestionTrueFalseValue === false,
           },
@@ -254,7 +256,7 @@ const UpdateQuestion = ({
           data: formData,
         })
           .then((res) => {
-            SUCCESS(toast, "Thêm câu hỏi thành công thành công");
+            SUCCESS(toast, "Cập nhật câu hỏi thành công thành công");
             fetchData();
           })
           .catch((err) => {
@@ -291,6 +293,9 @@ const UpdateQuestion = ({
 
         fourAnswer.forEach((obj, index) => {
           Object.entries(obj).forEach(([key, value]) => {
+            if(Number(typeQuestion) === Number(updateValue?.type)){
+            formData.append(`QuizAnswers[${index}].id`, updateValue?.quizAnswers[index]?.id);
+            }
             formData.append(`QuizAnswers[${index}].${key}`, value);
           });
         });
@@ -338,6 +343,9 @@ const UpdateQuestion = ({
 
         multipleAnswer.forEach((obj, index) => {
           Object.entries(obj).forEach(([key, value]) => {
+            if(Number(typeQuestion) === Number(updateValue?.type)){
+              formData.append(`QuizAnswers[${index}].id`, updateValue?.quizAnswers[index]?.id);
+              }
             formData.append(`QuizAnswers[${index}].${key}`, value);
           });
         });
@@ -348,7 +356,7 @@ const UpdateQuestion = ({
           data: formData,
         })
           .then((res) => {
-            SUCCESS(toast, "Thêm câu hỏi thành công thành công");
+            SUCCESS(toast, "Cập nhật câu hỏi thành công thành công");
             fetchData();
           })
           .catch((err) => {

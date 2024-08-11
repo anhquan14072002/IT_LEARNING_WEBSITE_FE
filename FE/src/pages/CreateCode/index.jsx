@@ -44,6 +44,7 @@ export default function CreateCode() {
 
   const [language, setLanguage] = useState("javascript");
   const [codeMain, setCodeMain] = useState("");
+  const [library, setLibrary] = useState("");
   const [codeSample, setCodeSample] = useState("");
   const [visible, setVisible] = useState(false);
 
@@ -61,11 +62,11 @@ export default function CreateCode() {
     const fetchData = async () => {
       try {
         //fetch languages
-        const languagesResponse = await restClientV2({
-          url: `languages`,
+        const languagesResponse = await restClient({
+          url: `api/programlanguage/getallprogramlanguage`,
           method: "GET",
         });
-        const transformedV1 = languagesResponse?.data?.map((item) => ({
+        const transformedV1 = languagesResponse?.data?.data?.map((item) => ({
           title: item?.name,
           idBase: item?.id,
         }));
@@ -81,39 +82,42 @@ export default function CreateCode() {
   const onSubmit = async (values) => {
     setLoading(true);
 
-    await restClient({
-      url: "api/programlanguage/createprogramlanguage",
+    // await restClient({
+    //   url: "api/programlanguage/createprogramlanguage",
+    //   method: "POST",
+    //   data: {
+    //     name: values?.language?.title,
+    //     baseId: values?.language?.idBase,
+    //     isActive: true,
+    //   },
+    // })
+    //   .then((res) => {
+    //     const programLanguage = res?.data?.data;
+    restClient({
+      url: "api/executecode/createexecutecode",
       method: "POST",
       data: {
-        name: values?.language?.title,
-        baseId: values?.language?.idBase,
-        isActive: true,
+        mainCode: encodeBase64(codeMain),
+        sampleCode: encodeBase64(codeSample),
+        problemId: id,
+        languageId: values?.language?.idBase,
+        libraries: library,
       },
     })
-      .then((res) => {
-        const programLanguage = res?.data?.data;
-        restClient({
-          url: "api/executecode/createexecutecode",
-          method: "POST",
-          data: {
-            mainCode: encodeBase64(codeMain),
-            sampleCode: encodeBase64(codeSample),
-            problemId: id,
-            languageId: programLanguage?.id,
-          },
-        })
-          .then((res) => {})
-          .catch((err) => {
-            REJECT(toast, "Xảy ra lỗi khi thêm mã thực thi");
-          });
-      })
+      .then((res) => {})
       .catch((err) => {
         REJECT(toast, "Xảy ra lỗi khi thêm mã thực thi");
-      })
-      .finally(() => {
-        setLoading(false);
+      }).finally(()=>{
         window.location.href = `/dashboard/quiz/manageexecutecode/${id}`;
       });
+    // })
+    // .catch((err) => {
+    //   REJECT(toast, "Xảy ra lỗi khi thêm mã thực thi");
+    // })
+    // .finally(() => {
+    //   setLoading(false);
+    //   window.location.href = `/dashboard/quiz/manageexecutecode/${id}`;
+    // });
   };
 
   return (
@@ -152,6 +156,25 @@ export default function CreateCode() {
                       options={languagesList}
                     />
 
+                    <div className="mb-2">
+                      <h1>
+                        Import thư viện <span className="text-red-600">*</span>
+                      </h1>
+                      <CodeMirror
+                        value={library}
+                        options={{
+                          mode: language,
+                          theme: "material",
+                          lineNumbers: true,
+                        }}
+                        onBeforeChange={(editor, data, value) => {
+                          setLibrary(value);
+                        }}
+                        editorDidMount={(editor) => {
+                          editor.setSize(null, "calc(50vh - 5px)");
+                        }}
+                      />
+                    </div>
                     <div className="mb-2">
                       <h1>
                         Main code <span className="text-red-600">*</span>

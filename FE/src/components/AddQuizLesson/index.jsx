@@ -25,11 +25,6 @@ const validationSchema = Yup.object({
       return Object.keys(value).length !== 0; // Check if object is not empty
     })
     .required("Không bỏ trống trường này"),
-  type: Yup.object()
-    .test("is-not-empty", "Không được để trống trường này", (value) => {
-      return Object.keys(value).length !== 0; // Check if object is not empty
-    })
-    .required("Không bỏ trống trường này"),
   document: Yup.object()
     .test("is-not-empty", "Không được để trống trường này", (value) => {
       return Object.keys(value).length !== 0; // Check if object is not empty
@@ -57,7 +52,6 @@ export default function AddQuizLesson({
     score: null,
     topic: {},
     lesson: {},
-    type: {},
   });
   const [documentList, setDocumentList] = useState([]);
   const [topicList, setListTopic] = useState([]);
@@ -74,7 +68,7 @@ export default function AddQuizLesson({
       try {
         // Fetch all grades
         const gradeResponse = await restClient({
-          url: `api/grade/getallgrade`,
+          url: `api/grade/getallgrade?isInclude=false`,
           method: "GET",
         });
         setListGrade(gradeResponse?.data?.data || []);
@@ -112,7 +106,7 @@ export default function AddQuizLesson({
     //   }
     let model = {
       title: values?.title,
-      type: values?.type?.id,
+      type: 1,
       description: values?.description,
       score: values?.score,
       topicId: values?.topic.id,
@@ -121,10 +115,10 @@ export default function AddQuizLesson({
     if (values?.lesson && values?.lesson.id) {
       model = {
         title: values?.title,
-        type: values?.type?.id,
+        type: 1,
         description: values?.description,
         score: values?.score,
-        topicId: values?.topic.id,
+        topicId: null,
         lessonId: values?.lesson.id,
         isActive: true,
       };
@@ -305,14 +299,6 @@ export default function AddQuizLesson({
                 setClearTopic={setClearLesson}
                 disabled={!lessonList || lessonList.length === 0}
                 options={lessonList}
-              />
-
-              <CustomDropdown
-                title="Thể loại"
-                label="thể loại"
-                name="type"
-                id="type"
-                options={typeQuiz}
               />
 
               <CustomTextInput
