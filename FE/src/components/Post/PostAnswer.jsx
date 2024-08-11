@@ -70,7 +70,7 @@ const PostAnswer = ({ post }) => {
     }
     // }
     // }, 1000);
-  }, [refresh, id, numberOfCommentFake]);
+  }, [refresh, id]);
 
   useEffect(() => {
     fetchPost();
@@ -106,8 +106,10 @@ const PostAnswer = ({ post }) => {
       description: `${user?.name} đã phản hồi bài viết của bạn`,
       notificationTime: new Date(),
       isRead: false,
-      link: post?.id?.ToString(),
+      link: "test",
     };
+    console.log(body);
+
     createPostNotification(body);
   }
   return (

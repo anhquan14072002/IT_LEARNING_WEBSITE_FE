@@ -62,11 +62,11 @@ export const PostProvider = ({ children }) => {
         conn.on(
           "ReceivedPersonalNotification",
           (message, userReceiveId, userSendId) => {
-            setRefresh(new Date());
-            setRefresh2(new Date());
             if (userReceiveId !== userSendId) {
               fetchNumberNotificationByUserId();
             }
+            setRefresh(new Date());
+            setRefresh2(new Date());
           }
         );
         conn.onclose(() => {
