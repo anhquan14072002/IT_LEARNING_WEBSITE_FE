@@ -270,7 +270,7 @@ function ImportStepTwo() {
           />
         </DataTable>
       </div>
-      {/* <DataTable data={excelValidateResponse.quizQuestionImportDtos || []} /> */}
+
       <p className="pt-2">
         Tải về tập tin chứa các dòng nhập liệu không thành công
         <a className="text-blue-700 font-medium" onClick={exportToExcel}>
