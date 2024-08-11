@@ -31,6 +31,7 @@ export const PostProvider = ({ children }) => {
     gradeIdSelected: undefined,
     itemTab: undefined,
   });
+  const [compose, setCompose] = useState({ isCompose: false, data: null });
   const toast = useRef(null);
   const [refresh, setRefresh] = useState();
   const [refresh2, setRefresh2] = useState();
@@ -194,6 +195,28 @@ export const PostProvider = ({ children }) => {
       })
       .finally(() => setLoading(false));
   };
+  const fetchPostById = (id) => {
+    console.log("fetchDataById");
+    setLoading(true);
+    restClient({
+      url: `api/post/getpostbyid?id=${id}`,
+      method: "GET",
+    })
+      .then((res) => {
+        console.log("fetch post");
+
+        console.log(res.data.data);
+        // setCompose((preValue) => ({ isCompose: true, data: res.data.data }));
+        setCompose((preValue) => ({
+          isCompose: true,
+          data: { ...res.data.data, idPost: id },
+        }));
+      })
+      .catch((err) => {
+        console.error("Error fetching data:", err);
+      })
+      .finally(() => setLoading(false));
+  };
 
   const fetchFavoriteByUserId = () => {
     setLoading(true);
@@ -289,6 +312,22 @@ export const PostProvider = ({ children }) => {
         setLoading(false);
       });
   };
+  const updatePost = (contentPost) => {
+    restClient({
+      url: "api/post/updatePost",
+      method: "PUT",
+      data: contentPost,
+    })
+      .then((res) => {
+        // SUCCESS(toast, "Tạo bài post thành công");
+        setRefresh2(new Date());
+        setLoading(false);
+      })
+      .catch((err) => {
+        REJECT(toast, err.message);
+        setLoading(false);
+      });
+  };
 
   const createFavoritePost = (postId) => {
     // ?userId=1&postId=2
@@ -314,6 +353,22 @@ export const PostProvider = ({ children }) => {
     })
       .then((res) => {
         SUCCESS(toast, "Bình luận bài đăng thành công");
+        setLoading(false);
+        fetchPost();
+      })
+      .catch((err) => {
+        REJECT(toast, err.message);
+        setLoading(false);
+      });
+  };
+  const updatePostComment = (contentPost, fetchPost) => {
+    restClient({
+      url: "api/postcomment/updatepostcomment",
+      method: "PUT",
+      data: contentPost,
+    })
+      .then((res) => {
+        SUCCESS(toast, "Sửa bài đăng thành công");
         setLoading(false);
         fetchPost();
       })
@@ -395,6 +450,11 @@ export const PostProvider = ({ children }) => {
         fetchPostCommentById,
         createPostNotification,
         createFavoritePost,
+        setCompose,
+        compose,
+        fetchPostById,
+        updatePost,
+        updatePostComment,
       }}
     >
       <Toast ref={toast} />

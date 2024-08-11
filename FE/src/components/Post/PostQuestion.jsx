@@ -13,6 +13,8 @@ function PostQuestion({ post, isFavoritePost }) {
     setItemSidebar,
     createFavoritePost,
     createPostNotification,
+    fetchPostById,
+    setCompose,
   } = useContext(PostContext);
   const {
     content,
@@ -66,7 +68,16 @@ function PostQuestion({ post, isFavoritePost }) {
     setIsFavorite((preValue) => !preValue);
     createFavoritePost(id);
   }
+  function editPost() {
+    /* solution: Where is the origin of action from ? 
+        -  take id post and call api open 
+        - isCompose
+        - send data for isCompose  */
+    console.log(id);
+    console.log("fetch post");
 
+    fetchPostById(id);
+  }
   return (
     <div className="border-stone-200 border-b-2 ">
       <div className="rounded p-5 flex flex-col gap-3">
@@ -130,6 +141,13 @@ function PostQuestion({ post, isFavoritePost }) {
             <span>
               <a className="cursor-pointer" onClick={responseAnswer}>
                 Thu hồi
+              </a>
+            </span>
+          )}
+          {userId === user?.sub && isLoggedIn() && (
+            <span>
+              <a className="cursor-pointer" onClick={editPost}>
+                Chỉnh sửa bài post
               </a>
             </span>
           )}

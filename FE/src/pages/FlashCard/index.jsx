@@ -16,6 +16,7 @@ import { Button } from "primereact/button";
 import restClient from "../../services/restClient";
 import { decodeIfNeeded, isBase64 } from "../../utils";
 import FlashcardList from "../../components/FlashcardList";
+import NotifyProvider from "../../store/NotificationContext";
 
 export default function Quiz() {
   const fixedDivRef = useRef(null);
@@ -65,53 +66,55 @@ export default function Quiz() {
   }, [fixedDivRef]);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <div ref={fixedDivRef} className="fixed top-0 w-full z-50">
-        <Header />
-        <Menu />
-      </div>
+    <NotifyProvider>
+      <div className="min-h-screen flex flex-col">
+        <div ref={fixedDivRef} className="fixed top-0 w-full z-50">
+          <Header />
+          <Menu />
+        </div>
 
-      <div
-        style={{ paddingTop: `${fixedDivHeight}px` }}
-        className="flex flex-col justify-center items-center gap-5 h-screen bg-gray-100"
-      >
-        {quiz && (
-          <div className="text-center">
-            <p className="mb-3 font-bold text-xl">{quizDetails?.title}</p>
-            <p className="font-semibold">
-              {currentCardIndex + 1}/{quiz?.length}
-            </p>
-          </div>
-        )}
         <div
-          className={`w-1/2 shadow-lg rounded-md bg-white h-4/5 p-5 flex items-center justify-center cursor-pointer overflow-y-auto ${
-            showAnswer ? "flip" : ""
-          }`}
-          onClick={() => {
-            setShowAnswer(!showAnswer);
-          }}
+          style={{ paddingTop: `${fixedDivHeight}px` }}
+          className="flex flex-col justify-center items-center gap-5 h-screen bg-gray-100"
         >
-          {loading ? (
-            <Loading />
-          ) : (
-            <div className="w-full">
-              {!quiz ? (
-                <p className="text-center">Quiz không tồn tại.</p>
-              ) : (
-                <FlashcardList
-                  flashcards={quiz}
-                  currentCardIndex={currentCardIndex}
-                  setCurrentCardIndex={setCurrentCardIndex}
-                  showAnswer={showAnswer}
-                  setShowAnswer={setShowAnswer}
-                />
-              )}
+          {quiz && (
+            <div className="text-center">
+              <p className="mb-3 font-bold text-xl">{quizDetails?.title}</p>
+              <p className="font-semibold">
+                {currentCardIndex + 1}/{quiz?.length}
+              </p>
             </div>
           )}
+          <div
+            className={`w-1/2 shadow-lg rounded-md bg-white h-4/5 p-5 flex items-center justify-center cursor-pointer overflow-y-auto ${
+              showAnswer ? "flip" : ""
+            }`}
+            onClick={() => {
+              setShowAnswer(!showAnswer);
+            }}
+          >
+            {loading ? (
+              <Loading />
+            ) : (
+              <div className="w-full">
+                {!quiz ? (
+                  <p className="text-center">Quiz không tồn tại.</p>
+                ) : (
+                  <FlashcardList
+                    flashcards={quiz}
+                    currentCardIndex={currentCardIndex}
+                    setCurrentCardIndex={setCurrentCardIndex}
+                    showAnswer={showAnswer}
+                    setShowAnswer={setShowAnswer}
+                  />
+                )}
+              </div>
+            )}
+          </div>
         </div>
-      </div>
 
-      <Footer ref={displayRef} />
-    </div>
+        <Footer ref={displayRef} />
+      </div>
+    </NotifyProvider>
   );
 }

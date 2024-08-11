@@ -7,14 +7,20 @@ function ItemSideBar({ Menu, index, indexMenu, step }) {
   // neeus step bawng step step cua Menu.pah thif cho bg nen
   let bgStep =
     "flex p-2 rounded cursor-pointer bg-[#e9eaea] border border-[#c5c7c7] text-sm items-center gap-x-4 ";
-  if (step === Menu.path) {
+  console.log(Menu.path.includes(step));
+
+  if (Menu.path.includes(step)) {
+    console.log(Menu.path);
+
     bgStep += " bg-blue-500";
   }
+  console.log(index, indexMenu);
+
   return (
     <li
       className={`${bgStep}
-      ${index != 0 ? "mt-2" : ""}${
-        index === indexMenu ? "bg-light-white" : ""
+      ${index != 0 ? "mt-2 " : ""}${
+        !Menu.path.includes(step) ? "  bg-light-white" : ""
       }`}
     >
       <Button disabled className="origin-left duration-200 opacity-100">

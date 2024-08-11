@@ -10,10 +10,11 @@ import { useNavigate } from "react-router-dom";
 import Loading from "../Loading";
 import { REJECT } from "../../utils";
 import { Toast } from "primereact/toast";
+
 import { Dialog } from "primereact/dialog";
 function ImportStepTwo() {
   const [excelValidateResponse, setExcelValidateResponse] = useState([]);
-  const { formData, file, checkRecord, idImportFail, quizId } =
+  const { formData, file, checkRecord, idImportResult, quizId } =
     useContext(FormDataContext);
   const [visibleDelete, setVisibleDelete] = useState(false);
   const [visible, setVisible] = useState(false);
@@ -36,7 +37,7 @@ function ImportStepTwo() {
               label="Quay lại"
               className="p-2 bg-blue-500 text-white mr-2"
               onClick={() => {
-                navigate("/importQuiz/stepOne");
+                navigate(`/importQuiz/stepOne/${quizId}`);
                 setVisibleDelete(false);
               }}
             />
@@ -48,7 +49,7 @@ function ImportStepTwo() {
       try {
         setLoading(true);
         const response = await axios.post(
-          `${BASE_URL}/api/quizquestion/ImportValidate?quizId=1`,
+          `${BASE_URL}/api/quizquestion/ImportValidate?quizId=${quizId}`,
           formData,
           { headers: { "Content-Type": "multipart/form-data" } }
         );
@@ -61,8 +62,7 @@ function ImportStepTwo() {
             responseData.countFail,
             responseData.idImport,
             responseData.idImportFail,
-            responseData.idImportResult,
-            quizId
+            responseData.idImportResult
           );
         } else {
           console.error("File upload failed:", response);
@@ -83,7 +83,7 @@ function ImportStepTwo() {
               label="Quay lại"
               className="p-2 bg-blue-500 text-white mr-2"
               onClick={() => {
-                navigate("/importQuiz/stepOne");
+                navigate(`/importQuiz/stepOne/${quizId}`);
                 setVisible(false);
               }}
             />
@@ -99,9 +99,11 @@ function ImportStepTwo() {
   }, []);
 
   async function exportToExcel() {
+    console.log(1234);
+
     try {
       let res = await axios.get(
-        `${BASE_URL}/api/quizquestion/ExportExcelResult/${idImportResult}`,
+        `${BASE_URL}/api/quizquestion/exportexcelresult/${idImportResult}`,
         {
           responseType: "arraybuffer", // Important to handle binary data
         }
@@ -175,7 +177,7 @@ function ImportStepTwo() {
         label="Đồng ý"
         icon="pi pi-check"
         onClick={() => {
-          navigate("/importQuiz/stepOne");
+          navigate(`/importQuiz/stepOne/${quizId}`);
           setVisible(false);
         }}
         autoFocus
