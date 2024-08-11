@@ -1,15 +1,21 @@
 import { Button } from "primereact/button";
 import { InputText } from "primereact/inputtext";
-import React, { useContext, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import FormDataContext from "../../store/FormDataContext";
 import { BASE_URL } from "../../services/restClient";
+import { useParams } from "react-router-dom";
 
 function ImportStepOne(props) {
   const fileInputRef = useRef(null);
   const [file, setFile] = useState();
 
-  const { setData } = useContext(FormDataContext);
+  const { setData, setQuizId } = useContext(FormDataContext);
+  const { id } = useParams();
+  useEffect(() => {
+    setQuizId(id);
+  }, [id]);
+
   const handleButtonClick = () => {
     fileInputRef.current.click();
   };

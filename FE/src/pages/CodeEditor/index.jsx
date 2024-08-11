@@ -520,7 +520,7 @@ import DescriptionComponent from "../../components/DescriptionComponent";
 import { useParams } from "react-router-dom";
 import InstructionComponent from "../../components/InstructionComponent";
 import restClient from "../../services/restClient";
-import LoadingFull from "../../components/LoadingFull"
+import LoadingFull from "../../components/LoadingFull";
 import {
   ACCEPT,
   decodeBase64,
@@ -532,7 +532,10 @@ import {
 import { Toast } from "primereact/toast";
 import { useSelector } from "react-redux";
 import { Tooltip } from "primereact/tooltip";
-import { ProgressSpinner } from 'primereact/progressspinner';
+import { ProgressSpinner } from "primereact/progressspinner";
+import CommentCoding from "../../components/CommentCoding";
+import SubmitCoding from "../../components/SubmitCoding";
+import NotifyProvider from "../../store/NotificationContext";
 
 const CodeEditor = () => {
   const toast = useRef(null);
@@ -553,9 +556,15 @@ const CodeEditor = () => {
   const [typeError, setErrorType] = useState(null);
   const [loading, setLoading] = useState(false); // State to manage loading
 
-  useEffect(() => {
-    console.log("testcase::", testCase?.isHidden);
-  }, [testCase]);
+  // useEffect(() => {
+  //   restClient({url:`api/submission/getsubmission?ProblemId=${id}&UserId=${user?.sub}`}).then((res)=>{
+  //     console.log('====================================');
+  //     console.log(res?.data);
+  //     console.log('====================================');
+  //   }).catch((err) => {
+
+  //   })
+  // }, []);
 
   const submit = () => {
     if (!isLoggedIn()) {
@@ -644,12 +653,20 @@ const CodeEditor = () => {
         setExecuteCode(res.data?.data);
         setCode(decodeBase64(res.data?.data[0]?.sampleCode) || "");
         restClient({
+          url: `api/submission/getsubmission?ProblemId=${id}&UserId=${user?.sub}&LanguageId=${res.data?.data[0]?.languageId}`,
+        })
+          .then((res) => {
+            setCode(decodeBase64(res?.data?.data?.sourceCode));
+          })
+          .catch((err) => {});
+        restClient({
           url:
             "api/programlanguage/getprogramlanguagebyid/" +
             res.data?.data[0]?.languageId,
         })
           .then((res) => {
             setLanguage(res.data?.data);
+
             restClient({
               url: "api/testcase/getalltestcasebyproblemid/" + id,
             })
@@ -703,26 +720,35 @@ const CodeEditor = () => {
 
   const handleLanguageChange = (event) => {
     const selectedLanguageId = event.target.value;
-    if (Array.isArray(executeCode)) {
-      const selectedLanguage = executeCode?.find(
-        (language) => language?.id === parseInt(selectedLanguageId)
-      );
-      setLanguage(selectedLanguage);
-      setCode(decodeBase64(selectedLanguage?.sampleCode));
-    } else {
-      setCode();
-    }
+    restClient({
+      url: `api/submission/getsubmission?ProblemId=${id}&UserId=${user?.sub}&LanguageId=${res.data?.data[0]?.languageId}`,
+    })
+      .then((res) => {
+        if (res?.data?.data?.sourceCode) {
+          setCode(decodeBase64(res?.data?.data?.sourceCode));
+        } else {
+          if (Array.isArray(executeCode)) {
+            const selectedLanguage = executeCode?.find(
+              (language) => language?.id === parseInt(selectedLanguageId)
+            );
+            setLanguage(selectedLanguage);
+            setCode(decodeBase64(selectedLanguage?.sampleCode));
+          } else {
+            setCode();
+          }
+        }
+      })
+      .catch((err) => {});
   };
 
   return (
+    <NotifyProvider>
     <div>
       <div ref={fixedDivRef} className="fixed top-0 w-full z-10">
         <Header />
         <Toast ref={toast} />
       </div>
-      {loading && (
-        <LoadingFull />
-      )}
+      {loading && <LoadingFull />}
       <div>
         <Split
           sizes={[40, 60]}
@@ -759,9 +785,33 @@ const CodeEditor = () => {
               >
                 Hướng dẫn
               </button>
+              <button
+                onClick={() => setNavIndex(3)}
+                className={`py-2 px-4 rounded-lg ${
+                  navIndex === 3
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200 text-gray-700"
+                } hover:bg-blue-600 transition-colors`}
+              >
+                Bình luận
+              </button>
+              {isLoggedIn() && (
+                <button
+                  onClick={() => setNavIndex(4)}
+                  className={`py-2 px-4 rounded-lg ${
+                    navIndex === 4
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-200 text-gray-700"
+                  } hover:bg-blue-600 transition-colors`}
+                >
+                  Bài đã nộp
+                </button>
+              )}
             </nav>
             {navIndex === 1 && <DescriptionComponent id={id} />}
             {navIndex === 2 && <InstructionComponent id={id} />}
+            {navIndex === 3 && <CommentCoding id={id} />}
+            {isLoggedIn() && navIndex === 4 && <SubmitCoding id={id} />}
           </div>
 
           <div className="min-w-[30%] bg-[#182537]">
@@ -790,7 +840,7 @@ const CodeEditor = () => {
                       </option>
                       {executeCode.map((lang) => (
                         <option key={lang?.id} value={lang?.id}>
-                          {lang?.id}
+                          {lang?.languageName}
                         </option>
                       ))}
                     </select>
@@ -887,14 +937,17 @@ const CodeEditor = () => {
                                 data-pr-position="top"
                               ></span>
                               <Tooltip target=".pi-check-circle" />
-                            </> 
+                            </>
                           )}
                         {Array?.isArray(result) &&
                           result[index] &&
                           result[index]?.status === "WrongAnswer" && (
                             <>
-                              <span className="pi pi-times-circle text-red-600 font-bold text-xl mr-1" data-pr-tooltip="Test case chưa pass"
-                                data-pr-position="top"></span>
+                              <span
+                                className="pi pi-times-circle text-red-600 font-bold text-xl mr-1"
+                                data-pr-tooltip="Test case chưa pass"
+                                data-pr-position="top"
+                              ></span>
                               <Tooltip target=".pi-times-circle" />
                             </>
                           )}
@@ -968,6 +1021,7 @@ const CodeEditor = () => {
         {/* Problem Description */}
       </div>
     </div>
+    </NotifyProvider>
   );
 };
 

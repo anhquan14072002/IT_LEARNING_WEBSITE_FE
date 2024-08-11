@@ -21,18 +21,21 @@ const validationSchema = Yup.object({
     .required("Không bỏ trống trường này"),
 });
 
-function PostContent() {
-  const [isCompose, setIsCompose] = useState(false);
-
+function PostContent({ ...props }) {
+  const { compose, setCompose } = useContext(PostContext);
   return (
     <div
-      className="w-[80%] mt-4  flex flex-col gap-5 flex-grow "
+      className="w-full md:w-[80%] mt-4  flex flex-col gap-5 grow "
       // className="w-[80%] mt-4 h-screen flex flex-col gap-5 flex-grow ml-[18%]"
     >
-      {!isCompose ? (
-        <ComposeComment onClick={() => setIsCompose(true)} />
+      {!compose?.isCompose ? (
+        <ComposeComment
+          onClick={() =>
+            setCompose((preValue) => ({ ...preValue, isCompose: true }))
+          }
+        />
       ) : (
-        <PostWrite setIsCompose={setIsCompose} />
+        <PostWrite setCompose={setCompose} compose={compose} />
       )}
       <main>
         <PostContentItem />
@@ -41,17 +44,22 @@ function PostContent() {
   );
 }
 
-function PostWrite({ setIsCompose }) {
+function PostWrite({ setCompose, compose }) {
   const {
     createPost,
     loading,
     setLoading,
     createPostNotification,
-    setRefresh,
+    updatePost,
   } = useContext(PostContext);
+
   const user = useSelector((state) => state.user.value);
   const toast = useRef(null);
-  const [initialValues] = useState({ grade: {} });
+  const [initialValues] = useState({
+    grade: compose?.data?.gradeId
+      ? { id: compose?.data?.gradeId, title: compose?.data?.gradeTitle }
+      : {},
+  });
   const [description, setDescription] = useState("");
   const [gradeList, setListGrade] = useState([]);
   useEffect(() => {
@@ -80,11 +88,19 @@ function PostWrite({ setIsCompose }) {
       userId: user?.sub,
       gradeId: values.grade?.id,
     };
-    createPost(descriptionPost);
-    notifyPersonalResponse();
-    setIsCompose(false);
+    let postId = compose?.data?.idPost;
+    if (postId) {
+      updatePost({ ...descriptionPost, id: postId });
+    } else {
+      createPost(descriptionPost);
+    }
+    notifyPersonalResponse(postId);
+    setCompose((preValue) => ({
+      data: null,
+      isCompose: false,
+    }));
   };
-  function notifyPersonalResponse() {
+  function notifyPersonalResponse(postId) {
     /* solution: Where is the origin of action from ? 
           - pass body in request :  */
     const body = {
@@ -93,10 +109,10 @@ function PostWrite({ setIsCompose }) {
       userSendName: user?.name,
       userReceiveId: user?.sub,
       userReceiveName: user?.name,
-      description: `Bạn vừa tạo bài post thành công`,
+      description: `Bạn vừa ${postId ? "sửa" : "tạo"} bài post thành công`,
       notificationTime: new Date(),
       isRead: false,
-      link: "",
+      link: postId,
     };
     createPostNotification(body);
   }
@@ -108,6 +124,8 @@ function PostWrite({ setIsCompose }) {
       props.onChange(e);
     }
   };
+
+  console.log(initialValues);
 
   return (
     <>
@@ -136,7 +154,10 @@ function PostWrite({ setIsCompose }) {
                 />
               </div>
               <div>
-                <UncontrolledEditor onChange={handleEditorChange} />
+                <UncontrolledEditor
+                  onChange={handleEditorChange}
+                  value={compose?.data?.content || ""}
+                />
                 <ErrorMessage name="description" component="div" />
               </div>
               <div className="flex justify-end gap-2 mt-[3rem]">
@@ -144,7 +165,12 @@ function PostWrite({ setIsCompose }) {
                   className="px-3 border-2 hover:bg-gray-100 "
                   type="button"
                   severity="danger"
-                  onClick={() => setIsCompose(false)}
+                  onClick={() =>
+                    setCompose((preValue) => ({
+                      data: null,
+                      isCompose: false,
+                    }))
+                  }
                 >
                   Hủy
                 </Button>
@@ -152,7 +178,7 @@ function PostWrite({ setIsCompose }) {
                   className="p-2 bg-blue-600 hover:bg-blue-500 text-white font-bold"
                   type="submit"
                 >
-                  Tạo bài đăng
+                  {compose?.data ? "Sửa" : "Tạo"} bài đăng
                 </Button>
               </div>
             </Form>
@@ -174,7 +200,7 @@ function ComposeComment({ ...props }) {
         {isLoggedIn() ? (
           <span className="flex items-center">
             <img
-              src={user?.picture}
+              src={user?.picture || image}
               alt="Ảnh người dùng"
               width="30px"
               style={{ borderRadius: "25px" }}

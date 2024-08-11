@@ -21,6 +21,7 @@ import restClientV2 from "../../services/restClientV2";
 import AddTestCase from "../AddTestCase";
 import { Toast } from "primereact/toast";
 import { encodeBase64, REJECT } from "../../utils";
+import NotifyProvider from "../../store/NotificationContext";
 
 const validationSchema = Yup.object({
   titleInstruction: Yup.string().required(
@@ -102,7 +103,7 @@ export default function CreateProblem() {
       try {
         // Fetch all grades
         const gradeResponse = await restClient({
-          url: `api/grade/getallgrade`,
+          url: `api/grade/getallgrade?isInclude=false`,
           method: "GET",
         });
         setListGrade(gradeResponse?.data?.data || []);
@@ -168,7 +169,8 @@ export default function CreateProblem() {
                 url: "api/testcase/createtestcase",
                 method: "POST",
                 data: {
-                  input: item?.input === null ? null : encodeBase64(item?.input),
+                  input:
+                    item?.input === null ? null : encodeBase64(item?.input),
                   output: encodeBase64(item?.output),
                   isHidden: item?.visible,
                   isActive: true,
@@ -299,111 +301,112 @@ export default function CreateProblem() {
       {loading ? (
         <LoadingScreen setLoading={setLoading} />
       ) : (
-        <div>
-          <div ref={fixedDivRef} className="fixed top-0 w-full z-10">
-            <Header />
-            <Menu />
-          </div>
+        <NotifyProvider>
+          <div>
+            <div ref={fixedDivRef} className="fixed top-0 w-full z-10">
+              <Header />
+              <Menu />
+            </div>
 
-          <div
-            className="px-20 min-h-screen bg-gray-200 pb-5"
-            style={{ paddingTop: `${fixedDivHeight}px` }}
-          >
-            <Toast ref={toast} />
-            <AddTestCase
-              visible={visible}
-              setVisible={setVisible}
-              toast={toast}
-              testCase={testCase}
-              setTestCaseList={setTestCaseList}
-            />
-            <div className="p-3 bg-white rounded-lg mt-5 mb-5">
-              <h1 className="font-bold text-3xl my-5 text-center">
-                Tạo bài tập thực hành
-              </h1>
-              <Formik
-                initialValues={initialValues}
-                validationSchema={validationSchema}
-                onSubmit={onSubmit}
-              >
-                {(formik) => (
-                  <Form>
-                    <CustomDropdownInSearch
-                      title="Chọn lớp"
-                      label="Lớp"
-                      name="grade"
-                      id="grade"
-                      isClear={true}
-                      handleOnChange={handleOnChangeGrade}
-                      options={gradeList}
-                    />
+            <div
+              className="px-20 min-h-screen bg-gray-200 pb-5"
+              style={{ paddingTop: `${fixedDivHeight}px` }}
+            >
+              <Toast ref={toast} />
+              <AddTestCase
+                visible={visible}
+                setVisible={setVisible}
+                toast={toast}
+                testCase={testCase}
+                setTestCaseList={setTestCaseList}
+              />
+              <div className="p-3 bg-white rounded-lg mt-5 mb-5">
+                <h1 className="font-bold text-3xl my-5 text-center">
+                  Tạo bài tập thực hành
+                </h1>
+                <Formik
+                  initialValues={initialValues}
+                  validationSchema={validationSchema}
+                  onSubmit={onSubmit}
+                >
+                  {(formik) => (
+                    <Form>
+                      <CustomDropdownInSearch
+                        title="Chọn lớp"
+                        label="Lớp"
+                        name="grade"
+                        id="grade"
+                        isClear={true}
+                        handleOnChange={handleOnChangeGrade}
+                        options={gradeList}
+                      />
 
-                    <CustomDropdownInSearch
-                      title="Chọn tài liệu"
-                      label="Tài liệu"
-                      name="document"
-                      id="document"
-                      isClear={true}
-                      clearGrade={clearGrade}
-                      setClearGrade={setClearGrade}
-                      disabled={!documentList || documentList.length === 0} // Disable if documentList is empty or undefined
-                      handleOnChange={handleOnChangeDocument}
-                      options={documentList}
-                    />
+                      <CustomDropdownInSearch
+                        title="Chọn tài liệu"
+                        label="Tài liệu"
+                        name="document"
+                        id="document"
+                        isClear={true}
+                        clearGrade={clearGrade}
+                        setClearGrade={setClearGrade}
+                        disabled={!documentList || documentList.length === 0} // Disable if documentList is empty or undefined
+                        handleOnChange={handleOnChangeDocument}
+                        options={documentList}
+                      />
 
-                    <CustomDropdownInSearch
-                      title="Chọn chủ đề"
-                      label="Chủ đề"
-                      name="topic"
-                      id="topic"
-                      isClear={true}
-                      touched={false}
-                      clearGrade={clearTopic}
-                      setClearGrade={setClearTopic}
-                      disabled={!topicList || topicList.length === 0}
-                      handleOnChange={handleOnChangeTopic}
-                      options={topicList}
-                    />
+                      <CustomDropdownInSearch
+                        title="Chọn chủ đề"
+                        label="Chủ đề"
+                        name="topic"
+                        id="topic"
+                        isClear={true}
+                        touched={false}
+                        clearGrade={clearTopic}
+                        setClearGrade={setClearTopic}
+                        disabled={!topicList || topicList.length === 0}
+                        handleOnChange={handleOnChangeTopic}
+                        options={topicList}
+                      />
 
-                    <CustomDropdown
-                      title="Chọn bài học"
-                      label="Bài học"
-                      name="lesson"
-                      id="lesson"
-                      touched={false}
-                      clearTopic={clearLesson}
-                      setClearTopic={setClearLesson}
-                      disabled={!lessonList || lessonList.length === 0}
-                      options={lessonList}
-                    />
+                      <CustomDropdown
+                        title="Chọn bài học"
+                        label="Bài học"
+                        name="lesson"
+                        id="lesson"
+                        touched={false}
+                        clearTopic={clearLesson}
+                        setClearTopic={setClearLesson}
+                        disabled={!lessonList || lessonList.length === 0}
+                        options={lessonList}
+                      />
 
-                    <CustomDropdown
-                      title="Độ khó"
-                      label="Độ khó"
-                      name="difficulty"
-                      id="difficulty"
-                      isClear={true}
-                      options={difficultyList}
-                    />
+                      <CustomDropdown
+                        title="Độ khó"
+                        label="Độ khó"
+                        name="difficulty"
+                        id="difficulty"
+                        isClear={true}
+                        options={difficultyList}
+                      />
 
-                    <CustomTextInput
-                      label="Tiêu đề"
-                      name="title"
-                      type="text"
-                      id="title"
-                    />
+                      <CustomTextInput
+                        label="Tiêu đề"
+                        name="title"
+                        type="text"
+                        id="title"
+                      />
 
-                    <div>
-                      <CustomEditor
-                        label="Thông tin chi tiết"
-                        name="description"
-                        id="description"
-                      >
-                        <ErrorMessage name="description" component="div" />
-                      </CustomEditor>
-                    </div>
+                      <div>
+                        <CustomEditor
+                          label="Thông tin chi tiết"
+                          name="description"
+                          id="description"
+                        >
+                          <ErrorMessage name="description" component="div" />
+                        </CustomEditor>
+                      </div>
 
-                    {/* <CustomDropdown
+                      {/* <CustomDropdown
                       title="Ngôn ngữ"
                       label="Ngôn ngữ"
                       name="language"
@@ -452,89 +455,90 @@ export default function CreateProblem() {
                       />
                     </div> */}
 
-                    <div>
-                      <h1>
-                        Test case <span className="text-red-600">*</span>
-                      </h1>
+                      <div>
+                        <h1>
+                          Test case <span className="text-red-600">*</span>
+                        </h1>
 
-                      <Button
-                        icon="pi pi-plus"
-                        className="p-2 bg-green-500 text-white"
-                        type="button"
-                        severity="success"
-                        disabled={testCase?.length > 9}
-                        onClick={handleOpenModal}
-                      >
-                        Tạo test case
-                      </Button>
-                    </div>
-                    {/* Display the test cases */}
-                    <div className="my-4">
-                      {testCase.length > 0 ? (
-                        <ul className="list-disc pl-5 flex gap-5">
-                          {testCase.map((test, index) => (
-                            <li
-                              key={index}
-                              className="flex justify-between p-2 items-center mb-2 rounded-lg border border-gray-400"
-                            >
-                              <span>Test case {index}</span>
-                              <Button
-                                icon="pi pi-trash"
-                                type="button"
-                                className="p-button-rounded p-button-danger cursor-pointer"
-                                onClick={() => handleDeleteTestCase(index)}
-                              />
-                            </li>
-                          ))}
-                        </ul>
-                      ) : (
-                        <p>Chưa có test case nào</p>
-                      )}
-                    </div>
+                        <Button
+                          icon="pi pi-plus"
+                          className="p-2 bg-green-500 text-white"
+                          type="button"
+                          severity="success"
+                          disabled={testCase?.length > 9}
+                          onClick={handleOpenModal}
+                        >
+                          Tạo test case
+                        </Button>
+                      </div>
+                      {/* Display the test cases */}
+                      <div className="my-4">
+                        {testCase.length > 0 ? (
+                          <ul className="list-disc pl-5 flex gap-5">
+                            {testCase.map((test, index) => (
+                              <li
+                                key={index}
+                                className="flex justify-between p-2 items-center mb-2 rounded-lg border border-gray-400"
+                              >
+                                <span>Test case {index}</span>
+                                <Button
+                                  icon="pi pi-trash"
+                                  type="button"
+                                  className="p-button-rounded p-button-danger cursor-pointer"
+                                  onClick={() => handleDeleteTestCase(index)}
+                                />
+                              </li>
+                            ))}
+                          </ul>
+                        ) : (
+                          <p>Chưa có test case nào</p>
+                        )}
+                      </div>
 
-                    <CustomTextInput
-                      label="Tiêu đề hướng dẫn"
-                      name="titleInstruction"
-                      type="text"
-                      id="titleInstruction"
-                    />
+                      <CustomTextInput
+                        label="Tiêu đề hướng dẫn"
+                        name="titleInstruction"
+                        type="text"
+                        id="titleInstruction"
+                      />
 
-                    <div>
-                      <CustomEditor
-                        label="Thông tin hướng dẫn chi tiết"
-                        name="descriptionInstruction"
-                        id="descriptionInstruction"
-                      >
-                        <ErrorMessage
+                      <div>
+                        <CustomEditor
+                          label="Thông tin hướng dẫn chi tiết"
                           name="descriptionInstruction"
-                          component="div"
-                        />
-                      </CustomEditor>
-                    </div>
+                          id="descriptionInstruction"
+                        >
+                          <ErrorMessage
+                            name="descriptionInstruction"
+                            component="div"
+                          />
+                        </CustomEditor>
+                      </div>
 
-                    <div className="flex justify-end gap-2">
-                      {/* <Button
+                      <div className="flex justify-end gap-2">
+                        {/* <Button
                         className="p-2 bg-red-500 text-white"
                         type="button"
                         severity="danger"
                       >
                         Hủy
                       </Button> */}
-                      <Button
-                        className="p-2 bg-blue-500 text-white"
-                        type="submit"
-                      >
-                        Thêm
-                      </Button>
-                    </div>
-                  </Form>
-                )}
-              </Formik>
+                        <Button
+                          className="p-2 bg-blue-500 text-white"
+                          type="submit"
+                        >
+                          Thêm
+                        </Button>
+                      </div>
+                    </Form>
+                  )}
+                </Formik>
+              </div>
             </div>
-          </div>
 
-          <Footer />
-        </div>
+            <Footer />
+          </div>
+        </NotifyProvider>
       )}
     </>
   );

@@ -49,9 +49,9 @@ export default function ManagementQuizLesson() {
   
   const fetchData = () => {
     setLoading(true);
-    const title = "title";
+  
     restClient({
-      url: `api/tag/searchbytagpagination?PageIndex=${page}&PageSize=${rows}&Key=${title}&Value=${textSearch}`,
+      url: `api/tag/getalltagpagination?PageIndex=${page}&PageSize=${rows}&Value=${textSearch}`,
       method: "GET",
     })
       .then((res) => {

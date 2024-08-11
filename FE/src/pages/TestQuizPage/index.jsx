@@ -9,6 +9,7 @@ import Header from "../../components/Header";
 import Menu from "../../components/Menu";
 import Footer from "../../components/Footer";
 import { isLoggedIn } from "../../utils";
+import NotifyProvider from "../../store/NotificationContext";
 
 export default function TestQuizPage() {
   const [quizData, setQuizData] = useState([]);
@@ -67,23 +68,25 @@ export default function TestQuizPage() {
     fetchData();
   }, [id]);
   return (
-    <div>
-      <div ref={fixedDivRef} className="fixed top-0 w-full z-10">
-        <Header />
-        <Menu />
-      </div>
+    <NotifyProvider>
+      <div>
+        <div ref={fixedDivRef} className="fixed top-0 w-full z-10">
+          <Header />
+          <Menu />
+        </div>
 
-      <div
-        style={{ paddingTop: `${fixedDivHeight}px` }}
-        className="min-h-screen"
-      >
-        <ViewQuestionInTest quizData={quizData} quizDetail={quizDetail} />
-      </div>
+        <div
+          style={{ paddingTop: `${fixedDivHeight}px` }}
+          className="min-h-screen"
+        >
+          <ViewQuestionInTest quizData={quizData} quizDetail={quizDetail} />
+        </div>
 
-      <LazyComponent>
-        <Footer />
-      </LazyComponent>
-    </div>
+        <LazyComponent>
+          <Footer />
+        </LazyComponent>
+      </div>
+    </NotifyProvider>
   );
 }
 

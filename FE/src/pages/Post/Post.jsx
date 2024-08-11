@@ -31,13 +31,14 @@ function Post(props) {
             </div>
             <div
               style={{ paddingTop: `${fixedDivHeight}px` }}
-              className=" flex gap-3 p-3"
+              className="flex flex-col md:flex-row gap-3 p-3"
             >
-              {/* <div className=" flex gap-3 p-3"> */}
+              {/* <div className="lg:w-[17%]"> */}
               <PostGrade />
-              <PostContent />
+              {/* </div> */}
 
-              {/* <PostRank /> */}
+              {/* <div className="lg:flex-1"> */}
+              <PostContent />
               {/* </div> */}
             </div>
           </div>
