@@ -33,8 +33,9 @@ import NotFound from "./pages/NotFound";
 import ManageExecuteCode from "./pages/ManageExecuteCode";
 import CreateCode from "./pages/CreateCode";
 import DetailClass from "./pages/DetailClass";
+import Post from "./pages/Post/Post"
 import ManageQuestionQuiz from "./components/ManageQuestionQuiz";
-import Post from "./pages/Post/Post";
+
 
 function App() {
   return (
