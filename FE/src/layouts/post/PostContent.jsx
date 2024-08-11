@@ -112,7 +112,7 @@ function PostWrite({ setCompose, compose }) {
       description: `Bạn vừa ${postId ? "sửa" : "tạo"} bài post thành công`,
       notificationTime: new Date(),
       isRead: false,
-      link: postId,
+      link: "test",
     };
     createPostNotification(body);
   }

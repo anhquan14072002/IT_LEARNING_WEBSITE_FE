@@ -279,7 +279,7 @@ const Answer = ({
       description: `${user?.name} ${msg}`,
       notificationTime: new Date(),
       isRead: false,
-      link: post?.id,
+      link: "test",
     };
     createPostNotification(body);
   }
