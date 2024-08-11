@@ -24,7 +24,9 @@ function Footer({ Menus }) {
   const navigate = useNavigate();
 
   const locationSplit = location.pathname.split("/")[2];
-  const indexRoute = Menus.findIndex((menu) => menu.path === locationSplit);
+  const indexRoute = Menus.findIndex((menu) =>
+    menu.path.includes(locationSplit)
+  );
   const { success, step } = useContext(FormDataContext);
   function implement() {
     const nextRoute = Menus[indexRoute + 1].path;
@@ -34,7 +36,7 @@ function Footer({ Menus }) {
     /* solution: Where is the origin of action from ? 
           -  w*/
     let nextRoute =
-      indexRoute === 0 ? "/dashboard" : Menus[indexRoute - 1].path;
+      indexRoute === 0 ? "/dashboard/quiz" : Menus[indexRoute - 1].path;
     navigate(nextRoute);
   }
   let labelButton = "Tiếp Tục";
@@ -73,7 +75,7 @@ function Footer({ Menus }) {
         <IconButton
           icon={cancel}
           title="Hủy bỏ"
-          onClick={() => navigate("/dashboard")}
+          onClick={() => navigate("/dashboard/quiz")}
         />
       </span>
     </footer>

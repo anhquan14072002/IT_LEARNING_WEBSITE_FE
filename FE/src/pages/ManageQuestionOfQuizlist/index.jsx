@@ -1,7 +1,7 @@
 import debounce from "lodash.debounce";
 import { confirmDialog, ConfirmDialog } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
-import React, { useEffect, useRef, useState } from "react";
+import React, { useContext, useEffect, useRef, useState } from "react";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
 import { Paginator } from "primereact/paginator";
@@ -25,6 +25,8 @@ import { useNavigate, useParams } from "react-router-dom";
 import Header from "../../components/Header";
 import { Tooltip } from "primereact/tooltip";
 import ImportFromQuiz from "../../components/ImportFromQuiz";
+import NotifyProvider from "../../store/NotificationContext";
+import FormDataContext, { FormDataProvider } from "../../store/FormDataContext";
 
 export default function ManageQuestionOfQuizlist() {
   const toast = useRef(null);
@@ -238,7 +240,7 @@ export default function ManageQuestionOfQuizlist() {
   };
 
   return (
-    <>
+    <NotifyProvider>
       <div className="fixed top-0 w-full z-30">
         <Header />
       </div>
@@ -254,14 +256,7 @@ export default function ManageQuestionOfQuizlist() {
                border-2 rounded-full ${!open ? "rotate-180" : ""}`}
             onClick={() => setOpen(!open)}
           />
-          {/* <div className="flex gap-x-4 items-center">
-                <img
-                  src="/src/assets/logo.png"
-                  className={`cursor-pointer duration-500 ${
-                    open ? "rotate-[360deg]" : ""
-                  }`}
-                />
-              </div> */}
+
           <ul className="pt-6">
             {Menus.map((Menu) => (
               <li
@@ -315,6 +310,13 @@ export default function ManageQuestionOfQuizlist() {
               <div className="flex justify-between pt-1">
                 <h1 className="font-bold text-3xl">Câu hỏi quiz</h1>
                 <div className="flex gap-5">
+                  <Button
+                    label="Import câu hỏi"
+                    icon="pi pi-plus-circle"
+                    severity="info"
+                    className="bg-blue-600 text-white p-2 text-sm font-normal"
+                    onClick={() => navigate(`/importQuiz/stepOne/${id}`)}
+                  />
                   <Button
                     label="Soạn câu hỏi mới"
                     icon="pi pi-plus-circle"
@@ -459,6 +461,6 @@ export default function ManageQuestionOfQuizlist() {
           </div>
         </div>
       </div>
-    </>
+    </NotifyProvider>
   );
 }

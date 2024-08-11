@@ -535,6 +535,7 @@ import { Tooltip } from "primereact/tooltip";
 import { ProgressSpinner } from "primereact/progressspinner";
 import CommentCoding from "../../components/CommentCoding";
 import SubmitCoding from "../../components/SubmitCoding";
+import NotifyProvider from "../../store/NotificationContext";
 
 const CodeEditor = () => {
   const toast = useRef(null);
@@ -741,6 +742,7 @@ const CodeEditor = () => {
   };
 
   return (
+    <NotifyProvider>
     <div>
       <div ref={fixedDivRef} className="fixed top-0 w-full z-10">
         <Header />
@@ -1019,6 +1021,7 @@ const CodeEditor = () => {
         {/* Problem Description */}
       </div>
     </div>
+    </NotifyProvider>
   );
 };
 

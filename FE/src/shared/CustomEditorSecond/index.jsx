@@ -3,8 +3,8 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css"; // Import Quill's CSS
 import "./UncontrollEditor.css"; // Import your custom CSS
 
-const UncontrolledEditor = ({ onChange }) => {
-  const [editorHtml, setEditorHtml] = useState("");
+const UncontrolledEditor = ({ onChange, value }) => {
+  const [editorHtml, setEditorHtml] = useState(value || "");
 
   const handleChange = (value) => {
     setEditorHtml(value);

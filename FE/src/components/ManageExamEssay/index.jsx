@@ -52,10 +52,9 @@ export default function ManageExam() {
 
   const fetchData = () => {
     setLoading(true);
-    const title = "title"
     const id = "id"
   restClient({
-    url: `api/exam/searchbyexampagination?PageIndex=${page}&PageSize=${rows}&Type=1&Key=${title}&Value=${textSearch}&OrderBy=${id}&IsAscending=false`,
+    url: `api/exam/getallexampagination?PageIndex=${page}&PageSize=${rows}&Type=1&Value=${textSearch}&OrderBy=${id}&IsAscending=false`,
     method: "GET",
   })
       .then((res) => {

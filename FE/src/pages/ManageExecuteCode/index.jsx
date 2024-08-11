@@ -25,6 +25,7 @@ import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/python/python";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/material.css";
+import NotifyProvider from "../../store/NotificationContext";
 
 export default function ManageExecuteCode() {
   const toast = useRef(null);
@@ -228,7 +229,7 @@ export default function ManageExecuteCode() {
   };
 
   return (
-    <>
+    <NotifyProvider>
       <div className="fixed top-0 w-full z-30">
         <Header />
       </div>
@@ -281,7 +282,7 @@ export default function ManageExecuteCode() {
                     icon="pi pi-plus-circle"
                     severity="info"
                     className="bg-blue-600 text-white p-2 text-sm font-normal"
-                    onClick={() => navigate("/dashboard/createcode/"+id)}
+                    onClick={() => navigate("/dashboard/createcode/" + id)}
                   />
                 </div>
               </div>
@@ -381,6 +382,6 @@ export default function ManageExecuteCode() {
           </div>
         </div>
       </div>
-    </>
+    </NotifyProvider>
   );
 }

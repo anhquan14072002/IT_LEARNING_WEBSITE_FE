@@ -17,6 +17,7 @@ import restClient from "../../services/restClient";
 import { decodeIfNeeded, isBase64 } from "../../utils";
 import { faBook, faClipboardList } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import NotifyProvider from "../../store/NotificationContext";
 
 export default function Quiz() {
   const fixedDivRef = useRef(null);
@@ -25,7 +26,7 @@ export default function Quiz() {
   const [loading, setLoading] = useState(false);
   const { id } = useParams();
   const [quiz, setQuiz] = useState(null);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   const fetchData = async () => {
     setLoading(true);
@@ -57,52 +58,63 @@ export default function Quiz() {
   }, [fixedDivRef]);
 
   return (
-    <div className="">
-      <div ref={fixedDivRef} className="fixed top-0 w-full z-50">
-        <Header />
-        <Menu />
-      </div>
-      <div
-        style={{ paddingTop: `${fixedDivHeight}px` }}
-        className="flex justify-center items-center gap-5 h-screen bg-gray-100"
-      >
-        <div className="w-1/2 shadow-lg rounded-md bg-white p-5">
-          {loading ? (
-            <Loading />
-          ) : (
-            <div>
-              {quiz === null ? (
-                <p className="text-center">Quiz không tồn tại.</p>
-              ) : (
-                <div>
-                  <h1 className="font-bold text-2xl text-center">
-                    {quiz?.title}
-                  </h1>
-                  <div className="flex gap-2 flex-wrap my-10">
-                    <p className="flex-1 text-center bg-green-500 hover:bg-green-300 cursor-pointer p-2 text-white font-semibold" onClick={()=>navigate(`/flashcard/${id}`)}>
-                    <FontAwesomeIcon icon={faBook} className="mr-2" />
-                      Thẻ ghi nhớ
-                    </p>
-                    <p className="flex-1 text-center bg-yellow-500 hover:bg-yellow-300 cursor-pointer p-2 text-white font-semibold" onClick={()=>navigate(`/testquiz/${id}`)}>
-                    <FontAwesomeIcon icon={faClipboardList} className="mr-2" />
-                      Kiểm tra
-                    </p>
-                  </div>
-                  <p>
-                    <span className="font-semibold">Thông tin về quiz:{" "}</span>
-                    <span
-                      dangerouslySetInnerHTML={{ __html: quiz.description }}
-                    />
-                  </p>
-                  {/* Render other quiz details here */}
-                </div>
-              )}
-            </div>
-          )}
+    <NotifyProvider>
+      <div className="">
+        <div ref={fixedDivRef} className="fixed top-0 w-full z-50">
+          <Header />
+          <Menu />
         </div>
-      </div>
+        <div
+          style={{ paddingTop: `${fixedDivHeight}px` }}
+          className="flex justify-center items-center gap-5 h-screen bg-gray-100"
+        >
+          <div className="w-1/2 shadow-lg rounded-md bg-white p-5">
+            {loading ? (
+              <Loading />
+            ) : (
+              <div>
+                {quiz === null ? (
+                  <p className="text-center">Quiz không tồn tại.</p>
+                ) : (
+                  <div>
+                    <h1 className="font-bold text-2xl text-center">
+                      {quiz?.title}
+                    </h1>
+                    <div className="flex gap-2 flex-wrap my-10">
+                      <p
+                        className="flex-1 text-center bg-green-500 hover:bg-green-300 cursor-pointer p-2 text-white font-semibold"
+                        onClick={() => navigate(`/flashcard/${id}`)}
+                      >
+                        <FontAwesomeIcon icon={faBook} className="mr-2" />
+                        Thẻ ghi nhớ
+                      </p>
+                      <p
+                        className="flex-1 text-center bg-yellow-500 hover:bg-yellow-300 cursor-pointer p-2 text-white font-semibold"
+                        onClick={() => navigate(`/testquiz/${id}`)}
+                      >
+                        <FontAwesomeIcon
+                          icon={faClipboardList}
+                          className="mr-2"
+                        />
+                        Kiểm tra
+                      </p>
+                    </div>
+                    <p>
+                      <span className="font-semibold">Thông tin về quiz: </span>
+                      <span
+                        dangerouslySetInnerHTML={{ __html: quiz.description }}
+                      />
+                    </p>
+                    {/* Render other quiz details here */}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        </div>
 
-      <Footer ref={displayRef} />
-    </div>
+        <Footer ref={displayRef} />
+      </div>
+    </NotifyProvider>
   );
 }

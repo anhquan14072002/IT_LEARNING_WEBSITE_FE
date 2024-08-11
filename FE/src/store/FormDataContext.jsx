@@ -8,7 +8,7 @@ export const FormDataProvider = ({ children }) => {
   const [file, setFile] = useState(null);
   const [success, setSuccess] = useState(0);
   const [fail, setFail] = useState(0);
-  const [quizId, setQuizId] = useState(1);
+  const [quizId, setQuizId] = useState(0);
   const [idImport, setIdImport] = useState("");
   const [idImportFail, setIdImportFail] = useState("");
   const [idImportResult, setIdImportResult] = useState("");
@@ -18,20 +18,12 @@ export const FormDataProvider = ({ children }) => {
     setFile(file);
     setFormData(formData);
   }
-  function checkRecord(
-    success,
-    fail,
-    idImport,
-    idImportFail,
-    idImportResult,
-    quizId
-  ) {
+  function checkRecord(success, fail, idImport, idImportFail, idImportResult) {
     setSuccess(success);
     setFail(fail);
     setIdImport(idImport);
     setIdImportFail(idImportFail);
     setIdImportResult(idImportResult);
-    setQuizId(quizId);
   }
   return (
     <FormDataContext.Provider
@@ -48,6 +40,7 @@ export const FormDataProvider = ({ children }) => {
         checkRecord,
         setStep,
         quizId,
+        setQuizId,
       }}
     >
       {children}
