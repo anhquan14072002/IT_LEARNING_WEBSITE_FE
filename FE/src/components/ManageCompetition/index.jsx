@@ -47,11 +47,10 @@ export default function ManageExam() {
   
   const fetchData = async () => {
     setLoading(true);
-     const title = "title"
     const id = "id"
     try {
       const res = await restClient({
-        url: `api/competition/searchcompetitionpagination?PageIndex=${page}&PageSize=${rows}&Key=${title}&Value=${textSearch}&OrderBy=${id}&IsAscending=false`,
+        url: `api/competition/getallcompetitionpagination?PageIndex=${page}&PageSize=${rows}&Value=${textSearch}&OrderBy=${id}&IsAscending=false`,
         method: "GET",
       });
   
