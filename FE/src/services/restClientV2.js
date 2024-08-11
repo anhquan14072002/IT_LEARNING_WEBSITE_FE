@@ -11,7 +11,7 @@ export default function restClientV2({
   headers = {},
 }) {
   return axios({
-    url: `${BASE_URL}/${url}`,  /
+    url: `${BASE_URL}/${url}`, 
     method,
     params,
     data,
