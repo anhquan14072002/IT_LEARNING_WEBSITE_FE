@@ -13,7 +13,7 @@ export default function CategoryOfClass({ display, params, setParams }) {
   useEffect(() => {
     setLoading(true);
     restClient({
-      url: `api/grade/getallgrade`,
+      url: `api/grade/getallgrade?isInclude=false`,
       method: "GET",
     })
       .then((res) => {

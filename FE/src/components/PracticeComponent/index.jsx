@@ -1,38 +1,16 @@
+import { Button } from "primereact/button";
+import { InputTextarea } from "primereact/inputtextarea";
 import React, { useEffect, useRef, useState } from "react";
-import { InputText } from "primereact/inputtext";
-import { Dropdown } from "primereact/dropdown";
+import Loading from "../Loading";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
-import { ContextMenu } from "primereact/contextmenu";
 import { Paginator } from "primereact/paginator";
-import { Toast } from "primereact/toast";
-import { ProductService } from "../../services/ProductService";
-import { Button } from "primereact/button";
-import AddLessonDialog from "../AddLessonDialog";
-import UpdateLessonDialog from "../UpdateLessonDialog";
-import UpdateDocumentDialog from "../UpdateDocumentDialog";
-import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
-import {
-  ACCEPT,
-  REJECT,
-  decodeIfNeeded,
-  formatDate,
-  getTokenFromLocalStorage,
-  removeVietnameseTones,
-} from "../../utils";
-import Loading from "../Loading";
-import restClient from "../../services/restClient";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import debounce from "lodash.debounce";
-import { InputSwitch } from "primereact/inputswitch";
-import { Tooltip } from "primereact/tooltip";
-import { Dialog } from "primereact/dialog";
-import { Editor } from "primereact/editor";
-import classNames from "classnames";
-import PracticeComponent from "../PracticeComponent";
-import ManageLanguage from "../ManageLanguage";
+import restClient from "../../services/restClient";
+import { InputText } from "primereact/inputtext";
 
-export default function ManageCodeOnline() {
+export default function PracticeComponent() {
   const toast = useRef(null);
   const [products, setProducts] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -99,45 +77,6 @@ export default function ManageCodeOnline() {
         });
     }
   };
-
-  // const fetchData = (page, rows) => {
-  //   if (textSearch.trim()) {
-  //     setLoading(true);
-  //     restClient({
-  //       url: `api/problem/getallproblempagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}`,
-  //       method: "GET",
-  //     })
-  //       .then((res) => {
-  //         const paginationData = JSON.parse(res.headers["x-pagination"]);
-  //         setTotalPage(paginationData.TotalPages);
-  //         setProducts(Array.isArray(res.data.data) ? res.data.data : []);
-  //       })
-  //       .catch((err) => {
-  //         console.error("Error fetching data:", err);
-  //         setProducts([]);
-  //       })
-  //       .finally(() => setLoading(false));
-  //   } else {
-  //     setLoading(true);
-
-  //     restClient({
-  //       url: `api/problem/getallproblempagination?PageIndex=${page}&PageSize=${rows}`,
-  //       method: "GET",
-  //     })
-  //       .then((res) => {
-  //         const paginationData = JSON.parse(res.headers["x-pagination"]);
-  //         setTotalPage(paginationData.TotalPages);
-  //         setProducts(Array.isArray(res.data.data) ? res.data.data : []);
-  //       })
-  //       .catch((err) => {
-  //         console.error("Error fetching data:", err);
-  //         setProducts([]);
-  //       })
-  //       .finally(() => {
-  //         setLoading(false);
-  //       });
-  //   }
-  // };
 
   const actionBodyTemplate = (rowData) => {
     return (
@@ -268,47 +207,140 @@ export default function ManageCodeOnline() {
   const handleSearchInput = debounce((text) => {
     setTextSearch(text);
   }, 300);
-
   return (
     <div>
-      <Toast ref={toast} />
-      <Dialog
-        header="Nội dung chi tiết"
-        visible={visibleDialog}
-        style={{ width: "50vw" }}
-        onHide={() => {
-          if (!visibleDialog) return;
-          setVisibleDialog(false);
-        }}
-      >
-        <Editor
-          value={decodeIfNeeded(content)}
-          readOnly={true}
-          headerTemplate={<></>}
-          className="custom-editor-class"
-        />
-      </Dialog>
-      <ConfirmDialog visible={visibleDelete} />
-      <div className="flex justify-start border-b-2 mb-5 border-[#D1F7FF]">
-        <h1
-          className={classNames("p-5 cursor-pointer hover:bg-[#D1F7FF]", {
-            "bg-[#D1F7FF] font-bold": navIndex === 1,
-          })}
-          onClick={() => setNavIndex(1)}
-        >
-          Bài thực hành
-        </h1>
-        <h1
-          className={classNames("p-5 cursor-pointer hover:bg-[#D1F7FF]", {
-            "bg-[#D1F7FF] font-bold": navIndex === 2,
-          })}
-          onClick={() => setNavIndex(2)}
-        >
-          Ngôn ngữ lập trình
-        </h1>
+      <div className="flex justify-between pt-1">
+        <h1 className="font-bold text-3xl">Quản lí các bài thực hành</h1>
+        <div>
+          <Button
+            label="Thêm mới"
+            icon="pi pi-plus-circle"
+            severity="info"
+            className="bg-blue-600 text-white p-2 text-sm font-normal"
+            onClick={() => navigate("/dashboard/createproblem")}
+          />
+        </div>
       </div>
-      {navIndex === 1 && <PracticeComponent />}
-      {navIndex === 2 && <ManageLanguage />}
+
+      {/* data */}
+      <div className="border-2 rounded-md mt-2">
+        <div className="mb-10 flex flex-wrap items-center p-2">
+          <div className="border-2 rounded-md p-2">
+            <InputText
+              onChange={(e) => {
+                handleSearchInput(removeVietnameseTones(e.target.value));
+              }}
+              placeholder="Search"
+              className="flex-1 focus:outline-none w-36 focus:ring-0"
+            />
+            <Button
+              icon="pi pi-search"
+              className="p-button-warning focus:outline-none focus:ring-0 flex-shrink-0"
+            />
+          </div>
+
+          {/* <div className="flex-1 flex flex-wrap gap-3 justify-end">
+              <div className="border-2 rounded-md mt-4">
+                <Dropdown
+                  filter
+                  ref={dropDownRef2}
+                  value={selectedCity}
+                  onChange={(e) => setSelectedCity(e.value)}
+                  options={cities}
+                  optionLabel="name"
+                  showClear
+                  placeholder="Lớp"
+                  className="w-full md:w-14rem shadow-none h-full"
+                />
+              </div>
+              <div className="border-2 rounded-md mt-4">
+                <Dropdown
+                  filter
+                  ref={dropDownRef2}
+                  value={selectedCity}
+                  onChange={(e) => setSelectedCity(e.value)}
+                  options={cities}
+                  optionLabel="name"
+                  showClear
+                  placeholder="Bộ sách"
+                  className="w-full md:w-14rem shadow-none h-full"
+                />
+              </div>
+              <div className="border-2 rounded-md mt-4">
+                <Dropdown
+                  filter
+                  ref={dropDownRef2}
+                  value={selectedCity}
+                  onChange={(e) => setSelectedCity(e.value)}
+                  options={cities}
+                  optionLabel="name"
+                  showClear
+                  placeholder="Chủ đề"
+                  className="w-full md:w-14rem shadow-none h-full"
+                />
+              </div>
+            </div> */}
+        </div>
+        {loading ? (
+          <Loading />
+        ) : (
+          <DataTable
+            value={products}
+            onContextMenu={(e) => cm.current.show(e.originalEvent)}
+            selection={selectedProduct}
+            onSelectionChange={(e) => setSelectedProduct(e.value)}
+            className="border-t-2"
+            tableStyle={{ minHeight: "30rem" }}
+            scrollable
+            scrollHeight="30rem"
+          >
+            <Column
+              field="#"
+              header="#"
+              body={indexBodyTemplate}
+              className="border-b-2 border-t-2"
+              style={{ minWidth: "5rem" }}
+            />
+
+            <Column
+              field="title"
+              header="Tiêu đề"
+              className="border-b-2 border-t-2"
+              style={{ minWidth: "12rem" }}
+            ></Column>
+            <Column
+              body={description}
+              header="Nội dung"
+              className="border-b-2 border-t-2"
+              style={{ minWidth: "12rem" }}
+            ></Column>
+            <Column
+              header="Độ khó"
+              className="border-b-2 border-t-2"
+              field="difficulty"
+              style={{ minWidth: "12rem" }}
+            ></Column>
+            <Column
+              // header="Trạng thái"
+              className="border-b-2 border-t-2"
+              body={status}
+              style={{ minWidth: "10rem" }}
+            ></Column>
+            <Column
+              className="border-b-2 border-t-2"
+              body={actionBodyTemplate}
+            />
+          </DataTable>
+        )}
+        <Paginator
+          first={first}
+          rows={rows}
+          rowsPerPageOptions={[10, 20, 30]}
+          totalRecords={totalPage * rows}
+          onPageChange={onPageChange}
+          className="custom-paginator mx-auto"
+        />
+      </div>
     </div>
   );
 }

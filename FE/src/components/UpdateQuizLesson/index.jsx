@@ -25,11 +25,6 @@ const validationSchema = Yup.object({
       return Object.keys(value).length !== 0; // Check if object is not empty
     })
     .required("Không bỏ trống trường này"),
-  type: Yup.object()
-    .test("is-not-empty", "Không được để trống trường này", (value) => {
-      return Object.keys(value).length !== 0; // Check if object is not empty
-    })
-    .required("Không bỏ trống trường này"),
   document: Yup.object()
     .test("is-not-empty", "Không được để trống trường này", (value) => {
       return Object.keys(value).length !== 0; // Check if object is not empty
@@ -55,7 +50,6 @@ export default function UpdateQuizLesson({
     grade: {},
     description: "",
     document: {},
-    type:{},
     score: null,
     topic: {},
     lesson: {},
@@ -71,17 +65,17 @@ export default function UpdateQuizLesson({
   const [typeList, setTypeList] = useState([]);
 
   useEffect(() => {
-
     const fetchInitialData = async () => {
       setLoading(true);
       try {
         console.log(updateValue);
+        let lessonByIdData;
         if (updateValue && updateValue.lessonId) {
           const lessonById = await restClient({
             url: `api/lesson/getlessonbyid/${updateValue.lessonId}`,
             method: "GET",
           });
-          const lessonByIdData = lessonById.data?.data || {};
+          lessonByIdData = lessonById.data?.data || {};
 
           setInitialValues((prevValues) => ({
             ...prevValues,
@@ -105,13 +99,33 @@ export default function UpdateQuizLesson({
         }));
         setTypeList(transformedData);
 
-        const typeFind = transformedData?.find((item,index)=> item?.title === updateValue?.type)
-
-        const topicById = await restClient({
-          url: `api/topic/gettopicbyid?id=${updateValue.topicId}`,
-          method: "GET",
-        });
-        const selectTopicById = topicById.data?.data || {};
+        const typeFind = transformedData?.find(
+          (item, index) => item?.title === updateValue?.type
+        );
+        
+        let selectTopicById;
+        if (lessonByIdData) {
+          const topicById = await restClient({
+            url: `api/topic/gettopicbyid?id=${lessonByIdData?.topicId}`,
+            method: "GET",
+          });
+          selectTopicById = topicById.data?.data || {};
+          setInitialValues((prevValues) => ({
+            ...prevValues,
+            topic: selectTopicById,
+          }));
+        }else if(!lessonByIdData){
+          const topicById = await restClient({
+            url: `api/topic/gettopicbyid?id=${updateValue?.topicId}`,
+            method: "GET",
+          });
+          selectTopicById = topicById.data?.data || {};
+          setInitialValues((prevValues) => ({
+            ...prevValues,
+            topic: selectTopicById,
+          }));
+        }
+        
 
         const documentById = await restClient({
           url: `api/document/getdocumentbyid/${selectTopicById.documentId}`,
@@ -132,12 +146,11 @@ export default function UpdateQuizLesson({
           description: updateValue.description,
           document: documentByIdData,
           score: updateValue.score,
-          topic: selectTopicById,
-          type: typeFind
+          type: typeFind,
         }));
 
         const gradeAllResponse = await restClient({
-          url: `api/grade/getallgrade`,
+          url: `api/grade/getallgrade?isInclude=false`,
           method: "GET",
         });
         const listGrade = gradeAllResponse.data?.data || [];
@@ -187,7 +200,7 @@ export default function UpdateQuizLesson({
     let model = {
       id: updateValue.id,
       title: values.title,
-      type: values?.type?.id,
+      type: 1,
       description: values.description,
       score: values.score,
       topicId: values.topic.id,
@@ -197,10 +210,10 @@ export default function UpdateQuizLesson({
       model = {
         id: updateValue.id,
         title: values.title,
-        type: values?.type?.id,
+        type: 1,
         description: values.description,
         score: values.score,
-        topicId: values.topic.id,
+        topicId: null,
         lessonId: values.lesson.id,
         isActive: true,
       };
@@ -381,14 +394,6 @@ export default function UpdateQuizLesson({
                 setClearTopic={setClearLesson}
                 disabled={!lessonList || lessonList.length === 0}
                 options={lessonList}
-              />
-
-              <CustomDropdown
-                title="Thể loại"
-                label="thể loại"
-                name="type"
-                id="type"
-                options={typeList}
               />
 
               <CustomTextInput

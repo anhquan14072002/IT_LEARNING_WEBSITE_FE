@@ -533,6 +533,8 @@ import { Toast } from "primereact/toast";
 import { useSelector } from "react-redux";
 import { Tooltip } from "primereact/tooltip";
 import { ProgressSpinner } from "primereact/progressspinner";
+import CommentCoding from "../../components/CommentCoding";
+import SubmitCoding from "../../components/SubmitCoding";
 import NotifyProvider from "../../store/NotificationContext";
 
 const CodeEditor = () => {
@@ -554,9 +556,15 @@ const CodeEditor = () => {
   const [typeError, setErrorType] = useState(null);
   const [loading, setLoading] = useState(false); // State to manage loading
 
-  useEffect(() => {
-    console.log("testcase::", testCase?.isHidden);
-  }, [testCase]);
+  // useEffect(() => {
+  //   restClient({url:`api/submission/getsubmission?ProblemId=${id}&UserId=${user?.sub}`}).then((res)=>{
+  //     console.log('====================================');
+  //     console.log(res?.data);
+  //     console.log('====================================');
+  //   }).catch((err) => {
+
+  //   })
+  // }, []);
 
   const submit = () => {
     if (!isLoggedIn()) {
@@ -645,12 +653,20 @@ const CodeEditor = () => {
         setExecuteCode(res.data?.data);
         setCode(decodeBase64(res.data?.data[0]?.sampleCode) || "");
         restClient({
+          url: `api/submission/getsubmission?ProblemId=${id}&UserId=${user?.sub}&LanguageId=${res.data?.data[0]?.languageId}`,
+        })
+          .then((res) => {
+            setCode(decodeBase64(res?.data?.data?.sourceCode));
+          })
+          .catch((err) => {});
+        restClient({
           url:
             "api/programlanguage/getprogramlanguagebyid/" +
             res.data?.data[0]?.languageId,
         })
           .then((res) => {
             setLanguage(res.data?.data);
+
             restClient({
               url: "api/testcase/getalltestcasebyproblemid/" + id,
             })
@@ -704,275 +720,307 @@ const CodeEditor = () => {
 
   const handleLanguageChange = (event) => {
     const selectedLanguageId = event.target.value;
-    if (Array.isArray(executeCode)) {
-      const selectedLanguage = executeCode?.find(
-        (language) => language?.id === parseInt(selectedLanguageId)
-      );
-      setLanguage(selectedLanguage);
-      setCode(decodeBase64(selectedLanguage?.sampleCode));
-    } else {
-      setCode();
-    }
+    restClient({
+      url: `api/submission/getsubmission?ProblemId=${id}&UserId=${user?.sub}&LanguageId=${res.data?.data[0]?.languageId}`,
+    })
+      .then((res) => {
+        if (res?.data?.data?.sourceCode) {
+          setCode(decodeBase64(res?.data?.data?.sourceCode));
+        } else {
+          if (Array.isArray(executeCode)) {
+            const selectedLanguage = executeCode?.find(
+              (language) => language?.id === parseInt(selectedLanguageId)
+            );
+            setLanguage(selectedLanguage);
+            setCode(decodeBase64(selectedLanguage?.sampleCode));
+          } else {
+            setCode();
+          }
+        }
+      })
+      .catch((err) => {});
   };
 
   return (
     <NotifyProvider>
+    <div>
+      <div ref={fixedDivRef} className="fixed top-0 w-full z-10">
+        <Header />
+        <Toast ref={toast} />
+      </div>
+      {loading && <LoadingFull />}
       <div>
-        <div ref={fixedDivRef} className="fixed top-0 w-full z-10">
-          <Header />
-          <Toast ref={toast} />
-        </div>
-        {loading && <LoadingFull />}
-        <div>
-          <Split
-            sizes={[40, 60]}
-            minSize={100}
-            expandToMin={false}
-            gutterSize={10}
-            gutterAlign="center"
-            snapOffset={30}
-            dragInterval={1}
-            direction="horizontal"
-            cursor="col-resize"
-            className="flex"
-            style={{ paddingTop: `${fixedDivHeight}px` }}
-          >
-            <div className="p-5 h-screen overflow-y-auto custom-scrollbar min-w-[30%]">
-              <nav className="flex space-x-4 mb-10">
-                <button
-                  onClick={() => setNavIndex(1)}
-                  className={`py-2 px-4 rounded-lg ${
-                    navIndex === 1
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200 text-gray-700"
-                  } hover:bg-blue-600 transition-colors`}
-                >
-                  Chi tiết
-                </button>
-                <button
-                  onClick={() => setNavIndex(2)}
-                  className={`py-2 px-4 rounded-lg ${
-                    navIndex === 2
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200 text-gray-700"
-                  } hover:bg-blue-600 transition-colors`}
-                >
-                  Hướng dẫn
-                </button>
-              </nav>
-              {navIndex === 1 && <DescriptionComponent id={id} />}
-              {navIndex === 2 && <InstructionComponent id={id} />}
-            </div>
-
-            <div className="min-w-[30%] bg-[#182537]">
-              {/* Code Editor */}
-              <div
-                className="h-screen overflow-y-auto custom-scrollbar"
-                style={{ height: "100vh" }}
+        <Split
+          sizes={[40, 60]}
+          minSize={100}
+          expandToMin={false}
+          gutterSize={10}
+          gutterAlign="center"
+          snapOffset={30}
+          dragInterval={1}
+          direction="horizontal"
+          cursor="col-resize"
+          className="flex"
+          style={{ paddingTop: `${fixedDivHeight}px` }}
+        >
+          <div className="p-5 h-screen overflow-y-auto custom-scrollbar min-w-[30%]">
+            <nav className="flex space-x-4 mb-10">
+              <button
+                onClick={() => setNavIndex(1)}
+                className={`py-2 px-4 rounded-lg ${
+                  navIndex === 1
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200 text-gray-700"
+                } hover:bg-blue-600 transition-colors`}
               >
-                <div
-                  className="h-full"
-                  style={{ height: "10vh", backgroundColor: "#182537" }}
+                Chi tiết
+              </button>
+              <button
+                onClick={() => setNavIndex(2)}
+                className={`py-2 px-4 rounded-lg ${
+                  navIndex === 2
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200 text-gray-700"
+                } hover:bg-blue-600 transition-colors`}
+              >
+                Hướng dẫn
+              </button>
+              <button
+                onClick={() => setNavIndex(3)}
+                className={`py-2 px-4 rounded-lg ${
+                  navIndex === 3
+                    ? "bg-blue-500 text-white"
+                    : "bg-gray-200 text-gray-700"
+                } hover:bg-blue-600 transition-colors`}
+              >
+                Bình luận
+              </button>
+              {isLoggedIn() && (
+                <button
+                  onClick={() => setNavIndex(4)}
+                  className={`py-2 px-4 rounded-lg ${
+                    navIndex === 4
+                      ? "bg-blue-500 text-white"
+                      : "bg-gray-200 text-gray-700"
+                  } hover:bg-blue-600 transition-colors`}
                 >
-                  <div className="flex justify-between flex-wrap p-2 text-white">
-                    <div className="flex items-center">
-                      <label htmlFor="language-select" className="mr-2">
-                        Ngôn ngữ:
-                      </label>
-                      <select
-                        id="language-select"
-                        value={language?.id || ""}
-                        onChange={handleLanguageChange}
-                        className="bg-gray-700 text-white py-2 px-4 rounded-lg border border-gray-600 hover:bg-gray-700 focus:outline-none"
-                      >
-                        <option value="" disabled>
-                          Chọn ngôn ngữ
+                  Bài đã nộp
+                </button>
+              )}
+            </nav>
+            {navIndex === 1 && <DescriptionComponent id={id} />}
+            {navIndex === 2 && <InstructionComponent id={id} />}
+            {navIndex === 3 && <CommentCoding id={id} />}
+            {isLoggedIn() && navIndex === 4 && <SubmitCoding id={id} />}
+          </div>
+
+          <div className="min-w-[30%] bg-[#182537]">
+            {/* Code Editor */}
+            <div
+              className="h-screen overflow-y-auto custom-scrollbar"
+              style={{ height: "100vh" }}
+            >
+              <div
+                className="h-full"
+                style={{ height: "10vh", backgroundColor: "#182537" }}
+              >
+                <div className="flex justify-between flex-wrap p-2 text-white">
+                  <div className="flex items-center">
+                    <label htmlFor="language-select" className="mr-2">
+                      Ngôn ngữ:
+                    </label>
+                    <select
+                      id="language-select"
+                      value={language?.id || ""}
+                      onChange={handleLanguageChange}
+                      className="bg-gray-700 text-white py-2 px-4 rounded-lg border border-gray-600 hover:bg-gray-700 focus:outline-none"
+                    >
+                      <option value="" disabled>
+                        Chọn ngôn ngữ
+                      </option>
+                      {executeCode.map((lang) => (
+                        <option key={lang?.id} value={lang?.id}>
+                          {lang?.languageName}
                         </option>
-                        {executeCode.map((lang) => (
-                          <option key={lang?.id} value={lang?.id}>
-                            {lang?.id}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="flex gap-5 flex-wrap">
-                      <button
-                        onClick={runTestCases}
-                        className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition-colors"
-                      >
-                        Chạy code
-                      </button>
-                      <button
-                        className="bg-green-500 text-white py-2 px-6 rounded-lg hover:bg-green-600 transition-colors"
-                        onClick={submit}
-                      >
-                        Nộp bài
-                      </button>
-                    </div>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="flex gap-5 flex-wrap">
+                    <button
+                      onClick={runTestCases}
+                      className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition-colors"
+                    >
+                      Chạy code
+                    </button>
+                    <button
+                      className="bg-green-500 text-white py-2 px-6 rounded-lg hover:bg-green-600 transition-colors"
+                      onClick={submit}
+                    >
+                      Nộp bài
+                    </button>
                   </div>
                 </div>
-                <Split
-                  maxSize={700}
-                  expandToMin={true}
-                  gutterSize={10}
-                  gutterAlign="center"
-                  snapOffset={30}
-                  dragInterval={1}
-                  direction="vertical"
-                  cursor="row-resize"
-                  onDrag={(e) => {
-                    if (codeMirrorRef.current) {
-                      codeMirrorRef.current.editor.display.wrapper.style.height = `calc(${e[0]}vh - 5px)`;
-                    }
-                  }}
-                  className="h-[100vh]"
-                >
-                  <div className="border border-gray-300 rounded-lg shadow-md">
-                    <CodeMirror
-                      ref={codeMirrorRef}
-                      value={code}
-                      options={{
-                        theme: "material",
-                        lineNumbers: true,
-                      }}
-                      onBeforeChange={(editor, data, value) => {
-                        setCode(value);
-                      }}
-                      editorDidMount={(editor) => {
-                        editor.setSize(null, "calc(50vh - 5px)");
-                      }}
-                    />
-                  </div>
+              </div>
+              <Split
+                maxSize={700}
+                expandToMin={true}
+                gutterSize={10}
+                gutterAlign="center"
+                snapOffset={30}
+                dragInterval={1}
+                direction="vertical"
+                cursor="row-resize"
+                onDrag={(e) => {
+                  if (codeMirrorRef.current) {
+                    codeMirrorRef.current.editor.display.wrapper.style.height = `calc(${e[0]}vh - 5px)`;
+                  }
+                }}
+                className="h-[100vh]"
+              >
+                <div className="border border-gray-300 rounded-lg shadow-md">
+                  <CodeMirror
+                    ref={codeMirrorRef}
+                    value={code}
+                    options={{
+                      theme: "material",
+                      lineNumbers: true,
+                    }}
+                    onBeforeChange={(editor, data, value) => {
+                      setCode(value);
+                    }}
+                    editorDidMount={(editor) => {
+                      editor.setSize(null, "calc(50vh - 5px)");
+                    }}
+                  />
+                </div>
 
-                  <div
-                    style={{ backgroundColor: "#182537", height: "auto" }}
-                    className="p-2 flex"
-                  >
-                    {/* Test Case Navigation Bar */}
-                    <nav className="flex flex-col gap-2 w-1/6">
-                      {errorResult !== "WrongAnswer" &&
-                        errorResult !== "Accepted" &&
-                        errorResult && (
-                          <button
-                            onClick={() => setSelectedTestCase(-1)}
-                            className={`py-2 px-4 rounded-lg ${
-                              selectedTestCase === -1
-                                ? "bg-blue-500 text-white"
-                                : "bg-gray-200 text-gray-700"
-                            } hover:bg-blue-600 transition-colors`}
-                          >
-                            Console
-                          </button>
-                        )}
-                      {testcaseList?.map((item, index) => (
+                <div
+                  style={{ backgroundColor: "#182537", height: "auto" }}
+                  className="p-2 flex"
+                >
+                  {/* Test Case Navigation Bar */}
+                  <nav className="flex flex-col gap-2 w-1/6">
+                    {errorResult !== "WrongAnswer" &&
+                      errorResult !== "Accepted" &&
+                      errorResult && (
                         <button
-                          key={item.id} // Use a unique key if available
-                          onClick={() => {
-                            setSelectedTestCase(index);
-                            setTestCase(item);
-                          }}
+                          onClick={() => setSelectedTestCase(-1)}
                           className={`py-2 px-4 rounded-lg ${
-                            selectedTestCase === index
+                            selectedTestCase === -1
                               ? "bg-blue-500 text-white"
                               : "bg-gray-200 text-gray-700"
                           } hover:bg-blue-600 transition-colors`}
                         >
-                          {Array?.isArray(result) &&
-                            result[index] &&
-                            result[index]?.status === "Accepted" && (
-                              <>
-                                <span
-                                  className="pi pi-check-circle text-green-600 font-bold text-xl mr-1"
-                                  data-pr-tooltip="Test case đã pass"
-                                  data-pr-position="top"
-                                ></span>
-                                <Tooltip target=".pi-check-circle" />
-                              </>
-                            )}
-                          {Array?.isArray(result) &&
-                            result[index] &&
-                            result[index]?.status === "WrongAnswer" && (
-                              <>
-                                <span
-                                  className="pi pi-times-circle text-red-600 font-bold text-xl mr-1"
-                                  data-pr-tooltip="Test case chưa pass"
-                                  data-pr-position="top"
-                                ></span>
-                                <Tooltip target=".pi-times-circle" />
-                              </>
-                            )}
-                          Test Case {index + 1}
-                          {/* Dynamically label the buttons */}
+                          Console
                         </button>
-                      ))}
-                    </nav>
-
-                    {selectedTestCase === -1 && (
-                      <div className="h-auto p-3 bg-transparent text-red-500 font-semibold text-base ml-5 w-5/6">
-                        {errorResult}
-                        <br />
-                        {Array.isArray(result) &&
-                          decodeBase64(result[0]?.compileOutput)}
-                      </div>
-                    )}
-
-                    {selectedTestCase >= 0 && (
-                      <div
-                        style={{ backgroundColor: "#182537", height: "auto" }}
-                        className="p-2"
+                      )}
+                    {testcaseList?.map((item, index) => (
+                      <button
+                        key={item.id} // Use a unique key if available
+                        onClick={() => {
+                          setSelectedTestCase(index);
+                          setTestCase(item);
+                        }}
+                        className={`py-2 px-4 rounded-lg ${
+                          selectedTestCase === index
+                            ? "bg-blue-500 text-white"
+                            : "bg-gray-200 text-gray-700"
+                        } hover:bg-blue-600 transition-colors`}
                       >
-                        {testCase?.isHidden === true ? (
-                          <p className="ml-5 text-base text-white font-semibold">
-                            Testcase ẩn
-                          </p>
-                        ) : (
-                          <div className="text-white font-semibold text-base ml-5">
-                            <div className="flex gap-5 mb-5">
-                              <p className="w-40">Đầu vào</p>
-                              <p>
-                                {testCase &&
-                                processInput(testCase?.input).arrayItems
-                                  .length > 0
-                                  ? `[${processInput(
-                                      testCase.input
-                                    )?.arrayItems.join(", ")}]`
-                                  : ""}
-                              </p>
-                            </div>
-                            <div className="flex gap-5 mb-5">
-                              <p className="w-40">Đầu ra thực tế</p>
-                              <p>
-                                {Array?.isArray(result) &&
-                                  result[selectedTestCase]?.output &&
-                                  decodeBase64(
-                                    result[selectedTestCase]?.output
-                                  )}
-                              </p>
-                            </div>
-                            <div className="flex gap-5 mb-5">
-                              <p className="w-40">Đầu ra mong đợi</p>
-                              <p>{testCase && testCase?.output}</p>
-                            </div>
-                            <div className="flex gap-5 mb-5">
-                              <p className="w-40">Mô tả</p>
-                              <p>
-                                {Array?.isArray(result) &&
-                                  result[selectedTestCase]?.output &&
-                                  result[selectedTestCase]?.status}
-                              </p>
-                            </div>
+                        {Array?.isArray(result) &&
+                          result[index] &&
+                          result[index]?.status === "Accepted" && (
+                            <>
+                              <span
+                                className="pi pi-check-circle text-green-600 font-bold text-xl mr-1"
+                                data-pr-tooltip="Test case đã pass"
+                                data-pr-position="top"
+                              ></span>
+                              <Tooltip target=".pi-check-circle" />
+                            </>
+                          )}
+                        {Array?.isArray(result) &&
+                          result[index] &&
+                          result[index]?.status === "WrongAnswer" && (
+                            <>
+                              <span
+                                className="pi pi-times-circle text-red-600 font-bold text-xl mr-1"
+                                data-pr-tooltip="Test case chưa pass"
+                                data-pr-position="top"
+                              ></span>
+                              <Tooltip target=".pi-times-circle" />
+                            </>
+                          )}
+                        Test Case {index + 1}
+                        {/* Dynamically label the buttons */}
+                      </button>
+                    ))}
+                  </nav>
+
+                  {selectedTestCase === -1 && (
+                    <div className="h-auto p-3 bg-transparent text-red-500 font-semibold text-base ml-5 w-5/6">
+                      {errorResult}
+                      <br />
+                      {Array.isArray(result) &&
+                        decodeBase64(result[0]?.compileOutput)}
+                    </div>
+                  )}
+
+                  {selectedTestCase >= 0 && (
+                    <div
+                      style={{ backgroundColor: "#182537", height: "auto" }}
+                      className="p-2"
+                    >
+                      {testCase?.isHidden === true ? (
+                        <p className="ml-5 text-base text-white font-semibold">
+                          Testcase ẩn
+                        </p>
+                      ) : (
+                        <div className="text-white font-semibold text-base ml-5">
+                          <div className="flex gap-5 mb-5">
+                            <p className="w-40">Đầu vào</p>
+                            <p>
+                              {testCase &&
+                              processInput(testCase?.input).arrayItems.length >
+                                0
+                                ? `[${processInput(
+                                    testCase.input
+                                  )?.arrayItems.join(", ")}]`
+                                : ""}
+                            </p>
                           </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </Split>
-              </div>
+                          <div className="flex gap-5 mb-5">
+                            <p className="w-40">Đầu ra thực tế</p>
+                            <p>
+                              {Array?.isArray(result) &&
+                                result[selectedTestCase]?.output &&
+                                decodeBase64(result[selectedTestCase]?.output)}
+                            </p>
+                          </div>
+                          <div className="flex gap-5 mb-5">
+                            <p className="w-40">Đầu ra mong đợi</p>
+                            <p>{testCase && testCase?.output}</p>
+                          </div>
+                          <div className="flex gap-5 mb-5">
+                            <p className="w-40">Mô tả</p>
+                            <p>
+                              {Array?.isArray(result) &&
+                                result[selectedTestCase]?.output &&
+                                result[selectedTestCase]?.status}
+                            </p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </Split>
             </div>
-          </Split>
-          {/* Problem Description */}
-        </div>
+          </div>
+        </Split>
+        {/* Problem Description */}
       </div>
+    </div>
     </NotifyProvider>
   );
 };

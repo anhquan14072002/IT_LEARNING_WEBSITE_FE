@@ -10,6 +10,10 @@ import Search from "./pages/Search";
 import CheckMail from "./pages/CheckMail";
 import Document from "./pages/Document";
 import Lesson from "./pages/Lesson";
+import ImportQuiz from "./pages/Quiz/ImportQuiz";
+import ImportStepOne from "./components/Quiz/ImportStepOne";
+import ImportStepTwo from "./components/Quiz/ImportStepTwo";
+import ImportStepThree from "./components/Quiz/ImportStepThree";
 import Topic from "./pages/Topic";
 import ChangePassword from "./pages/ChangePassword";
 import Quiz from "./pages/Quiz";
@@ -29,12 +33,9 @@ import NotFound from "./pages/NotFound";
 import ManageExecuteCode from "./pages/ManageExecuteCode";
 import CreateCode from "./pages/CreateCode";
 import DetailClass from "./pages/DetailClass";
-import ImportQuiz from "./pages/Quiz/ImportQuiz";
-import Post from "./pages/Post/Post";
-import ImportStepOne from "./components/Quiz/ImportStepOne";
-import ImportStepTwo from "./components/Quiz/ImportStepTwo";
-import ImportStepThree from "./components/Quiz/ImportStepThree";
 import ManageQuestionQuiz from "./components/ManageQuestionQuiz";
+import Post from "./pages/Post/Post";
+
 function App() {
   return (
     //     <Router>
@@ -93,7 +94,7 @@ function App() {
             <Route path="stepOne/:id" element={<ImportStepOne />} />
             <Route path="stepTwo" element={<ImportStepTwo />} />
             <Route path="stepThree" element={<ImportStepThree />} />
-          </Route>
+          </Route> 
           <Route path="/dashboard/:typeId" element={<Dashboard />} />
           <Route path="/question/:quizId" element={<ManageQuestionQuiz />} />
           <Route path="/search" element={<Search />} />
@@ -130,6 +131,12 @@ function App() {
           />
           <Route path="/codeEditor/:id" element={<CodeEditor />} />
           <Route path="/dashboard/createproblem" element={<CreateProblem />} />
+          <Route path="/dashboard/createcode/:id" element={<CreateCode />} />
+          <Route path="/detailclass/:id" element={<DetailClass />} />
+          <Route
+            path="/dashboard/quiz/manageexecutecode/:id"
+            element={<ManageExecuteCode />}
+          />
         </Routes>
       </Router>
     </>
@@ -137,3 +144,4 @@ function App() {
 }
 
 export default App;
+ 

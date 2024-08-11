@@ -351,7 +351,7 @@ export default function ManageExecuteCode() {
                       />
                       <Column
                         header="Ngôn ngữ"
-                        field="languageId"
+                        field="languageName"
                         className="border-b-2 border-t-2"
                         style={{ minWidth: "15rem" }}
                       />

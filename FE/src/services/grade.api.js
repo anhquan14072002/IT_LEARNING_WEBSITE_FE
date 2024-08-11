@@ -3,7 +3,7 @@ import restClient from "./restClient";
 export const getAllGrade = async (setLoading,setListClass) => {
     setLoading(true);
     await restClient({
-        url: `api/grade/getallgrade`,
+        url: `api/grade/getallgrade?isInclude=false`,
         method: "GET",
     })
         .then((res) => {
