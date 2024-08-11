@@ -37,7 +37,7 @@ function ImportStepTwo() {
               label="Quay lại"
               className="p-2 bg-blue-500 text-white mr-2"
               onClick={() => {
-                navigate("/importQuiz/stepOne");
+                navigate(`/importQuiz/stepOne/${quizId}`);
                 setVisibleDelete(false);
               }}
             />
@@ -49,7 +49,7 @@ function ImportStepTwo() {
       try {
         setLoading(true);
         const response = await axios.post(
-          `${BASE_URL}/api/quizquestion/ImportValidate?quizId=1`,
+          `${BASE_URL}/api/quizquestion/ImportValidate?quizId=${quizId}`,
           formData,
           { headers: { "Content-Type": "multipart/form-data" } }
         );
@@ -62,8 +62,7 @@ function ImportStepTwo() {
             responseData.countFail,
             responseData.idImport,
             responseData.idImportFail,
-            responseData.idImportResult,
-            quizId
+            responseData.idImportResult
           );
         } else {
           console.error("File upload failed:", response);
@@ -84,7 +83,7 @@ function ImportStepTwo() {
               label="Quay lại"
               className="p-2 bg-blue-500 text-white mr-2"
               onClick={() => {
-                navigate("/importQuiz/stepOne");
+                navigate(`/importQuiz/stepOne/${quizId}`);
                 setVisible(false);
               }}
             />
@@ -178,7 +177,7 @@ function ImportStepTwo() {
         label="Đồng ý"
         icon="pi pi-check"
         onClick={() => {
-          navigate("/importQuiz/stepOne");
+          navigate(`/importQuiz/stepOne/${quizId}`);
           setVisible(false);
         }}
         autoFocus

@@ -10,6 +10,7 @@ import { Toast } from "primereact/toast";
 import { useSelector } from "react-redux";
 import restClient from "../../services/restClient";
 import { isLoggedIn } from "../../utils";
+import NotifyProvider from "../../store/NotificationContext";
 
 export default function Document() {
   const navigate = useNavigate();
@@ -94,95 +95,100 @@ export default function Document() {
   }, [fixedDivRef]);
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <Toast ref={toast} />
-      <div ref={fixedDivRef} className="fixed top-0 w-full z-10">
-        <Header />
-        <Menu />
-      </div>
-      <div style={{ paddingTop: `${fixedDivHeight}px` }} className="flex gap-5">
-        <DocumentClass display={isDisplay} />
-
-        <div className="pt-6 flex-1">
-          {documentDetailArrayList && (
-            <>
-              <div className="min-h-screen">
-                <h1 className="font-bold text-lg pb-5 text-center">
-                  {documentDetailArrayList.title}
-                </h1>
-
-                <div className="flex flex-wrap">
-                  {documentDetailArrayList.topics &&
-                    documentDetailArrayList.topics.map((topic, index) => (
-                      <div key={index} className="w-full md:w-1/2 mb-4 px-2">
-                        <div className="border rounded p-4">
-                          <h2
-                            className="font-semibold hover:text-green-600 cursor-pointer"
-                            onClick={() => navigate("/topic/" + topic.id)}
-                          >
-                            {topic.title}
-                          </h2>
-                          <ul className="list-disc pl-6">
-                            {Array.isArray(topic.lessons) &&
-                              topic.lessons.map((lesson, i) => (
-                                <li
-                                  key={i}
-                                  className="hover:text-green-600 cursor-pointer"
-                                  onClick={() =>
-                                    navigate("/document/lesson/" + lesson.id)
-                                  }
-                                >
-                                  {lesson.title}
-                                </li>
-                              ))}
-                          </ul>
-                          {Array.isArray(topic.childTopics) &&
-                            topic.childTopics.map((childTopic, idx) => (
-                              <div key={idx} className="ml-4 mt-2">
-                                <h3
-                                  className="font-semibold hover:text-green-600 cursor-pointer"
-                                  onClick={() =>
-                                    navigate("/topic/" + childTopic.id)
-                                  }
-                                >
-                                  {childTopic.title}
-                                </h3>
-                                <ul className="list-disc pl-6">
-                                  {Array.isArray(childTopic.lessons) &&
-                                    childTopic.lessons.map((lesson, i) => (
-                                      <li
-                                        key={i}
-                                        className="hover:text-green-600 cursor-pointer"
-                                        onClick={() =>
-                                          navigate(
-                                            "/document/lesson/" + lesson.id
-                                          )
-                                        }
-                                      >
-                                        {lesson.title}
-                                      </li>
-                                    ))}
-                                </ul>
-                              </div>
-                            ))}
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              </div>
-              {/* comment */}
-              <Comment
-                documentId={id}
-                toast={toast}
-                listCommentByUser={listCommentByUser}
-                fetDocumentByUser={fetDocumentByUser}
-              />
-            </>
-          )}
+    <NotifyProvider>
+      <div className="min-h-screen flex flex-col">
+        <Toast ref={toast} />
+        <div ref={fixedDivRef} className="fixed top-0 w-full z-10">
+          <Header />
+          <Menu />
         </div>
-      </div>
+        <div
+          style={{ paddingTop: `${fixedDivHeight}px` }}
+          className="flex gap-5"
+        >
+          <DocumentClass display={isDisplay} />
 
-      <Footer ref={displayRef} />
-    </div>
+          <div className="pt-6 flex-1">
+            {documentDetailArrayList && (
+              <>
+                <div className="min-h-screen">
+                  <h1 className="font-bold text-lg pb-5 text-center">
+                    {documentDetailArrayList.title}
+                  </h1>
+
+                  <div className="flex flex-wrap">
+                    {documentDetailArrayList.topics &&
+                      documentDetailArrayList.topics.map((topic, index) => (
+                        <div key={index} className="w-full md:w-1/2 mb-4 px-2">
+                          <div className="border rounded p-4">
+                            <h2
+                              className="font-semibold hover:text-green-600 cursor-pointer"
+                              onClick={() => navigate("/topic/" + topic.id)}
+                            >
+                              {topic.title}
+                            </h2>
+                            <ul className="list-disc pl-6">
+                              {Array.isArray(topic.lessons) &&
+                                topic.lessons.map((lesson, i) => (
+                                  <li
+                                    key={i}
+                                    className="hover:text-green-600 cursor-pointer"
+                                    onClick={() =>
+                                      navigate("/document/lesson/" + lesson.id)
+                                    }
+                                  >
+                                    {lesson.title}
+                                  </li>
+                                ))}
+                            </ul>
+                            {Array.isArray(topic.childTopics) &&
+                              topic.childTopics.map((childTopic, idx) => (
+                                <div key={idx} className="ml-4 mt-2">
+                                  <h3
+                                    className="font-semibold hover:text-green-600 cursor-pointer"
+                                    onClick={() =>
+                                      navigate("/topic/" + childTopic.id)
+                                    }
+                                  >
+                                    {childTopic.title}
+                                  </h3>
+                                  <ul className="list-disc pl-6">
+                                    {Array.isArray(childTopic.lessons) &&
+                                      childTopic.lessons.map((lesson, i) => (
+                                        <li
+                                          key={i}
+                                          className="hover:text-green-600 cursor-pointer"
+                                          onClick={() =>
+                                            navigate(
+                                              "/document/lesson/" + lesson.id
+                                            )
+                                          }
+                                        >
+                                          {lesson.title}
+                                        </li>
+                                      ))}
+                                  </ul>
+                                </div>
+                              ))}
+                          </div>
+                        </div>
+                      ))}
+                  </div>
+                </div>
+                {/* comment */}
+                <Comment
+                  documentId={id}
+                  toast={toast}
+                  listCommentByUser={listCommentByUser}
+                  fetDocumentByUser={fetDocumentByUser}
+                />
+              </>
+            )}
+          </div>
+        </div>
+
+        <Footer ref={displayRef} />
+      </div>
+    </NotifyProvider>
   );
 }

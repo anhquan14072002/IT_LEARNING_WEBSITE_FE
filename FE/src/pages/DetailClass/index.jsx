@@ -5,6 +5,7 @@ import Menu from "../../components/Menu";
 import { useNavigate, useParams } from "react-router-dom";
 import { getDocumentByGradeId } from "../../services/document.api";
 import Loading from "../../components/Loading";
+import NotifyProvider from "../../store/NotificationContext";
 
 export default function DetailClass() {
   const footerRef = useRef(null);
@@ -28,12 +29,12 @@ export default function DetailClass() {
   // Helper function to extract quizzes by type
   const extractQuizzesByType = (type) => {
     return (documentList?.documents ?? []).flatMap((d) =>
-      (d.topics ?? []).flatMap((t) =>
-        [
-          ...(t.quizzes ?? []).filter((q) => q.type === type),
-          ...(t.lessons ?? []).flatMap((l) => (l.quizzes ?? []).filter((q) => q.type === type)),
-        ]
-      )
+      (d.topics ?? []).flatMap((t) => [
+        ...(t.quizzes ?? []).filter((q) => q.type === type),
+        ...(t.lessons ?? []).flatMap((l) =>
+          (l.quizzes ?? []).filter((q) => q.type === type)
+        ),
+      ])
     );
   };
 
@@ -44,37 +45,41 @@ export default function DetailClass() {
   if (loading) return <Loading />;
 
   return (
-    <>
+    <NotifyProvider>
       <div className="min-h-screen bg-gray-100">
-        <div ref={fixedDivRef} className="fixed top-0 w-full bg-white shadow-md z-10">
+        <div
+          ref={fixedDivRef}
+          className="fixed top-0 w-full bg-white shadow-md z-10"
+        >
           <Header />
           <Menu />
         </div>
-        <main style={{ paddingTop: `${fixedDivHeight}px` }} className="py-6 px-4">
-        <div className="py-6 px-4">
-        <div className="text-xl font-bold mb-5">
-      {documentList?.title} | Đề thi, Bài tập, Tài liệu, Câu hỏi ôn tập
-    </div>
-  <ul className="list-disc pl-5 space-y-2">
-    
-    <li className="text-md text-blue-500 underline cursor-pointer font-bold">
-      Tài liệu {documentList?.title}
-    </li>
-    <li className="text-md text-blue-500 underline cursor-pointer font-bold">
-      Câu hỏi ôn tập flashcard {documentList?.title}
-    </li>
-    <li className="text-md text-blue-500 underline cursor-pointer font-bold">
-      Câu hỏi ôn tập trắc nghiệm {documentList?.title}
-    </li>
-    <li className="text-md text-blue-500 underline cursor-pointer font-bold">
-      Đề thi {documentList?.title}
-    </li>
-    <li className="text-md text-blue-500 underline cursor-pointer font-bold">
-      Bài tập {documentList?.title}
-    </li>
-  </ul>
-</div>
-
+        <main
+          style={{ paddingTop: `${fixedDivHeight}px` }}
+          className="py-6 px-4"
+        >
+          <div className="py-6 px-4">
+            <div className="text-xl font-bold mb-5">
+              {documentList?.title} | Đề thi, Bài tập, Tài liệu, Câu hỏi ôn tập
+            </div>
+            <ul className="list-disc pl-5 space-y-2">
+              <li className="text-md text-blue-500 underline cursor-pointer font-bold">
+                Tài liệu {documentList?.title}
+              </li>
+              <li className="text-md text-blue-500 underline cursor-pointer font-bold">
+                Câu hỏi ôn tập flashcard {documentList?.title}
+              </li>
+              <li className="text-md text-blue-500 underline cursor-pointer font-bold">
+                Câu hỏi ôn tập trắc nghiệm {documentList?.title}
+              </li>
+              <li className="text-md text-blue-500 underline cursor-pointer font-bold">
+                Đề thi {documentList?.title}
+              </li>
+              <li className="text-md text-blue-500 underline cursor-pointer font-bold">
+                Bài tập {documentList?.title}
+              </li>
+            </ul>
+          </div>
 
           {documentList?.documents?.length > 0 && (
             <Section
@@ -116,17 +121,19 @@ export default function DetailClass() {
             />
           )}
 
-          {documentList?.documents?.flatMap(d =>
-            d.topics?.flatMap(t =>
-              t.lessons?.flatMap(l => l.problems) || []
-            ) || []
+          {documentList?.documents?.flatMap(
+            (d) =>
+              d.topics?.flatMap(
+                (t) => t.lessons?.flatMap((l) => l.problems) || []
+              ) || []
           ).length > 0 && (
             <Section
               title="Bài tập"
-              items={documentList.documents.flatMap(d =>
-                d.topics?.flatMap(t =>
-                  t.lessons?.flatMap(l => l.problems) || []
-                ) || []
+              items={documentList.documents.flatMap(
+                (d) =>
+                  d.topics?.flatMap(
+                    (t) => t.lessons?.flatMap((l) => l.problems) || []
+                  ) || []
               )}
               navigate={navigate}
               pathPrefix="/codeEditor/"
@@ -135,17 +142,19 @@ export default function DetailClass() {
         </main>
       </div>
       <Footer ref={footerRef} />
-    </>
+    </NotifyProvider>
   );
 }
 
 // Reusable Section Component
 const Section = ({ title, items, navigate, pathPrefix, showAllLink }) => (
   <section className="mb-14">
-    <h2 className="text-2xl font-bold mb-4 text-center text-blue-500">{title}</h2>
+    <h2 className="text-2xl font-bold mb-4 text-center text-blue-500">
+      {title}
+    </h2>
     <div className="space-y-2">
-    <div className="grid grid-cols-2 gap-4 text-center">
-        {items.map(item => (
+      <div className="grid grid-cols-2 gap-4 text-center">
+        {items.map((item) => (
           <div
             key={item.id}
             className="cursor-pointer text-lg transition text-green-600 font-semibold"
@@ -158,12 +167,12 @@ const Section = ({ title, items, navigate, pathPrefix, showAllLink }) => (
       {items.length > 4 && (
         <div className="grid grid-cols-2 gap-4 text-center">
           <p></p>
-        <p
-          href={showAllLink}
-          className="text-sm text-blue-600 underline mt-3 text-center"
-        >
-          {">>> "}Xem tất cả
-        </p>
+          <p
+            href={showAllLink}
+            className="text-sm text-blue-600 underline mt-3 text-center"
+          >
+            {">>> "}Xem tất cả
+          </p>
         </div>
       )}
       <hr />

@@ -90,7 +90,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/loginAdmin" element={<LoginAdmin />} />
           <Route path="/importQuiz" element={<ImportQuiz />}>
-            <Route path="stepOne" element={<ImportStepOne />} />
+            <Route path="stepOne/:id" element={<ImportStepOne />} />
             <Route path="stepTwo" element={<ImportStepTwo />} />
             <Route path="stepThree" element={<ImportStepThree />} />
           </Route>

@@ -16,7 +16,6 @@ import ManageCodeOnline from "../../components/ManageCodeOnline";
 import { assets } from "../../assets/assets";
 import NotifyProvider from "../../store/NotificationContext";
 
-
 const Dashboard = () => {
   const [open, setOpen] = useState(true);
   const navigate = useNavigate();
@@ -24,29 +23,28 @@ const Dashboard = () => {
   const { typeId } = useParams();
 
   const Menus = [
-
-    { title: "Thống kê", src:assets.chart_fill, index: "statistic" },
-    { title: "Quản lí tài khoản", src:assets.user, index: "user" },
+    { title: "Thống kê", src: assets.chart_fill, index: "statistic" },
+    { title: "Quản lí tài khoản", src: assets.user, index: "user" },
     {
       title: "Quản lí tài liệu/chủ đề/bài học ",
-      src:assets.folder,
+      src: assets.folder,
       index: "adminManageDocument",
     },
-    { title: "Quản lí bài học ",  src:assets.folder, index: "lesson" },
-    { title: "Quản lí câu hỏi ôn tập ",  src:assets.folder, index: "quiz" },
-    { title: "Quản lí đề thi",  src:assets.folder, index: "test" },
-    { title: "Quản lí tag ",  src:assets.folder, index: "tag" },
-    { title: "Quản lí bài thực hành",  src:assets.folder, index: "codeeditor" },
+    { title: "Quản lí bài học ", src: assets.folder, index: "lesson" },
+    { title: "Quản lí câu hỏi ôn tập ", src: assets.folder, index: "quiz" },
+    { title: "Quản lí đề thi", src: assets.folder, index: "test" },
+    { title: "Quản lí tag ", src: assets.folder, index: "tag" },
+    { title: "Quản lí bài thực hành", src: assets.folder, index: "codeeditor" },
   ];
 
-  useEffect(()=>{
-     if(!Menus.some((item,index)=> item.index === typeId)){
-      navigate("/notfound")
-     }
-  },[])
+  useEffect(() => {
+    if (!Menus.some((item, index) => item.index === typeId)) {
+      navigate("/notfound");
+    }
+  }, []);
 
   return (
-    <>
+    <NotifyProvider>
       {loading ? (
         <LoadingScreen setLoading={setLoading} />
       ) : (
@@ -85,7 +83,6 @@ const Dashboard = () => {
                       navigate(`/dashboard/${Menu.index}`);
                     }}
                   >
-
                     <Tooltip
                       target={`menu-${Menu.index}`}
                       content={Menu.title}
@@ -105,10 +102,7 @@ const Dashboard = () => {
             </div>
           </div>
           <div className="ml-20 mt-16 p-7">
-
-
-            <div className="h-screen" onClick={(e)=>setOpen(false)}>
-
+            <div className="h-screen" onClick={(e) => setOpen(false)}>
               {typeId === "user" && <ManageAccount />}
               {typeId === "adminManageDocument" && <ManageDocument />}
               {typeId === "lesson" && <ContentLesson />}
@@ -120,7 +114,7 @@ const Dashboard = () => {
           </div>
         </>
       )}
-    </>
+    </NotifyProvider>
   );
 };
 

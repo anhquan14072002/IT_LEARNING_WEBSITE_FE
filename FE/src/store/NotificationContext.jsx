@@ -1,6 +1,7 @@
 import { createContext, useCallback, useEffect, useState } from "react";
 import restClient from "../services/restClient";
 import { useSelector } from "react-redux";
+import { isLoggedIn } from "../utils";
 
 export const NotificationContext = createContext();
 
@@ -12,7 +13,7 @@ export default function NotifyProvider({ children }) {
   const [rows, setRows] = useState(6);
   const [activeTabIndex, setTabIndex] = useState(0);
   const fetchNumberNotificationByUserId = useCallback(() => {
-    if (user?.sub) {
+    if (user?.sub && isLoggedIn()) {
       restClient({
         url: `api/notifications/getnumberofnotificationbyuser/${user?.sub}`,
         method: "GET",
@@ -26,7 +27,7 @@ export default function NotifyProvider({ children }) {
     }
   }, [user, refresh]);
   const fetchListNotificationByUserId = useCallback(() => {
-    if (user?.sub) {
+    if (user?.sub && isLoggedIn()) {
       restClient({
         url: `api/notifications/getallnotificationbyuser/${user?.sub}?PageIndex=1&PageSize=${rows}`,
         method: "GET",
@@ -41,7 +42,7 @@ export default function NotifyProvider({ children }) {
     }
   }, [user?.sub, refresh, rows]);
   const fetchListNotificationNotRead = useCallback(() => {
-    if (user?.sub) {
+    if (user?.sub && isLoggedIn()) {
       restClient({
         url: `api/notifications/getallnotificationnotreadbyuser?userId=${user?.sub}&PageIndex=1&PageSize=${rows}`,
         method: "GET",
@@ -56,7 +57,7 @@ export default function NotifyProvider({ children }) {
     }
   }, [user?.sub, refresh, rows]);
   const deleteallnotificationbyuser = useCallback(() => {
-    if (user?.sub) {
+    if (user?.sub && isLoggedIn()) {
       restClient({
         url: `api/notifications/deleteallnotificationbyuser/${user?.sub}`,
         method: "DELETE",
@@ -72,7 +73,7 @@ export default function NotifyProvider({ children }) {
     }
   }, [user?.sub, refresh]);
   const markallasreadasync = () => {
-    if (user?.sub) {
+    if (user?.sub && isLoggedIn()) {
       restClient({
         url: `api/notifications/markallasreadasync?userId=${user?.sub}`,
         method: "POST",

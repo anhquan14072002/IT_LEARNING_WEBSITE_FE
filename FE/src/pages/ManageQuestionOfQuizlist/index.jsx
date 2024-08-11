@@ -28,7 +28,7 @@ import ImportFromQuiz from "../../components/ImportFromQuiz";
 import NotifyProvider from "../../store/NotificationContext";
 import FormDataContext, { FormDataProvider } from "../../store/FormDataContext";
 
-export function ManageQuestionOfQuizlistProvider() {
+export default function ManageQuestionOfQuizlist() {
   const toast = useRef(null);
   const dropDownRef1 = useRef(null);
   const dropDownRef2 = useRef(null);
@@ -43,7 +43,6 @@ export function ManageQuestionOfQuizlistProvider() {
   const [visibleDelete, setVisibleDelete] = useState(false);
   const [loading, setLoading] = useState(false);
   const [textSearch, setTextSearch] = useState("");
-  const { setQuizId } = useContext(FormDataContext);
   const { id } = useParams();
 
   //pagination
@@ -69,9 +68,6 @@ export function ManageQuestionOfQuizlistProvider() {
     { title: "Quản lí tag ", src: "Folder", index: "tag" },
   ];
 
-  useEffect(() => {
-    setQuizId(id);
-  }, [id]);
   useEffect(() => {
     fetchData();
   }, [page, rows, textSearch]);
@@ -319,7 +315,7 @@ export function ManageQuestionOfQuizlistProvider() {
                     icon="pi pi-plus-circle"
                     severity="info"
                     className="bg-blue-600 text-white p-2 text-sm font-normal"
-                    onClick={() => navigate("/importQuiz/stepOne")}
+                    onClick={() => navigate(`/importQuiz/stepOne/${id}`)}
                   />
                   <Button
                     label="Soạn câu hỏi mới"
@@ -466,12 +462,5 @@ export function ManageQuestionOfQuizlistProvider() {
         </div>
       </div>
     </NotifyProvider>
-  );
-}
-export default function ManageQuestionOfQuizlist() {
-  return (
-    <FormDataProvider>
-      <ManageQuestionOfQuizlistProvider />
-    </FormDataProvider>
   );
 }

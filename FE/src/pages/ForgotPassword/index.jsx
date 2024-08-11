@@ -3,9 +3,10 @@ import { Button } from "primereact/button";
 import { useForm, Controller } from "react-hook-form";
 import Header from "../../components/Header";
 import { useLocation } from "react-router-dom";
-import {  resetPassword } from "../../services/authenService";
+import { resetPassword } from "../../services/authenService";
 import { InputText } from "primereact/inputtext";
 import { assets } from "../../assets/assets";
+import NotifyProvider from "../../store/NotificationContext";
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
@@ -23,25 +24,23 @@ const index = () => {
   } = useForm();
 
   const onSubmit = async (data) => {
-    const password = data.password
+    const password = data.password;
     try {
-      await resetPassword( {token, email, password });
-      alert("sucess")
+      await resetPassword({ token, email, password });
+      alert("sucess");
     } catch (error) {
-      alert("reject")
+      alert("reject");
     }
-
-
   };
 
   return (
-    <>
+    <NotifyProvider>
       <Header />
 
       <div className="flex h-screen">
         <div className="w-1/2">
           <div className="w-auto h-full">
-          <img   src={assets.image} alt="" className="w-full h-full" />
+            <img src={assets.image} alt="" className="w-full h-full" />
           </div>
         </div>
 
@@ -132,7 +131,7 @@ const index = () => {
           </div>
         </div>
       </div>
-    </>
+    </NotifyProvider>
   );
 };
 
