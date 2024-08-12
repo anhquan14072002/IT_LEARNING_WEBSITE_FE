@@ -64,7 +64,7 @@ export default function AddDocumentDialog({
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    restClient({ url: "api/grade/getallgrade", method: "GET" })
+    restClient({ url: "api/grade/getallgrade?isInclude=false", method: "GET" })
       .then((res) => {
         setGradeList(Array.isArray(res.data.data) ? res.data.data : []);
       })
