@@ -62,6 +62,12 @@ export default function Class({ item, index }) {
   const practiceQuizzes = extractQuizzesByType("Practice");
   const testQuizzes = extractQuizzesByType("Test");
 
+  const handleExam = (exam) => {
+      exam?.type === 1
+        ? navigate(`/examdetail/${exam.id}`)
+        : navigate(`/examcodedetail/${exam.id}`);
+    
+  }
   return (
     <div>
       <div
@@ -163,7 +169,7 @@ export default function Class({ item, index }) {
               <h1
                 key={exam.id}
                 className="cursor-pointer hover:opacity-85"
-                onClick={() => navigate(`/document/${exam.id}`)}
+                onClick={() => handleExam(exam)}
               >
                 {exam.title}
               </h1>

@@ -23,6 +23,7 @@ import { InputSwitch } from "primereact/inputswitch";
 import AddQuizLesson from "../AddQuizLesson";
 import UpdateQuizLesson from "../UpdateQuizLesson";
 import { useNavigate } from "react-router-dom";
+import { text } from "@fortawesome/fontawesome-svg-core";
 
 export default function ManagementQuizLesson() {
   const toast = useRef(null);
@@ -54,7 +55,7 @@ export default function ManagementQuizLesson() {
     setLoading(true);
 
     restClient({
-      url: `api/quiz/getallquizpagination?Custom=false&PageIndex=${page}&PageSize=${rows}`,
+      url: `api/quiz/getallquizpagination?Custom=3&PageIndex=${page}&PageSize=${rows}&Value=${textSearch}`,
       method: "GET",
     })
       .then((res) => {
