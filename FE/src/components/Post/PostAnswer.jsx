@@ -238,6 +238,7 @@ const Answer = ({
   const deleteAnswer = () => {
     if (checkUser()) {
       deletePostComment(id, fetchPost);
+      notifyAllResponse("Bạn đã thu hồi phản hồi thành công");
     }
   };
   const updateAnswer = () => {
@@ -279,7 +280,23 @@ const Answer = ({
       description: `${user?.name} ${msg}`,
       notificationTime: new Date(),
       isRead: false,
-      link: post?.id,
+      link: "test",
+    };
+    createPostNotification(body);
+  }
+  function notifyAllResponse(msg) {
+    /* solution: Where is the origin of action from ? 
+          - pass body in request :  */
+    const body = {
+      notificationType: 1,
+      userSendId: user?.sub,
+      userSendName: user?.name,
+      userReceiveId: userId,
+      userReceiveName: fullName,
+      description: `${user?.name} ${msg}`,
+      notificationTime: new Date(),
+      isRead: false,
+      link: "test",
     };
     createPostNotification(body);
   }
