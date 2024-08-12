@@ -39,7 +39,7 @@ export default function Header({ params, setParams, textSearchProps }) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showOptionNotifications, setShowOptionNotifications] = useState(false);
   // const [activeTabIndex, setActiveTabIndex] = useState(0);
-
+  
   const handleLogout = () => {
     dispatch(retmoveUser());
     logout();
@@ -59,11 +59,14 @@ export default function Header({ params, setParams, textSearchProps }) {
           icon: "pi pi-user-edit",
           command: (e) => navigate("/profile"),
         },
-        {
-          label: "Quản lí",
-          icon: "pi pi-chart-bar",
-          command: (e) => navigate("/dashboard/statistic"),
-        },
+        ...(user.role === "Admin" || user.role === "ContentManager" ?[
+          {
+            label: "Quản lí",
+            icon: "pi pi-chart-bar",
+            command: (e) => navigate("/dashboard/statistic"),
+          },
+        ]:[] ),
+        
         {
           label: "Đăng xuất",
           icon: "pi pi-sign-out",

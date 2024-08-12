@@ -68,7 +68,7 @@ export default function ManageAdmin() {
       method: "GET",
     })
       .then((res) => {
-        setRoleList(res?.data?.data);
+        setRoleList(res?.data?.data?.id);
         console.log(res?.data?.data);
       })
       .catch((err) => {
