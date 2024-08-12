@@ -2,10 +2,6 @@ import axios from "axios";
 
 export const BASE_URL = "http://localhost:8000";
 
-
-
-
-
 export default function restClient({
   url,
   method = "GET",
