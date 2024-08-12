@@ -7,6 +7,7 @@ import { REJECT, SUCCESS } from "../../utils";
 import { Toast } from "primereact/toast";
 import Loading from "../../components/Loading";
 import NotifyProvider from "../../store/NotificationContext";
+import { useNavigate } from "react-router-dom";
 const Index = () => {
   const toast = useRef(null);
   const [imageURL, setImageURL] = useState(null);
@@ -20,7 +21,7 @@ const Index = () => {
   } = useForm();
 
   const id = localStorage.getItem("userId");
-
+  const navigate =useNavigate()
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -289,7 +290,13 @@ const Index = () => {
                       )}
                     </div>
                   </div>
-                  <div className="flex justify-end">
+                  <div className="flex justify-end gap-2">
+                  <button
+                      type="submit"
+                      className="w-1/3 px-6 py-3 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 " onClick={()=>navigate("/")}
+                    >
+                      Trở về
+                    </button>
                     <button
                       type="submit"
                       className="w-1/3 px-6 py-3 bg-orange-500 text-white font-semibold rounded-lg shadow-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"

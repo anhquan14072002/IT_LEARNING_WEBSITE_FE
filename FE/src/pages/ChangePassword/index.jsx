@@ -1,5 +1,5 @@
-import { Button } from "primereact/button";
 import React, { useRef } from "react";
+import { Button } from "primereact/button";
 import { Controller, useForm } from "react-hook-form";
 import Header from "../../components/Header";
 import { changePassword } from "../../services/profileService";
@@ -8,7 +8,7 @@ import { REJECT, SUCCESS } from "../../utils";
 import { InputText } from "primereact/inputtext";
 import NotifyProvider from "../../store/NotificationContext";
 
-const index = () => {
+const Index = () => {
   const toast = useRef(null);
   const {
     control,
@@ -17,11 +17,13 @@ const index = () => {
     getValues,
     setValue,
   } = useForm();
+
   const onSubmit = async (data) => {
     const { password, newPassword } = data;
+    const email = localStorage.getItem("userEmail");
+
     try {
       await changePassword({ email, password, newPassword });
-
       SUCCESS(toast, "Đổi mật khẩu thành công");
       setValue("password", "");
       setValue("newPassword", "");
@@ -33,6 +35,7 @@ const index = () => {
       REJECT(toast, "Đổi mật khẩu không thành công");
     }
   };
+
   return (
     <NotifyProvider>
       <Header />
@@ -87,8 +90,8 @@ const index = () => {
               </label>
               <Controller
                 name="newPassword"
-                defaultValue=""
                 control={control}
+                defaultValue=""
                 rules={{
                   required: "Mật khẩu không được để trống",
                   pattern: {
@@ -123,8 +126,8 @@ const index = () => {
               </label>
               <Controller
                 name="passwordAgain"
-                defaultValue=""
                 control={control}
+                defaultValue=""
                 rules={{
                   required: "Mật khẩu không được để trống",
                   validate: (value) =>
@@ -162,4 +165,4 @@ const index = () => {
   );
 };
 
-export default index;
+export default Index;

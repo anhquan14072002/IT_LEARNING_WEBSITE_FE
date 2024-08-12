@@ -84,7 +84,7 @@ const UpdateTopicDialog = ({
 
         // Fetch grade data by
         const gradeAllResponse = await restClient({
-          url: `api/grade/getallgrade`,
+          url: `api/grade/getallgrade?isInclude=false`,
           method: "GET",
         }); 
         const listGrade = gradeAllResponse.data?.data || [];
