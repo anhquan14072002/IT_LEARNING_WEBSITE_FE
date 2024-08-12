@@ -379,6 +379,7 @@ import CustomDropdown from "../../shared/CustomDropdown";
 import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
 import { DataTable } from "primereact/datatable";
 import { Column } from "primereact/column";
+import { MultiSelect } from "primereact/multiselect";
 
 const validationSchema = Yup.object({
   title: Yup.string().required("Tiêu đề không được bỏ trống"),
@@ -412,7 +413,8 @@ export default function AddQuizLesson({
   const [quizList, setQuizList] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState([]);
   const [realQuizList, setRealQuizList] = useState([]);
-
+  const [tagList, setTagList] = useState([]);
+  const [tag, setTag] = useState(null);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -425,7 +427,7 @@ export default function AddQuizLesson({
           title: item?.name,
           id: item?.value,
         }));
-        if(Array.isArray(transformedData)){
+        if (Array.isArray(transformedData)) {
           setTypeQuiz(transformedData);
         }
 
@@ -444,14 +446,31 @@ export default function AddQuizLesson({
         } else {
           setRealQuizList([]);
         }
-      } catch (error) {
-      }
+      } catch (error) {}
     };
 
     // Call the fetchData function when the component mounts (empty dependency array)
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const tagResponse = await restClient({
+          url: "api/tag/getalltag",
+          method: "GET",
+        });
+        console.log(tagResponse?.data?.data);
+        setTagList(
+          Array.isArray(tagResponse?.data?.data) ? tagResponse?.data?.data : []
+        );
+      } catch (error) {
+        console.error("Failed to fetch tags:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
   //choose custom question
   const check1 = (rowData) => {
     return (
@@ -561,6 +580,7 @@ export default function AddQuizLesson({
   };
 
   const onSubmit = (values) => {
+    const tagValues = tag.map((item) => item.keyWord);
     if (!selectedProduct || selectedProduct.length === 0) {
       REJECT(toast, "Vui lòng không để trống lấy câu hỏi");
     } else {
@@ -569,6 +589,7 @@ export default function AddQuizLesson({
         score: values?.score,
         type: values?.type?.id,
         description: values?.description,
+        tagValues: tagValues,
         isActive: true,
       };
       restClient({
@@ -585,6 +606,7 @@ export default function AddQuizLesson({
           })
             .then((res) => {
               ACCEPT(toast, "Thêm thành công");
+              setTag([]);
             })
             .catch((err) => {
               // REJECT(toast, "Xảy ra lỗi khi thêm 1 ");
@@ -593,6 +615,7 @@ export default function AddQuizLesson({
               setQuizList([]);
               setSelectedProduct([]);
               setRealQuizList([]);
+              setTag([]);
             });
         })
         .catch((err) => {
@@ -646,7 +669,21 @@ export default function AddQuizLesson({
                 type="number"
                 id="score"
               />
-
+              <div>
+                <>
+                  <span>Tag</span>
+                </>
+                <MultiSelect
+                  value={tag}
+                  options={tagList}
+                  onChange={(e) => setTag(e.value)}
+                  optionLabel="title"
+                  placeholder="Chọn Tag"
+                  className="w-full shadow-none custom-multiselect border border-gray-300"
+                  display="chip"
+                  filter
+                />
+              </div>
               <div>
                 <CustomEditor
                   label="Thông tin chi tiết"

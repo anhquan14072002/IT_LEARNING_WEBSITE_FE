@@ -13,6 +13,7 @@ import Loading from "../Loading";
 import { Dropdown } from "primereact/dropdown";
 import CustomDropdown from "../../shared/CustomDropdown";
 import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
+import { MultiSelect } from "primereact/multiselect";
 
 const validationSchema = Yup.object({
   title: Yup.string().required("Tiêu đề không được bỏ trống"),
@@ -62,7 +63,8 @@ export default function AddQuizLesson({
   const [clearLesson, setClearLesson] = useState(false);
   const [lessonList, setLessonList] = useState([]);
   const [typeQuiz, setTypeQuiz] = useState([]);
-
+  const [tagList, setTagList] = useState([]);
+  const [tag, setTag] = useState(null);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -72,13 +74,13 @@ export default function AddQuizLesson({
           method: "GET",
         });
         setListGrade(gradeResponse?.data?.data || []);
-  
+
         // Fetch type quizzes
         const typeQuizResponse = await restClient({
           url: `api/enum/gettypequiz`,
           method: "GET",
         });
-        const transformedData = typeQuizResponse?.data?.data?.map(item => ({
+        const transformedData = typeQuizResponse?.data?.data?.map((item) => ({
           title: item?.name,
           id: item?.value,
         }));
@@ -90,11 +92,29 @@ export default function AddQuizLesson({
         setTypeQuiz([]);
       }
     };
-  
+
     // Call the fetchData function when the component mounts (empty dependency array)
     fetchData();
   }, []);
 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const tagResponse = await restClient({
+          url: "api/tag/getalltag",
+          method: "GET",
+        });
+        console.log(tagResponse?.data?.data);
+        setTagList(
+          Array.isArray(tagResponse?.data?.data) ? tagResponse?.data?.data : []
+        );
+      } catch (error) {
+        console.error("Failed to fetch tags:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
   const onSubmit = (values) => {
     // {
     //     "title": "string",
@@ -104,12 +124,16 @@ export default function AddQuizLesson({
     //     "topicId": 0,
     //     "lessonId": 0
     //   }
+    const tagValues = tag.map(item => item.keyWord);
+
+    
     let model = {
       title: values?.title,
       type: 1,
       description: values?.description,
       score: values?.score,
       topicId: values?.topic.id,
+      tagValues:tagValues,
       isActive: true,
     };
     if (values?.lesson && values?.lesson.id) {
@@ -120,6 +144,7 @@ export default function AddQuizLesson({
         score: values?.score,
         topicId: null,
         lessonId: values?.lesson.id,
+        tagValues:tagValues,
         isActive: true,
       };
     }
@@ -131,11 +156,13 @@ export default function AddQuizLesson({
     })
       .then((res) => {
         SUCCESS(toast, "Thêm bài quiz thành công");
+        setTag([])
         fetchData();
         setLoading(false);
       })
       .catch((err) => {
         REJECT(toast, err.message);
+        setTag([])
         setLoading(false);
       })
       .finally(() => {
@@ -307,7 +334,23 @@ export default function AddQuizLesson({
                 type="text"
                 id="title"
               />
-
+              <div>
+                <>
+                  <span>
+                    Tag 
+                  </span>
+                </>
+                <MultiSelect
+                  value={tag}
+                  options={tagList}
+                  onChange={(e) => setTag(e.value)}
+                  optionLabel="title"
+                  placeholder="Chọn Tag"
+                  className="w-full shadow-none custom-multiselect border border-gray-300"
+                  display="chip"
+                  filter
+                />
+              </div>
               <CustomTextInput
                 label="Điểm"
                 name="score"

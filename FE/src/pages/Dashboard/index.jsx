@@ -15,21 +15,23 @@ import { useNavigate, useParams } from "react-router-dom";
 import ManageCodeOnline from "../../components/ManageCodeOnline";
 import { assets } from "../../assets/assets";
 import NotifyProvider from "../../store/NotificationContext";
+import { useSelector } from "react-redux";
 
 const Dashboard = () => {
   const [open, setOpen] = useState(true);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const { typeId } = useParams();
-
+  const user = useSelector((state) => state.user.value);
   const Menus = [
     { title: "Thống kê", src: assets.chart_fill, index: "statistic" },
     { title: "Quản lí tài khoản", src: assets.user, index: "user" },
+    ...(user.role === "Admin"  ?[
     {
       title: "Quản lí tài liệu/chủ đề/bài học ",
       src: assets.folder,
       index: "adminManageDocument",
-    },
+    }] :[]),
     { title: "Quản lí bài học ", src: assets.folder, index: "lesson" },
     { title: "Quản lí câu hỏi ôn tập ", src: assets.folder, index: "quiz" },
     { title: "Quản lí đề thi", src: assets.folder, index: "test" },

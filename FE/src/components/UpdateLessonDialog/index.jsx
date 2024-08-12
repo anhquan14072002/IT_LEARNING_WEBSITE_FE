@@ -100,7 +100,7 @@ export default function UpdateLessonDialog({
         const selectedGrade = gradeResponse.data?.data;
 
         const listGradeResponse = await restClient({
-          url: `api/grade/getallgrade`,
+          url: `api/grade/getallgrade?isInclude=false`,
           method: "GET",
         });
 

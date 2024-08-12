@@ -82,7 +82,7 @@ export default function AddExam({
 
         // Fetch grade list
         const gradeResponse = await restClient({
-          url: "api/grade/getallgrade",
+          url: "api/grade/getallgrade?isInclude=false",
           method: "GET",
         });
         console.log(gradeResponse?.data?.data);

@@ -725,6 +725,8 @@ export const isLoggedIn = () => {
 const clearTokens = () => {
   localStorage.removeItem("accessToken");
   localStorage.removeItem("refreshToken");
+  localStorage.removeItem("userEmail");
+  localStorage.removeItem("userId");
 };
 
 export const logout = () => {

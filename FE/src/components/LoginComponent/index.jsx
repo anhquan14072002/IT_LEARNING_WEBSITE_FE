@@ -65,7 +65,6 @@ const Index = () => {
 
   const onReject = (error) => {
     console.error("[Facebook Login Failed] Error:", error);
-    // Handle login failure logic here (e.g., display error message)
   };
 
   return (

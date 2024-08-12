@@ -68,7 +68,7 @@ export default function ManageAdmin() {
       method: "GET",
     })
       .then((res) => {
-        setRoleList(res?.data?.data);
+        setRoleList(res?.data?.data?.id);
         console.log(res?.data?.data);
       })
       .catch((err) => {
@@ -158,6 +158,10 @@ export default function ManageAdmin() {
     setTextSearch(text);
   }, 300);
 
+  const formatRoles = (roles) => {
+    if (!roles || roles.length === 0) return "N/A";
+    return roles.join(", ");
+  };
   return (
     <div>
       <Toast ref={toast} />
@@ -257,9 +261,10 @@ export default function ManageAdmin() {
                 />
                 <Column
                   field="roles"
-                  header="SĐT "
+                  header="Roles"
                   className="border-b-2 border-t-2"
                   style={{ width: "15%" }}
+                  body={(rowData) => formatRoles(rowData.roles)} // Use the custom renderer
                 />
 
                 <Column
