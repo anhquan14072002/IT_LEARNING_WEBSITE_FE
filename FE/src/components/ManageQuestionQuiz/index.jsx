@@ -17,6 +17,7 @@ import {
   formatDate,
   getTokenFromLocalStorage,
   REJECT,
+  removeVietnameseTones,
 } from "../../utils";
 import { InputSwitch } from "primereact/inputswitch";
 import AddQuizLesson from "../AddQuizLesson";
@@ -52,7 +53,7 @@ export default function ManageQuestionQuiz() {
     setLoading(true);
 
     restClient({
-      url: `api/quizquestion/getallquizquestionpagination?PageIndex=${page}&PageSize=${rows}`,
+      url: `api/quizquestion/getallquizquestionpagination?PageIndex=${page}&PageSize=${rows}&Value=${textSearch}`,
       method: "GET",
     })
       .then((res) => {
@@ -316,20 +317,20 @@ export default function ManageQuestionQuiz() {
                 <Column
                   header="Nội dung"
                   className="border-b-2 border-t-2"
-                  style={{ minWidth: '35rem' }}
+                  style={{ minWidth: "35rem" }}
                   body={content}
                 />
                 <Column
                   field="type"
                   header="Loại câu hỏi"
                   className="border-b-2 border-t-2"
-                  style={{ minWidth: '15rem' }}
+                  style={{ minWidth: "15rem" }}
                 />
                 <Column
                   field="questionLevel"
                   header="Mức độ"
                   className="border-b-2 border-t-2"
-                  style={{ minWidth: '15rem' }}
+                  style={{ minWidth: "15rem" }}
                 />
                 {/* <Column
                   field="score"
@@ -341,7 +342,7 @@ export default function ManageQuestionQuiz() {
                   header="Trạng thái"
                   className="border-b-2 border-t-2"
                   body={status}
-                  style={{ minWidth: '15rem' }}
+                  style={{ minWidth: "15rem" }}
                 ></Column>
                 {/* <Column
                   field="createdDate"
@@ -360,7 +361,7 @@ export default function ManageQuestionQuiz() {
                 <Column
                   className="border-b-2 border-t-2"
                   body={actionBodyTemplate}
-                  style={{ minWidth: '15rem' }}
+                  style={{ minWidth: "15rem" }}
                 />
               </DataTable>
               <Paginator
