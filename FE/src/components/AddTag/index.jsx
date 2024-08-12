@@ -29,7 +29,6 @@ export default function AddTag({
     console.log(values.title);
     const data = {
       title: values.title,
-      keyWord: removeVietnameseTones(values.title),
       isActive:false
     }
     await restClient({
