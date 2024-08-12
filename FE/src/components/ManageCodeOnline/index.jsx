@@ -201,7 +201,7 @@ export default function ManageCodeOnline() {
       <button
         className="bg-blue-600 hover:bg-blue-400 text-white p-2 rounded-md"
         onClick={() =>
-          navigate(`/dashboard/quiz/manageexecutecode/${rowData?.id}`)
+          navigate(`/dashboard/updateproblem/${rowData?.id}`)
         }
       >
         Chỉnh sửa mã thực thi

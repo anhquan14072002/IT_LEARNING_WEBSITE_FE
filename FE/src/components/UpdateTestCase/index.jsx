@@ -1,71 +1,63 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
-import { REJECT } from "../../utils";
 import { Controlled as CodeMirror } from "react-codemirror2";
 import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/python/python";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/material.css";
 
-const AddTestCase = ({
+const UpdateTestCase = ({
   visible,
   setVisible,
   testCase,
+  index,
   setTestCaseList,
   toast,
 }) => {
-  const [inputView, setInputView] = useState(null);
-  const [inputCode, setInputCode] = useState(null);
-  const [values, setValues] = useState([""]);
-  const [target, setTarget] = useState("");
+  const [inputView, setInputView] = useState("");
+  const [inputCode, setInputCode] = useState("");
   const [output, setOutput] = useState("");
   const [isVisible, setIsVisible] = useState(true);
 
-  // Handle the change in each input value
-  const handleInputChange = (e) => {
-    setInputView(e.target.value);
-  };
+  useEffect(() => {
+    if (visible && index !== null && testCase[index]) {
+      const { input, inputView, output, visible } = testCase[index];
+      setInputView(inputView);
+      setInputCode(input);
+      setOutput(output);
+      setIsVisible(visible);
+    }
+  }, [visible, index, testCase]);
 
-  const handleInputCode = (e) => {
-    setInputCode(e.target.value);
-  };
+  const handleInputChange = (e) => setInputView(e.target.value);
+  const handleInputCode = (e) => setInputCode(e.target.value);
 
-  const handleAddTestCase = () => {
-    // Validate input
+  const handleUpdateTestCase = () => {
     if (!output) {
-      REJECT(
-        toast,
-        "Vui lòng không để trống các trường đánh dấu bắt buộc nhập"
-      );
-      return; // Exit function if validation fails
+      REJECT(toast, "Vui lòng không để trống các trường đánh dấu bắt buộc nhập");
+      return;
     }
 
-    let input;
+    const updatedTestCases = testCase.map((item, idx) =>
+      idx === index
+        ? { input: inputCode, inputView, output, visible: isVisible }
+        : item
+    );
 
-    console.log("====================================");
-    console.log(output);
-    console.log("====================================");
-    setTestCaseList([
-      ...testCase,
-      { input: inputCode, inputView, output, visible: isVisible },
-    ]);
+    setTestCaseList(updatedTestCases);
     setVisible(false);
-    setInputCode("");
-    setInputView("");
-    setOutput("");
   };
 
   return (
     <Dialog
-      header="Thêm test case"
+      header="Cập nhật test case"
       visible={visible}
       style={{ width: "50vw" }}
       onHide={() => {
         setVisible(false);
-        setTotal(0);
-        setValues([""]);
-        setTarget("");
+        setInputCode("");
+        setInputView("");
         setOutput("");
       }}
     >
@@ -100,12 +92,8 @@ const AddTestCase = ({
             theme: "material",
             lineNumbers: true,
           }}
-          onBeforeChange={(editor, data, value) => {
-            setOutput(value);
-          }}
-          editorDidMount={(editor) => {
-            editor.setSize(null, "calc(50vh - 5px)");
-          }}
+          onBeforeChange={(editor, data, value) => setOutput(value)}
+          editorDidMount={(editor) => editor.setSize(null, "calc(50vh - 5px)")}
         />
       </div>
 
@@ -116,9 +104,7 @@ const AddTestCase = ({
         <input
           type="checkbox"
           checked={isVisible}
-          onChange={() => {
-            setIsVisible(!isVisible);
-          }}
+          onChange={() => setIsVisible(!isVisible)}
         />
         <label className="ml-2">Test case này có ẩn không?</label>
       </div>
@@ -134,14 +120,14 @@ const AddTestCase = ({
         </Button>
         <Button
           className="p-2 bg-blue-500 text-white"
-          type="submit"
-          onClick={handleAddTestCase}
+          type="button"
+          onClick={handleUpdateTestCase}
         >
-          Thêm
+          Cập nhật
         </Button>
       </div>
     </Dialog>
   );
 };
 
-export default AddTestCase;
+export default UpdateTestCase;

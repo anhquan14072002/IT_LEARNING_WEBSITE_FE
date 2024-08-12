@@ -56,7 +56,7 @@
 //       problemId: id,
 //       languageId: language?.id,
 //       sourceCode: encodeBase64(code),
-//       userId: user?.sub,
+//       userId: localStorage.getItem("userId"),
 //       submit: true,
 //     };
 //     restClient({
@@ -99,7 +99,7 @@
 //       problemId: id,
 //       languageId: language?.id,
 //       sourceCode: encodeBase64(code),
-//       userId: user?.sub,
+//       userId: localStorage.getItem("userId"),
 //       submit: false,
 //     };
 //     restClient({
@@ -567,10 +567,6 @@ const CodeEditor = () => {
   // }, []);
 
   const submit = () => {
-    if (!isLoggedIn()) {
-      REJECT(toast, "Vui lòng đăng nhập");
-      return;
-    }
     setLoading(true); // Show loading spinner
     let model = {
       problemId: id,
@@ -653,7 +649,7 @@ const CodeEditor = () => {
         setExecuteCode(res.data?.data);
         setCode(decodeBase64(res.data?.data[0]?.sampleCode) || "");
         restClient({
-          url: `api/submission/getsubmission?ProblemId=${id}&UserId=${user?.sub}&LanguageId=${res.data?.data[0]?.languageId}`,
+          url: `api/submission/getsubmission?ProblemId=${id}&UserId=${localStorage.getItem("userId")}&LanguageId=${res.data?.data[0]?.languageId}`,
         })
           .then((res) => {
             setCode(decodeBase64(res?.data?.data?.sourceCode));
@@ -721,7 +717,7 @@ const CodeEditor = () => {
   const handleLanguageChange = (event) => {
     const selectedLanguageId = event.target.value;
     restClient({
-      url: `api/submission/getsubmission?ProblemId=${id}&UserId=${user?.sub}&LanguageId=${res.data?.data[0]?.languageId}`,
+      url: `api/submission/getsubmission?ProblemId=${id}&UserId=${localStorage.getItem("userId")}&LanguageId=${res.data?.data[0]?.languageId}`,
     })
       .then((res) => {
         if (res?.data?.data?.sourceCode) {
@@ -980,13 +976,7 @@ const CodeEditor = () => {
                           <div className="flex gap-5 mb-5">
                             <p className="w-40">Đầu vào</p>
                             <p>
-                              {testCase &&
-                              processInput(testCase?.input).arrayItems.length >
-                                0
-                                ? `[${processInput(
-                                    testCase.input
-                                  )?.arrayItems.join(", ")}]`
-                                : ""}
+                              {testCase?.inputView}
                             </p>
                           </div>
                           <div className="flex gap-5 mb-5">

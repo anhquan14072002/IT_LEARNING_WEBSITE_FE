@@ -35,6 +35,8 @@ import CreateCode from "./pages/CreateCode";
 import DetailClass from "./pages/DetailClass";
 import ManageQuestionQuiz from "./components/ManageQuestionQuiz";
 import Post from "./pages/Post/Post";
+import UpdateExecuteCode from "./pages/UpdateExecuteCode";
+import UpdateProblem from "./components/UpdateProblem"
 
 function App() {
   return (
@@ -132,10 +134,15 @@ function App() {
           <Route path="/codeEditor/:id" element={<CodeEditor />} />
           <Route path="/dashboard/createproblem" element={<CreateProblem />} />
           <Route path="/dashboard/createcode/:id" element={<CreateCode />} />
+          <Route path="/dashboard/updateexecutecode/:id" element={<UpdateExecuteCode />} />
           <Route path="/detailclass/:id" element={<DetailClass />} />
           <Route
             path="/dashboard/quiz/manageexecutecode/:id"
             element={<ManageExecuteCode />}
+          />
+          <Route
+            path="/dashboard/updateproblem/:id"
+            element={<UpdateProblem />}
           />
         </Routes>
       </Router>

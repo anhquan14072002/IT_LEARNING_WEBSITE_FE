@@ -1,9 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import Header from "../../components/Header";
-import Footer from "../../components/Footer";
+import Header from "../Header";
+import Footer from "../Footer";
 import { Formik, Form, Field, ErrorMessage } from "formik";
-import LoadingScreen from "../../components/LoadingScreen";
-import { useNavigate } from "react-router-dom";
+import LoadingScreen from "../LoadingScreen";
+import { useNavigate, useParams } from "react-router-dom";
 import Menu from "../Menu";
 import * as Yup from "yup";
 import CustomTextInput from "../../shared/CustomTextInput";
@@ -23,6 +23,8 @@ import { Toast } from "primereact/toast";
 import { encodeBase64, REJECT } from "../../utils";
 import NotifyProvider from "../../store/NotificationContext";
 import UpdateTestCase from "../UpdateTestCase";
+import AddInUpdateProblem from "../AddInUpdateProblem";
+import UpdateInUpdateTestCase from "../UpdateInUpdateTestcase";
 
 const validationSchema = Yup.object({
   titleInstruction: Yup.string().required(
@@ -60,7 +62,7 @@ const validationSchema = Yup.object({
     .required("Không bỏ trống trường này"),
 });
 
-export default function CreateProblem() {
+export default function UpdateProblem() {
   const [initialValues, setInitialValues] = useState({
     title: "",
     description: "",
@@ -72,6 +74,7 @@ export default function CreateProblem() {
     titleInstruction: "",
     descriptionInstruction: "",
   });
+  const { id } = useParams();
   const fixedDivRef = useRef(null);
   const [fixedDivHeight, setFixedDivHeight] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -93,6 +96,8 @@ export default function CreateProblem() {
   const [visible, setVisible] = useState(false);
 
   const navigate = useNavigate();
+  const [loadingForm, setLoadingForm] = useState(false);
+  const [editorial, setEditoral] = useState();
 
   useEffect(() => {
     setTimeout(() => {
@@ -101,6 +106,92 @@ export default function CreateProblem() {
       }
     }, 1000);
   }, [fixedDivRef.current]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoadingForm(true);
+      try {
+        const problemRes = await restClient({
+          url: "api/problem/getproblembyid/" + id,
+        });
+        const problem = problemRes?.data?.data;
+
+        const lessonById = await restClient({
+          url: `api/lesson/getlessonbyid/${problem?.lessonId}`,
+          method: "GET",
+        });
+        const lessonByIdData = lessonById.data?.data || {};
+
+        const topicById = await restClient({
+          url: `api/topic/gettopicbyid?id=${lessonByIdData?.topicId}`,
+          method: "GET",
+        });
+        const selectTopicById = topicById.data?.data || {};
+
+        const documentById = await restClient({
+          url: `api/document/getdocumentbyid/${selectTopicById.documentId}`,
+          method: "GET",
+        });
+        const documentByIdData = documentById.data?.data || {};
+
+        const gradeById = await restClient({
+          url: `api/grade/getgradebyid/${documentByIdData.gradeId}`,
+          method: "GET",
+        });
+        const gradeByIdData = gradeById.data?.data || {};
+
+        const getAllDocumentByGradeId = await restClient({
+          url: `api/document/getalldocumentbygrade/` + gradeByIdData?.id,
+        });
+
+        setDocumentList(getAllDocumentByGradeId?.data?.data);
+
+        const getAllTopicByGradeId = await restClient({
+          url: `api/topic/getalltopicbydocument/` + documentByIdData?.id,
+        });
+
+        setListTopic(getAllTopicByGradeId?.data?.data);
+
+        const getAlllessonByGradeId = await restClient({
+          url: `api/lesson/getalllessonbytopic/` + selectTopicById?.id,
+        });
+
+        setLessonList(getAlllessonByGradeId?.data?.data);
+
+        const getEditoral = await restClient({
+          url: "api/editorial/geteditorialbyproblemid/" + id,
+        });
+        const editoralData = getEditoral?.data?.data;
+
+        setEditoral(editoralData);
+
+        const getAllTestcase = await restClient({
+          url: "api/testcase/getalltestcasebyproblemid/" + id,
+        });
+        setTestCaseList(getAllTestcase?.data?.data);
+
+        setInitialValues({
+          ...initialValues,
+          title: problem?.title,
+          description: problem?.description,
+          difficulty: {
+            title: problem?.difficultyName,
+            id: problem?.difficulty,
+          },
+          lesson: lessonByIdData,
+          topic: selectTopicById,
+          document: documentByIdData,
+          grade: gradeByIdData,
+          titleInstruction: editoralData?.title,
+          descriptionInstruction: editoralData?.description,
+        });
+      } catch (error) {
+      } finally {
+        setLoadingForm(false);
+      }
+    };
+    fetchData();
+  }, [id]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -144,9 +235,10 @@ export default function CreateProblem() {
 
     setLoading(true);
     await restClient({
-      url: "api/problem/createproblem",
-      method: "POST",
+      url: "api/problem/updateproblem",
+      method: "PUT",
       data: {
+        id,
         title: values?.title,
         description: values?.description,
         difficulty: values?.difficulty?.id,
@@ -163,30 +255,51 @@ export default function CreateProblem() {
         console.log("====================================");
 
         const formData = new FormData();
+        formData.append("Id", editorial?.id);
         formData.append("Title", values?.titleInstruction);
         formData.append("Description", values?.descriptionInstruction);
         formData.append("ProblemId", problemData?.id);
         restClient({
-          url: "api/editorial/createeditorial",
-          method: "POST",
+          url: "api/editorial/updateeditorial",
+          method: "PUT",
           data: formData,
         })
           .then((res) => {
             testCase.forEach((item, index) => {
-              restClient({
-                url: "api/testcase/createtestcase",
-                method: "POST",
-                data: {
-                  input:
-                    item?.input === null ? null : encodeBase64(item?.input),
-                  inputView: item?.inputView === null ? null : item?.inputView,
-                  output: encodeBase64(item?.output),
-                  outputView: item?.output,
-                  isHidden: item?.visible,
-                  isActive: true,
-                  problemId: problemData?.id,
-                },
-              });
+              if (item && item.id === null) {
+                restClient({
+                  url: "api/testcase/createtestcase",
+                  method: "POST",
+                  data: {
+                    input:
+                      item?.input === null ? null : encodeBase64(item?.input),
+                    inputView:
+                      item?.inputView === null ? null : item?.inputView,
+                    output: encodeBase64(item?.output),
+                    outputView: item?.output,
+                    isHidden: item?.isHidden,
+                    isActive: true,
+                    problemId: problemData?.id,
+                  },
+                });
+              } else {
+                restClient({
+                  url: "api/testcase/updatetestcase",
+                  method: "PUT",
+                  data: {
+                    id: item?.id,
+                    input:
+                      item?.input === null ? null : encodeBase64(item?.input),
+                    inputView:
+                      item?.inputView === null ? null : item?.inputView,
+                    output: encodeBase64(item?.output),
+                    outputView: item?.output,
+                    isHidden: item?.isHidden,
+                    isActive: true,
+                    problemId: problemData?.id,
+                  },
+                });
+              }
             });
           })
           .catch((err) => {
@@ -323,14 +436,14 @@ export default function CreateProblem() {
               style={{ paddingTop: `${fixedDivHeight}px` }}
             >
               <Toast ref={toast} />
-              <AddTestCase
+              <AddInUpdateProblem
                 visible={visible}
                 setVisible={setVisible}
                 toast={toast}
                 testCase={testCase}
                 setTestCaseList={setTestCaseList}
               />
-              <UpdateTestCase
+              <UpdateInUpdateTestCase
                 visible={visibleUpdateModal}
                 setVisible={setVisibleUpdateModal}
                 testCase={testCase}
@@ -340,7 +453,7 @@ export default function CreateProblem() {
               />
               <div className="p-3 bg-white rounded-lg mt-5 mb-5">
                 <h1 className="font-bold text-3xl my-5 text-center">
-                  Tạo bài tập thực hành
+                  Cập nhật bài tập thực hành
                 </h1>
                 <Formik
                   initialValues={initialValues}
@@ -551,7 +664,7 @@ export default function CreateProblem() {
                           className="p-2 bg-blue-500 text-white"
                           type="submit"
                         >
-                          Thêm
+                          Cập nhật
                         </Button>
                       </div>
                     </Form>
