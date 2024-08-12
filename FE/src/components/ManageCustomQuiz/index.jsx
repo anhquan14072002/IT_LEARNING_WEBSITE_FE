@@ -54,7 +54,7 @@ export default function ManageCustomQuiz() {
     setLoading(true);
 
     restClient({
-      url: `api/quiz/getallquizpagination?Custom=true&PageIndex=${page}&PageSize=${rows}`,
+      url: `api/quiz/getallquizpagination?Custom=2&PageIndex=${page}&PageSize=${rows}&Value=${textSearch}`,
       method: "GET",
     })
       .then((res) => {
