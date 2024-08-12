@@ -157,7 +157,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData, id }) => {
             REJECT(toast, err.message);
           })
           .finally(() => {
-            setTypeQuestion("");
+            setTypeQuestion(1);
             setVisible(false);
             setLoading(false);
           });
@@ -202,7 +202,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData, id }) => {
             REJECT(toast, err.message);
           })
           .finally(() => {
-            setTypeQuestion("");
+            setTypeQuestion(1);
             setFourAnswer([
               { content: "", isCorrect: false },
               { content: "", isCorrect: false },
@@ -253,7 +253,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData, id }) => {
             REJECT(toast, err.message);
           })
           .finally(() => {
-            setTypeQuestion("");
+            setTypeQuestion(1);
             setMultipleAnswer([]);
             setVisible(false);
             setLoading(false);
@@ -399,7 +399,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData, id }) => {
           { content: "", isCorrect: false },
           { content: "", isCorrect: false },
         ]);
-        setTypeQuestion(0);
+        setTypeQuestion(1);
       }}
     >
       {loading === true ? (
@@ -609,7 +609,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData, id }) => {
                         isCorrect: false,
                       }))
                     );
-                    setTypeQuestion("");
+                    setTypeQuestion(1);
                   }}
                 >
                   Hủy

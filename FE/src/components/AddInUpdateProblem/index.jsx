@@ -8,7 +8,7 @@ import "codemirror/mode/python/python";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/material.css";
 
-const AddTestCase = ({
+const AddInUpdateProblem = ({
   visible,
   setVisible,
   testCase,
@@ -20,7 +20,7 @@ const AddTestCase = ({
   const [values, setValues] = useState([""]);
   const [target, setTarget] = useState("");
   const [output, setOutput] = useState("");
-  const [isVisible, setIsVisible] = useState(true);
+  const [isHidden, setisHidden] = useState(true);
 
   // Handle the change in each input value
   const handleInputChange = (e) => {
@@ -48,7 +48,7 @@ const AddTestCase = ({
     console.log("====================================");
     setTestCaseList([
       ...testCase,
-      { input: inputCode, inputView, output, visible: isVisible },
+      { input: inputCode, inputView, output, isHidden, id: null },
     ]);
     setVisible(false);
     setInputCode("");
@@ -63,7 +63,6 @@ const AddTestCase = ({
       style={{ width: "50vw" }}
       onHide={() => {
         setVisible(false);
-        setTotal(0);
         setValues([""]);
         setTarget("");
         setOutput("");
@@ -115,9 +114,9 @@ const AddTestCase = ({
         </h1>
         <input
           type="checkbox"
-          checked={isVisible}
+          checked={isHidden}
           onChange={() => {
-            setIsVisible(!isVisible);
+            setisHidden(!isHidden);
           }}
         />
         <label className="ml-2">Test case này có ẩn không?</label>
@@ -144,4 +143,4 @@ const AddTestCase = ({
   );
 };
 
-export default AddTestCase;
+export default AddInUpdateProblem;

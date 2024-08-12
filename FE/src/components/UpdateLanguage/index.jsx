@@ -53,8 +53,6 @@ export default function UpdateLanguage({
       });
   }, []);
 
- 
-
   // useEffect(() => {
   //   restClient({ url: "api/document/getalldocument", method: "GET" })
   //     .then((res) => {

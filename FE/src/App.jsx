@@ -34,6 +34,8 @@ import ManageExecuteCode from "./pages/ManageExecuteCode";
 import CreateCode from "./pages/CreateCode";
 import DetailClass from "./pages/DetailClass";
 import Post from "./pages/Post/Post";
+import UpdateExecuteCode from "./pages/UpdateExecuteCode";
+import UpdateProblem from "./components/UpdateProblem"
 import ManageQuestionQuiz from "./components/ManageQuestionQuiz";
 import { useSelector } from "react-redux";
 
@@ -157,6 +159,18 @@ function App() {
             element={<ExampleAddQuizQuestion />}
           />
           <Route path="/codeEditor/:id" element={<CodeEditor />} />
+          <Route path="/dashboard/createproblem" element={<CreateProblem />} />
+          <Route path="/dashboard/createcode/:id" element={<CreateCode />} />
+          <Route path="/dashboard/updateexecutecode/:id" element={<UpdateExecuteCode />} />
+          <Route path="/detailclass/:id" element={<DetailClass />} />
+          <Route
+            path="/dashboard/quiz/manageexecutecode/:id"
+            element={<ManageExecuteCode />}
+          />
+          <Route
+            path="/dashboard/updateproblem/:id"
+            element={<UpdateProblem />}
+          />
           <Route path="/detailclass/:id" element={<DetailClass />} />
         </Routes>
       </Router>

@@ -481,26 +481,26 @@ export function encodeBase64(str) {
 
 export function processInput(inputStr) {
   // Ensure inputStr is a string
-  if (typeof inputStr !== 'string') {
-      console.error('Invalid input: inputStr must be a string');
-      return {
-          arrayItems: [],
-          targetValue: null,
-          isTargetInArray: false
-      };
+  if (typeof inputStr !== "string") {
+    console.error("Invalid input: inputStr must be a string");
+    return {
+      arrayItems: [],
+      targetValue: null,
+      isTargetInArray: false,
+    };
   }
 
   // Split the input string into an array of strings
-  const parts = inputStr.split(' ');
+  const parts = inputStr.split(" ");
 
   // Ensure there are enough parts in the input
   if (parts.length < 2) {
-      console.error('Invalid input: Not enough parts in the input string');
-      return {
-          arrayItems: [],
-          targetValue: "",
-          isTargetInArray: false
-      };
+    console.error("Invalid input: Not enough parts in the input string");
+    return {
+      arrayItems: [],
+      targetValue: "",
+      isTargetInArray: false,
+    };
   }
 
   // Extract the length of the array
@@ -508,12 +508,12 @@ export function processInput(inputStr) {
 
   // Check if arrayLength is a valid number
   if (isNaN(arrayLength) || arrayLength < 0) {
-      console.error('Invalid input: arrayLength must be a non-negative number');
-      return {
-          arrayItems: [],
-          targetValue: "",
-          isTargetInArray: false
-      };
+    console.error("Invalid input: arrayLength must be a non-negative number");
+    return {
+      arrayItems: [],
+      targetValue: "",
+      isTargetInArray: false,
+    };
   }
 
   // Extract the array items
@@ -523,22 +523,22 @@ export function processInput(inputStr) {
   const targetValue = parseInt(parts[1 + arrayLength], 10);
 
   // Check if the target value is a valid number
-  if (isNaN(targetValue)) {
-      console.error('Invalid input: targetValue must be a number');
-      return {
-          arrayItems,
-          targetValue: "",
-          isTargetInArray: false
-      };
+  if (!targetValue) {
+    console.error("Invalid input: targetValue must be a number");
+    return {
+      arrayItems,
+      targetValue: "",
+      isTargetInArray: false,
+    };
   }
 
   // Check if the target value is in the array
   const isTargetInArray = arrayItems.includes(targetValue);
 
   return {
-      arrayItems,
-      targetValue,
-      isTargetInArray
+    arrayItems,
+    targetValue,
+    isTargetInArray,
   };
 }
 
@@ -776,7 +776,7 @@ export const getProvinceByName = (name) => {
   return foundProvince;
 };
 export function getYearByYear(yearValue) {
-  return years.find(yearObj => yearObj.year === yearValue) || null;
+  return years.find((yearObj) => yearObj.year === yearValue) || null;
 }
 
 export const TYPE = [

@@ -9,6 +9,9 @@ import { useNavigate } from "react-router-dom";
 import debounce from "lodash.debounce";
 import restClient from "../../services/restClient";
 import { InputText } from "primereact/inputtext";
+import { ACCEPT, REJECT, removeVietnameseTones } from "../../utils";
+import { confirmDialog } from "primereact/confirmdialog";
+import { Toast } from "primereact/toast";
 
 export default function PracticeComponent() {
   const toast = useRef(null);
@@ -43,12 +46,12 @@ export default function PracticeComponent() {
     if (textSearch.trim()) {
       setLoading(true);
       restClient({
-        url: `api/problem/getallproblem`,
+        url: `api/problem/getallproblempagination?Value=${textSearch.trim()}`,
         method: "GET",
       })
         .then((res) => {
-          // const paginationData = JSON.parse(res.headers["x-pagination"]);
-          // setTotalPage(paginationData.TotalPages);
+          const paginationData = JSON.parse(res.headers["x-pagination"]);
+          setTotalPage(paginationData.TotalPages);
           setProducts(Array.isArray(res.data.data) ? res.data.data : []);
         })
         .catch((err) => {
@@ -60,12 +63,12 @@ export default function PracticeComponent() {
       setLoading(true);
 
       restClient({
-        url: `api/problem/getallproblem`,
+        url: `api/problem/getallproblempagination`,
         method: "GET",
       })
         .then((res) => {
-          // const paginationData = JSON.parse(res.headers["x-pagination"]);
-          // setTotalPage(paginationData.TotalPages);
+          const paginationData = JSON.parse(res.headers["x-pagination"]);
+          setTotalPage(paginationData.TotalPages);
           setProducts(Array.isArray(res.data.data) ? res.data.data : []);
         })
         .catch((err) => {
@@ -79,19 +82,25 @@ export default function PracticeComponent() {
   };
 
   const actionBodyTemplate = (rowData) => {
+    const handleDelete = (id) => {
+      if (window.confirm("Are you sure you want to delete this record?")) {
+        deleteLesson(id); // Call the delete function here
+      }
+    };
+
     return (
       <div style={{ display: "flex" }}>
         <Button
           icon="pi pi-pencil"
           className="text-blue-600 p-mr-2 shadow-none"
+          onClick={()=>{
+            navigate(`/dashboard/updateproblem/${rowData?.id}`)
+          }}
         />
         <Button
           icon="pi pi-trash"
           className="text-red-600 shadow-none"
-          onClick={() => {
-            setVisibleDelete(true);
-            confirm(rowData.id);
-          }}
+          onClick={() => handleDelete(rowData.id)}
         />
       </div>
     );
@@ -148,39 +157,6 @@ export default function PracticeComponent() {
     );
   };
 
-  // modal delete
-  const confirm = (id) => {
-    setVisibleDelete(true);
-    confirmDialog({
-      message: "Do you want to delete this record?",
-      header: "Delete Confirmation",
-      icon: "pi pi-info-circle",
-      defaultFocus: "reject",
-      acceptClassName: "p-button-danger",
-      footer: (
-        <>
-          <Button
-            label="Hủy"
-            icon="pi pi-times"
-            className="p-2 bg-red-500 text-white mr-2"
-            onClick={() => {
-              setVisibleDelete(false);
-              REJECT(toast);
-            }}
-          />
-          <Button
-            label="Xóa"
-            icon="pi pi-check"
-            className="p-2 bg-blue-500 text-white"
-            onClick={() => {
-              deleteLesson(id);
-            }}
-          />
-        </>
-      ),
-    });
-  };
-
   const description = (rowData, { rowIndex }) => {
     return <p dangerouslySetInnerHTML={{ __html: rowData?.description }}></p>;
   };
@@ -191,7 +167,7 @@ export default function PracticeComponent() {
   };
 
   const deleteLesson = (id) => {
-    restClient({ url: `api/lesson/deletelesson/${id}`, method: "DELETE" })
+    restClient({ url: `api/problem/deleteproblem/${id}`, method: "DELETE" })
       .then((res) => {
         getData();
         ACCEPT(toast, "Xóa thành công");
@@ -199,9 +175,7 @@ export default function PracticeComponent() {
       .catch((err) => {
         REJECT(toast, "Xảy ra lỗi khi xóa tài liệu này");
       })
-      .finally(() => {
-        setVisibleDelete(false);
-      });
+      .finally(() => {});
   };
 
   const handleSearchInput = debounce((text) => {
@@ -210,6 +184,7 @@ export default function PracticeComponent() {
   return (
     <div>
       <div className="flex justify-between pt-1">
+        <Toast ref={toast} />
         <h1 className="font-bold text-3xl">Quản lí các bài thực hành</h1>
         <div>
           <Button
@@ -335,7 +310,6 @@ export default function PracticeComponent() {
         <Paginator
           first={first}
           rows={rows}
-          rowsPerPageOptions={[10, 20, 30]}
           totalRecords={totalPage * rows}
           onPageChange={onPageChange}
           className="custom-paginator mx-auto"
