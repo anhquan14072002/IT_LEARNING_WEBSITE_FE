@@ -295,7 +295,7 @@ export default function Header({ params, setParams, textSearchProps }) {
                       </div>
 
                       <div className="px-3 overflow-auto max-h-[58vh] ">
-                        <ul className="flex flex-wrap text-md font-medium text-center text-gray-500  dark:border-gray-200 dark:text-gray-400">
+                        <ul className="flex flex-wrap text-sm font-sm text-center text-gray-500  dark:border-gray-200 dark:text-gray-400">
                           {tabsData.map((tab, idx) => (
                             <li key={idx} className="me-2">
                               <a
@@ -407,7 +407,7 @@ function NotificationList({ notifications }) {
                 <img
                   src={notification?.userSendImage || image}
                   alt="Ảnh người dùng"
-                  width="40px"
+                  width="50px"
                   className="rounded-full"
                   onError={(e) => (e.target.src = image)}
                 />
