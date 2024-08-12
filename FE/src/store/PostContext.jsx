@@ -135,9 +135,9 @@ export const PostProvider = ({ children }) => {
     console.log(itemSidebar?.gradeIdSelected);
 
     if (itemSidebar?.gradeIdSelected) {
-      url = `api/post/getallpostbyuserandgradepagination?userId=${user?.sub}&gradeId=${itemSidebar?.gradeIdSelected}&PageIndex=${page}&PageSize=${rows}`;
+      url = `api/post/getallpostbyuserandgradepagination?userId=${user?.sub}&gradeId=${itemSidebar?.gradeIdSelected}&PageIndex=${page}&PageSize=${rows}&OrderBy=createdDate&IsAscending=false`;
     } else {
-      url = `api/post/getallpostbyuserpagination?userId=${user?.sub}&PageIndex=${page}&PageSize=${rows}`;
+      url = `api/post/getallpostbyuserpagination?userId=${user?.sub}&PageIndex=${page}&PageSize=${rows}&OrderBy=createdDate&IsAscending=false`;
     }
     restClient({
       url: url,
@@ -158,9 +158,9 @@ export const PostProvider = ({ children }) => {
     setLoading(true);
     let url;
     if (itemSidebar?.gradeIdSelected) {
-      url = `api/post/getallpostnotanswerbygradepagination?gradeId=${itemSidebar?.gradeIdSelected}&PageIndex=${page}&PageSize=${rows}`;
+      url = `api/post/getallpostnotanswerbygradepagination?gradeId=${itemSidebar?.gradeIdSelected}&PageIndex=${page}&PageSize=${rows}&OrderBy=createdDate&IsAscending=false`;
     } else {
-      url = `api/post/getallpostnotanswerbygradepagination?gradeId=0&PageIndex=${page}&PageSize=${rows}`;
+      url = `api/post/getallpostnotanswerbygradepagination?gradeId=0&PageIndex=${page}&PageSize=${rows}&OrderBy=createdDate&IsAscending=false`;
     }
     restClient({
       url: url,
@@ -181,7 +181,7 @@ export const PostProvider = ({ children }) => {
     console.log("fetchDataById");
     setLoading(true);
     restClient({
-      url: `api/post/getallpostbygradepagination?gradeId=${itemSidebar.gradeIdSelected}&PageIndex=${page}&PageSize=${rows}`,
+      url: `api/post/getallpostbygradepagination?gradeId=${itemSidebar.gradeIdSelected}&PageIndex=${page}&PageSize=${rows}&OrderBy=createdDate&IsAscending=false`,
       method: "GET",
     })
       .then((res) => {
@@ -259,7 +259,7 @@ export const PostProvider = ({ children }) => {
     })
       .then((res) => {
         // SUCCESS(toast, "Thu hôi bài post thành công");
-        setRefresh2(new Date());
+        // setRefresh2(new Date());
       })
       .catch((err) => {
         REJECT(toast, "Xảy ra lỗi khi xóa đề thi này");
@@ -281,7 +281,7 @@ export const PostProvider = ({ children }) => {
   const fetchData = () => {
     setLoading(true);
     restClient({
-      url: `api/post/getallpostpagination?PageIndex=${page}&PageSize=${rows}`,
+      url: `api/post/getallpostpagination?PageIndex=${page}&PageSize=${rows}&OrderBy=createdDate&IsAscending=false`,
       method: "GET",
     })
       .then((res) => {

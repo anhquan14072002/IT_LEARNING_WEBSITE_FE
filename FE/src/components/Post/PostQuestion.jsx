@@ -26,6 +26,7 @@ function PostQuestion({ post, isFavoritePost }) {
     userId,
     id,
     numberOfComment,
+    roles,
   } = post;
   const [isFavorite, setIsFavorite] = useState(isFavoritePost);
   let contentJsx = <div dangerouslySetInnerHTML={{ __html: content }} />;
@@ -91,8 +92,16 @@ function PostQuestion({ post, isFavoritePost }) {
                 style={{ borderRadius: "25px" }}
               />
             </span>
-            <span className="flex flex-col">
-              <strong>{userName}</strong>
+            <span className="flex flex-col gap-2">
+              <strong className="text-xl font-medium">{userName}</strong>
+              {roles.map((role) => (
+                <Button
+                  label={role}
+                  severity="warning"
+                  style={{ backgroundColor: "#f58220" }}
+                  className="text-white rounded-3xl text-sm w-fit px-2 font-bold"
+                />
+              ))}
               <span className="text-sm text-stone-400">
                 {/* 12 giờ trước (20:28) - SIT18 */}
                 {formattedDate}
@@ -110,7 +119,7 @@ function PostQuestion({ post, isFavoritePost }) {
           <Button
             label={` #Tin học ${gradeTitle}`}
             severity="warning"
-            style={{ backgroundColor: "#FAA500" }}
+            style={{ backgroundColor: "#bc594a" }}
             onClick={handleChooseGrade}
             className="text-white px-2 py-1 rounded-3xl text-sm"
           />
