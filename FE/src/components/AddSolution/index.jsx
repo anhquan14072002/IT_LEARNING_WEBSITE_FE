@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
-import { ACCEPT, REJECT } from "../../utils";
+import { ACCEPT, encodeBase64, REJECT } from "../../utils";
 import { Controlled as CodeMirror } from "react-codemirror2";
 import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/python/python";
@@ -34,7 +34,7 @@ const AddSoltution = ({ visible, setVisible, toast, id, fetchSolutions }) => {
       data: {
         title: title.trim(),
         description: description.trim(),
-        coding: code.trim(),
+        coding: encodeBase64(code.trim()),
         problemId: id,
         userId: user?.sub,
         isActive: true,

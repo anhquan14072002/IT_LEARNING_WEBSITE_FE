@@ -36,6 +36,7 @@ import DetailClass from "./pages/DetailClass";
 import Post from "./pages/Post/Post";
 import UpdateExecuteCode from "./pages/UpdateExecuteCode";
 import UpdateProblem from "./components/UpdateProblem"
+import ListPractice from "./pages/ListPractice";
 import ManageQuestionQuiz from "./components/ManageQuestionQuiz";
 import { useSelector } from "react-redux";
 
@@ -166,6 +167,10 @@ function App() {
           <Route
             path="/dashboard/quiz/manageexecutecode/:id"
             element={<ManageExecuteCode />}
+          />
+          <Route
+            path="/listpractice"
+            element={<ListPractice />}
           />
           <Route
             path="/dashboard/updateproblem/:id"
