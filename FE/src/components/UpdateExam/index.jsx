@@ -188,7 +188,7 @@ export default function UpdateExam({
     formData.append("Title", values.title || "");
     formData.append("Province", values.province.name|| "");
     formData.append("Description", values.description || "");
-    formData.append("NumberQuestion", values.numberQuestion || "");
+    formData.append("NumberQuestion", values.numberQuestion || 0);
     formData.append("Year", values.year.year || "");
     formData.append("isActive", updateValue?.isActive );
     if (tag && tag.length > 0) {
