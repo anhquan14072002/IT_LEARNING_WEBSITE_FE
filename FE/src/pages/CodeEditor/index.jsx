@@ -56,7 +56,7 @@
 //       problemId: id,
 //       languageId: language?.id,
 //       sourceCode: encodeBase64(code),
-//       userId: localStorage.getItem("userId"),
+//       userId: user?.sub,
 //       submit: true,
 //     };
 //     restClient({
@@ -99,7 +99,7 @@
 //       problemId: id,
 //       languageId: language?.id,
 //       sourceCode: encodeBase64(code),
-//       userId: localStorage.getItem("userId"),
+//       userId: user?.sub,
 //       submit: false,
 //     };
 //     restClient({
@@ -649,7 +649,7 @@ const CodeEditor = () => {
         setExecuteCode(res.data?.data);
         setCode(decodeBase64(res.data?.data[0]?.sampleCode) || "");
         restClient({
-          url: `api/submission/getsubmission?ProblemId=${id}&UserId=${localStorage.getItem("userId")}&LanguageId=${res.data?.data[0]?.languageId}`,
+          url: `api/submission/getsubmission?ProblemId=${id}&UserId=${user?.sub}&LanguageId=${res.data?.data[0]?.languageId}`,
         })
           .then((res) => {
             setCode(decodeBase64(res?.data?.data?.sourceCode));
@@ -717,7 +717,7 @@ const CodeEditor = () => {
   const handleLanguageChange = (event) => {
     const selectedLanguageId = event.target.value;
     restClient({
-      url: `api/submission/getsubmission?ProblemId=${id}&UserId=${localStorage.getItem("userId")}&LanguageId=${res.data?.data[0]?.languageId}`,
+      url: `api/submission/getsubmission?ProblemId=${id}&UserId=${user?.sub}&LanguageId=${res.data?.data[0]?.languageId}`,
     })
       .then((res) => {
         if (res?.data?.data?.sourceCode) {

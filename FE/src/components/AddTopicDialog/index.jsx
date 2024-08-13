@@ -50,7 +50,7 @@ export default function AddTopicDialog({
 
   useEffect(() => {
     restClient({
-      url: `api/grade/getallgrade`,
+      url: `api/grade/getallgrade?isInclude=false`,
       method: "GET",
     })
       .then((res) => {

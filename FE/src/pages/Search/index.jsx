@@ -229,15 +229,7 @@ export default function Search() {
                 </div>
               </div>
             </div>
-            <div className="m-4">
-              <h1>
-                Có{" "}
-                <span className="text-blue-700 underline">
-                  {Array.isArray(products) && products.length}
-                </span>{" "}
-                kết quả tìm kiếm
-              </h1>
-            </div>
+            
 
             {/* {loading ? (
               <Loading />

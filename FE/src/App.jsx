@@ -37,6 +37,7 @@ import ManageQuestionQuiz from "./components/ManageQuestionQuiz";
 import Post from "./pages/Post/Post";
 import UpdateExecuteCode from "./pages/UpdateExecuteCode";
 import UpdateProblem from "./components/UpdateProblem"
+import ListPractice from "./pages/ListPractice";
 
 function App() {
   return (
@@ -139,6 +140,10 @@ function App() {
           <Route
             path="/dashboard/quiz/manageexecutecode/:id"
             element={<ManageExecuteCode />}
+          />
+          <Route
+            path="/listpractice"
+            element={<ListPractice />}
           />
           <Route
             path="/dashboard/updateproblem/:id"
