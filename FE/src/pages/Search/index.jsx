@@ -66,7 +66,7 @@ export default function Search() {
         });
       },
       {
-        threshold: 0.5,
+        threshold: 0.2,
       }
     );
 

@@ -762,12 +762,22 @@ export const decodeIfNeeded = (content) => {
   return content;
 };
 
-export const isBase64 = (content) => {
-  if (/^[A-Za-z0-9+/=]+\s*$/.test(content)) {
-    return true;
+// export const isBase64 = (content) => {
+//   if (/^[A-Za-z0-9+/=]+\s*$/.test(content)) {
+//     return true;
+//   }
+//   return false;
+// };
+
+export const isBase64 = (str) => {
+  try {
+    // Check if the input is a valid base64 string
+    return btoa(atob(str)).replace(/\s/g, '') === str.replace(/\s/g, '');
+  } catch (e) {
+    return false;
   }
-  return false;
 };
+
 
 export const getProvinceByName = (name) => {
   const foundProvince = province.data.find(

@@ -35,32 +35,43 @@ const CustomImage = ({ src, alt, width }) => {
 };
 
 const ViewQuestionInTest = ({ quizData, quizDetail }) => {
+  console.log("====================================");
+  console.log("quizData?.length::", quizData?.length);
+  console.log("====================================");
   const [selectedAnswers, setSelectedAnswers] = useState({});
   const [showBackToTop, setShowBackToTop] = useState(false);
-  const [timeLeft, setTimeLeft] = useState(3);
+  const [timeLeft, setTimeLeft] = useState(quizData?.length * 30 || 30);
   const questionRefs = useRef([]);
   const user = useSelector((state) => state.user.value);
   const [isCompleted, setIsCompleted] = useState(false);
   const [quizResult, setQuizResult] = useState(null);
 
   useEffect(() => {
-    // setTimeLeft(quizData?.length * 30);
+    if (quizData && quizData?.length > 0) {
+      setTimeLeft(quizData?.length * 30);
+      const initialSelectedAnswers = {};
+      quizData.forEach((question) => {
+        initialSelectedAnswers[question.id] = null;
+      });
+      setSelectedAnswers(initialSelectedAnswers);
+    }
   }, [quizData]);
 
   useEffect(() => {
-    const timer = setInterval(() => {
-      setTimeLeft((prevTime) => {
-        return prevTime - 1;
-      });
-    }, 1000);
+    if (timeLeft > 0) {
+      const timer = setInterval(() => {
+        setTimeLeft((prevTime) => {
+          return prevTime - 1;
+        });
+      }, 1000);
 
-    return () => {
-      clearInterval(timer);
-    };
-  }, []);
+      return () => {
+        clearInterval(timer);
+      };
+    }
+  }, [isCompleted]);
 
   useEffect(() => {
-    console.log("timeLeft updated: ", timeLeft);
     if (timeLeft === 0) {
       handleSubmitQuiz();
     }
@@ -82,33 +93,65 @@ const ViewQuestionInTest = ({ quizData, quizDetail }) => {
     };
   }, []);
 
+  // const handleAnswerSelect = (questionId, answerId) => {
+  //   setSelectedAnswers((prevState) => {
+  //     // Check if the answerId is already in the array
+  //     const isSelected = prevState[questionId]?.includes(answerId);
+
+  //     if (isSelected) {
+  //       // Remove answerId from the array if already selected
+  //       const updatedAnswers = prevState[questionId].filter(
+  //         (id) => id !== answerId
+  //       );
+  //       return {
+  //         ...prevState,
+  //         [questionId]:
+  //           updatedAnswers.length === 0 ? undefined : updatedAnswers, // Remove key if array is empty
+  //       };
+  //     } else {
+  //       // Add answerId to the array if not selected
+  //       return {
+  //         ...prevState,
+  //         [questionId]: [...(prevState[questionId] || []), answerId],
+  //       };
+  //     }
+  //   });
+  // };
+
   const handleAnswerSelect = (questionId, answerId) => {
     setSelectedAnswers((prevState) => {
-      // Check if the answerId is already in the array
-      const isSelected = prevState[questionId]?.includes(answerId);
-
-      if (isSelected) {
-        // Remove answerId from the array if already selected
-        const updatedAnswers = prevState[questionId].filter(
-          (id) => id !== answerId
-        );
-        return {
-          ...prevState,
-          [questionId]:
-            updatedAnswers.length === 0 ? undefined : updatedAnswers, // Remove key if array is empty
-        };
+      const currentSelection = prevState[questionId];
+  
+      if (Array.isArray(currentSelection)) {
+        // Handle multiple choice questions
+        const isSelected = currentSelection.includes(answerId);
+        if (isSelected) {
+          // Remove answerId from the array if already selected
+          return {
+            ...prevState,
+            [questionId]: currentSelection.filter((id) => id !== answerId),
+          };
+        } else {
+          // Add answerId to the array if not selected
+          return {
+            ...prevState,
+            [questionId]: [...currentSelection, answerId],
+          };
+        }
       } else {
-        // Add answerId to the array if not selected
+        // Initialize or handle non-array selections
         return {
           ...prevState,
-          [questionId]: [...(prevState[questionId] || []), answerId],
+          [questionId]: [answerId],
         };
       }
     });
   };
 
   const isAnswerSelected = (questionId, answerId) => {
-    return selectedAnswers[questionId] === answerId;
+    return !selectedAnswers[questionId]
+      ? true
+      : selectedAnswers[questionId] === answerId;
   };
 
   const scrollToQuestion = (index) => {
@@ -152,10 +195,15 @@ const ViewQuestionInTest = ({ quizData, quizDetail }) => {
 
   const handleSubmitQuiz = async () => {
     const questionAnswerDto = Object.keys(selectedAnswers).map(
-      (questionId) => ({
-        type: 1,
+      (questionId,index) => ({
+        type: quizData[index]?.type,
         questionId: parseInt(questionId),
-        answerId: [selectedAnswers[questionId]],
+        answerId:
+          selectedAnswers[questionId] === null
+            ? null
+            : Array.isArray(selectedAnswers[questionId])
+            ? selectedAnswers[questionId]
+            : [selectedAnswers[questionId]],
       })
     );
 
@@ -184,12 +232,18 @@ const ViewQuestionInTest = ({ quizData, quizDetail }) => {
         console.log("====================================");
         setQuizResult(res?.data?.data); // Store the result data
         setIsCompleted(true);
+        setTimeLeft(-1);
       })
       .catch((err) => {
         alert("Xảy ra lỗi khi nộp bài");
+      })
+      .finally(() => {
+        const initialSelectedAnswers = {};
+        quizData.forEach((question) => {
+          initialSelectedAnswers[question.id] = null;
+        });
+        setSelectedAnswers(initialSelectedAnswers);
       });
-
-    setSelectedAnswers({});
   };
 
   if (isCompleted) {
@@ -197,6 +251,7 @@ const ViewQuestionInTest = ({ quizData, quizDetail }) => {
       <QuizResult
         totalQuestions={quizData.length}
         historyQuizzes={quizResult?.historyQuizzes}
+        quizResult={quizResult}
       />
     );
   }
@@ -242,7 +297,7 @@ const ViewQuestionInTest = ({ quizData, quizDetail }) => {
                   </li>
                 ))}
 
-              {Number(question?.type) === 3 &&
+              {/* {Number(question?.type) === 3 &&
                 question?.quizAnswers?.map((answer, index) => (
                   <li key={answer?.id}>
                     <label>
@@ -250,9 +305,30 @@ const ViewQuestionInTest = ({ quizData, quizDetail }) => {
                         type="checkbox"
                         name={`question_${question.id}`}
                         value={answer.id}
-                        checked={selectedAnswers[question.id]?.includes(
-                          answer.id
-                        )}
+                        checked={
+                          Array.isArray(selectedAnswers[question.id]) &&
+                          selectedAnswers[question.id]?.includes(answer.id)
+                        }
+                        onChange={() =>
+                          handleAnswerSelect(question.id, answer.id)
+                        }
+                      />
+                      {answer.content}
+                    </label>
+                  </li>
+                ))} */}
+              {Number(question?.type) === 3 &&
+                question?.quizAnswers?.map((answer) => (
+                  <li key={answer?.id}>
+                    <label>
+                      <input
+                        type="checkbox"
+                        name={`question_${question.id}`}
+                        value={answer.id}
+                        checked={
+                          Array.isArray(selectedAnswers[question.id]) &&
+                          selectedAnswers[question.id]?.includes(answer.id)
+                        }
                         onChange={() =>
                           handleAnswerSelect(question.id, answer.id)
                         }
@@ -267,7 +343,7 @@ const ViewQuestionInTest = ({ quizData, quizDetail }) => {
       </div>
 
       {/* Lesson Box */}
-      <div className="question-box p-4">
+      <div className="question-box p-4 z-10">
         <Button
           label="Nộp bài"
           className="text-center bg-blue-600 hover:bg-blue-400 text-white w-full mb-2 py-1"
