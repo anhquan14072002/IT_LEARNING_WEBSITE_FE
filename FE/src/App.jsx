@@ -35,10 +35,11 @@ import CreateCode from "./pages/CreateCode";
 import DetailClass from "./pages/DetailClass";
 import Post from "./pages/Post/Post";
 import UpdateExecuteCode from "./pages/UpdateExecuteCode";
-import UpdateProblem from "./components/UpdateProblem"
+import UpdateProblem from "./components/UpdateProblem";
 import ListPractice from "./pages/ListPractice";
 import ManageQuestionQuiz from "./components/ManageQuestionQuiz";
 import { useSelector } from "react-redux";
+import HistoryQuiz from "./pages/HistoryQuiz";
 
 function App() {
   const user = useSelector((state) => state.user.value);
@@ -152,7 +153,6 @@ function App() {
           <Route path="/profile" element={<Profile />} />
           <Route path="/checkmail" element={<CheckMail />} />
           <Route path="/changepassword" element={<ChangePassword />} />
-         
 
           <Route path="*" element={<NotFound />} />
           <Route
@@ -162,21 +162,22 @@ function App() {
           <Route path="/codeEditor/:id" element={<CodeEditor />} />
           <Route path="/dashboard/createproblem" element={<CreateProblem />} />
           <Route path="/dashboard/createcode/:id" element={<CreateCode />} />
-          <Route path="/dashboard/updateexecutecode/:id" element={<UpdateExecuteCode />} />
+          <Route
+            path="/dashboard/updateexecutecode/:id"
+            element={<UpdateExecuteCode />}
+          />
           <Route path="/detailclass/:id" element={<DetailClass />} />
           <Route
             path="/dashboard/quiz/manageexecutecode/:id"
             element={<ManageExecuteCode />}
           />
-          <Route
-            path="/listpractice"
-            element={<ListPractice />}
-          />
+          <Route path="/listpractice" element={<ListPractice />} />
           <Route
             path="/dashboard/updateproblem/:id"
             element={<UpdateProblem />}
           />
           <Route path="/detailclass/:id" element={<DetailClass />} />
+          <Route path="/historyQuiz" element={<HistoryQuiz />} />
         </Routes>
       </Router>
     </>

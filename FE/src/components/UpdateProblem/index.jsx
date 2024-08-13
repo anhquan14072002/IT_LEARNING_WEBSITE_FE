@@ -20,7 +20,7 @@ import "codemirror/theme/material.css";
 import restClientV2 from "../../services/restClientV2";
 import AddTestCase from "../AddTestCase";
 import { Toast } from "primereact/toast";
-import { encodeBase64, REJECT } from "../../utils";
+import { encodeBase64, isBase64, REJECT } from "../../utils";
 import NotifyProvider from "../../store/NotificationContext";
 import UpdateTestCase from "../UpdateTestCase";
 import AddInUpdateProblem from "../AddInUpdateProblem";
@@ -271,8 +271,7 @@ export default function UpdateProblem() {
                   url: "api/testcase/createtestcase",
                   method: "POST",
                   data: {
-                    input:
-                      item?.input === null ? null : encodeBase64(item?.input),
+                    input: encodeBase64(item?.input),
                     inputView:
                       item?.inputView === null ? null : item?.inputView,
                     output: encodeBase64(item?.output),
@@ -281,15 +280,16 @@ export default function UpdateProblem() {
                     isActive: true,
                     problemId: problemData?.id,
                   },
-                });
+                })
+                  .then((res) => {})
+                  .catch((err) => {});
               } else {
                 restClient({
                   url: "api/testcase/updatetestcase",
                   method: "PUT",
                   data: {
                     id: item?.id,
-                    input:
-                      item?.input === null ? null : encodeBase64(item?.input),
+                    input: encodeBase64(item?.input),
                     inputView:
                       item?.inputView === null ? null : item?.inputView,
                     output: encodeBase64(item?.output),
@@ -407,10 +407,25 @@ export default function UpdateProblem() {
     setVisible(true);
   };
 
-  const handleDeleteTestCase = (index) => {
-    setTestCaseList((prevTestCase) =>
-      prevTestCase.filter((_, i) => i !== index)
-    );
+  const handleDeleteTestCase = (index, test) => {
+    console.log("itemdelete::", test);
+
+    if (test && test.id) {
+      restClient({
+        url: "api/testcase/deletetestcase/" + test?.id,
+        method: "DELETE",
+      })
+        .then((res) => {
+          setTestCaseList((prevTestCase) =>
+            prevTestCase.filter((_, i) => i !== index)
+          );
+        })
+        .catch((err) => {});
+    } else {
+      setTestCaseList((prevTestCase) =>
+        prevTestCase.filter((_, i) => i !== index)
+      );
+    }
   };
 
   useEffect(() => {
@@ -622,7 +637,9 @@ export default function UpdateProblem() {
                                   icon="pi pi-trash"
                                   type="button"
                                   className="p-button-rounded p-button-danger cursor-pointer text-red-500"
-                                  onClick={() => handleDeleteTestCase(index)}
+                                  onClick={() =>
+                                    handleDeleteTestCase(index, test)
+                                  }
                                 />
                               </li>
                             ))}

@@ -11,7 +11,7 @@ import AddSolution from "../AddSolution";
 import { Toast } from "primereact/toast";
 import { useSelector } from "react-redux";
 import { Paginator } from "primereact/paginator";
-import axios from "axios"; // Use axios or fetch for making API requests
+import restClient from "../../services/restClient";
 
 export default function CommentCoding({ id }) {
   const navigate = useNavigate();
@@ -27,37 +27,23 @@ export default function CommentCoding({ id }) {
   const [totalPage, setTotalPage] = useState(0);
 
   const fetchSolutions = async () => {
-    try {
-      const pageIndex = page || 1;
-      const pageSize = rows || 10;
-      const response = await axios.get(
-        `http://localhost:8000/api/solution/getallsolutionbyproblemidpagination?ProblemId=${id}&PageIndex=${pageIndex}&PageSize=${pageSize}`
-      );
-      if (response.data.isSucceeded) {
-        const paginationData = JSON.parse(response.headers["x-pagination"]);
-        setTotalPage(paginationData.TotalPages);
-        setSolutions(response.data.data);
-      } else {
-        // Handle error if needed
-        toast.current.show({
-          severity: "error",
-          summary: "Error",
-          detail: response.data.message,
-        });
-      }
-    } catch (error) {
-      console.error("Error fetching solutions:", error);
-      toast.current.show({
-        severity: "error",
-        summary: "Error",
-        detail: "Failed to fetch solutions.",
+    const pageSize = rows || 10;
+    restClient({
+      url: `api/solution/getallsolutionbyproblemidpagination?ProblemId=${id}&PageIndex=${pageIndex}&PageSize=${pageSize}`,
+    })
+      .then((response) => {
+        if (response.data.isSucceeded) {
+          const paginationData = JSON.parse(response.headers["x-pagination"]);
+          setTotalPage(paginationData.TotalPages);
+          setSolutions(response.data.data);
+        }
+      })
+      .catch((err) => {
+        setSolutions([]);
       });
-    }
   };
 
   useEffect(() => {
-    
-
     fetchSolutions();
   }, [id, page, rows]);
 
@@ -144,7 +130,7 @@ export default function CommentCoding({ id }) {
             />
           </>
         ) : (
-          <p>No solutions found.</p>
+          <p>Chưa có lời giải nào</p>
         )}
       </div>
     </div>

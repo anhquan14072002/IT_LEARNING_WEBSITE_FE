@@ -37,6 +37,8 @@ export default function Lesson() {
   const [documentList, setDocumentList] = useState({});
   const [tableContentId, setTableContentId] = useState([]);
   const { id } = useParams();
+  const [isNext, setIsNext] = useState(true);
+  const [isPrevious, setisPrevious] = useState(true);
 
   const fetchData = async () => {
     try {
@@ -175,7 +177,7 @@ export default function Lesson() {
     });
 
     if (currentIndex === -1 || currentIndex === data?.length - 1) {
-      return null; // Current lesson ID not found in data
+      return null;
     }
 
     // Find the previous lesson ID
@@ -196,7 +198,7 @@ export default function Lesson() {
     });
 
     if (currentIndex === -1 || currentIndex === 0) {
-      return null; // Current lesson ID not found in data
+      return null;
     }
 
     // Find the previous lesson ID

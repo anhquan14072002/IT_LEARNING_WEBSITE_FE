@@ -86,9 +86,10 @@ export default function Quiz() {
             </div>
           )}
           <div
-            className={`w-1/2 shadow-lg rounded-md bg-white h-4/5 p-5 flex items-center justify-center cursor-pointer overflow-y-auto ${
-              showAnswer ? "flip" : ""
-            }`}
+            className={`w-full sm:w-full md:w-3/4 lg:w-1/2 xl:w-1/2 
+  shadow-lg rounded-md bg-white h-4/5 p-5 flex items-center justify-center cursor-pointer overflow-y-auto ${
+    showAnswer ? "flip" : ""
+  }`}
             onClick={() => {
               setShowAnswer(!showAnswer);
             }}

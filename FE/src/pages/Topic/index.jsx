@@ -156,7 +156,7 @@ export default function Topic() {
     });
 
     if (currentIndex === -1 || currentIndex === data?.length - 1) {
-      return null; // Current lesson ID not found in data
+      return null;
     }
 
     // Find the previous lesson ID
@@ -177,7 +177,7 @@ export default function Topic() {
     });
 
     if (currentIndex === -1 || currentIndex === 0) {
-      return null; // Current lesson ID not found in data
+      return null;
     }
 
     // Find the previous lesson ID
