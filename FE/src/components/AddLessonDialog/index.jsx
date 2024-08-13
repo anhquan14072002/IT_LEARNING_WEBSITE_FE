@@ -15,6 +15,7 @@ import { FileUpload } from "primereact/fileupload";
 import restClient from "../../services/restClient";
 import CustomDropdown from "../../shared/CustomDropdown";
 import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
+import { MultiSelect } from "primereact/multiselect";
 
 export default function AddLessonDialog({
   visible,
@@ -29,7 +30,8 @@ export default function AddLessonDialog({
   const [isLoadingAddLesson, setIsLoadingAddLesson] = useState(false);
   const [clearTopic, setClearTopic] = useState(false);
   const [clearGrade, setClearGrade] = useState(false);
-
+  const [tagList, setTagList] = useState([]);
+  const [tag, setTag] = useState(null);
   //select insert content
   const [inputContet, setInputContent] = useState(true);
 
@@ -75,9 +77,25 @@ export default function AddLessonDialog({
         setListGrade([]);
       });
   }, []);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const tagResponse = await restClient({
+          url: "api/tag/getalltag",
+          method: "GET",
+        });
+        console.log(tagResponse?.data?.data);
+        setTagList(
+          Array.isArray(tagResponse?.data?.data) ? tagResponse?.data?.data : []
+        );
+      } catch (error) {
+        console.error("Failed to fetch tags:", error);
+      }
+    };
 
+    fetchData();
+  }, []);
   const onSubmit = (values) => {
-
     const formData = new FormData();
     formData.append("Title", values.title);
     formData.append("TopicId", values.topic.id);
@@ -85,7 +103,11 @@ export default function AddLessonDialog({
       formData.append("Content", values.content);
     }
     formData.append("IsActive", false);
-
+    if (tag && tag.length > 0) {
+      tag.forEach((item, index) => {
+        formData.append(`tagValues[${index}]`, item.keyWord);
+      });
+    }
     if (!inputContet) {
       if (files.length === 0) {
         REJECT(toast, "Vui lòng chọn file để tải lên");
@@ -111,10 +133,12 @@ export default function AddLessonDialog({
         getData();
         setIsLoadingAddLesson(false);
         setFiles([]);
+        setTag([]);
       })
       .catch((err) => {
         REJECT(toast, "Xảy ra lỗi khi thêm bài học");
         setIsLoadingAddLesson(false);
+      setTag([])
       })
       .finally(() => {
         setVisible(false);
@@ -247,7 +271,21 @@ export default function AddLessonDialog({
                 type="text"
                 id="title"
               />
-
+              <div>
+                <>
+                  <span>Tag</span>
+                </>
+                <MultiSelect
+                  value={tag}
+                  options={tagList}
+                  onChange={(e) => setTag(e.value)}
+                  optionLabel="title"
+                  placeholder="Chọn Tag"
+                  className="w-full shadow-none custom-multiselect border border-gray-300"
+                  display="chip"
+                  filter
+                />
+              </div>
               <div className="flex justify-between mb-1">
                 <h1>Nội dung bài học</h1>
                 <select

@@ -19,6 +19,7 @@ function PostGrade(props) {
       {loading ? (
         <LoadingScreen setLoading={loading} />
       ) : (
+
         <>
           {/* Icon for toggling sidebar on small screens */}
           <div className="md:hidden flex justify-end">

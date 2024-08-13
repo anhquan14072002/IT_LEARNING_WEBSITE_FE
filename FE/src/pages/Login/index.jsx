@@ -1,6 +1,6 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import { Button } from "primereact/button";
-import { useForm, Controller, set } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import LoginComponent from "../../components/LoginComponent";
 import Header from "../../components/Header";
 import { useNavigate } from "react-router-dom";
@@ -20,12 +20,15 @@ const Index = () => {
   const [currState, setCurrState] = useState("Login");
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const { control, handleSubmit, formState: { errors }, reset } = useForm();
 
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
+  useEffect(() => {
+    // Retrieve saved email and password from localStorage
+    const savedEmail = localStorage.getItem("email") || "";
+    const savedPassword = localStorage.getItem("password") || "";
+    setChecked(!!savedEmail); // Update checked state based on savedEmail
+    reset({ email: savedEmail, password: savedPassword }); // Set initial form values
+  }, [reset]);
 
   const saveLoginInfo = (data) => {
     if (checked) {
@@ -70,10 +73,10 @@ const Index = () => {
 
   return (
     <NotifyProvider>
-      <div className="min-h-screen ">
+      <div className="min-h-screen">
         <Header />
         <Menu />
-        <div className="flex h-screen  ">
+        <div className="flex h-screen">
           <div className="w-1/2">
             <div className="w-auto h-full">
               <img src={assets.image} alt="" className="w-full h-full" />
@@ -104,9 +107,7 @@ const Index = () => {
                     name="email"
                     control={control}
                     defaultValue=""
-                    rules={{
-                      required: "Tài khoản không được để trống",
-                    }}
+                    rules={{ required: "Tài khoản không được để trống" }}
                     render={({ field }) => (
                       <InputText
                         id="email"
@@ -163,13 +164,14 @@ const Index = () => {
                   </div>
                 )}
                 {currState === "Login" && (
-                  <div className="mb-4">
+                  <div className="mb-4 flex items-center">
                     <input
                       type="checkbox"
                       onChange={(e) => setChecked(e.target.checked)}
                       checked={checked}
+                      className="mr-2"
                     />
-                    <span className="ml-2">Ghi nhớ mật khẩu</span>
+                    <span>Ghi nhớ mật khẩu</span>
                   </div>
                 )}
 

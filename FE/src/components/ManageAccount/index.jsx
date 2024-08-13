@@ -20,7 +20,7 @@ import { InputSwitch } from "primereact/inputswitch";
 import { Dropdown } from "primereact/dropdown";
 import AddUser from "./AddUser";
 
-export default function ManageAdmin() {
+export default function ManageAccount() {
   const toast = useRef(null);
   const [selectedCity, setSelectedCity] = useState(null);
   const [products, setProducts] = useState([]);
@@ -44,7 +44,7 @@ export default function ManageAdmin() {
 
   const fetchData = () => {
     setLoading(true);
-    const selectedRole = role ? role : "";
+    const selectedRole = role ? role?.name : "";
     restClient({
       url: `api/admin/getallmemberbyrolepagination?PageIndex=${page}&PageSize=${rows}&Value=${textSearch}&Role=${selectedRole}&OrderBy=id&IsAscending=false`,
       method: "GET",
@@ -157,7 +157,22 @@ export default function ManageAdmin() {
   const handleSearchInput = debounce((text) => {
     setTextSearch(text);
   }, 300);
+  const status = (rowData) => {
+    // Assuming rowData has a property `active` to determine the status
+    const isActive = rowData.lockOutEnd;
 
+    return (
+        <Button
+            icon={!isActive ? "pi pi-check-circle" : "pi pi-times-circle"} 
+            className={`p-button-text ${!isActive ? 'text-green-600' : 'text-red-600'} p-mr-2 shadow-none`}
+            tooltip={!isActive ? "Active" : "Inactive"} 
+        />
+    );
+};
+  const formatRoles = (roles) => {
+    if (!roles || roles.length === 0) return "N/A";
+    return roles.join(", ");
+  };
   return (
     <div>
       <Toast ref={toast} />
@@ -205,7 +220,7 @@ export default function ManageAdmin() {
                   value={role}
                   onChange={(e) => handleSearch(e.value)}
                   options={roleList}
-                  optionLabel="title"
+                  optionLabel="name"
                   showClear
                   placeholder="Vai trò"
                   className="w-full md:w-14rem shadow-none"
@@ -255,11 +270,18 @@ export default function ManageAdmin() {
                   className="border-b-2 border-t-2"
                   style={{ width: "15%" }}
                 />
-                <Column
-                  field="roles"
-                  header="SĐT "
+                 <Column
+                  body={status}
+                  header="Trạng Thái "
                   className="border-b-2 border-t-2"
                   style={{ width: "15%" }}
+                />
+                <Column
+                  field="roles"
+                  header="Vai Trò"
+                  className="border-b-2 border-t-2"
+                  style={{ width: "15%" }}
+                  body={(rowData) => formatRoles(rowData.roles)} // Use the custom renderer
                 />
 
                 <Column

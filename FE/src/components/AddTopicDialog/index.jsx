@@ -14,6 +14,7 @@ import Loading from "../Loading";
 import { Dropdown } from "primereact/dropdown";
 import CustomDropdown from "../../shared/CustomDropdown";
 import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
+import { MultiSelect } from "primereact/multiselect";
 
 const validationSchema = Yup.object({
   title: Yup.string().required("Tiêu đề không được bỏ trống"),
@@ -47,7 +48,8 @@ export default function AddTopicDialog({
   const [documentList, setDocumentList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [gradeList, setListGrade] = useState([]);
-
+  const [tagList, setTagList] = useState([]);
+  const [tag, setTag] = useState(null);
   useEffect(() => {
     restClient({
       url: `api/grade/getallgrade?isInclude=false`,
@@ -70,14 +72,33 @@ export default function AddTopicDialog({
   //       setDocumentList([]);
   //     });
   // }, []);
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const tagResponse = await restClient({
+          url: "api/tag/getalltag",
+          method: "GET",
+        });
+        console.log(tagResponse?.data?.data);
+        setTagList(
+          Array.isArray(tagResponse?.data?.data) ? tagResponse?.data?.data : []
+        );
+      } catch (error) {
+        console.error("Failed to fetch tags:", error);
+      }
+    };
 
+    fetchData();
+  }, []);
   const onSubmit = (values) => {
     setLoading(true);
+    const tagValues = tag.map((item) => item.keyWord);
     const model = {
       title: values.title,
       objectives: values.objectives,
       description: values.description,
       documentId: values.document.id,
+      tagValues: tagValues,
       isActive: true,
     };
     restClient({
@@ -87,11 +108,13 @@ export default function AddTopicDialog({
     })
       .then((res) => {
         SUCCESS(toast, "Thêm chủ đề thành công");
+        setTag([]);
         fetchData();
         setLoading(false);
       })
       .catch((err) => {
         REJECT(toast, err.message);
+        setTag([]);
         setLoading(false);
       })
       .finally(() => {
@@ -155,7 +178,12 @@ export default function AddTopicDialog({
                 disabled={!documentList || documentList.length === 0}
                 options={documentList}
               />
-
+              <CustomTextInput
+                label="Tiêu đề"
+                name="title"
+                type="text"
+                id="title"
+              />
               <CustomTextarea
                 label="Mục tiêu chủ đề"
                 name="objectives"
@@ -163,7 +191,21 @@ export default function AddTopicDialog({
               >
                 <ErrorMessage name="objectives" component="div" />
               </CustomTextarea>
-
+              <div>
+                <>
+                  <span>Tag</span>
+                </>
+                <MultiSelect
+                  value={tag}
+                  options={tagList}
+                  onChange={(e) => setTag(e.value)}
+                  optionLabel="title"
+                  placeholder="Chọn Tag"
+                  className="w-full shadow-none custom-multiselect border border-gray-300"
+                  display="chip"
+                  filter
+                />
+              </div>
               <div>
                 <CustomEditor
                   label="Thông tin chi tiết"
@@ -173,13 +215,6 @@ export default function AddTopicDialog({
                   <ErrorMessage name="description" component="div" />
                 </CustomEditor>
               </div>
-
-              <CustomTextInput
-                label="Tiêu đề"
-                name="title"
-                type="text"
-                id="title"
-              />
 
               <div className="flex justify-end gap-2">
                 <Button

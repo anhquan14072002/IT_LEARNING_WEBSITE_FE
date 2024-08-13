@@ -39,7 +39,7 @@ export default function Header({ params, setParams, textSearchProps }) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showOptionNotifications, setShowOptionNotifications] = useState(false);
   // const [activeTabIndex, setActiveTabIndex] = useState(0);
-
+  
   const handleLogout = () => {
     dispatch(retmoveUser());
     logout();
@@ -50,10 +50,23 @@ export default function Header({ params, setParams, textSearchProps }) {
     {
       items: [
         {
-          label: "Quản lí",
-          icon: "pi pi-chart-bar",
-          command: (e) => navigate("/dashboard/statistic"),
+          label: "Đổi mật khẩu",
+          icon: "pi pi-key",
+          command: (e) => navigate("/changepassword"),
         },
+        {
+          label: "Quản lí tài khoản cá nhân",
+          icon: "pi pi-user-edit",
+          command: (e) => navigate("/profile"),
+        },
+        ...(user.role === "Admin" || user.role === "ContentManager" ?[
+          {
+            label: "Quản lí",
+            icon: "pi pi-chart-bar",
+            command: (e) => navigate("/dashboard/statistic"),
+          },
+        ]:[] ),
+        
         {
           label: "Đăng xuất",
           icon: "pi pi-sign-out",
@@ -295,7 +308,7 @@ export default function Header({ params, setParams, textSearchProps }) {
                       </div>
 
                       <div className="px-3 overflow-auto max-h-[58vh] ">
-                        <ul className="flex flex-wrap text-md font-medium text-center text-gray-500  dark:border-gray-200 dark:text-gray-400">
+                        <ul className="flex flex-wrap text-sm font-sm text-center text-gray-500  dark:border-gray-200 dark:text-gray-400">
                           {tabsData.map((tab, idx) => (
                             <li key={idx} className="me-2">
                               <a
@@ -407,7 +420,7 @@ function NotificationList({ notifications }) {
                 <img
                   src={notification?.userSendImage || image}
                   alt="Ảnh người dùng"
-                  width="40px"
+                  width="50px"
                   className="rounded-full"
                   onError={(e) => (e.target.src = image)}
                 />
