@@ -88,8 +88,9 @@ function PostQuestion({ post, isFavoritePost }) {
               <img
                 src={avatar || image}
                 alt="Ảnh người dùng"
-                width="30px"
-                style={{ borderRadius: "25px" }}
+                width="35px"
+                className="rounded-full"
+                onError={(e) => (e.target.src = image)}
               />
             </span>
             <span className="flex flex-col gap-2">
