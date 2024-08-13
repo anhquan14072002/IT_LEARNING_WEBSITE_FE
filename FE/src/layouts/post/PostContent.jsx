@@ -13,6 +13,7 @@ import { ACCEPT, containsRudeWords, isLoggedIn } from "../../utils";
 import "../../shared/CustomDropdown/index.css";
 import { getAllGrade } from "../../services/grade.api";
 import image from "../../assets/img/image.png";
+import restClient from "../../services/restClient";
 const validationSchema = Yup.object({
   grade: Yup.object()
     .test("is-not-empty", "Không được để trống trường này", (value) => {
@@ -55,11 +56,20 @@ function PostWrite({ setCompose, compose }) {
 
   const user = useSelector((state) => state.user.value);
   const toast = useRef(null);
-  const [initialValues] = useState({
-    grade: compose?.data?.gradeId
-      ? { id: compose?.data?.gradeId, title: compose?.data?.gradeTitle }
-      : {},
-  });
+  const [initialValues, setInitialValues] = useState({ grade: {} });
+  useEffect(() => {
+    if (compose?.data?.gradeId) {
+      async function getGradeById() {
+        const gradeById = await restClient({
+          url: `api/grade/getgradebyid/${compose?.data?.gradeId}`,
+          method: "GET",
+        });
+        const gradeByIdData = gradeById.data?.data || {};
+        setInitialValues((preValue) => ({ grade: gradeByIdData }));
+      }
+      getGradeById();
+    }
+  }, [compose?.data?.gradeId]);
   const [description, setDescription] = useState("");
   const [gradeList, setListGrade] = useState([]);
   useEffect(() => {

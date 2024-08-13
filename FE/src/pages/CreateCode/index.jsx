@@ -102,7 +102,7 @@ export default function CreateCode() {
         sampleCode: encodeBase64(codeSample),
         problemId: id,
         languageId: values?.language?.idBase,
-        libraries: library,
+        libraries: encodeBase64(library),
       },
     })
       .then((res) => {})

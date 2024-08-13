@@ -567,10 +567,6 @@ const CodeEditor = () => {
   // }, []);
 
   const submit = () => {
-    if (!isLoggedIn()) {
-      REJECT(toast, "Vui lòng đăng nhập");
-      return;
-    }
     setLoading(true); // Show loading spinner
     let model = {
       problemId: id,
@@ -980,13 +976,7 @@ const CodeEditor = () => {
                           <div className="flex gap-5 mb-5">
                             <p className="w-40">Đầu vào</p>
                             <p>
-                              {testCase &&
-                              processInput(testCase?.input).arrayItems.length >
-                                0
-                                ? `[${processInput(
-                                    testCase.input
-                                  )?.arrayItems.join(", ")}]`
-                                : ""}
+                              {testCase?.inputView}
                             </p>
                           </div>
                           <div className="flex gap-5 mb-5">

@@ -35,19 +35,6 @@ export default function ManageLanguage() {
   const [loading, setLoading] = useState(false);
   const [textSearch, setTextSearch] = useState("");
 
-  // useEffect(() => {
-  //   restClient({
-  //     url: `api/grade/getallgrade`,
-  //     method: "GET",
-  //   })
-  //     .then((res) => {
-  //       setListGrade(res.data.data || []);
-  //     })
-  //     .catch((err) => {
-  //       setListGrade([]);
-  //     });
-  // }, []);
-
   const fetchData = () => {
     setLoading(true);
     restClient({

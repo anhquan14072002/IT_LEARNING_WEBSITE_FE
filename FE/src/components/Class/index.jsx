@@ -109,7 +109,7 @@ export default function Class({ item, index }) {
               >
                 {d.title}
               </h1>
-            ))}
+            )).slice(0,4)}
             {documentList?.documents?.length > 4 && (
               <h1
                 className="text-sm text-blue-600 mt-3 cursor-pointer"
@@ -130,7 +130,7 @@ export default function Class({ item, index }) {
           >
             {d.title}
           </h1>
-        ))}
+        )).slice(0,4)}
         {practiceQuizzes.length > 4 && (
           <h1
             className="text-sm text-blue-600 mt-3 cursor-pointer"
@@ -138,7 +138,7 @@ export default function Class({ item, index }) {
           >
             Xem tất cả
           </h1>
-        )}
+        ).slice(0,4)}
       </div>
 
       <div>
@@ -151,7 +151,7 @@ export default function Class({ item, index }) {
           >
             {d.title}
           </h1>
-        ))}
+        )).slice(0,4)}
         {testQuizzes.length > 4 && (
           <h1
             className="text-sm text-blue-600 mt-3 cursor-pointer"
@@ -173,7 +173,7 @@ export default function Class({ item, index }) {
               >
                 {exam.title}
               </h1>
-            ))}
+            )).slice(0,4)}
             {documentList?.exams?.length > 4 && (
               <h1
                 className="text-sm text-blue-600 mt-3 cursor-pointer"
@@ -200,7 +200,7 @@ export default function Class({ item, index }) {
                 >
                   {problem.title}
                 </h1>
-              ))}
+              )).slice(0,4)}
             {documentList?.documents?.flatMap(
               (d) =>
                 d.topics?.flatMap(

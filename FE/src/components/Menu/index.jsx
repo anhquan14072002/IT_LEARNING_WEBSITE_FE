@@ -68,7 +68,7 @@ function Menu() {
 
             Hỏi bài
           </div>
-          <div className="p-2 flex items-center justify-center cursor-pointer hover:bg-[#D1F7FF] flex-1">
+          <div className="p-2 flex items-center justify-center cursor-pointer hover:bg-[#D1F7FF] flex-1" onClick={()=>navigate('/listpractice')}>
             Thực hành
           </div>
           <div

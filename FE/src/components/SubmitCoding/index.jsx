@@ -13,6 +13,15 @@ export default function SubmitCoding({ id }) {
   const exec = (rowData, { rowIndex }) =>{
     return <span>{rowData?.executionTime}s</span>;
   }
+  const execC = (rowData, { rowIndex }) => {
+    const formatDate = (dateString) => {
+      const date = new Date(dateString);
+      return date.toLocaleString(); // Formats the date to a readable format
+    };
+  
+    return <span>{rowData?.createdDate ? formatDate(rowData.createdDate) : ''}</span>;
+  };
+  
   useEffect(() => {
     restClient({
       url: `api/submission/getallsubmission?ProblemId=${id}&UserId=${user.sub}`,
@@ -39,21 +48,27 @@ export default function SubmitCoding({ id }) {
           header="#"
           body={indexBodyTemplate}
           className="border-b-2 border-t-2"
-          style={{ width: "5%" }}
+          style={{ minWidth: "5rem" }}
         />
 
         <Column
           field="status"
           header="Trạng thái"
           className="border-b-2 border-t-2"
-          style={{ width: "15%" }}
+          style={{ minWidth: "15rem" }}
         />
 
         <Column
           header="Thời gian thực hiện"
           className="border-b-2 border-t-2"
-          style={{ width: "15%" }}
+          style={{ minWidth: "15rem" }}
           body={exec}
+        />
+        <Column
+          header="Thời gian nộp bài"
+          className="border-b-2 border-t-2"
+          style={{ minWidth: "20rem" }}
+          body={execC}
         />
       </DataTable>
     </div>
