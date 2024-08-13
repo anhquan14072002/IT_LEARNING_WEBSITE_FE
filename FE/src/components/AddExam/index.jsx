@@ -22,7 +22,9 @@ const baseValidationSchema = Yup.object({
       return Object.keys(value).length !== 0;
     })
     .required("Không bỏ trống trường này"),
-  title: Yup.string().required("Tiêu đề không được bỏ trống"),
+    title: Yup.string()
+    .min(5, "Tiêu đề phải có ít nhất 5 ký tự")
+    .required("Tiêu đề không được bỏ trống"),
   description: Yup.string().required("Mô tả không được bỏ trống"),
   province: Yup.object()
     .test("is-not-empty", "Không được để trống trường này", (value) => {
@@ -122,6 +124,8 @@ export default function AddExam({
   };
   const onSubmit = async (values, { resetForm }) => {
     setLoading(true);
+    console.log(files);
+    
     const formData = new FormData();
     formData.append("Type", types);
     formData.append("CompetitionId", values.competition.id);
