@@ -6,6 +6,7 @@ import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/python/python";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/material.css";
+import { decodeBase64, isBase64 } from "../../utils";
 
 const UpdateInUpdateTestCase = ({
   visible,
@@ -20,6 +21,21 @@ const UpdateInUpdateTestCase = ({
   const [output, setOutput] = useState("");
   const [isHidden, setisHidden] = useState(true);
 
+  // useEffect(() => {
+  //   if (visible && index !== null && testCase[index]) {
+  //     const {
+  //       input = isBase64(input) ? decodeBase64(input) : input,
+  //       inputView,
+  //       output = isBase64(output) ? decodeBase64(output) : output,
+  //       isHidden,
+  //       id,
+  //     } = testCase[index];
+  //     setInputView(inputView);
+  //     setInputCode(input);
+  //     setOutput(output);
+  //     setisHidden(isHidden);
+  //   }
+  // }, [index, testCase]);
   useEffect(() => {
     if (visible && index !== null && testCase[index]) {
       const { input, inputView, output, isHidden, id } = testCase[index];
@@ -28,7 +44,7 @@ const UpdateInUpdateTestCase = ({
       setOutput(output);
       setisHidden(isHidden);
     }
-  }, [index, testCase]);
+  }, [visible, index, testCase]);
 
   const handleInputChange = (e) => setInputView(e.target.value);
   const handleInputCode = (e) => setInputCode(e.target.value);
@@ -43,7 +59,9 @@ const UpdateInUpdateTestCase = ({
     }
 
     const updatedTestCases = testCase.map((item, idx) =>
-      idx === index ? { input: inputCode, inputView, output, isHidden , id : item?.id } : item
+      idx === index
+        ? { input: inputCode, inputView, output, isHidden, id: item?.id }
+        : item
     );
 
     setTestCaseList(updatedTestCases);

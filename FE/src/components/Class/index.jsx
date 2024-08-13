@@ -47,20 +47,20 @@ export default function Class({ item, index }) {
   };
 
   // Helper function to extract quizzes by type
-  const extractQuizzesByType = (type) => {
+  const extractQuizzesByType = (typeId) => {
     return (documentList?.documents ?? []).flatMap((d) =>
       (d.topics ?? []).flatMap((t) =>
         [
-          ...(t.quizzes ?? []).filter((q) => q.type === type),
-          ...(t.lessons ?? []).flatMap((l) => (l.quizzes ?? []).filter((q) => q.type === type)),
+          ...(t.quizzes ?? []).filter((q) => q.typeId === typeId),
+          ...(t.lessons ?? []).flatMap((l) => (l.quizzes ?? []).filter((q) => q.typeId === typeId)),
         ]
       )
     );
   };
 
   // Extract quizzes for both "Practice" and "Test"
-  const practiceQuizzes = extractQuizzesByType("Practice");
-  const testQuizzes = extractQuizzesByType("Test");
+  const practiceQuizzes = extractQuizzesByType(1);
+  const testQuizzes = extractQuizzesByType(2);
 
   const handleExam = (exam) => {
       exam?.type === 1

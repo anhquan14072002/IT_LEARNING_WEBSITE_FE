@@ -46,7 +46,7 @@ export default function PracticeComponent() {
     if (textSearch.trim()) {
       setLoading(true);
       restClient({
-        url: `api/problem/getallproblempagination?Value=${textSearch.trim()}`,
+        url: `api/problem/getallproblempagination?Value=${textSearch.trim()}&PageIndex=${page}`,
         method: "GET",
       })
         .then((res) => {
@@ -63,7 +63,7 @@ export default function PracticeComponent() {
       setLoading(true);
 
       restClient({
-        url: `api/problem/getallproblempagination`,
+        url: `api/problem/getallproblempagination?PageIndex=${page}`,
         method: "GET",
       })
         .then((res) => {
