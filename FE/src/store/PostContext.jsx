@@ -6,7 +6,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import restClient from "../services/restClient";
+import restClient, { BASE_URL } from "../services/restClient";
 import { ACCEPT, isLoggedIn, REJECT, SUCCESS } from "../utils";
 import { Toast } from "primereact/toast";
 import { useSelector } from "react-redux";
@@ -46,7 +46,7 @@ export const PostProvider = ({ children }) => {
     const notification = async () => {
       try {
         const conn = new HubConnectionBuilder()
-          .withUrl("https://localhost:7000/notificationHub", {
+          .withUrl(`${BASE_URL}/notificationHub`, {
             skipNegotiation: true,
             transport: HttpTransportType.WebSockets,
           })
@@ -259,7 +259,7 @@ export const PostProvider = ({ children }) => {
     })
       .then((res) => {
         // SUCCESS(toast, "Thu hôi bài post thành công");
-        // setRefresh2(new Date());
+        setRefresh2(new Date());
       })
       .catch((err) => {
         REJECT(toast, "Xảy ra lỗi khi xóa đề thi này");
