@@ -392,6 +392,11 @@ const validationSchema = Yup.object({
       return Object.keys(value).length !== 0; // Check if object is not empty
     })
     .required("Không bỏ trống trường này"),
+  grade: Yup.object()
+    .test("is-not-empty", "Không được để trống trường này", (value) => {
+      return Object.keys(value).length !== 0; // Check if object is not empty
+    })
+    .required("Không bỏ trống trường này"),
 });
 
 export default function AddQuizLesson({
@@ -405,6 +410,7 @@ export default function AddQuizLesson({
     description: "",
     score: null,
     type: {},
+    grade: {},
   });
   const [loading, setLoading] = useState(false);
 
@@ -414,6 +420,7 @@ export default function AddQuizLesson({
   const [selectedProduct, setSelectedProduct] = useState([]);
   const [realQuizList, setRealQuizList] = useState([]);
   const [tagList, setTagList] = useState([]);
+  const [gradeList, setGradeList] = useState([]);
   const [tag, setTag] = useState(null);
   useEffect(() => {
     const fetchData = async () => {
@@ -452,7 +459,18 @@ export default function AddQuizLesson({
     // Call the fetchData function when the component mounts (empty dependency array)
     fetchData();
   }, []);
-
+  useEffect(() => {
+    restClient({
+      url: `api/grade/getallgrade?isInclude=false`,
+      method: "GET",
+    })
+      .then((res) => {
+        setGradeList(res.data.data || []);
+      })
+      .catch((err) => {
+        setGradeList([]);
+      });
+  }, []);
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -581,6 +599,7 @@ export default function AddQuizLesson({
 
   const onSubmit = (values) => {
     const tagValues = tag.map((item) => item.keyWord);
+
     if (!selectedProduct || selectedProduct.length === 0) {
       REJECT(toast, "Vui lòng không để trống lấy câu hỏi");
     } else {
@@ -591,6 +610,7 @@ export default function AddQuizLesson({
         description: values?.description,
         tagValues: tagValues,
         isActive: true,
+        gradeId: values?.grade?.id,
       };
       restClient({
         url: "api/quiz/createquiz",
@@ -654,7 +674,13 @@ export default function AddQuizLesson({
                 type="text"
                 id="title"
               />
-
+              <CustomDropdown
+                title="Lớp"
+                label="Lớp"
+                name="grade"
+                id="grade"
+                options={gradeList}
+              />
               <CustomDropdown
                 title="Thể loại"
                 label="Thể loại"

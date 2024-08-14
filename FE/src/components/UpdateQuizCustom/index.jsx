@@ -25,6 +25,11 @@ const validationSchema = Yup.object({
       return Object.keys(value).length !== 0; // Check if object is not empty
     })
     .required("Không bỏ trống trường này"),
+  grade: Yup.object()
+    .test("is-not-empty", "Không được để trống trường này", (value) => {
+      return Object.keys(value).length !== 0; // Check if object is not empty
+    })
+    .required("Không bỏ trống trường này"),
 });
 
 export default function UpdateQuizCustom({
@@ -39,18 +44,31 @@ export default function UpdateQuizCustom({
     description: "",
     score: null,
     type: {},
+    grade: {},
   });
   const [documentList, setDocumentList] = useState([]);
   const [topicList, setListTopic] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [gradeList, setListGrade] = useState([]);
+  const [gradeList, setGradeList] = useState([]);
   const [clearTopic, setClearTopic] = useState(false);
   const [clearGrade, setClearGrade] = useState(false);
   const [clearLesson, setClearLesson] = useState(false);
   const [lessonList, setLessonList] = useState([]);
   const [typeList, setTypeList] = useState([]);
-
   useEffect(() => {
+    restClient({
+      url: `api/grade/getallgrade?isInclude=false`,
+      method: "GET",
+    })
+      .then((res) => {
+        setGradeList(res.data.data || []);
+      })
+      .catch((err) => {
+        setGradeList([]);
+      });
+  }, []);
+  useEffect(() => {
+    
     const fetchInitialData = async () => {
       setLoading(true);
       try {
@@ -172,6 +190,7 @@ export default function UpdateQuizCustom({
       description: values.description,
       score: values.score,
       isActive: true,
+      gradeId: values?.grade?.id,
     };
 
     restClient({
@@ -218,6 +237,13 @@ export default function UpdateQuizCustom({
                 name="title"
                 type="text"
                 id="title"
+              />
+              <CustomDropdown
+                title="Lớp"
+                label="Lớp"
+                name="grade"
+                id="grade"
+                options={gradeList}
               />
               <CustomDropdown
                 title="Thể loại"
