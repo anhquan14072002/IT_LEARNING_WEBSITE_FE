@@ -20,6 +20,7 @@ import { InputSwitch } from "primereact/inputswitch";
 import { Dropdown } from "primereact/dropdown";
 import AddUser from "./AddUser";
 
+
 export default function ManageAccount() {
   const toast = useRef(null);
   const [selectedCity, setSelectedCity] = useState(null);
@@ -37,7 +38,7 @@ export default function ManageAccount() {
   const [page, setPage] = useState(1);
   const [rows, setRows] = useState(10);
   const [totalPage, setTotalPage] = useState(0);
-
+  const UserId =localStorage.getItem("userId") 
   useEffect(() => {
     fetchData();
   }, [page, rows, textSearch, role]);
@@ -89,6 +90,7 @@ export default function ManageAccount() {
   };
 
   const actionBodyTemplate = (rowData) => {
+    const isDisabled = UserId === rowData.id;
     return (
       <div style={{ display: "flex" }}>
         <Button
@@ -97,6 +99,7 @@ export default function ManageAccount() {
           onClick={() => {
             confirmDelete(rowData.id);
           }}
+          disabled={isDisabled}
         />
       </div>
     );
@@ -106,6 +109,7 @@ export default function ManageAccount() {
     setRole(text);
   };
   const confirmDelete = (id) => {
+   
     setVisibleDelete(true);
     confirmDialog({
       message: "Bạn có chắc chắn muốn xóa tài khoản này?",
@@ -158,17 +162,52 @@ export default function ManageAccount() {
     setTextSearch(text);
   }, 300);
   const status = (rowData) => {
-    // Assuming rowData has a property `active` to determine the status
-    const isActive = rowData.lockOutEnd;
-
+    const isActive = !rowData.lockOutEnd;
+   
+    const isDisabled = UserId === rowData.id;
     return (
+      <div className="flex">
         <Button
-            icon={!isActive ? "pi pi-check-circle" : "pi pi-times-circle"} 
-            className={`p-button-text ${!isActive ? 'text-green-600' : 'text-red-600'} p-mr-2 shadow-none`}
-            tooltip={!isActive ? "Active" : "Inactive"} 
+          icon={isActive ? "pi pi-check-circle" : "pi pi-times-circle"}
+          className={`p-button-text ${
+            isActive ? "text-green-600" : "text-red-600"
+          } p-mr-2 shadow-none`}
+          tooltip={isActive ? "Bình thường" : "Đã bị chặn"}
         />
+        <Button
+          label={isActive ? "Khóa " : " Mở Khóa"}
+          className={`border-2 border-${isActive ? "green-600" : "red-600"} ${
+            isActive ? "text-green-600 bg-green-100" : "text-red-600 bg-red-100"
+          } rounded-lg p-2 font-semibold  hover:bg-opacity-80 transition duration-300 ease-in-out`}
+          onClick={() => handleClick(rowData)}
+          disabled={isDisabled}
+        />
+      </div>
     );
-};
+  };
+  const handleClick = (rowData) => {
+    const isActive = !rowData.lockOutEnd;
+
+    const lockmember = "api/admin/lockmember";
+    const unlockmember = "api/admin/unlockmember";
+
+    const apiUrl = isActive ? lockmember : unlockmember;
+
+    // Make the API call
+    restClient({
+      url: apiUrl,
+      method: "POST",
+      params: { UserId: rowData?.id },
+    })
+      .then((response) => {
+        fetchData();
+      })
+      .catch((error) => {
+        // Handle error if needed
+        console.error("API call failed:", error);
+      });
+  };
+
   const formatRoles = (roles) => {
     if (!roles || roles.length === 0) return "N/A";
     return roles.join(", ");
@@ -189,7 +228,7 @@ export default function ManageAccount() {
           <h1 className="font-bold text-3xl">Quản Lý Tài Khoản</h1>
           <div>
             <Button
-              label="Thêm mới"
+              label="Thêm Nguời Dùng"
               icon="pi pi-plus-circle"
               severity="info"
               className="bg-blue-600 text-white p-2 text-sm font-normal"
@@ -270,7 +309,7 @@ export default function ManageAccount() {
                   className="border-b-2 border-t-2"
                   style={{ width: "15%" }}
                 />
-                 <Column
+                <Column
                   body={status}
                   header="Trạng Thái "
                   className="border-b-2 border-t-2"

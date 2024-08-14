@@ -24,6 +24,11 @@ const validationSchema = Yup.object({
   confirmPassword: Yup.string()
     .required("Nhập lại mật khẩu không được bỏ trống")
     .oneOf([Yup.ref("password"), null], "Mật khẩu không khớp"),
+  role: Yup.object()
+    .test("is-not-empty", "Không được để trống trường này", (value) => {
+      return Object.keys(value).length !== 0; // Check if object is not empty
+    })
+    .required("Không bỏ trống trường này"),
 });
 
 export default function AddUser({
@@ -33,7 +38,7 @@ export default function AddUser({
   fetchData,
   roleList,
 }) {
-  const [role, setRole] = useState(null);
+  console.log(roleList);
 
   const initialValues = {
     fistName: "",
@@ -42,9 +47,9 @@ export default function AddUser({
     email: "",
     password: "",
     confirmPassword: "",
+    role: {},
   };
   const [loading, setLoading] = useState(false);
-  console.log(roleList);
 
   const onSubmit = (values) => {
     setLoading(true);
@@ -57,7 +62,7 @@ export default function AddUser({
       email: values.email,
       password: values.password,
       confirmPassword: values.confirmPassword,
-      roleString:role
+      roleString: values.role.baseName,
     };
     restClient({
       url: "api/admin/register",
@@ -65,22 +70,20 @@ export default function AddUser({
       data: model,
     })
       .then((res) => {
-        SUCCESS(toast, "Thêm tài liệu thành công");
+        SUCCESS(toast, "Tạo tài khoản thành công");
         fetchData();
         setLoading(false);
       })
       .catch((err) => {
-        REJECT(toast, err.message);
+        REJECT(toast, "Tạo tài khoản không thành công");
         setLoading(false);
       })
       .finally(() => {
         setVisible(false);
       });
   };
-  const handleSearch = (text) => {
-    setRole(text);
-  };
-  
+
+
   return (
     <Dialog
       header="Thêm Nguời Dùng"
@@ -137,16 +140,14 @@ export default function AddUser({
                 type="password"
                 id="confirmPassword"
               />
-              <span>Vai trò</span>
-              <Dropdown
-                value={role}
-                onChange={(e) => handleSearch(e.value)}
-                options={roleList}
-                optionLabel="title"
-                showClear
-                placeholder="Vai trò"
-                className="w-full rounded-l shadow-none  border border-gray-300"
-              />
+              <CustomDropdown
+                title="Vai trò" 
+                label="Vai trò" 
+                name="role" 
+                id="role" 
+                customTitle = "name"
+                options={roleList} 
+                placeholder="Chọn vai trò" />
 
               <div className="flex justify-end gap-2 mt-3">
                 <Button
