@@ -354,7 +354,9 @@ export const PostProvider = ({ children }) => {
       .then((res) => {
         SUCCESS(toast, "Bình luận bài đăng thành công");
         setLoading(false);
-        fetchPost();
+        // fetchPost();
+        setRefresh(new Date());
+        setRefresh2(new Date());
       })
       .catch((err) => {
         REJECT(toast, err.message);

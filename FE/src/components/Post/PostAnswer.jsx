@@ -42,8 +42,8 @@ const PostAnswer = ({ post }) => {
     updatePostComment,
   } = useContext(PostContext);
   const { id, userId, fullName, numberOfComment } = post;
-  const [numberOfCommentFake, setNumberOfCommentFake] =
-    useState(numberOfComment);
+  // const [numberOfCommentFake, setNumberOfCommentFake] =
+  //   useState(numberOfComment);
   const toast = useRef(null);
   const [visibleCount, setVisibleCount] = useState(3);
 
@@ -52,25 +52,25 @@ const PostAnswer = ({ post }) => {
   };
   const fetchPost = useCallback(async () => {
     // console.log(numberOfCommentFake);
-    // console.log(numberOfComment);
+    console.log(numberOfComment);
     // setTimeout(async () => {
-    // if (numberOfComment > 0) {
-    setLoading(true);
-    setViewAnswer(true);
-    try {
-      const response = await restClient({
-        url: `api/postcomment/getallcommentbypostidpagination?postId=${id}`,
-        method: "GET",
-      });
-      setAnswers(response.data.data);
-    } catch {
-      setAnswers([]);
-    } finally {
-      setLoading(false);
+    if (numberOfComment > 0) {
+      setLoading(true);
+      setViewAnswer(true);
+      try {
+        const response = await restClient({
+          url: `api/postcomment/getallcommentbypostidpagination?postId=${id}`,
+          method: "GET",
+        });
+        setAnswers(response.data.data);
+      } catch {
+        setAnswers([]);
+      } finally {
+        setLoading(false);
+      }
     }
-    // }
     // }, 1000);
-  }, [refresh, id]);
+  }, [refresh, id, numberOfComment]);
 
   useEffect(() => {
     fetchPost();
@@ -81,7 +81,7 @@ const PostAnswer = ({ post }) => {
       const postComment = { content, postId: post?.id, userId: user?.sub };
 
       setIsChangeInput({ isChange: false, data: null });
-      setNumberOfCommentFake((preValue) => preValue + 1);
+      // setNumberOfCommentFake((preValue) => preValue + 1);
       if (!isChangeInput?.data?.content) {
         await createPostComment(postComment, fetchPost);
       } else {
