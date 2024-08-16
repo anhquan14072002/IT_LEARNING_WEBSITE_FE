@@ -4,7 +4,7 @@ import { getDocumentByGradeId } from "../../services/document.api";
 import { useNavigate } from "react-router-dom";
 
 export default function Class({ item, index }) {
-  const [toggle, setToggle] = useState(index === 0 ? true : false);
+  const [toggle, setToggle] = useState(false);
   const contentRef = useRef(null);
   const [contentHeight, setContentHeight] = useState("0px");
   const [loading, setLoading] = useState(false);
