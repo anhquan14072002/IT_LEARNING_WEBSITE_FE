@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "https://judge0-extra-ce.p.rapidapi.com";
+const BASE_URL = "https://judge0-ce.p.rapidapi.com/languages";
 
 // The function to call the API
 export default function restClientV2({
