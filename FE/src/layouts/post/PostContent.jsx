@@ -32,11 +32,15 @@ function PostContent({ ...props }) {
       {!compose?.isCompose ? (
         <ComposeComment
           onClick={() =>
-            setCompose((preValue) => ({ ...preValue, isCompose: true }))
+            setCompose((preValue) => ({ isCompose: true, data: null }))
           }
         />
       ) : (
-        <PostWrite setCompose={setCompose} compose={compose} />
+        <PostWrite
+          setCompose={setCompose}
+          key={compose?.data?.id}
+          compose={compose}
+        />
       )}
       <main>
         <PostContentItem />
@@ -58,18 +62,22 @@ function PostWrite({ setCompose, compose }) {
   const toast = useRef(null);
   const [initialValues, setInitialValues] = useState({ grade: {} });
   useEffect(() => {
-    if (compose?.data?.gradeId) {
+    if (compose?.data != null) {
       async function getGradeById() {
         const gradeById = await restClient({
-          url: `api/grade/getgradebyid/${compose?.data?.gradeId}`,
+          url: `api/grade/getgradebyid/${compose?.data?.gradeId}?include=false`,
           method: "GET",
         });
         const gradeByIdData = gradeById.data?.data || {};
+        console.log(gradeByIdData);
+
         setInitialValues((preValue) => ({ grade: gradeByIdData }));
       }
       getGradeById();
     }
-  }, [compose?.data?.gradeId]);
+  }, [compose?.data]);
+  console.log(compose?.data);
+
   const [description, setDescription] = useState("");
   const [gradeList, setListGrade] = useState([]);
   useEffect(() => {
@@ -81,7 +89,7 @@ function PostWrite({ setCompose, compose }) {
 
   const onSubmit = (values) => {
     if (description.trim() === "") {
-      ACCEPT(toast, "Bạn cần nhập nội dung bài post ? ");
+      ACCEPT(toast, "Bạn cần nhập thêm nội dung bài post ? ");
       return;
     }
     if (containsRudeWords(description)) {
@@ -134,8 +142,6 @@ function PostWrite({ setCompose, compose }) {
       props.onChange(e);
     }
   };
-
-  console.log(initialValues);
 
   return (
     <>
