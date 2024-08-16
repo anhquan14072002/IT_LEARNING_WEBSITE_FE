@@ -842,7 +842,7 @@ const CodeEditor = () => {
                       </label>
                       <select
                         id="language-select"
-                        value={language?.id || ""}
+                        value={language?.languageId || ""}
                         onChange={handleLanguageChange}
                         className="bg-gray-700 text-white py-2 px-4 rounded-lg border border-gray-600 hover:bg-gray-700 focus:outline-none"
                       >
