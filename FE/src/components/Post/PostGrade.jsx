@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from "react";
-import LoadingScreen from "../../components/LoadingScreen";
-import PostGradeItem from "../../components/Post/PostIGradetem";
+import LoadingScreen from "../LoadingScreen";
+import PostGradeItem from "./PostIGradetem";
 import PostContext from "../../store/PostContext";
 import { getAllGrade } from "../../services/grade.api";
 
@@ -19,7 +19,6 @@ function PostGrade(props) {
       {loading ? (
         <LoadingScreen setLoading={loading} />
       ) : (
-
         <>
           {/* Icon for toggling sidebar on small screens */}
           <div className="md:hidden flex justify-end">
