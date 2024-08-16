@@ -18,7 +18,7 @@ export default function restClientV2({
     headers: {
       ...headers,
       "x-rapidapi-host": "judge0-extra-ce.p.rapidapi.com",
-      "x-rapidapi-key": "dbc4c81344msh45e460ce8331a61p1dff48jsn75d8386e64cf", 
+      "x-rapidapi-key": "d4945d8336mshc741e0914347dccp167230jsn0dd36c7b7999", 
     },
   });
 }
