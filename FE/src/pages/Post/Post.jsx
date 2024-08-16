@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import PostGrade from "../../layouts/post/PostGrade";
-import PostContent from "../../layouts/post/PostContent";
+import PostGrade from "../../components/Post/PostGrade";
+import PostContent from "../../components/Post/PostContent";
 import PostRank from "../../components/Post/PostRank";
 import Header from "../../components/Header";
 import Menu from "../../components/Menu";

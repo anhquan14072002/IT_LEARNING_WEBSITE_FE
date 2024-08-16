@@ -567,6 +567,10 @@ const CodeEditor = () => {
   // }, []);
 
   const submit = () => {
+    if (!isLoggedIn()) {
+      REJECT(toast, "Vui lòng đăng nhập");
+      return;
+    }
     setLoading(true); // Show loading spinner
     let model = {
       problemId: id,
@@ -672,7 +676,9 @@ const CodeEditor = () => {
 
                 setTestCaseList(res.data?.data);
                 setSelectedTestCase(0);
-                setTestCase(Array.isArray(res.data?.data) ? res.data?.data[0] : []);
+                setTestCase(
+                  Array.isArray(res.data?.data) ? res.data?.data[0] : []
+                );
               })
               .catch((err) => console.error(err));
           })
@@ -707,13 +713,12 @@ const CodeEditor = () => {
           (language) => language?.id === parseInt(selectedLanguageId)
         );
         console.log("selected language: " + selectedLanguage);
-        
+
         setLanguage(selectedLanguage);
         if (res?.data?.data?.sourceCode) {
           setCode(decodeBase64(res?.data?.data?.sourceCode));
         } else {
           if (Array.isArray(executeCode)) {
-            
             setCode(decodeBase64(selectedLanguage?.sampleCode));
           } else {
             setCode();
@@ -844,7 +849,7 @@ const CodeEditor = () => {
                         <option value="" disabled>
                           Chọn ngôn ngữ
                         </option>
-                        {executeCode.map((lang) => (
+                        {executeCode?.map((lang) => (
                           <option key={lang?.id} value={lang?.id}>
                             {lang?.languageName}
                           </option>
@@ -973,7 +978,7 @@ const CodeEditor = () => {
                           decodeBase64(result[0]?.standardError)}
                           {Array.isArray(result) && result[0]?.message &&
                           decodeBase64(result[0]?.message)} */}
-                        {result.map((item, index) => {
+                        {result?.map((item, index) => {
                           const status = item?.status;
 
                           // Check if status is not "Accepted" or "WrongAnswer"

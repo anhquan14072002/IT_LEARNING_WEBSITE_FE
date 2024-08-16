@@ -29,7 +29,7 @@ export default function CommentCoding({ id }) {
   const fetchSolutions = async () => {
     const pageSize = rows || 10;
     restClient({
-      url: `api/solution/getallsolutionbyproblemidpagination?ProblemId=${id}&PageIndex=${pageIndex}&PageSize=${pageSize}`,
+      url: `api/solution/getallsolutionbyproblemidpagination?ProblemId=${id}&PageIndex=${page}&PageSize=${pageSize}`,
     })
       .then((response) => {
         if (response.data.isSucceeded) {
@@ -44,6 +44,9 @@ export default function CommentCoding({ id }) {
   };
 
   useEffect(() => {
+    console.log('====================================');
+    console.log("run solution");
+    console.log('====================================');
     fetchSolutions();
   }, [id, page, rows]);
 
