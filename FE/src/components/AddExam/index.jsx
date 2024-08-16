@@ -23,8 +23,9 @@ const baseValidationSchema = Yup.object({
     })
     .required("Không bỏ trống trường này"),
     title: Yup.string()
+    .required("Tiêu đề không được bỏ trống")
     .min(5, "Tiêu đề phải có ít nhất 5 ký tự")
-    .required("Tiêu đề không được bỏ trống"),
+    .max(50, "Tiêu đề không được vượt quá 50 ký tự"),
   description: Yup.string().required("Mô tả không được bỏ trống"),
   province: Yup.object()
     .test("is-not-empty", "Không được để trống trường này", (value) => {
@@ -141,8 +142,8 @@ export default function AddExam({
         formData.append(`tagValues[${index}]`, item.keyWord);
       });
     }
-    formData.append("ExamEssayFileUpload", files);
-    formData.append("ExamSolutionFileUpload", fileSolution);
+    formData.append("ExamEssayFileUpload",  files[0]);
+    formData.append("ExamSolutionFileUpload", fileSolution[0]);
     try {
       const response = await restClient({
         url: "api/exam/createexam",
