@@ -74,11 +74,15 @@ function PostQuestion({ post, isFavoritePost }) {
         -  take id post and call api open 
         - isCompose
         - send data for isCompose  */
-    console.log(id);
-    console.log("fetch post");
-
+    scrollToTop();
     fetchPostById(id);
   }
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
   return (
     <div className="border-stone-200 border-b-2 ">
       <div className="rounded p-5 flex flex-col gap-3">
