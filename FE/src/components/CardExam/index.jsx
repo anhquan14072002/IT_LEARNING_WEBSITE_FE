@@ -1,12 +1,22 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import "primeicons/primeicons.css";
+import { useSelector } from "react-redux";
 const Index = ({ id, title, type }) => {
   const navigate = useNavigate();
+  const user = useSelector((state) => state.user.value);
+  console.log(user?.sub);
+  
   const handleNavigate = () => {
-    type === 1
+     if (user?.sub){
+      type === 1
       ? navigate(`/examdetail/${id}`)
       : navigate(`/examcodedetail/${id}`);
+     }else{
+     window.confirm("Vui lòng đăng nhập để được xem đề thi")
+     navigate("/login")
+     }
+    
   };
   return (
     <div
