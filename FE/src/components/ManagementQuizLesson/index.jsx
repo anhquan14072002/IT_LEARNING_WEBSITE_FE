@@ -105,13 +105,7 @@ export default function ManagementQuizLesson() {
     return <span>{index}</span>;
   };
 
-  const cities = [
-    { name: "New York", code: "NY" },
-    { name: "Rome", code: "RM" },
-    { name: "London", code: "LDN" },
-    { name: "Istanbul", code: "IST" },
-    { name: "Paris", code: "PRS" },
-  ];
+ 
 
   const actionBodyTemplate = (rowData) => {
     return (
@@ -276,21 +270,7 @@ export default function ManagementQuizLesson() {
               />
             </div>
 
-            <div className="flex-1 flex flex-wrap gap-3 justify-end">
-              <div className="border-2 rounded-md mt-4">
-                <Dropdown
-                  filter
-                  ref={dropDownRef2}
-                  value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.value)}
-                  options={cities}
-                  optionLabel="name"
-                  showClear
-                  placeholder="Tài liệu"
-                  className="w-full md:w-14rem shadow-none h-full"
-                />
-              </div>
-            </div>
+           
           </div>
           {loading ? (
             <Loading />
