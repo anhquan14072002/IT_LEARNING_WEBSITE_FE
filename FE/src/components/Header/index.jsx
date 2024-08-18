@@ -45,6 +45,15 @@ export default function Header({ params, setParams, textSearchProps }) {
     logout();
     navigate("/login");
   };
+  const getNavigationPath = () => {
+    if (user.role === "Admin") {
+      return "/dashboard/statistic";
+    }
+    if (user.role === "ContentManager") {
+      return "/dashboard/lesson";
+    }
+    return ""; // Default or fallback route
+  };
 
   const items = [
     {
@@ -63,7 +72,7 @@ export default function Header({ params, setParams, textSearchProps }) {
           {
             label: "Quản lí",
             icon: "pi pi-chart-bar",
-            command: (e) => navigate("/dashboard/statistic"),
+            command: (e) => navigate(getNavigationPath()),
           },
         ]:[] ),
         

@@ -27,6 +27,7 @@ import { Tooltip } from "primereact/tooltip";
 import ImportFromQuiz from "../../components/ImportFromQuiz";
 import NotifyProvider from "../../store/NotificationContext";
 import FormDataContext, { FormDataProvider } from "../../store/FormDataContext";
+import { useSelector } from "react-redux";
 
 export default function ManageQuestionOfQuizlist() {
   const toast = useRef(null);
@@ -44,7 +45,7 @@ export default function ManageQuestionOfQuizlist() {
   const [loading, setLoading] = useState(false);
   const [textSearch, setTextSearch] = useState("");
   const { id } = useParams();
-
+  const user = useSelector((state) => state.user.value);
   //pagination
   const [first, setFirst] = useState(0);
   const [page, setPage] = useState(1);
@@ -55,17 +56,67 @@ export default function ManageQuestionOfQuizlist() {
   const navigate = useNavigate();
 
   const Menus = [
-    { title: "Thống kê", src: "Chart_fill", index: "statistic" },
-    { title: "Quản lí tài khoản", src: "User", index: "user" },
+    // Admin specific menus
+    ...(user.role === "Admin"
+      ? [
+          {
+            title: "Thống kê",
+          
+            icon: "pi pi-chart-bar",
+            index: "statistic",
+          },
+          {
+            title: "Quản lí tài khoản",
+        
+            icon: "pi pi-user",
+            index: "user",
+          },
+
+          {
+            title: "Quản lí tài liệu/chủ đề/bài học",
+       
+            icon: "pi pi-book",
+            index: "adminManageDocument",
+          },
+        ]
+      : []),
+
+    // Content Manager specific menus
+    ...(user.role === "ContentManager"
+      ? [
+          {
+            title: "Quản lí bài học",
+      
+            icon: "pi pi-book",
+            index: "lesson",
+          },
+        ]
+      : []),
+
+    // Common menus
     {
-      title: "Quản lí tài liệu/chủ đề/bài học ",
-      src: "Folder",
-      index: "adminManageDocument",
+      title: "Quản lí câu hỏi ôn tập",
+
+      icon: "pi pi-question-circle",
+      index: "quiz",
     },
-    { title: "Quản lí bài học ", src: "Folder", index: "lesson" },
-    { title: "Quản lí câu hỏi ôn tập ", src: "Folder", index: "quiz" },
-    { title: "Quản lí đề thi", src: "Folder", index: "test" },
-    { title: "Quản lí tag ", src: "Folder", index: "tag" },
+    {
+      title: "Quản lí đề thi",
+
+      icon: "pi pi-file",
+      index: "test",
+    },
+    {
+      title: "Quản lí tag",
+
+      icon: "pi pi-tag",
+      index: "tag",
+    },
+    {
+      title: "Quản lí bài thực hành",
+      icon: "pi pi-ticket",
+      index: "codeeditor",
+    },
   ];
 
   useEffect(() => {
@@ -250,12 +301,11 @@ export default function ManageQuestionOfQuizlist() {
             open ? "w-72" : "w-20"
           } bg-dark-purple h-screen p-5 pt-8 duration-300`}
         >
-          <img
-            src="/src/assets/control.png"
-            className={`absolute cursor-pointer -right-3 top-9 w-7 border-dark-purple
-               border-2 rounded-full ${!open ? "rotate-180" : ""}`}
-            onClick={() => setOpen(!open)}
-          />
+            <i
+                className={`pi pi-arrow-circle-right text-white text-xl  absolute cursor-pointer right-2 top-7 w-7 
+   rounded-full ${!open ? "rotate-180" : ""}`}
+                onClick={() => setOpen(!open)}
+              />
 
           <ul className="pt-6">
             {Menus.map((Menu) => (
@@ -266,8 +316,11 @@ export default function ManageQuestionOfQuizlist() {
                   navigate(`/dashboard/${Menu.index}`);
                 }}
               >
-                <Tooltip target={`menu-${Menu.index}`} content={Menu.title} />
-                <img src={`/src/assets/${Menu.src}.png`} alt={Menu.title} />
+               <Tooltip
+                      target={`#tooltip-${Menu.index}`}
+                      content={Menu.title}
+                    />
+                    <i id={`tooltip-${Menu.index}`} className={Menu.icon}></i>
                 <span
                   className={`${
                     !open ? "hidden" : ""
