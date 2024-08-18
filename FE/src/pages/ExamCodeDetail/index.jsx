@@ -23,7 +23,6 @@ const ExamDetail = () => {
   const [examList, setExamList] = useState([]);
   const [selectedExamCode, setSelectedExamCode] = useState([]);
   const newPlugin = defaultLayoutPlugin();
-  const new1Plugin = highlightPlugin();
   const { id } = useParams();
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
@@ -61,11 +60,10 @@ const ExamDetail = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
   
-    // Ensure all questions are represented in the answers state
+    
     const numberQuestion = data?.numberQuestion;
     const allQuestions = Array.from({ length: numberQuestion }, (_, index) => `question${index + 1}`);
   
-    // Check for unanswered questions and confirm with the user if necessary
     const unansweredQuestions = allQuestions.filter(q => !answers.hasOwnProperty(q));
     if (unansweredQuestions.length > 0) {
       const confirmed = window.confirm(`Bạn còn ${unansweredQuestions.length} câu hỏi chưa trả lời. Bạn chắc chắn muốn nộp bài chứ?`);
@@ -146,7 +144,7 @@ const ExamDetail = () => {
           <div className="w-3/4 h-full p-4  ">
             <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
               {viewPdf ? (
-                <Viewer fileUrl={viewPdf} plugins={[newPlugin, new1Plugin]} />
+                <Viewer fileUrl={viewPdf} plugins={[newPlugin]} />
               ) : (
                 <div>No PDF</div>
               )}
