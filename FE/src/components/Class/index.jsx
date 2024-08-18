@@ -58,8 +58,10 @@ export default function Class({ item, index }) {
       ? navigate(`/examdetail/${exam.id}`)
       : navigate(`/examcodedetail/${exam.id}`);
      }else{
-     window.confirm("Vui lòng đăng nhập để được xem đề thi")
-     navigate("/login")
+      const confirmed = window.confirm("Vui lòng đăng nhập để được xem đề thi");
+      if (confirmed) {
+        navigate("/login");
+      }
      }
   }
 
