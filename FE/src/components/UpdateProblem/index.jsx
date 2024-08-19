@@ -25,6 +25,7 @@ import NotifyProvider from "../../store/NotificationContext";
 import UpdateTestCase from "../UpdateTestCase";
 import AddInUpdateProblem from "../AddInUpdateProblem";
 import UpdateInUpdateTestCase from "../UpdateInUpdateTestcase";
+import LoadingFull from "../LoadingFull";
 
 const validationSchema = Yup.object({
   titleInstruction: Yup.string().required(
@@ -98,6 +99,8 @@ export default function UpdateProblem() {
   const navigate = useNavigate();
   const [loadingForm, setLoadingForm] = useState(false);
   const [editorial, setEditoral] = useState();
+
+  const [isFormReady, setIsFormReady] = useState(false);
 
   useEffect(() => {
     setTimeout(() => {
@@ -185,6 +188,9 @@ export default function UpdateProblem() {
           titleInstruction: editoralData?.title,
           descriptionInstruction: editoralData?.description,
         });
+
+        setIsFormReady(true);
+
       } catch (error) {
       } finally {
         setLoadingForm(false);
@@ -470,6 +476,7 @@ export default function UpdateProblem() {
                 <h1 className="font-bold text-3xl my-5 text-center">
                   Cập nhật bài tập thực hành
                 </h1>
+                {isFormReady ? (
                 <Formik
                   initialValues={initialValues}
                   validationSchema={validationSchema}
@@ -687,6 +694,7 @@ export default function UpdateProblem() {
                     </Form>
                   )}
                 </Formik>
+                ) : <LoadingFull /> }
               </div>
             </div>
 
