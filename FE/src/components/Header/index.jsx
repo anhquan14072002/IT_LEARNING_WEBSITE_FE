@@ -39,11 +39,19 @@ export default function Header({ params, setParams, textSearchProps }) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showOptionNotifications, setShowOptionNotifications] = useState(false);
   // const [activeTabIndex, setActiveTabIndex] = useState(0);
-  
+  const getNavigationPathLogout = () => {
+    if (user.role === "Admin"|| user.role === "ContentManager") {
+      return "/loginAdmin";
+    }
+    if (user.role === "User") {
+      return "/login";
+    }
+    return ""; 
+  };
   const handleLogout = () => {
     dispatch(retmoveUser());
     logout();
-    navigate("/login");
+    navigate(getNavigationPathLogout());
   };
   const getNavigationPath = () => {
     if (user.role === "Admin") {
