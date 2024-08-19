@@ -1,6 +1,6 @@
 import React, { forwardRef } from "react";
 import "./index.css";
-import logo from "../../assets/TNV.svg";
+import logo from "../../assets/THV.svg";
 
 const Footer = forwardRef((props, ref) => {
   return (
