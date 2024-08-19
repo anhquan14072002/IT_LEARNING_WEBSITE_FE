@@ -85,7 +85,7 @@ function ImportStepOne(props) {
         />
         <Button
           className="border border-[#c5c7c7] py-1 px-4"
-          label="Upload"
+          label="Upload File"
           onClick={handleButtonClick}
         />
       </p>
