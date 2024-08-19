@@ -74,8 +74,6 @@ function PostQuestion({ post, isFavoritePost }) {
         -  take id post and call api open 
         - isCompose
         - send data for isCompose  */
-    console.log(id);
-    console.log("fetch post");
 
     fetchPostById(id);
   }

@@ -90,7 +90,9 @@ const PostAnswer = ({ post }) => {
           fetchPost
         );
       }
-      notifyPersonalResponse();
+      if (user?.sub !== userId) {
+        notifyPersonalResponse();
+      }
     }
   };
 
