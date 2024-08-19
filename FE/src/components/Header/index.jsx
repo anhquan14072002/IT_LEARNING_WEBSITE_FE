@@ -39,20 +39,11 @@ export default function Header({ params, setParams, textSearchProps }) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showOptionNotifications, setShowOptionNotifications] = useState(false);
   // const [activeTabIndex, setActiveTabIndex] = useState(0);
-
+  
   const handleLogout = () => {
     dispatch(retmoveUser());
     logout();
     navigate("/login");
-  };
-  const getNavigationPath = () => {
-    if (user.role === "Admin") {
-      return "/dashboard/statistic";
-    }
-    if (user.role === "ContentManager") {
-      return "/dashboard/lesson";
-    }
-    return ""; // Default or fallback route
   };
 
   const items = [
@@ -68,16 +59,14 @@ export default function Header({ params, setParams, textSearchProps }) {
           icon: "pi pi-user-edit",
           command: (e) => navigate("/profile"),
         },
-        ...(user.role === "Admin" || user.role === "ContentManager"
-          ? [
-              {
-                label: "Quản lí",
-                icon: "pi pi-chart-bar",
-                command: (e) => navigate(getNavigationPath()),
-              },
-            ]
-          : []),
-
+        ...(user.role === "Admin" || user.role === "ContentManager" ?[
+          {
+            label: "Quản lí",
+            icon: "pi pi-chart-bar",
+            command: (e) => navigate("/dashboard/statistic"),
+          },
+        ]:[] ),
+        
         {
           label: "Đăng xuất",
           icon: "pi pi-sign-out",
@@ -174,24 +163,24 @@ export default function Header({ params, setParams, textSearchProps }) {
     <>
       <div className="w-full">
         <div className="bg-[#1976D2] flex justify-between py-4 px-16">
-          <div className="flex items-center justify-center ">
+          <div className="flex items-center">
             <img
-              className="h-[50px] w-[60px] cursor-pointer"
+              className="h-[50px] w-[50px] cursor-pointer"
               src={logo}
               onClick={() => navigate("/")}
             />
           </div>
 
           <div className="flex">
-            <div className="border border-white rounded-3xl flex items-center px-2.5 py-2 gap-2.5 w-full h-full">
+            <div className="border border-white rounded-3xl flex items-center px-2.5 py-2 gap-2.5">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 x="0px"
                 y="0px"
-                width="24" // Adjust width as needed
-                height="24" // Adjust height as needed
-                viewBox="0 0 256 256"
-                className="fill-white flex-shrink-0" // Prevent the SVG from shrinking
+                width="22"
+                height="22"
+                viewBox="0,0,256,256"
+                className="fill-white"
               >
                 <g
                   fillRule="nonzero"
@@ -217,7 +206,7 @@ export default function Header({ params, setParams, textSearchProps }) {
                 id="search"
                 placeholder="Tìm kiếm"
                 value={textSearch}
-                className="bg-transparent border-none text-white focus:outline-none placeholder:text-white w-full"
+                className="bg-transparent border-none text-white focus:outline-none placeholder:text-white"
                 onChange={(e) => setTextSearch(e.target.value)}
                 onKeyDown={(e) => handleKeyDown(e)}
               />
