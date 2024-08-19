@@ -54,7 +54,6 @@ export default function Header({ params, setParams, textSearchProps }) {
     }
     return ""; // Default or fallback route
   };
-
   const items = [
     {
       items: [
