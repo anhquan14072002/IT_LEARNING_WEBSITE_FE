@@ -1,15 +1,6 @@
 export const province = {
   data: [
     {
-      id: 999,
-      name: "Toàn Quốc",
-      name_en: "",
-      full_name: "",
-      full_name_en: "",
-      latitude: 10.5392057,
-      longitude: 105.2312822,
-    },
-    {
       id: 89,
       name: "An Giang",
       name_en: "An Giang",

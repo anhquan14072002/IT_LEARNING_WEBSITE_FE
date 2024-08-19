@@ -2,7 +2,6 @@ import React, { useState, useRef, useEffect } from "react";
 import arrowDown from "../../assets/img/icons8-arrow-down-50.png";
 import { getDocumentByGradeId } from "../../services/document.api";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
 
 export default function Class({ item, index }) {
   const [toggle, setToggle] = useState(false);
@@ -11,7 +10,6 @@ export default function Class({ item, index }) {
   const [loading, setLoading] = useState(false);
   const [documentList, setDocumentList] = useState([]);
   const navigate = useNavigate();
-  const user = useSelector((state) => state.user.value);
 
   useEffect(() => {
     if (toggle) {
@@ -53,16 +51,10 @@ export default function Class({ item, index }) {
   const testQuizzes = extractQuizzesByType(2);
 
   const handleExam = (exam) => {
-    if (user?.sub){
       exam?.type === 1
-      ? navigate(`/examdetail/${exam.id}`)
-      : navigate(`/examcodedetail/${exam.id}`);
-     }else{
-      const confirmed = window.confirm("Vui lòng đăng nhập để được xem đề thi");
-      if (confirmed) {
-        navigate("/login");
-      }
-     }
+        ? navigate(`/examdetail/${exam.id}`)
+        : navigate(`/examcodedetail/${exam.id}`);
+  
   }
 
   return (

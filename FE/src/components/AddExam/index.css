@@ -3,8 +3,3 @@
     color: white !important; /* Optional: change text color to white for better contrast */
   }
   
-  button[aria-label="Upload"].p-button.p-component {
-    display: none;
-  }
- 
- 

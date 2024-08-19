@@ -24,68 +24,19 @@ const Dashboard = () => {
   const { typeId } = useParams();
   const user = useSelector((state) => state.user.value);
   const Menus = [
-    // Admin specific menus
-    ...(user.role === "Admin"
-      ? [
-          {
-            title: "Thống kê",
-            src: assets.chart_fill,
-            icon: "pi pi-chart-bar",
-            index: "statistic",
-          },
-          {
-            title: "Quản lí tài khoản",
-            src: assets.user,
-            icon: "pi pi-user",
-            index: "user",
-          },
-
-          {
-            title: "Quản lí tài liệu/chủ đề/bài học",
-            src: assets.folder,
-            icon: "pi pi-book",
-            index: "adminManageDocument",
-          },
-        ]
-      : []),
-
-    // Content Manager specific menus
-    ...(user.role === "ContentManager"
-      ? [
-          {
-            title: "Quản lí bài học",
-            src: assets.folder,
-            icon: "pi pi-book",
-            index: "lesson",
-          },
-        ]
-      : []),
-
-    // Common menus
+    { title: "Thống kê", src: assets.chart_fill, index: "statistic" },
+    { title: "Quản lí tài khoản", src: assets.user, index: "user" },
+    ...(user.role === "Admin"  ?[
     {
-      title: "Quản lí câu hỏi ôn tập",
+      title: "Quản lí tài liệu/chủ đề/bài học ",
       src: assets.folder,
-      icon: "pi pi-question-circle",
-      index: "quiz",
-    },
-    {
-      title: "Quản lí đề thi",
-      src: assets.folder,
-      icon: "pi pi-file",
-      index: "test",
-    },
-    {
-      title: "Quản lí tag",
-      src: assets.folder,
-      icon: "pi pi-tag",
-      index: "tag",
-    },
-    {
-      title: "Quản lí bài thực hành",
-      src: assets.folder,
-      icon: "pi pi-ticket",
-      index: "codeeditor",
-    },
+      index: "adminManageDocument",
+    }] :[]),
+    { title: "Quản lí bài học ", src: assets.folder, index: "lesson" },
+    { title: "Quản lí câu hỏi ôn tập ", src: assets.folder, index: "quiz" },
+    { title: "Quản lí đề thi", src: assets.folder, index: "test" },
+    { title: "Quản lí tag ", src: assets.folder, index: "tag" },
+    { title: "Quản lí bài thực hành", src: assets.folder, index: "codeeditor" },
   ];
 
   useEffect(() => {
@@ -109,12 +60,12 @@ const Dashboard = () => {
                 open ? "w-72" : "w-20"
               } bg-dark-purple h-screen p-5 pt-8 duration-300`}
             >
-              <i
-                className={`pi pi-arrow-circle-right text-white text-xl  absolute cursor-pointer right-2 top-7 w-7 
-   rounded-full ${!open ? "rotate-180" : ""}`}
+              <img
+                src={assets.control}
+                className={`absolute cursor-pointer -right-3 top-9 w-7 border-dark-purple
+               border-2 rounded-full ${!open ? "rotate-180" : ""}`}
                 onClick={() => setOpen(!open)}
               />
-
               {/* <div className="flex gap-x-4 items-center">
                 <img
                   src="/src/assets/logo.png"
@@ -135,10 +86,10 @@ const Dashboard = () => {
                     }}
                   >
                     <Tooltip
-                      target={`#tooltip-${Menu.index}`}
+                      target={`menu-${Menu.index}`}
                       content={Menu.title}
                     />
-                    <i id={`tooltip-${Menu.index}`} className={Menu.icon}></i>
+                    <img src={Menu.src} alt={Menu.title} />
 
                     <span
                       className={`${

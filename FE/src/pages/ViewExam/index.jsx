@@ -20,7 +20,6 @@ const Index = () => {
   const [loading, setLoading] = useState(false);
   const [provinceList, setProvinceList] = useState([]);
   const [selectedProvince, setSelectedProvince] = useState("");
-  const [selectedProvince1, setSelectedProvince1] = useState("");
   const [competitionList, setCompetitionList] = useState([]);
   const [competition, setCompetition] = useState("");
   const [competitionSearch, setCompetitionSearch] = useState("");
@@ -29,7 +28,7 @@ const Index = () => {
 
   const fetchData = async () => {
     setLoading(true);
-    const province = selectedProvince1 ? selectedProvince1 : "";
+    const province = selectedProvince ? selectedProvince : "";
     const years = year ? year : "";
     const competition = competitionSearch ? competitionSearch : "";
     const id = "id";
@@ -89,7 +88,6 @@ const Index = () => {
 
   const handleProvince = (e) => {
     setSelectedProvince(e.value?.name);
-    setSelectedProvince1(e.value?.name_en);
   };
 
   const handleCompetition = (e) => {

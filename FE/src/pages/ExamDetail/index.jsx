@@ -34,8 +34,7 @@ const ExamDetail = () => {
     };
     fetchData();
   }, [id]);
- console.log(data?.urlDownloadSolutionFile);
- 
+
   return (
     <NotifyProvider>
       <Toast ref={toast} />
@@ -56,9 +55,7 @@ const ExamDetail = () => {
               )}
             </Worker>
           </div>
-          {data?.urlDownloadSolutionFile && (
           <div><a href={data?.urlDownloadSolutionFile}><button  className="bg-blue-600 mt-5  text-white p-2 text-sm font-normal border border-blue-500 "> Tải Lời Giải</button></a> </div>
-          )}
         </div>
        
       </div>

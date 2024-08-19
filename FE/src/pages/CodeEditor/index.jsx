@@ -342,7 +342,7 @@ const CodeEditor = () => {
                           Chọn ngôn ngữ
                         </option>
                         {executeCode?.map((lang) => (
-                          <option key={lang?.id} value={lang?.languageId}>
+                          <option key={lang?.id} value={lang?.id}>
                             {lang?.languageName}
                           </option>
                         ))}

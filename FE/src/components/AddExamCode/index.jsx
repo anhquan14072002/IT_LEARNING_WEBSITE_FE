@@ -89,7 +89,7 @@ export default function AddExamCode({
                 type="text"
               />
 
-              <h1>File Đề Bài <span style={{color:"red"}}>*</span> </h1>
+              <h1>File Đề Bài   </h1>
               <Field name="files">
                 {({ field }) => (
                   <FileUpload
