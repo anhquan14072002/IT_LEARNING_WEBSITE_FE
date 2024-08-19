@@ -6,7 +6,7 @@ import React, {
   useRef,
   useState,
 } from "react";
-import restClient from "../services/restClient";
+import restClient, { BASE_URL } from "../services/restClient";
 import { ACCEPT, isLoggedIn, REJECT, SUCCESS } from "../utils";
 import { Toast } from "primereact/toast";
 import { useSelector } from "react-redux";
@@ -31,6 +31,7 @@ export const PostProvider = ({ children }) => {
     gradeIdSelected: undefined,
     itemTab: undefined,
   });
+  const [compose, setCompose] = useState({ isCompose: false, data: null });
   const toast = useRef(null);
   const [refresh, setRefresh] = useState();
   const [refresh2, setRefresh2] = useState();
@@ -45,7 +46,7 @@ export const PostProvider = ({ children }) => {
     const notification = async () => {
       try {
         const conn = new HubConnectionBuilder()
-          .withUrl("https://localhost:7000/notificationHub", {
+          .withUrl(`${BASE_URL}/notificationHub`, {
             skipNegotiation: true,
             transport: HttpTransportType.WebSockets,
           })
@@ -61,11 +62,11 @@ export const PostProvider = ({ children }) => {
         conn.on(
           "ReceivedPersonalNotification",
           (message, userReceiveId, userSendId) => {
-            setRefresh(new Date());
-            setRefresh2(new Date());
             if (userReceiveId !== userSendId) {
               fetchNumberNotificationByUserId();
             }
+            setRefresh(new Date());
+            setRefresh2(new Date());
           }
         );
         conn.onclose(() => {
@@ -134,9 +135,9 @@ export const PostProvider = ({ children }) => {
     console.log(itemSidebar?.gradeIdSelected);
 
     if (itemSidebar?.gradeIdSelected) {
-      url = `api/post/getallpostbyuserandgradepagination?userId=${user?.sub}&gradeId=${itemSidebar?.gradeIdSelected}&PageIndex=${page}&PageSize=${rows}`;
+      url = `api/post/getallpostbyuserandgradepagination?userId=${user?.sub}&gradeId=${itemSidebar?.gradeIdSelected}&PageIndex=${page}&PageSize=${rows}&OrderBy=createdDate&IsAscending=false`;
     } else {
-      url = `api/post/getallpostbyuserpagination?userId=${user?.sub}&PageIndex=${page}&PageSize=${rows}`;
+      url = `api/post/getallpostbyuserpagination?userId=${user?.sub}&PageIndex=${page}&PageSize=${rows}&OrderBy=createdDate&IsAscending=false`;
     }
     restClient({
       url: url,
@@ -157,9 +158,9 @@ export const PostProvider = ({ children }) => {
     setLoading(true);
     let url;
     if (itemSidebar?.gradeIdSelected) {
-      url = `api/post/getallpostnotanswerbygradepagination?gradeId=${itemSidebar?.gradeIdSelected}&PageIndex=${page}&PageSize=${rows}`;
+      url = `api/post/getallpostnotanswerbygradepagination?gradeId=${itemSidebar?.gradeIdSelected}&PageIndex=${page}&PageSize=${rows}&OrderBy=createdDate&IsAscending=false`;
     } else {
-      url = `api/post/getallpostnotanswerbygradepagination?gradeId=0&PageIndex=${page}&PageSize=${rows}`;
+      url = `api/post/getallpostnotanswerbygradepagination?gradeId=0&PageIndex=${page}&PageSize=${rows}&OrderBy=createdDate&IsAscending=false`;
     }
     restClient({
       url: url,
@@ -180,7 +181,7 @@ export const PostProvider = ({ children }) => {
     console.log("fetchDataById");
     setLoading(true);
     restClient({
-      url: `api/post/getallpostbygradepagination?gradeId=${itemSidebar.gradeIdSelected}&PageIndex=${page}&PageSize=${rows}`,
+      url: `api/post/getallpostbygradepagination?gradeId=${itemSidebar.gradeIdSelected}&PageIndex=${page}&PageSize=${rows}&OrderBy=createdDate&IsAscending=false`,
       method: "GET",
     })
       .then((res) => {
@@ -191,6 +192,28 @@ export const PostProvider = ({ children }) => {
       .catch((err) => {
         console.error("Error fetching data:", err);
         setPosts([]);
+      })
+      .finally(() => setLoading(false));
+  };
+  const fetchPostById = (id) => {
+    console.log("fetchDataById");
+    setLoading(true);
+    restClient({
+      url: `api/post/getpostbyid?id=${id}`,
+      method: "GET",
+    })
+      .then((res) => {
+        console.log("fetch post");
+
+        console.log(res.data.data);
+        // setCompose((preValue) => ({ isCompose: true, data: res.data.data }));
+        setCompose((preValue) => ({
+          isCompose: true,
+          data: { ...res.data.data, idPost: id },
+        }));
+      })
+      .catch((err) => {
+        console.error("Error fetching data:", err);
       })
       .finally(() => setLoading(false));
   };
@@ -258,7 +281,7 @@ export const PostProvider = ({ children }) => {
   const fetchData = () => {
     setLoading(true);
     restClient({
-      url: `api/post/getallpostpagination?PageIndex=${page}&PageSize=${rows}`,
+      url: `api/post/getallpostpagination?PageIndex=${page}&PageSize=${rows}&OrderBy=createdDate&IsAscending=false`,
       method: "GET",
     })
       .then((res) => {
@@ -277,6 +300,22 @@ export const PostProvider = ({ children }) => {
     restClient({
       url: "api/post/createpost",
       method: "POST",
+      data: contentPost,
+    })
+      .then((res) => {
+        // SUCCESS(toast, "Tạo bài post thành công");
+        setRefresh2(new Date());
+        setLoading(false);
+      })
+      .catch((err) => {
+        REJECT(toast, err.message);
+        setLoading(false);
+      });
+  };
+  const updatePost = (contentPost) => {
+    restClient({
+      url: "api/post/updatePost",
+      method: "PUT",
       data: contentPost,
     })
       .then((res) => {
@@ -314,6 +353,24 @@ export const PostProvider = ({ children }) => {
     })
       .then((res) => {
         SUCCESS(toast, "Bình luận bài đăng thành công");
+        setLoading(false);
+        // fetchPost();
+        setRefresh(new Date());
+        setRefresh2(new Date());
+      })
+      .catch((err) => {
+        REJECT(toast, err.message);
+        setLoading(false);
+      });
+  };
+  const updatePostComment = (contentPost, fetchPost) => {
+    restClient({
+      url: "api/postcomment/updatepostcomment",
+      method: "PUT",
+      data: contentPost,
+    })
+      .then((res) => {
+        SUCCESS(toast, "Sửa bài đăng thành công");
         setLoading(false);
         fetchPost();
       })
@@ -395,6 +452,11 @@ export const PostProvider = ({ children }) => {
         fetchPostCommentById,
         createPostNotification,
         createFavoritePost,
+        setCompose,
+        compose,
+        fetchPostById,
+        updatePost,
+        updatePostComment,
       }}
     >
       <Toast ref={toast} />

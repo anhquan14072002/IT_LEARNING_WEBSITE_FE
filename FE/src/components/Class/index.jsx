@@ -2,14 +2,16 @@ import React, { useState, useRef, useEffect } from "react";
 import arrowDown from "../../assets/img/icons8-arrow-down-50.png";
 import { getDocumentByGradeId } from "../../services/document.api";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from "react-redux";
 
 export default function Class({ item, index }) {
-  const [toggle, setToggle] = useState(index === 0 ? true : false);
+  const [toggle, setToggle] = useState(false);
   const contentRef = useRef(null);
   const [contentHeight, setContentHeight] = useState("0px");
   const [loading, setLoading] = useState(false);
   const [documentList, setDocumentList] = useState([]);
   const navigate = useNavigate();
+  const user = useSelector((state) => state.user.value);
 
   useEffect(() => {
     if (toggle) {
@@ -17,25 +19,15 @@ export default function Class({ item, index }) {
     }
   }, [toggle, item.id]);
 
-  // useEffect(() => {
-  //   setContentHeight(toggle ? `${contentRef.current.scrollHeight}px` : "0px");
-  // }, [toggle]);
   useEffect(() => {
     setTimeout(() => {
-      // Function to update contentHeight based on toggle state
       const updateContentHeight = () => {
         setContentHeight(
           toggle ? `${contentRef?.current?.scrollHeight}px` : "0px"
         );
       };
-
-      // Call initially and on toggle change
       updateContentHeight();
-
-      // Listen to window resize events
       window.addEventListener("resize", updateContentHeight);
-
-      // Cleanup function to remove event listener
       return () => {
         window.removeEventListener("resize", updateContentHeight);
       };
@@ -46,21 +38,32 @@ export default function Class({ item, index }) {
     setToggle((prevToggle) => !prevToggle);
   };
 
-  // Helper function to extract quizzes by type
-  const extractQuizzesByType = (type) => {
+  const extractQuizzesByType = (typeId) => {
     return (documentList?.documents ?? []).flatMap((d) =>
       (d.topics ?? []).flatMap((t) =>
         [
-          ...(t.quizzes ?? []).filter((q) => q.type === type),
-          ...(t.lessons ?? []).flatMap((l) => (l.quizzes ?? []).filter((q) => q.type === type)),
+          ...(t.quizzes ?? []).filter((q) => q.typeId === typeId),
+          ...(t.lessons ?? []).flatMap((l) => (l.quizzes ?? []).filter((q) => q.typeId === typeId)),
         ]
       )
     );
   };
 
-  // Extract quizzes for both "Practice" and "Test"
-  const practiceQuizzes = extractQuizzesByType("Practice");
-  const testQuizzes = extractQuizzesByType("Test");
+  const practiceQuizzes = extractQuizzesByType(1);
+  const testQuizzes = extractQuizzesByType(2);
+
+  const handleExam = (exam) => {
+    if (user?.sub){
+      exam?.type === 1
+      ? navigate(`/examdetail/${exam.id}`)
+      : navigate(`/examcodedetail/${exam.id}`);
+     }else{
+      const confirmed = window.confirm("Vui lòng đăng nhập để được xem đề thi");
+      if (confirmed) {
+        navigate("/login");
+      }
+     }
+  }
 
   return (
     <div>
@@ -95,19 +98,40 @@ export default function Class({ item, index }) {
         <div className="flex gap-20 flex-wrap">
           <div>
             <h1 className="font-bold mb-3">Các bộ sách</h1>
-            {documentList?.documents?.map((d) => (
+            {(documentList?.documents ?? []).map((d) => (
               <h1
-                key={d.id}
+                key={d?.id}
                 className="cursor-pointer hover:opacity-85"
-                onClick={() => navigate(`/document/${d.id}`)}
+                onClick={() => navigate(`/document/${d?.id}`)}
+              >
+                {d?.title}
+              </h1>
+            )).slice(0, 4)}
+            {(documentList?.documents ?? []).length > 4 && (
+              <h1
+                className="text-sm text-blue-600 mt-3 cursor-pointer"
+                onClick={() => navigate(`/search?classId=${item?.id}`)}
+              >
+                Xem tất cả
+              </h1>
+            )}
+          </div>
+
+          <div>
+            <h1 className="font-bold mb-3">Câu hỏi ôn tập flashcard</h1>
+            {practiceQuizzes.map((d) => (
+              <h1
+                key={d?.id}
+                className="cursor-pointer hover:opacity-85"
+                onClick={() => navigate(`/flashcard/${d?.id}`)}
               >
                 {d.title}
               </h1>
-            ))}
-            {documentList?.documents?.length > 4 && (
+            )).slice(0, 4)}
+            {practiceQuizzes?.length > 4 && (
               <h1
                 className="text-sm text-blue-600 mt-3 cursor-pointer"
-                onClick={() => navigate(`/search?classId=${item.id}`)}
+                onClick={() => navigate(`/searchquiz`)}
               >
                 Xem tất cả
               </h1>
@@ -115,95 +139,78 @@ export default function Class({ item, index }) {
           </div>
 
           <div>
-        <h1 className="font-bold mb-3">Câu hỏi ôn tập flashcard</h1>
-        {practiceQuizzes.map((d) => (
-          <h1
-            key={d.id}
-            className="cursor-pointer hover:opacity-85"
-            onClick={() => navigate(`/flashcard/${d.id}`)}
-          >
-            {d.title}
-          </h1>
-        ))}
-        {practiceQuizzes.length > 4 && (
-          <h1
-            className="text-sm text-blue-600 mt-3 cursor-pointer"
-            onClick={() => navigate(`/searchquiz`)}
-          >
-            Xem tất cả
-          </h1>
-        )}
-      </div>
+            <h1 className="font-bold mb-3">Câu hỏi ôn tập trắc nghiệm</h1>
+            {testQuizzes?.map((d) => (
+              <h1
+                key={d?.id}
+                className="cursor-pointer hover:opacity-85"
+                onClick={() => navigate(`/testquiz/${d.id}`)}
+              >
+                {d.title}
+              </h1>
+            )).slice(0, 4)}
+            {testQuizzes.length > 4 && (
+              <h1
+                className="text-sm text-blue-600 mt-3 cursor-pointer"
+                onClick={() => navigate(`/searchquiz`)}
+              >
+                Xem tất cả
+              </h1>
+            )}
+          </div>
 
-      <div>
-        <h1 className="font-bold mb-3">Câu hỏi ôn tập trắc nghiệm</h1>
-        {testQuizzes.map((d) => (
-          <h1
-            key={d.id}
-            className="cursor-pointer hover:opacity-85"
-            onClick={() => navigate(`/testquiz/${d.id}`)}
-          >
-            {d.title}
-          </h1>
-        ))}
-        {testQuizzes.length > 4 && (
-          <h1
-            className="text-sm text-blue-600 mt-3 cursor-pointer"
-            onClick={() => navigate(`/searchquiz`)}
-          >
-            Xem tất cả
-          </h1>
-        )}
-      </div>
-    
-        
           <div>
             <h1 className="font-bold mb-3">Đề thi</h1>
-            {documentList?.exams?.map((exam) => (
+            {(documentList?.exams ?? []).map((exam) => (
               <h1
                 key={exam.id}
                 className="cursor-pointer hover:opacity-85"
-                onClick={() => navigate(`/document/${exam.id}`)}
+                onClick={() => handleExam(exam)}
               >
                 {exam.title}
               </h1>
-            ))}
-            {documentList?.exams?.length > 4 && (
+            )).slice(0, 4)}
+            {(documentList?.exams ?? []).length > 4 && (
               <h1
                 className="text-sm text-blue-600 mt-3 cursor-pointer"
-                onClick={() => navigate(`/search?classId=${item.id}`)}
+                onClick={() => navigate(`/search?classId=${item?.id}`)}
               >
                 Xem tất cả
               </h1>
             )}
           </div>
+          
           <div>
             <h1 className="font-bold mb-3">Bài tập</h1>
-            {documentList?.documents
-              ?.flatMap(
-                (d) =>
-                  d.topics?.flatMap(
-                    (t) => t.lessons?.flatMap((l) => l.problems) || []
-                  ) || []
+            {(
+              documentList?.documents ?? []
+            )
+              .flatMap((d) =>
+                (d?.topics ?? []).flatMap((t) =>
+                  (t.lessons ?? []).flatMap((l) => l?.problems ?? [])
+                )
               )
-              ?.map((problem) => (
+              .map((problem) => (
                 <h1
-                  key={problem.id}
+                  key={problem?.id}
                   className="cursor-pointer hover:opacity-85"
-                  onClick={() => navigate(`/codeEditor/${problem.id}`)}
+                  onClick={() => navigate(`/codeEditor/${problem?.id}`)}
                 >
-                  {problem.title}
+                  {problem?.title}
                 </h1>
-              ))}
-            {documentList?.documents?.flatMap(
-              (d) =>
-                d.topics?.flatMap(
-                  (t) => t.lessons?.flatMap((l) => l.problems) || []
-                ) || []
-            )?.length > 4 && (
+              ))
+              .slice(0, 4)}
+            {(
+              documentList?.documents ?? []
+            )
+              .flatMap((d) =>
+                (d.topics ?? []).flatMap((t) =>
+                  (t.lessons ?? []).flatMap((l) => l?.problems ?? [])
+                )
+              ).length > 4 && (
               <h1
                 className="text-sm text-blue-600 mt-3 cursor-pointer"
-                onClick={() => navigate(`/search?classId=${item.id}`)}
+                onClick={() => navigate(`/search?classId=${item?.id}`)}
               >
                 Xem tất cả
               </h1>

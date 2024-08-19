@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCheck, faTimes } from "@fortawesome/free-solid-svg-icons";
 
-const QuizResult = ({ totalQuestions, historyQuizzes }) => {
+const QuizResult = ({ totalQuestions, historyQuizzes, quizResult }) => {
   const navigate = useNavigate();
   const [isView, setIsView] = useState(false);
 
@@ -18,8 +18,11 @@ const QuizResult = ({ totalQuestions, historyQuizzes }) => {
           <h2 className="text-xl font-bold mb-4">Kết quả</h2>
           <p className="mb-4">
             Bạn trả lời đúng{" "}
-            {historyQuizzes?.filter((q) => q?.isCorrect).length} trong{" "}
-            {totalQuestions} câu hỏi.
+            {quizResult?.numberCorrect} trong{" "}
+            {quizResult?.totalQuestion} câu hỏi.
+          </p>
+          <p>
+            Điểm:{" "}{quizResult?.score}
           </p>
         </div>
 

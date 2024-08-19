@@ -17,9 +17,10 @@ import { Button } from "primereact/button";
 import restClient from "../../services/restClient";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
+import NotifyProvider from "../../store/NotificationContext";
 
 export default function Topic() {
-  const navigate = useNavigate()
+  const navigate = useNavigate();
   const fixedDivRef = useRef(null);
   const [fixedDivHeight, setFixedDivHeight] = useState(0);
   const [isDisplay, setIsDisplay] = useState(false);
@@ -155,7 +156,7 @@ export default function Topic() {
     });
 
     if (currentIndex === -1 || currentIndex === data?.length - 1) {
-      return null; // Current lesson ID not found in data
+      return null;
     }
 
     // Find the previous lesson ID
@@ -176,7 +177,7 @@ export default function Topic() {
     });
 
     if (currentIndex === -1 || currentIndex === 0) {
-      return null; // Current lesson ID not found in data
+      return null;
     }
 
     // Find the previous lesson ID
@@ -189,24 +190,28 @@ export default function Topic() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <div ref={fixedDivRef} className="fixed top-0 w-full z-10">
-        <Header />
-        <Menu />
-      </div>
-      <div style={{ paddingTop: `${fixedDivHeight}px` }} className="flex gap-5">
-        <LessonInDocument
-          display={isDisplay}
-          documentList={documentList}
-          topicId={id}
-        />
+    <NotifyProvider>
+      <div className="min-h-screen flex flex-col">
+        <div ref={fixedDivRef} className="fixed top-0 w-full z-10">
+          <Header />
+          <Menu />
+        </div>
+        <div
+          style={{ paddingTop: `${fixedDivHeight}px` }}
+          className="flex gap-5"
+        >
+          <LessonInDocument
+            display={isDisplay}
+            documentList={documentList}
+            topicId={id}
+          />
 
-        <div className="pt-6 flex-1">
-          {loading ? (
-            <Loading />
-          ) : Object.keys(topic).length > 0 ? (
-            <div>
-              <div className="flex justify-between mb-10">
+          <div className="pt-6 flex-1">
+            {loading ? (
+              <Loading />
+            ) : Object.keys(topic).length > 0 ? (
+              <div>
+                <div className="flex justify-between mb-10">
                   <button
                     onClick={handlePrevious}
                     className="flex items-center bg-blue-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -222,26 +227,27 @@ export default function Topic() {
                     <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
                   </button>
                 </div>
-              <h2 className="text-xl font-bold mb-5">{topic?.title}</h2>
-              <div>
-                <span className="font-semibold mb-2">Mục tiêu chủ đề :</span>
-                {topic?.objectives}
+                <h2 className="text-xl font-bold mb-5">{topic?.title}</h2>
+                <div>
+                  <span className="font-semibold mb-2">Mục tiêu chủ đề :</span>
+                  {topic?.objectives}
+                </div>
+                <div>
+                  <span className="font-semibold">Nội dung chủ đề :</span>
+                  <span
+                    className="inline"
+                    dangerouslySetInnerHTML={{ __html: topic?.description }}
+                  />
+                </div>
               </div>
-              <div>
-                <span className="font-semibold">Nội dung chủ đề :</span>
-                <span
-                  className="inline"
-                  dangerouslySetInnerHTML={{ __html: topic?.description }}
-                />
-              </div>
-            </div>
-          ) : (
-            <p>No topic data found.</p>
-          )}
+            ) : (
+              <p>No topic data found.</p>
+            )}
+          </div>
         </div>
-      </div>
 
-      <Footer ref={displayRef} />
-    </div>
+        <Footer ref={displayRef} />
+      </div>
+    </NotifyProvider>
   );
 }

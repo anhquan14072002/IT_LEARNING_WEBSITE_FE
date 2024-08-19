@@ -13,6 +13,7 @@ import { useSearchParams, useLocation, useNavigate } from "react-router-dom";
 import debounce from "lodash.debounce";
 import Loading from "../../components/Loading";
 import restClient from "../../services/restClient";
+import NotifyProvider from "../../store/NotificationContext";
 
 export default function Search() {
   const footerRef = useRef(null);
@@ -23,7 +24,7 @@ export default function Search() {
   const [isFooterVisible, setIsFooterVisible] = useState(false);
   const [selectedCity, setSelectedCity] = useState(null);
   const [params, setParams] = useSearchParams();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   //document
   const [products, setProducts] = useState([]);
@@ -65,7 +66,7 @@ export default function Search() {
         });
       },
       {
-        threshold: 0.5,
+        threshold: 0.2,
       }
     );
 
@@ -101,9 +102,9 @@ export default function Search() {
     });
   };
 
-  const handleOnChange =(e)=>{
-    navigate(`/${e?.value?.code}?text=${textSearch}`)
-  }
+  const handleOnChange = (e) => {
+    navigate(`/${e?.value?.code}?text=${textSearch}`);
+  };
 
   //pagination and search
   useEffect(() => {
@@ -111,7 +112,7 @@ export default function Search() {
   }, [page, rows, textSearch, classId]);
 
   const fetchData = () => {
-    let url = "api/document/searchbydocumentpagination?";
+    let url = "api/document/getalldocumentpagination?";
     const params = new URLSearchParams();
 
     if (textSearch) {
@@ -157,7 +158,7 @@ export default function Search() {
   };
 
   return (
-    <>
+    <NotifyProvider>
       <div className="min-h-screen">
         <div ref={fixedDivRef} className="fixed top-0 w-full z-10">
           <Header
@@ -228,15 +229,7 @@ export default function Search() {
                 </div>
               </div>
             </div>
-            <div className="m-4">
-              <h1>
-                Có{" "}
-                <span className="text-blue-700 underline">
-                  {Array.isArray(products) && products.length}
-                </span>{" "}
-                kết quả tìm kiếm
-              </h1>
-            </div>
+            
 
             {/* {loading ? (
               <Loading />
@@ -267,6 +260,6 @@ export default function Search() {
         </div>
       </div>
       <Footer ref={footerRef} />
-    </>
+    </NotifyProvider>
   );
 }

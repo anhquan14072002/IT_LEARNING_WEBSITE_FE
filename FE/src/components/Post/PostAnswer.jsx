@@ -29,13 +29,21 @@ const PostAnswer = ({ post }) => {
   const [answers, setAnswers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [isViewAnswer, setViewAnswer] = useState(false);
-  const [isChangeInput, setIsChangeInput] = useState(false);
+  const [isChangeInput, setIsChangeInput] = useState({
+    isChange: false,
+    data: null,
+  });
   const user = useSelector((state) => state.user.value);
-  const { createPostComment, checkUser, refresh, createPostNotification } =
-    useContext(PostContext);
+  const {
+    createPostComment,
+    checkUser,
+    refresh,
+    createPostNotification,
+    updatePostComment,
+  } = useContext(PostContext);
   const { id, userId, fullName, numberOfComment } = post;
-  const [numberOfCommentFake, setNumberOfCommentFake] =
-    useState(numberOfComment);
+  // const [numberOfCommentFake, setNumberOfCommentFake] =
+  //   useState(numberOfComment);
   const toast = useRef(null);
   const [visibleCount, setVisibleCount] = useState(3);
 
@@ -44,25 +52,25 @@ const PostAnswer = ({ post }) => {
   };
   const fetchPost = useCallback(async () => {
     // console.log(numberOfCommentFake);
-    // console.log(numberOfComment);
+    console.log(numberOfComment);
     // setTimeout(async () => {
-    // if (numberOfComment > 0) {
-    setLoading(true);
-    setViewAnswer(true);
-    try {
-      const response = await restClient({
-        url: `api/postcomment/getallcommentbypostidpagination?postId=${id}`,
-        method: "GET",
-      });
-      setAnswers(response.data.data);
-    } catch {
-      setAnswers([]);
-    } finally {
-      setLoading(false);
+    if (numberOfComment > 0) {
+      setLoading(true);
+      setViewAnswer(true);
+      try {
+        const response = await restClient({
+          url: `api/postcomment/getallcommentbypostidpagination?postId=${id}`,
+          method: "GET",
+        });
+        setAnswers(response.data.data);
+      } catch {
+        setAnswers([]);
+      } finally {
+        setLoading(false);
+      }
     }
-    // }
     // }, 1000);
-  }, [refresh, id, numberOfCommentFake]);
+  }, [refresh, id, numberOfComment]);
 
   useEffect(() => {
     fetchPost();
@@ -71,9 +79,17 @@ const PostAnswer = ({ post }) => {
   const onSubmitAnswer = async (content) => {
     if (checkUser()) {
       const postComment = { content, postId: post?.id, userId: user?.sub };
-      setIsChangeInput(false);
-      setNumberOfCommentFake((preValue) => preValue + 1);
-      await createPostComment(postComment, fetchPost);
+
+      setIsChangeInput({ isChange: false, data: null });
+      // setNumberOfCommentFake((preValue) => preValue + 1);
+      if (!isChangeInput?.data?.content) {
+        await createPostComment(postComment, fetchPost);
+      } else {
+        await updatePostComment(
+          { ...postComment, id: isChangeInput?.data?.id },
+          fetchPost
+        );
+      }
       notifyPersonalResponse();
     }
   };
@@ -90,15 +106,17 @@ const PostAnswer = ({ post }) => {
       description: `${user?.name} đã phản hồi bài viết của bạn`,
       notificationTime: new Date(),
       isRead: false,
-      link: post?.id,
+      link: "test",
     };
+    console.log(body);
+
     createPostNotification(body);
   }
   return (
     <>
       <Toast ref={toast} />
       <div className="flex flex-col gap-3 px-4 py-5 bg-[#f6f6f6]">
-        {!isChangeInput ? (
+        {!isChangeInput?.isChange ? (
           <p className="flex gap-3 border-stone-200 border-b-2 pb-3">
             <span className="flex items-center">
               <img
@@ -112,12 +130,15 @@ const PostAnswer = ({ post }) => {
               type="text"
               className="p-inputtext-lg border-2 p-1 border-stone-300 rounded w-[72vh]"
               placeholder="Trả lời nhanh câu hỏi này"
-              onClick={() => checkUser() && setIsChangeInput(true)}
+              onClick={() =>
+                checkUser() && setIsChangeInput({ isChange: true, data: null })
+              }
             />
           </p>
         ) : (
           <SendAnswer
             setIsChangeInput={setIsChangeInput}
+            isChangeInput={isChangeInput}
             loading={loading}
             setLoading={setLoading}
             onSubmitAnswer={onSubmitAnswer}
@@ -142,6 +163,7 @@ const PostAnswer = ({ post }) => {
                 (e) => e.userId === user?.sub
               ) !== -1
             }
+            setIsChangeInput={setIsChangeInput}
             postCommentChilds={comment?.postCommentChilds}
           />
         ))}
@@ -174,10 +196,11 @@ const Answer = ({
   response,
   isVoteComment,
   postCommentChilds,
+  setIsChangeInput,
   ...props
 }) => {
   const [loading, setLoading] = useState(false);
-  const [isChangeInput, setIsChangeInput] = useState(false);
+  // const [isChangeInput, setIsChangeInput] = useState(false);
   const [isViewMore, setIsViewMore] = useState(false);
   const [isLike, setIsLike] = useState(isVoteComment);
 
@@ -215,6 +238,14 @@ const Answer = ({
   const deleteAnswer = () => {
     if (checkUser()) {
       deletePostComment(id, fetchPost);
+      notifyAllResponse("Bạn đã thu hồi phản hồi thành công");
+    }
+  };
+  const updateAnswer = () => {
+    if (checkUser()) {
+      console.log({ content: content, id: id });
+
+      setIsChangeInput({ isChange: true, data: { content: content, id: id } });
     }
   };
   const responseAnswer = () => {
@@ -249,7 +280,23 @@ const Answer = ({
       description: `${user?.name} ${msg}`,
       notificationTime: new Date(),
       isRead: false,
-      link: post?.id,
+      link: "test",
+    };
+    createPostNotification(body);
+  }
+  function notifyAllResponse(msg) {
+    /* solution: Where is the origin of action from ? 
+          - pass body in request :  */
+    const body = {
+      notificationType: 1,
+      userSendId: user?.sub,
+      userSendName: user?.name,
+      userReceiveId: userId,
+      userReceiveName: fullName,
+      description: `${user?.name} ${msg}`,
+      notificationTime: new Date(),
+      isRead: false,
+      link: "test",
     };
     createPostNotification(body);
   }
@@ -304,6 +351,13 @@ const Answer = ({
               </a>
             </span>
           )}
+          {userId === user?.sub && isLoggedIn() && (
+            <span>
+              <a className="cursor-pointer" onClick={updateAnswer}>
+                Sửa phản hồi
+              </a>
+            </span>
+          )}
           {/* {postCommentChilds?.length > 0 && (
             <span>
               <a
@@ -318,7 +372,7 @@ const Answer = ({
             </span>
           )} */}
         </p>
-        {isChangeInput && (
+        {/* {isChangeInput && (
           <SendAnswer
             className="ml-8 "
             setIsChangeInput={setIsChangeInput}
@@ -327,7 +381,7 @@ const Answer = ({
             onSubmitAnswer={onSubmitAnswer}
             ref={toast}
           />
-        )}
+        )} */}
 
         {/* {isViewMore &&
           postCommentChilds?.length > 0 &&
@@ -360,7 +414,14 @@ const Answer = ({
 };
 
 const SendAnswer = forwardRef(function SendAnswer(
-  { setIsChangeInput, onSubmitAnswer, loading, setLoading, ...props },
+  {
+    setIsChangeInput,
+    isChangeInput,
+    onSubmitAnswer,
+    loading,
+    setLoading,
+    ...props
+  },
   ref
 ) {
   const user = useSelector((state) => state.user.value);
@@ -380,8 +441,11 @@ const SendAnswer = forwardRef(function SendAnswer(
       ACCEPT(ref, "Câu hỏi của bạn chứa những từ không hợp lệ");
       return;
     }
+    // if (isChangeInput?.data) {
     onSubmitAnswer(content);
+    // }
   };
+  console.log(isChangeInput);
 
   return (
     <div {...props}>
@@ -402,7 +466,10 @@ const SendAnswer = forwardRef(function SendAnswer(
                   />
                 </span>
                 <div className="flex-grow ml-2">
-                  <UncontrolledEditor onChange={handleEditorChange} />
+                  <UncontrolledEditor
+                    onChange={handleEditorChange}
+                    value={isChangeInput?.data?.content ?? ""}
+                  />
                   <ErrorMessage name="content" component="div" />
                 </div>
               </div>
@@ -411,7 +478,9 @@ const SendAnswer = forwardRef(function SendAnswer(
                   className="px-3 border-2 hover:bg-gray-100 "
                   type="button"
                   severity="danger"
-                  onClick={() => setIsChangeInput(false)}
+                  onClick={() =>
+                    setIsChangeInput({ isChange: false, data: null })
+                  }
                 >
                   Hủy
                 </Button>
@@ -420,7 +489,7 @@ const SendAnswer = forwardRef(function SendAnswer(
                   type="submit"
                   onClick={onSubmit}
                 >
-                  Gửi câu trả lời
+                  {isChangeInput?.data?.content ? "Sửa" : "Tạo"} câu trả lời
                 </Button>
               </div>
             </Form>

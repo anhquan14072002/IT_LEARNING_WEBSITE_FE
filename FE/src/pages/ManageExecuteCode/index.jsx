@@ -25,6 +25,7 @@ import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/python/python";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/material.css";
+import NotifyProvider from "../../store/NotificationContext";
 
 export default function ManageExecuteCode() {
   const toast = useRef(null);
@@ -102,6 +103,18 @@ export default function ManageExecuteCode() {
     return <span>{index}</span>;
   };
 
+  const libraryTemplate = (rowData) => {
+    return (
+      <CodeMirror
+        value={decodeBase64(rowData?.libraries)}
+        options={{
+          theme: "material",
+          lineNumbers: true,
+        }}
+      />
+    );
+  };
+
   const contentBodyTemplate = (rowData) => {
     return (
       <CodeMirror
@@ -133,8 +146,7 @@ export default function ManageExecuteCode() {
           icon="pi pi-pencil"
           className="text-blue-600 p-mr-2 shadow-none"
           onClick={() => {
-            setUpdateValue(rowData);
-            setVisibleUpdate(true);
+            navigate('/dashboard/updateexecutecode/'+rowData?.id)
           }}
         />
         <Button
@@ -181,7 +193,7 @@ export default function ManageExecuteCode() {
 
   const deleteDocument = (id) => {
     restClient({
-      url: `api/executecode/delete/${id}`,
+      url: `api/executecode/deleteexecutecode/${id}`,
       method: "DELETE",
     })
       .then((res) => {
@@ -228,7 +240,7 @@ export default function ManageExecuteCode() {
   };
 
   return (
-    <>
+    <NotifyProvider>
       <div className="fixed top-0 w-full z-30">
         <Header />
       </div>
@@ -281,43 +293,13 @@ export default function ManageExecuteCode() {
                     icon="pi pi-plus-circle"
                     severity="info"
                     className="bg-blue-600 text-white p-2 text-sm font-normal"
-                    onClick={() => navigate("/dashboard/createcode/"+id)}
+                    onClick={() => navigate("/dashboard/createcode/" + id)}
                   />
                 </div>
               </div>
 
               <div className="border-2 rounded-md mt-2">
-                <div className="mb-10 flex flex-wrap items-center p-2">
-                  <div className="border-2 rounded-md p-2">
-                    <InputText
-                      onChange={(e) => {
-                        handleSearchInput(e.target.value);
-                      }}
-                      placeholder="Search"
-                      className="flex-1 focus:outline-none w-36 focus:ring-0"
-                    />
-                    <Button
-                      icon="pi pi-search"
-                      className="p-button-warning focus:outline-none focus:ring-0 flex-shrink-0"
-                    />
-                  </div>
-
-                  {/* <div className="flex-1 flex flex-wrap gap-3 justify-end">
-                    <div className="border-2 rounded-md mt-4">
-                      <Dropdown
-                        filter
-                        ref={dropDownRef2}
-                        value={selectedCity}
-                        onChange={(e) => setSelectedCity(e.value)}
-                        options={cities}
-                        optionLabel="name"
-                        showClear
-                        placeholder="Tài liệu"
-                        className="w-full md:w-14rem shadow-none h-full"
-                      />
-                    </div>
-                  </div> */}
-                </div>
+                
                 {loading ? (
                   <Loading />
                 ) : (
@@ -336,6 +318,12 @@ export default function ManageExecuteCode() {
                         body={indexBodyTemplate}
                         className="border-b-2 border-t-2"
                       />
+                       <Column
+                        header="Import thư viện"
+                        body={libraryTemplate}
+                        className="border-b-2 border-t-2"
+                        style={{ minWidth: "35rem" }}
+                      />
                       <Column
                         header="Mã chính"
                         body={contentBodyTemplate}
@@ -350,7 +338,7 @@ export default function ManageExecuteCode() {
                       />
                       <Column
                         header="Ngôn ngữ"
-                        field="languageId"
+                        field="languageName"
                         className="border-b-2 border-t-2"
                         style={{ minWidth: "15rem" }}
                       />
@@ -366,14 +354,7 @@ export default function ManageExecuteCode() {
                         style={{ minWidth: "15rem" }}
                       />
                     </DataTable>
-                    <Paginator
-                      first={first}
-                      rows={rows}
-                      rowsPerPageOptions={[10, 20, 30]}
-                      totalRecords={totalPage * rows}
-                      onPageChange={onPageChange}
-                      className="custom-paginator mx-auto"
-                    />
+                    
                   </>
                 )}
               </div>
@@ -381,6 +362,6 @@ export default function ManageExecuteCode() {
           </div>
         </div>
       </div>
-    </>
+    </NotifyProvider>
   );
 }

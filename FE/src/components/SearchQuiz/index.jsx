@@ -11,6 +11,7 @@ import { Dropdown } from "primereact/dropdown";
 import { useSearchParams, useLocation, useNavigate } from "react-router-dom";
 import restClient from "../../services/restClient";
 import CustomQuiz from "../../components/CustomQuiz";
+import NotifyProvider from "../../store/NotificationContext";
 
 export default function SearchQuiz() {
   const footerRef = useRef(null);
@@ -21,7 +22,7 @@ export default function SearchQuiz() {
   const [isFooterVisible, setIsFooterVisible] = useState(false);
   const [selectedCity, setSelectedCity] = useState(null);
   const [params, setParams] = useSearchParams();
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   //document
   const [products, setProducts] = useState([]);
@@ -142,12 +143,12 @@ export default function SearchQuiz() {
     setFirst(first);
   };
 
-  const handleOnChange =(e)=>{
-    navigate(`/${e?.value?.code}?text=${textSearch}`)
-  }
+  const handleOnChange = (e) => {
+    navigate(`/${e?.value?.code}?text=${textSearch}`);
+  };
 
   return (
-    <>
+    <NotifyProvider>
       <div className="min-h-screen">
         <div ref={fixedDivRef} className="fixed top-0 w-full z-10">
           <Header
@@ -213,15 +214,6 @@ export default function SearchQuiz() {
                 </div>
               </div>
             </div>
-            <div className="m-4">
-              <h1>
-                Có{" "}
-                <span className="text-blue-700 underline">
-                  {Array.isArray(products) && products.length}
-                </span>{" "}
-                kết quả tìm kiếm
-              </h1>
-            </div>
 
             {/* {loading ? (
               <Loading />
@@ -252,6 +244,6 @@ export default function SearchQuiz() {
         </div>
       </div>
       <Footer ref={footerRef} />
-    </>
+    </NotifyProvider>
   );
 }

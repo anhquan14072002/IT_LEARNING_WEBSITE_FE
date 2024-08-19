@@ -27,7 +27,6 @@ export default function ExamCode({
   const [visibleExam, setVisibleExam] = useState(false);
   const [examValue, setExamValue] = useState({});
   const [updateExamCodeValue, setUpdateExamCodeValue] = useState({});
-  // const [visibleDelete, setVisibleDelete] = useState(false);
 
 
   useEffect(() => {
@@ -60,16 +59,17 @@ export default function ExamCode({
         icon="pi pi-pencil"
         className="text-blue-600 p-mr-2 shadow-none"
         onClick={() => {
-          setUpdateExamCodeValue(rowData)
-          setVisibleUpdateExamCode(true)
+          setUpdateExamCodeValue(rowData);
+          setVisibleUpdateExamCode(true);
         }}
       />
       <Button
         icon="pi pi-trash"
         className="text-red-600 shadow-none"
         onClick={() => {
-          confirmDelete(rowData.id);
-          console.log("Hello");
+         if(window.confirm("Bạn có chắc chắn muốn xóa đề thi này chứ ?")) {
+          deleteExamCode(rowData.id)
+         }
         }}
       />
     </div>
@@ -83,47 +83,18 @@ export default function ExamCode({
     })
       .then((res) => {
         fetchData();
-        // visibleDelete = false;
+    
         ACCEPT(toast, "Xóa thành công");
       })
       .catch((err) => {
         REJECT(toast, "Xảy ra lỗi khi xóa đề thi này");
       })
       .finally(() => {
-        // visibleDelete = false;
+       
       });
   };
 
-  const confirmDelete = (id) => {
-    // visibleDelete = false;
-    confirmDialog({
-      message: "Bạn có chắc chắn muốn xóa đề thi này?",
-      header: "Delete Confirmation",
-      icon: "pi pi-info-circle",
-      defaultFocus: "reject",
-      acceptClassName: "p-button-danger",
-      footer: (
-        <>
-          <Button
-            label="Hủy"
-            icon="pi pi-times"
-            className="p-2 bg-red-500 text-white mr-2"
-            onClick={() => {
-              // visibleDelete = false;
-            }}
-          />
-          <Button
-            label="Xóa"
-            icon="pi pi-check"
-            className="p-2 bg-blue-500 text-white"
-            onClick={() => {
-              deleteExamCode(id);
-            }}
-          />
-        </>
-      ),
-    });
-  };
+  
   const anwserTemple = (rowData) => {
     return (
       <div style={{ display: "flex" }}>
@@ -155,13 +126,13 @@ export default function ExamCode({
           fetchData={fetchData}
         />
         <UpdateExamCode
-        visible={visibleUpdateExamCode}
-        setVisibleUpdateExamCode={setVisibleUpdateExamCode}
-        toast={toast}
-        updateExamCodeValue={updateExamCodeValue}
-        addExamCodeValue={examCodeValue?.id}
-        fetchData={fetchData}
-      />
+          visible={visibleUpdateExamCode}
+          setVisibleUpdateExamCode={setVisibleUpdateExamCode}
+          toast={toast}
+          updateExamCodeValue={updateExamCodeValue}
+          addExamCodeValue={examCodeValue?.id}
+          fetchData={fetchData}
+        />
         <AnswerExam
           visibleExam={visibleExam}
           setVisibleExam={setVisibleExam}

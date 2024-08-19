@@ -22,7 +22,8 @@ import {
   faDownload,
 } from "@fortawesome/free-solid-svg-icons";
 import { Editor } from "primereact/editor";
-import './index.css'
+import "./index.css";
+import NotifyProvider from "../../store/NotificationContext";
 
 export default function Lesson() {
   const navigate = useNavigate();
@@ -36,6 +37,8 @@ export default function Lesson() {
   const [documentList, setDocumentList] = useState({});
   const [tableContentId, setTableContentId] = useState([]);
   const { id } = useParams();
+  const [isNext, setIsNext] = useState(true);
+  const [isPrevious, setisPrevious] = useState(true);
 
   const fetchData = async () => {
     try {
@@ -174,7 +177,7 @@ export default function Lesson() {
     });
 
     if (currentIndex === -1 || currentIndex === data?.length - 1) {
-      return null; // Current lesson ID not found in data
+      return null;
     }
 
     // Find the previous lesson ID
@@ -195,7 +198,7 @@ export default function Lesson() {
     });
 
     if (currentIndex === -1 || currentIndex === 0) {
-      return null; // Current lesson ID not found in data
+      return null;
     }
 
     // Find the previous lesson ID
@@ -208,79 +211,94 @@ export default function Lesson() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col">
-      <div ref={fixedDivRef} className="fixed top-0 w-full z-50">
-        <Header />
-        <Menu />
-      </div>
-      <div style={{ paddingTop: `${fixedDivHeight}px` }} className="flex gap-5">
-        <LessonInDocument
-          display={isDisplay}
-          documentList={documentList}
-          lessonId={id}
-          fixedDivRef={fixedDivRef}
-        />
-
-        <div className="pt-6 flex-1">
-          {loading ? (
-            <Loading />
-          ) : Object.keys(lesson).length > 0 ? (
-            <>
-              <div>
-                <div className="flex justify-between mb-10">
-                  <button
-                    onClick={handlePrevious}
-                    className="flex items-center bg-blue-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  >
-                    <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
-                    Trang trước
-                  </button>
-                  {lesson && lesson?.urlDownload && (
-                    <button
-                      onClick={handleDownload}
-                      className="flex items-center bg-green-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
-                    >
-                      <FontAwesomeIcon icon={faDownload} className="mr-2" />
-                      Tải tài liệu về máy
-                    </button>
-                  )}
-                  <button
-                    className="flex items-center bg-blue-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    onClick={handleNext}
-                  >
-                    Trang sau
-                    <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
-                  </button>
-                </div>
-                <h2 className="text-xl font-bold">{lesson?.title}</h2>
-
-                {/* Add more details based on your lesson object */}
-              </div>
-              {isBase64(lesson.content) ? (
-                // <div
-                //   className="ql-editor"
-                //   dangerouslySetInnerHTML={{
-                //     __html: decodeIfNeeded(lesson.content),
-                //   }}
-                // />
-                <Editor value={decodeIfNeeded(lesson?.content)} readOnly={true} headerTemplate={<></>} className="custom-editor-class" />
-              ) : (
-                <Editor value={lesson?.content} readOnly={true} headerTemplate={<></>} className="custom-editor-class"  />
-                // <div
-                //   className="ql-editor" // Add Quill's class if necessary
-                //   dangerouslySetInnerHTML={{
-                //     __html: lesson.content,
-                //   }}
-                // />
-              )}
-            </>
-          ) : (
-            <p>No lesson data found.</p>
-          )}
+    <NotifyProvider>
+      <div className="min-h-screen flex flex-col">
+        <div ref={fixedDivRef} className="fixed top-0 w-full z-50">
+          <Header />
+          <Menu />
         </div>
-      </div>
+        <div
+          style={{ paddingTop: `${fixedDivHeight}px` }}
+          className="flex gap-5"
+        >
+          <LessonInDocument
+            display={isDisplay}
+            documentList={documentList}
+            lessonId={id}
+            fixedDivRef={fixedDivRef}
+          />
 
-      <Footer ref={displayRef} />
-    </div>
+          <div className="pt-6 flex-1">
+            {loading ? (
+              <Loading />
+            ) : Object.keys(lesson).length > 0 ? (
+              <>
+                <div>
+                  <div className="flex justify-between mb-10">
+                    <button
+                      onClick={handlePrevious}
+                      className="flex items-center bg-blue-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    >
+                      <FontAwesomeIcon icon={faArrowLeft} className="mr-2" />
+                      Trang trước
+                    </button>
+                    {lesson && lesson?.urlDownload && (
+                      <button
+                        onClick={handleDownload}
+                        className="flex items-center bg-green-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500"
+                      >
+                        <FontAwesomeIcon icon={faDownload} className="mr-2" />
+                        Tải tài liệu về máy
+                      </button>
+                    )}
+                    <button
+                      className="flex items-center bg-blue-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      onClick={handleNext}
+                    >
+                      Trang sau
+                      <FontAwesomeIcon icon={faArrowRight} className="ml-2" />
+                    </button>
+                  </div>
+                  <h2 className="text-xl font-bold">{lesson?.title}</h2>
+
+                  {/* Add more details based on your lesson object */}
+                </div>
+                {isBase64(lesson.content) ? (
+                  // <div
+                  //   className="ql-editor"
+                  //   dangerouslySetInnerHTML={{
+                  //     __html: decodeIfNeeded(lesson.content),
+                  //   }}
+                  // />
+                  <Editor
+                    value={decodeIfNeeded(lesson?.content)}
+                    readOnly={true}
+                    headerTemplate={<></>}
+                    className="custom-editor-class"
+                  />
+                ) : (
+                  <Editor
+                    value={lesson?.content}
+                    readOnly={true}
+                    headerTemplate={<></>}
+                    className="custom-editor-class"
+                  />
+                  // <div
+                  //   className="ql-editor" // Add Quill's class if necessary
+                  //   dangerouslySetInnerHTML={{
+                  //     __html: lesson.content,
+                  //   }}
+                  // />
+                )}
+              </>
+            ) : (
+              <p>No lesson data found.</p>
+            )}
+          </div>
+        </div>
+
+        <Footer ref={displayRef} />
+      </div>
+    </NotifyProvider>
   );
 }

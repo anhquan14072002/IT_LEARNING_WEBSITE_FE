@@ -12,11 +12,18 @@ import { InputText } from "primereact/inputtext";
 import { Dropdown } from "primereact/dropdown";
 import restClient from "../../services/restClient";
 import Loading from "../Loading";
-import { ACCEPT, formatDate, getTokenFromLocalStorage, REJECT, removeVietnameseTones } from "../../utils";
+import {
+  ACCEPT,
+  formatDate,
+  getTokenFromLocalStorage,
+  REJECT,
+  removeVietnameseTones,
+} from "../../utils";
 import { InputSwitch } from "primereact/inputswitch";
 import AddQuizLesson from "../AddQuizLesson";
 import UpdateQuizLesson from "../UpdateQuizLesson";
 import { useNavigate } from "react-router-dom";
+import { text } from "@fortawesome/fontawesome-svg-core";
 
 export default function ManagementQuizLesson() {
   const toast = useRef(null);
@@ -32,14 +39,13 @@ export default function ManagementQuizLesson() {
   const [visibleDelete, setVisibleDelete] = useState(false);
   const [loading, setLoading] = useState(false);
   const [textSearch, setTextSearch] = useState("");
-  const navigate = useNavigate()
+  const navigate = useNavigate();
 
   //pagination
   const [first, setFirst] = useState(0);
   const [page, setPage] = useState(1);
   const [rows, setRows] = useState(10);
   const [totalPage, setTotalPage] = useState(0);
-  
 
   useEffect(() => {
     fetchData();
@@ -49,7 +55,7 @@ export default function ManagementQuizLesson() {
     setLoading(true);
 
     restClient({
-      url: `api/quiz/getallquizpagination?Custom=false&PageIndex=${page}&PageSize=${rows}`,
+      url: `api/quiz/getallquizpagination?Custom=3&PageIndex=${page}&PageSize=${rows}&Value=${textSearch}`,
       method: "GET",
     })
       .then((res) => {
@@ -99,23 +105,17 @@ export default function ManagementQuizLesson() {
     return <span>{index}</span>;
   };
 
-  const cities = [
-    { name: "New York", code: "NY" },
-    { name: "Rome", code: "RM" },
-    { name: "London", code: "LDN" },
-    { name: "Istanbul", code: "IST" },
-    { name: "Paris", code: "PRS" },
-  ];
+ 
 
   const actionBodyTemplate = (rowData) => {
     return (
-      <div style={{ display: "flex",gap:'2rem' }}>
+      <div style={{ display: "flex", gap: "2rem" }}>
         <Button
           icon="pi pi-cog"
           label="Chỉnh sửa câu hỏi ôn tập"
           className="bg-blue-600 p-mr-2 shadow-none p-2 text-white"
           onClick={() => {
-            navigate("/dashboard/quiz/managequestionofquizlist/"+rowData?.id)
+            navigate("/dashboard/quiz/managequestionofquizlist/" + rowData?.id);
           }}
         />
         <Button
@@ -208,11 +208,7 @@ export default function ManagementQuizLesson() {
       <InputSwitch
         checked={rowData.isActive}
         onChange={(e) => changeStatusLesson(e.value, rowData.id)}
-        tooltip={
-          rowData.isActive
-            ? "Đã được duyệt"
-            : "Chưa được duyệt"
-        }
+        tooltip={rowData.isActive ? "Đã được duyệt" : "Chưa được duyệt"}
       />
     );
   };
@@ -274,21 +270,7 @@ export default function ManagementQuizLesson() {
               />
             </div>
 
-            <div className="flex-1 flex flex-wrap gap-3 justify-end">
-              <div className="border-2 rounded-md mt-4">
-                <Dropdown
-                  filter
-                  ref={dropDownRef2}
-                  value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.value)}
-                  options={cities}
-                  optionLabel="name"
-                  showClear
-                  placeholder="Tài liệu"
-                  className="w-full md:w-14rem shadow-none h-full"
-                />
-              </div>
-            </div>
+           
           </div>
           {loading ? (
             <Loading />
@@ -313,63 +295,63 @@ export default function ManagementQuizLesson() {
                   field="#"
                   header="#"
                   body={indexBodyTemplate}
-                  style={{ minWidth: '5rem' }}
+                  style={{ minWidth: "5rem" }}
                   className="border-b-2 border-t-2"
                 />
                 <Column
                   field="title"
                   header="Tiêu đề"
                   className="border-b-2 border-t-2"
-                  style={{ minWidth: '15rem' }}
+                  style={{ minWidth: "15rem" }}
                 />
                 <Column
                   field="topicTitle"
                   header="Chủ đề"
                   className="border-b-2 border-t-2"
-                  style={{ minWidth: '15rem' }}
+                  style={{ minWidth: "15rem" }}
                 />
                 <Column
                   field="lessonTitle"
                   header="Bài học"
                   className="border-b-2 border-t-2"
-                  style={{ minWidth: '15rem' }}
+                  style={{ minWidth: "15rem" }}
                 />
                 <Column
-                  field="type"
+                  field="typeName"
                   header="Thể loại"
                   className="border-b-2 border-t-2"
-                  style={{ minWidth: '15rem' }}
+                  style={{ minWidth: "15rem" }}
                 />
                 <Column
                   field="score"
                   header="Điểm"
                   className="border-b-2 border-t-2"
-                  style={{ minWidth: '15rem' }}
+                  style={{ minWidth: "15rem" }}
                 />
                 <Column
                   header="Trạng thái"
                   className="border-b-2 border-t-2"
                   body={status}
-                  style={{ minWidth: '15rem' }}
+                  style={{ minWidth: "15rem" }}
                 ></Column>
                 <Column
                   field="createdDate"
                   header="Ngày tạo"
                   className="border-b-2 border-t-2"
-                  style={{ minWidth: '15rem' }}
+                  style={{ minWidth: "15rem" }}
                   body={(rowData) => formatDate(rowData.createdDate)}
                 />
                 <Column
                   field="lastModifiedDate"
                   header="Ngày cập nhật"
                   className="border-b-2 border-t-2"
-                  style={{ minWidth: '15rem' }}
+                  style={{ minWidth: "15rem" }}
                   body={(rowData) => formatDate(rowData.lastModifiedDate)}
                 />
                 <Column
                   className="border-b-2 border-t-2"
                   body={actionBodyTemplate}
-                  style={{ minWidth: '25rem' }}
+                  style={{ minWidth: "25rem" }}
                 />
               </DataTable>
               <Paginator

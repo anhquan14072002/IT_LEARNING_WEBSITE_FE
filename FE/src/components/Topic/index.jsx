@@ -80,7 +80,7 @@ export default function Topic() {
     if (textSearch.trim()) {
       setLoading(true);
       restClient({
-        url: `api/topic/getalltopicpagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}`,
+        url: `api/topic/getalltopicpagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}&Value=${textSearch}`,
         method: "GET",
       })
         .then((res) => {

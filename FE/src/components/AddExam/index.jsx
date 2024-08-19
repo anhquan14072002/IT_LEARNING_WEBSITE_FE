@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Dialog } from "primereact/dialog";
-import { Formik, Form, ErrorMessage } from "formik";
+import { Formik, Form, ErrorMessage, Field } from "formik";
 import * as Yup from "yup";
 import CustomTextInput from "../../shared/CustomTextInput";
 import CustomEditor from "../../shared/CustomEditor";
@@ -22,7 +22,10 @@ const baseValidationSchema = Yup.object({
       return Object.keys(value).length !== 0;
     })
     .required("Không bỏ trống trường này"),
-  title: Yup.string().required("Tiêu đề không được bỏ trống"),
+    title: Yup.string()
+    .required("Tiêu đề không được bỏ trống")
+    .min(5, "Tiêu đề phải có ít nhất 5 ký tự")
+    .max(50, "Tiêu đề không được vượt quá 50 ký tự"),
   description: Yup.string().required("Mô tả không được bỏ trống"),
   province: Yup.object()
     .test("is-not-empty", "Không được để trống trường này", (value) => {
@@ -82,7 +85,7 @@ export default function AddExam({
 
         // Fetch grade list
         const gradeResponse = await restClient({
-          url: "api/grade/getallgrade",
+          url: "api/grade/getallgrade?isInclude=false",
           method: "GET",
         });
         console.log(gradeResponse?.data?.data);
@@ -110,6 +113,7 @@ export default function AddExam({
     description: "",
     year: {},
     numberQuestion: "",
+    files: [],
   });
   useEffect(() => {
     if (years) {
@@ -122,6 +126,8 @@ export default function AddExam({
   };
   const onSubmit = async (values, { resetForm }) => {
     setLoading(true);
+    console.log(files);
+    
     const formData = new FormData();
     formData.append("Type", types);
     formData.append("CompetitionId", values.competition.id);
@@ -137,8 +143,8 @@ export default function AddExam({
         formData.append(`tagValues[${index}]`, item.keyWord);
       });
     }
-    formData.append("ExamEssayFileUpload", files);
-    formData.append("ExamSolutionFileUpload", fileSolution);
+    formData.append("ExamEssayFileUpload",  files[0]);
+    formData.append("ExamSolutionFileUpload", fileSolution[0]);
     try {
       const response = await restClient({
         url: "api/exam/createexam",
@@ -162,6 +168,9 @@ export default function AddExam({
       setVisible(false);
     }
   };
+  useEffect(() => {
+    console.log("Current files value:", files);
+  }, [files]);
 
   const onFileSelect = (e) => {
     setFiles(e.files);
@@ -169,13 +178,13 @@ export default function AddExam({
   const onFileSolutionSelect = (e) => {
     setFileSolution(e.files);
   };
-  const validationSchema =
-    types === 2
-      ? baseValidationSchema.shape({
-          numberQuestion: Yup.number().required("Không được bỏ trống"),
-        })
-      : baseValidationSchema;
-
+  const validationSchema = types === 2
+  ? baseValidationSchema.shape({
+      numberQuestion: Yup.number().required("Không được bỏ trống"),
+    })
+  : baseValidationSchema.shape({
+      files: Yup.array().min(1, "File đề bài là bắt buộc").required("Không được bỏ trống trường này"),
+    });
   return (
     <Dialog
       header="Thêm Đề Thi"
@@ -191,7 +200,7 @@ export default function AddExam({
           validationSchema={validationSchema}
           onSubmit={onSubmit}
         >
-          {(formik) => (
+          {({ setFieldValue, errors, touched }) => (
             <Form>
               <CustomTextInput
                 label={
@@ -294,18 +303,31 @@ export default function AddExam({
               </CustomEditor>
               {types === 1 && (
                 <>
-                  <h1>File Đề Bài</h1>
+                  <h1>File Đề Bài <span style={{color:"red"}}>*</span></h1>
+                  <Field name="files">
+                {({ field }) => (
                   <FileUpload
-                    name="demo[]"
-                    url={"/api/upload"}
-                    accept=".pdf, application/pdf"
+                    name="ExamFileUpload"
+                    accept=".pdf"
                     maxFileSize={10485760} // 10MB
                     emptyTemplate={
-                      <p className="m-0">Drag and drop files here to upload.</p>
+                      <p className="m-0">Kéo và thả file vào đây để tải lên.</p>
                     }
-                    className="custom-file-upload mb-2"
-                    onSelect={onFileSelect}
+                     className="custom-file-upload mb-2"
+                    onSelect={(e) => {
+                      setFieldValue("files", e.files);
+                      onFileSelect(e);
+                    }}
+                    onClear={() => {
+                      setFieldValue("files", []);
+                      setFiles([]); 
+                    }}
                   />
+                )}
+              </Field>
+              {errors.files && touched.files && (
+                <div className="p-error">{errors.files}</div>
+              )}
                   <h1>File Đề Lời Giải</h1>
                   <FileUpload
                     name="demo[]"
@@ -313,7 +335,7 @@ export default function AddExam({
                     accept=".pdf, application/pdf"
                     maxFileSize={10485760} // 10MB
                     emptyTemplate={
-                      <p className="m-0">Drag and drop files here to upload.</p>
+                      <p className="m-0">Kéo và thả file vào đây để tải lên.</p>
                     }
                     className="custom-file-upload mb-2"
                     onSelect={onFileSolutionSelect}

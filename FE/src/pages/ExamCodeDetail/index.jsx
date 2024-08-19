@@ -23,7 +23,6 @@ const ExamDetail = () => {
   const [examList, setExamList] = useState([]);
   const [selectedExamCode, setSelectedExamCode] = useState([]);
   const newPlugin = defaultLayoutPlugin();
-  const new1Plugin = highlightPlugin();
   const { id } = useParams();
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
@@ -60,27 +59,34 @@ const ExamDetail = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-
-    const countAnswers = Object.keys(answers).length;
-    const numberQuestion =data?.numberQuestion
-    if (numberQuestion-countAnswers !== 0) {
-      window.confirm(`Bạn còn ${numberQuestion-countAnswers} câu hỏi chưa trả lời.Bạn chắc chắn muốn nộp bài chứ?`)
-      return
+  
+    
+    const numberQuestion = data?.numberQuestion;
+    const allQuestions = Array.from({ length: numberQuestion }, (_, index) => `question${index + 1}`);
+  
+    const unansweredQuestions = allQuestions.filter(q => !answers.hasOwnProperty(q));
+    if (unansweredQuestions.length > 0) {
+      const confirmed = window.confirm(`Bạn còn ${unansweredQuestions.length} câu hỏi chưa trả lời. Bạn chắc chắn muốn nộp bài chứ?`);
+      if (!confirmed) return; // If not confirmed, stop the submission
     }
-
-    const formattedAnswers = Object.keys(answers).map((key) => ({
-      numberOfQuestion: parseInt(key.replace("question", ""), 10),
-      answer: answers[key] ,
+  
+    // Initialize answers for all questions, with empty string for unanswered ones
+    const formattedAnswers = allQuestions.map((questionKey) => ({
+      numberOfQuestion: parseInt(questionKey.replace("question", ""), 10),
+      answer: answers[questionKey] || "", // Use empty string if no answer is provided
     }));
-
+  
     console.log("Submitted answers:", formattedAnswers);
+  
+    // Create payload
     const payload = {
       userId: userId,
       examCodeId: data.id,
       userAnswerDtos: formattedAnswers,
     };
-    console.log(payload);
+  
     try {
+      // Submit the answers
       const response = await restClient({
         url: "api/userexam/submitexam",
         method: "POST",
@@ -93,9 +99,10 @@ const ExamDetail = () => {
       }, 1000);
     } catch (error) {
       console.error("Error adding exam:", error);
-      REJECT(toast, error.message);
+      REJECT(toast, "Nộp bài thất bại");
     }
   };
+  
 
   const handleChangeExamCode = async (e) => {
     console.log(e.value);
@@ -137,7 +144,7 @@ const ExamDetail = () => {
           <div className="w-3/4 h-full p-4  ">
             <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
               {viewPdf ? (
-                <Viewer fileUrl={viewPdf} plugins={[newPlugin, new1Plugin]} />
+                <Viewer fileUrl={viewPdf} plugins={[newPlugin]} />
               ) : (
                 <div>No PDF</div>
               )}

@@ -52,10 +52,9 @@ export default function ManageExam() {
 
   const fetchData = ()=> {
     setLoading(true);
-      const title = "title"
       const id = "id"
     restClient({
-      url: `api/exam/searchbyexampagination?PageIndex=${page}&PageSize=${rows}&Type=2&Key=${title}&Value=${textSearch}&OrderBy=${id}&IsAscending=false`,
+      url: `api/exam/getallexampagination?PageIndex=${page}&PageSize=${rows}&Type=2&Value=${textSearch}&OrderBy=${id}&IsAscending=false`,
       method: "GET",
     })
       .then((res) => {
@@ -85,14 +84,7 @@ export default function ManageExam() {
     return <span>{index}</span>;
   };
 
-  const cities = [
-    { name: "New York", code: "NY" },
-    { name: "Rome", code: "RM" },
-    { name: "London", code: "LDN" },
-    { name: "Istanbul", code: "IST" },
-    { name: "Paris", code: "PRS" },
-  ];
-
+ 
   const actionBodyTemplate = (rowData) => {
     return (
       <div style={{ display: "flex" }}>

@@ -3,9 +3,11 @@ import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
 import { loginWithRoleAdmin } from "../../services/authenService";
-import { REJECT } from "../../utils";
+import { decodeToken, REJECT } from "../../utils";
 import { Toast } from "primereact/toast";
 import * as Yup from "yup";
+import { useDispatch } from "react-redux";
+import { addUser } from "../../redux/userr/userSlice";
 
 // Define the validation schema with regex for password
 const validationSchema = Yup.object().shape({
@@ -25,6 +27,7 @@ export default function About() {
   const [emailError, setEmailError] = useState("");
   const [passwordError, setPasswordError] = useState("");
   const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const handleSubmit = async () => {
     // Reset errors
@@ -39,6 +42,8 @@ export default function About() {
         localStorage.setItem("refreshToken", response.data.data.refreshToken);
         localStorage.setItem("userId", response.data.data.admin.id);
         localStorage.setItem("userEmail", response.data.data.admin.email);
+        const decodedToken = decodeToken(response?.data?.data?.accessToken);
+        dispatch(addUser(decodedToken));
         navigate("/dashboard/statistic");
       } else {
         REJECT(toast, "Sai tài khoản hoặc mật khẩu");

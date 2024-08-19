@@ -30,7 +30,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData, id }) => {
   const [typeList, settypeList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [questionLevel, setquestionLevelList] = useState([]);
-  const [typeQuestion, setTypeQuestion] = useState("");
+  const [typeQuestion, setTypeQuestion] = useState(1);
 
   //answer of four answers
   const [fourAnswer, setFourAnswer] = useState([
@@ -83,11 +83,10 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData, id }) => {
           levelName: item.value,
         }));
 
+        setInitialValues({...initialValues,type: typeData[0]})
         settypeList(typeData);
         setquestionLevelList(questionLevelData);
       } catch (e) {
-        settypeList([]);
-        setquestionLevelList([]);
       } finally {
         setLoading(false);
       }
@@ -99,7 +98,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData, id }) => {
   }, [visible]);
 
   const onSubmit = (values) => {
-    if (typeQuestion === "QuestionTrueFalse") {
+    if (typeQuestion === 1) {
       if (!values.QuestionTrueFalse) {
         REJECT(toast, "Bạn phải chọn đáp án đúng");
       } else {
@@ -158,12 +157,12 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData, id }) => {
             REJECT(toast, err.message);
           })
           .finally(() => {
-            setTypeQuestion("");
+            setTypeQuestion(1);
             setVisible(false);
             setLoading(false);
           });
       }
-    } else if (typeQuestion === "QuestionFourAnswer") {
+    } else if (typeQuestion === 2) {
       if (hasEmptyContent(fourAnswer)) {
         REJECT(
           toast,
@@ -203,7 +202,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData, id }) => {
             REJECT(toast, err.message);
           })
           .finally(() => {
-            setTypeQuestion("");
+            setTypeQuestion(1);
             setFourAnswer([
               { content: "", isCorrect: false },
               { content: "", isCorrect: false },
@@ -214,7 +213,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData, id }) => {
             setLoading(false);
           });
       }
-    } else if (typeQuestion === "QuestionMultiChoice") {
+    } else if (typeQuestion === 3) {
       if (handleMultipleContent(multipleAnswer)) {
         REJECT(
           toast,
@@ -254,7 +253,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData, id }) => {
             REJECT(toast, err.message);
           })
           .finally(() => {
-            setTypeQuestion("");
+            setTypeQuestion(1);
             setMultipleAnswer([]);
             setVisible(false);
             setLoading(false);
@@ -264,8 +263,10 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData, id }) => {
   };
 
   const handleChangeType = (e, helpers, setTouchedState, props) => {
-    setTypeQuestion(e?.value?.title); // Update typeQuestion based on selection
-
+    setTypeQuestion(e?.value?.typeName); // Update typeQuestion based on selection
+   console.log('====================================');
+   console.log(e);
+   console.log('====================================');
     const selectedType = {
       title: e?.value?.title,
       typeName: e?.value?.typeName,
@@ -398,7 +399,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData, id }) => {
           { content: "", isCorrect: false },
           { content: "", isCorrect: false },
         ]);
-        setTypeQuestion("");
+        setTypeQuestion(1);
       }}
     >
       {loading === true ? (
@@ -437,7 +438,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData, id }) => {
                 options={typeList}
               />
 
-              {typeQuestion && typeQuestion === "QuestionTrueFalse" && (
+              {typeQuestion && typeQuestion === 1 && (
                 <>
                   <div className="my-4">
                     <label
@@ -475,7 +476,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData, id }) => {
                 </>
               )}
 
-              {typeQuestion && typeQuestion === "QuestionFourAnswer" && (
+              {typeQuestion && typeQuestion === 2 && (
                 <>
                   <div className="my-4">
                     <label
@@ -512,7 +513,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData, id }) => {
                 </>
               )}
 
-              {typeQuestion && typeQuestion === "QuestionMultiChoice" && (
+              {typeQuestion && typeQuestion === 3 && (
                 <>
                   <div className="mb-5">
                     <label
@@ -608,7 +609,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData, id }) => {
                         isCorrect: false,
                       }))
                     );
-                    setTypeQuestion("");
+                    setTypeQuestion(1);
                   }}
                 >
                   Hủy

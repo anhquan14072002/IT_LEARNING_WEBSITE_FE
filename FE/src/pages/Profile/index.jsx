@@ -6,6 +6,8 @@ import { getUser, updateUser } from "../../services/profileService";
 import { REJECT, SUCCESS } from "../../utils";
 import { Toast } from "primereact/toast";
 import Loading from "../../components/Loading";
+import NotifyProvider from "../../store/NotificationContext";
+import { useNavigate } from "react-router-dom";
 const Index = () => {
   const toast = useRef(null);
   const [imageURL, setImageURL] = useState(null);
@@ -19,14 +21,14 @@ const Index = () => {
   } = useForm();
 
   const id = localStorage.getItem("userId");
-
+  const navigate =useNavigate()
   useEffect(() => {
     const fetchData = async () => {
       try {
         const response = await getUser(id);
         if (response.data && response.data.data) {
-          setLoading(true)
-         
+          setLoading(true);
+
           const userData = response.data.data;
           setImageURL(userData.image);
           setValue("firstname", userData.firstName);
@@ -77,232 +79,239 @@ const Index = () => {
       setImageFile(file);
       setImageURL(URL.createObjectURL(file));
       field.onChange(file);
-
     } else {
-      
       console.log("File không hợp lệ:", file);
       alert("Vui lòng chọn tệp JPG hoặc PNG.");
     }
-  }
+  };
 
   return (
-    <>
+    <NotifyProvider>
       <Header />
       <div className="min-w-screen min-h-screen flex justify-center items-center bg-gray-100 ">
         <form
           onSubmit={handleSubmit(onSubmit)}
           className="bg-white shadow-md rounded-lg p-20"
         >
-          {!loading ? <Loading/> : (<>
-            <h1 className="font-semibold text-3xl text-center mb-6  text-gray-800">
-            Thông Tin Hồ Sơ
-          </h1>
-          <div className="flex">
-            <div className="w-1/2 flex flex-col items-center">
-              <label htmlFor="image" className="cursor-pointer mb-4">
-                <img
-                  src={imageURL ? imageURL : "src/assets/img/image.png"}
-                  alt="Profile"
-                  className="w-60 h-60 object-cover border-2 border-gray-300 rounded-full"
-                />
-              </label>
-              <Controller
-                name="image"
-                control={control}
-                render={({ field }) => (
-                  <input
-                    onChange={(e) => handleImageChange(e, field)}
-                    type="file"
-                    id="image"
-                    hidden
-                  />
-                )}
-              />
-              <button
-                type="button"
-                onClick={() => document.getElementById("image").click()}
-                className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 focus:outline-none"
-              >
-                Cập nhật ảnh
-              </button>
-            </div>
-            <div className="flex flex-col items-center my-4 mx-6">
-              <div className="w-px h-full bg-gray-300"></div>
-            </div>
-            <div className="w-3/4 flex-grow">
-              <div className="flex mb-4">
-                <div className="w-1/2 mr-2">
-                  <label
-                    htmlFor="firstname"
-                    className="block mb-2 text-lg font-medium text-gray-700"
-                  >
-                    Họ <span className="text-red-500">*</span>
-                  </label>
-                  <Controller
-                    name="firstname"
-                    control={control}
-                    rules={{ required: "Họ không được để trống" }}
-                    render={({ field }) => (
-                      <input
-                        id="firstname"
-                        type="text"
-                        {...field}
-                        value={field.value || ""}
-                        className="w-full h-10 border border-gray-300 rounded-md px-3"
-                        placeholder="Nhập họ"
-                      />
-                    )}
-                  />
-                  {errors.firstname && (
-                    <span className="text-red-500 text-sm">
-                      {errors.firstname.message}
-                    </span>
-                  )}
-                </div>
-                <div className="w-1/2 ml-2">
-                  <label
-                    htmlFor="lastname"
-                    className="block mb-2 text-lg font-medium text-gray-700"
-                  >
-                    Tên <span className="text-red-500">*</span>
-                  </label>
-                  <Controller
-                    name="lastname"
-                    control={control}
-                    rules={{ required: "Tên không được để trống" }}
-                    render={({ field }) => (
-                      <input
-                        id="lastname"
-                        type="text"
-                        {...field}
-                        value={field.value || ""}
-                        className="w-full h-10 border border-gray-300 rounded-md px-3"
-                        placeholder="Nhập tên"
-                      />
-                    )}
-                  />
-                  {errors.lastname && (
-                    <span className="text-red-500 text-sm">
-                      {errors.lastname.message}
-                    </span>
-                  )}
-                </div>
-              </div>
-              <div className="mb-4">
-                <label
-                  htmlFor="email"
-                  className="block mb-2 text-lg font-medium text-gray-700"
-                >
-                  Email <span className="text-red-500">*</span>
-                </label>
-                <Controller
-                  name="email"
-                  control={control}
-                  rules={{
-                    required: "Email không được để trống",
-                    pattern: {
-                      value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                      message: "Email không hợp lệ",
-                    },
-                  }}
-                  render={({ field }) => (
-                    <input
-                      id="email"
-                      type="text"
-                      {...field}
-                      value={field.value || ""}
-                      className="w-full h-10 border border-gray-300 rounded-md px-3"
-                      placeholder="Nhập email"
-                      readOnly
+          {!loading ? (
+            <Loading />
+          ) : (
+            <>
+              <h1 className="font-semibold text-3xl text-center mb-6  text-gray-800">
+                Thông Tin Hồ Sơ
+              </h1>
+              <div className="flex">
+                <div className="w-1/2 flex flex-col items-center">
+                  <label htmlFor="image" className="cursor-pointer mb-4">
+                    <img
+                      src={imageURL ? imageURL : "src/assets/img/image.png"}
+                      alt="Profile"
+                      className="w-60 h-60 object-cover border-2 border-gray-300 rounded-full"
                     />
-                  )}
-                />
-                {errors.email && (
-                  <span className="text-red-500 text-sm">
-                    {errors.email.message}
-                  </span>
-                )}
-              </div>
-              <div className="flex mb-4">
-                <div className="w-1/2 mr-2">
-                  <label
-                    htmlFor="dob"
-                    className="block mb-2 text-lg font-medium text-gray-700"
-                  >
-                    Ngày sinh <span className="text-red-500">*</span>
                   </label>
                   <Controller
-                    name="dob"
+                    name="image"
                     control={control}
-                    rules={{ required: "Cập nhật ngày sinh" }}
                     render={({ field }) => (
                       <input
-                        id="dob"
-                        type="date"
-                        {...field}
-                        value={field.value || ""}
-                        className="w-full h-10 border border-gray-300 rounded-md px-3"
-                        placeholder="Nhập ngày sinh"
+                        onChange={(e) => handleImageChange(e, field)}
+                        type="file"
+                        id="image"
+                        hidden
                       />
                     )}
                   />
-                  {errors.dob && (
-                    <span className="text-red-500 text-sm">
-                      {errors.dob.message}
-                    </span>
-                  )}
-                </div>
-                <div className="w-1/2 ml-2">
-                  <label
-                    htmlFor="phoneNumber"
-                    className="block mb-2 text-lg font-medium text-gray-700"
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById("image").click()}
+                    className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 focus:outline-none"
                   >
-                    Số điện thoại <span className="text-red-500">*</span>
-                  </label>
-                  <Controller
-                    name="phoneNumber"
-                    control={control}
-                    rules={{
-                      required: "Vui lòng nhập số điện thoại",
-                      pattern: {
-                        value: /^0\d{9}$/,
-                        message: "Số điện thoại không hợp lệ",
-                      },
-                    }}
-                    render={({ field }) => (
-                      <input
-                        id="phoneNumber"
-                        type="text"
-                        {...field}
-                        value={field.value || ""}
-                        className="w-full h-10 border border-gray-300 rounded-md px-3"
-                        placeholder="Nhập số điện thoại"
+                    Cập nhật ảnh
+                  </button>
+                </div>
+                <div className="flex flex-col items-center my-4 mx-6">
+                  <div className="w-px h-full bg-gray-300"></div>
+                </div>
+                <div className="w-3/4 flex-grow">
+                  <div className="flex mb-4">
+                    <div className="w-1/2 mr-2">
+                      <label
+                        htmlFor="firstname"
+                        className="block mb-2 text-lg font-medium text-gray-700"
+                      >
+                        Họ <span className="text-red-500">*</span>
+                      </label>
+                      <Controller
+                        name="firstname"
+                        control={control}
+                        rules={{ required: "Họ không được để trống" }}
+                        render={({ field }) => (
+                          <input
+                            id="firstname"
+                            type="text"
+                            {...field}
+                            value={field.value || ""}
+                            className="w-full h-10 border border-gray-300 rounded-md px-3"
+                            placeholder="Nhập họ"
+                          />
+                        )}
                       />
+                      {errors.firstname && (
+                        <span className="text-red-500 text-sm">
+                          {errors.firstname.message}
+                        </span>
+                      )}
+                    </div>
+                    <div className="w-1/2 ml-2">
+                      <label
+                        htmlFor="lastname"
+                        className="block mb-2 text-lg font-medium text-gray-700"
+                      >
+                        Tên <span className="text-red-500">*</span>
+                      </label>
+                      <Controller
+                        name="lastname"
+                        control={control}
+                        rules={{ required: "Tên không được để trống" }}
+                        render={({ field }) => (
+                          <input
+                            id="lastname"
+                            type="text"
+                            {...field}
+                            value={field.value || ""}
+                            className="w-full h-10 border border-gray-300 rounded-md px-3"
+                            placeholder="Nhập tên"
+                          />
+                        )}
+                      />
+                      {errors.lastname && (
+                        <span className="text-red-500 text-sm">
+                          {errors.lastname.message}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="mb-4">
+                    <label
+                      htmlFor="email"
+                      className="block mb-2 text-lg font-medium text-gray-700"
+                    >
+                      Email <span className="text-red-500">*</span>
+                    </label>
+                    <Controller
+                      name="email"
+                      control={control}
+                      rules={{
+                        required: "Email không được để trống",
+                        pattern: {
+                          value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                          message: "Email không hợp lệ",
+                        },
+                      }}
+                      render={({ field }) => (
+                        <input
+                          id="email"
+                          type="text"
+                          {...field}
+                          value={field.value || ""}
+                          className="w-full h-10 border border-gray-300 rounded-md px-3"
+                          placeholder="Nhập email"
+                          readOnly
+                        />
+                      )}
+                    />
+                    {errors.email && (
+                      <span className="text-red-500 text-sm">
+                        {errors.email.message}
+                      </span>
                     )}
-                  />
-                  {errors.phoneNumber && (
-                    <span className="text-red-500 text-sm">
-                      {errors.phoneNumber.message}
-                    </span>
-                  )}
+                  </div>
+                  <div className="flex mb-4">
+                    <div className="w-1/2 mr-2">
+                      <label
+                        htmlFor="dob"
+                        className="block mb-2 text-lg font-medium text-gray-700"
+                      >
+                        Ngày sinh <span className="text-red-500">*</span>
+                      </label>
+                      <Controller
+                        name="dob"
+                        control={control}
+                        rules={{ required: "Cập nhật ngày sinh" }}
+                        render={({ field }) => (
+                          <input
+                            id="dob"
+                            type="date"
+                            {...field}
+                            value={field.value || ""}
+                            className="w-full h-10 border border-gray-300 rounded-md px-3"
+                            placeholder="Nhập ngày sinh"
+                          />
+                        )}
+                      />
+                      {errors.dob && (
+                        <span className="text-red-500 text-sm">
+                          {errors.dob.message}
+                        </span>
+                      )}
+                    </div>
+                    <div className="w-1/2 ml-2">
+                      <label
+                        htmlFor="phoneNumber"
+                        className="block mb-2 text-lg font-medium text-gray-700"
+                      >
+                        Số điện thoại <span className="text-red-500">*</span>
+                      </label>
+                      <Controller
+                        name="phoneNumber"
+                        control={control}
+                        rules={{
+                          required: "Vui lòng nhập số điện thoại",
+                          pattern: {
+                            value: /^0\d{9}$/,
+                            message: "Số điện thoại không hợp lệ",
+                          },
+                        }}
+                        render={({ field }) => (
+                          <input
+                            id="phoneNumber"
+                            type="text"
+                            {...field}
+                            value={field.value || ""}
+                            className="w-full h-10 border border-gray-300 rounded-md px-3"
+                            placeholder="Nhập số điện thoại"
+                          />
+                        )}
+                      />
+                      {errors.phoneNumber && (
+                        <span className="text-red-500 text-sm">
+                          {errors.phoneNumber.message}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div className="flex justify-end gap-2">
+                  <button
+                      type="submit"
+                      className="w-1/3 px-6 py-3 bg-red-500 text-white font-semibold rounded-lg shadow-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75 " onClick={()=>navigate("/")}
+                    >
+                      Trở về
+                    </button>
+                    <button
+                      type="submit"
+                      className="w-1/3 px-6 py-3 bg-orange-500 text-white font-semibold rounded-lg shadow-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+                    >
+                      Cập Nhật
+                    </button>
+                  </div>
                 </div>
               </div>
-              <div className="flex justify-end">
-                <button
-                  type="submit"
-                  className="w-1/3 px-6 py-3 bg-orange-500 text-white font-semibold rounded-lg shadow-md hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
-                >
-                  Cập Nhật
-                </button>
-              </div>
-            </div>
-          </div></>)}
-          
-          
+            </>
+          )}
         </form>
         <Toast ref={toast} />
       </div>
-    </>
+    </NotifyProvider>
   );
 };
 

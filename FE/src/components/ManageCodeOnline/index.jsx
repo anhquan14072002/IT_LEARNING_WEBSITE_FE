@@ -28,6 +28,9 @@ import { InputSwitch } from "primereact/inputswitch";
 import { Tooltip } from "primereact/tooltip";
 import { Dialog } from "primereact/dialog";
 import { Editor } from "primereact/editor";
+import classNames from "classnames";
+import PracticeComponent from "../PracticeComponent";
+import ManageLanguage from "../ManageLanguage";
 
 export default function ManageCodeOnline() {
   const toast = useRef(null);
@@ -42,6 +45,7 @@ export default function ManageCodeOnline() {
   const [content, setContent] = useState("");
   const [visibleDelete, setVisibleDelete] = useState(false);
   const navigate = useNavigate();
+  const [navIndex, setNavIndex] = useState(1);
 
   //pagination
   const [first, setFirst] = useState(0);
@@ -194,7 +198,12 @@ export default function ManageCodeOnline() {
   const status = (rowData, { rowIndex }) => {
     // return <InputSwitch checked={rowData.isActive} />;
     return (
-      <button className="bg-blue-600 hover:bg-blue-400 text-white p-2 rounded-md" onClick={()=>navigate(`/dashboard/quiz/manageexecutecode/${rowData?.id}`)}>
+      <button
+        className="bg-blue-600 hover:bg-blue-400 text-white p-2 rounded-md"
+        onClick={() =>
+          navigate(`/dashboard/updateproblem/${rowData?.id}`)
+        }
+      >
         Chỉnh sửa mã thực thi
       </button>
     );
@@ -280,140 +289,26 @@ export default function ManageCodeOnline() {
         />
       </Dialog>
       <ConfirmDialog visible={visibleDelete} />
-      <div>
-        <div className="flex justify-between pt-1">
-          <h1 className="font-bold text-3xl">Quản lí các bài thực hành</h1>
-          <div>
-            <Button
-              label="Thêm mới"
-              icon="pi pi-plus-circle"
-              severity="info"
-              className="bg-blue-600 text-white p-2 text-sm font-normal"
-              onClick={() => navigate("/dashboard/createproblem")}
-            />
-          </div>
-        </div>
-
-        {/* data */}
-        <div className="border-2 rounded-md mt-2">
-          <div className="mb-10 flex flex-wrap items-center p-2">
-            <div className="border-2 rounded-md p-2">
-              <InputText
-                onChange={(e) => {
-                  handleSearchInput(removeVietnameseTones(e.target.value));
-                }}
-                placeholder="Search"
-                className="flex-1 focus:outline-none w-36 focus:ring-0"
-              />
-              <Button
-                icon="pi pi-search"
-                className="p-button-warning focus:outline-none focus:ring-0 flex-shrink-0"
-              />
-            </div>
-
-            {/* <div className="flex-1 flex flex-wrap gap-3 justify-end">
-              <div className="border-2 rounded-md mt-4">
-                <Dropdown
-                  filter
-                  ref={dropDownRef2}
-                  value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.value)}
-                  options={cities}
-                  optionLabel="name"
-                  showClear
-                  placeholder="Lớp"
-                  className="w-full md:w-14rem shadow-none h-full"
-                />
-              </div>
-              <div className="border-2 rounded-md mt-4">
-                <Dropdown
-                  filter
-                  ref={dropDownRef2}
-                  value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.value)}
-                  options={cities}
-                  optionLabel="name"
-                  showClear
-                  placeholder="Bộ sách"
-                  className="w-full md:w-14rem shadow-none h-full"
-                />
-              </div>
-              <div className="border-2 rounded-md mt-4">
-                <Dropdown
-                  filter
-                  ref={dropDownRef2}
-                  value={selectedCity}
-                  onChange={(e) => setSelectedCity(e.value)}
-                  options={cities}
-                  optionLabel="name"
-                  showClear
-                  placeholder="Chủ đề"
-                  className="w-full md:w-14rem shadow-none h-full"
-                />
-              </div>
-            </div> */}
-          </div>
-          {loading ? (
-            <Loading />
-          ) : (
-            <DataTable
-              value={products}
-              onContextMenu={(e) => cm.current.show(e.originalEvent)}
-              selection={selectedProduct}
-              onSelectionChange={(e) => setSelectedProduct(e.value)}
-              className="border-t-2"
-              tableStyle={{ minHeight: "30rem" }}
-              scrollable
-              scrollHeight="30rem"
-            >
-              <Column
-                field="#"
-                header="#"
-                body={indexBodyTemplate}
-                className="border-b-2 border-t-2"
-                style={{ minWidth: "5rem" }}
-              />
-
-              <Column
-                field="title"
-                header="Tiêu đề"
-                className="border-b-2 border-t-2"
-                style={{ minWidth: "12rem" }}
-              ></Column>
-              <Column
-                body={description}
-                header="Nội dung"
-                className="border-b-2 border-t-2"
-                style={{ minWidth: "12rem" }}
-              ></Column>
-              <Column
-                header="Độ khó"
-                className="border-b-2 border-t-2"
-                field="difficulty"
-                style={{ minWidth: "12rem" }}
-              ></Column>
-              <Column
-                // header="Trạng thái"
-                className="border-b-2 border-t-2"
-                body={status}
-                style={{ minWidth: "10rem" }}
-              ></Column>
-              <Column
-                className="border-b-2 border-t-2"
-                body={actionBodyTemplate}
-              />
-            </DataTable>
-          )}
-          <Paginator
-            first={first}
-            rows={rows}
-            rowsPerPageOptions={[10, 20, 30]}
-            totalRecords={totalPage * rows}
-            onPageChange={onPageChange}
-            className="custom-paginator mx-auto"
-          />
-        </div>
+      <div className="flex justify-start border-b-2 mb-5 border-[#D1F7FF]">
+        <h1
+          className={classNames("p-5 cursor-pointer hover:bg-[#D1F7FF]", {
+            "bg-[#D1F7FF] font-bold": navIndex === 1,
+          })}
+          onClick={() => setNavIndex(1)}
+        >
+          Bài thực hành
+        </h1>
+        <h1
+          className={classNames("p-5 cursor-pointer hover:bg-[#D1F7FF]", {
+            "bg-[#D1F7FF] font-bold": navIndex === 2,
+          })}
+          onClick={() => setNavIndex(2)}
+        >
+          Ngôn ngữ lập trình
+        </h1>
       </div>
+      {navIndex === 1 && <PracticeComponent />}
+      {navIndex === 2 && <ManageLanguage />}
     </div>
   );
 }

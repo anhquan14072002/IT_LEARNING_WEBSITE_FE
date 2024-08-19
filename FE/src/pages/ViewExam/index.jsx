@@ -20,6 +20,7 @@ const Index = () => {
   const [loading, setLoading] = useState(false);
   const [provinceList, setProvinceList] = useState([]);
   const [selectedProvince, setSelectedProvince] = useState("");
+  const [selectedProvince1, setSelectedProvince1] = useState("");
   const [competitionList, setCompetitionList] = useState([]);
   const [competition, setCompetition] = useState("");
   const [competitionSearch, setCompetitionSearch] = useState("");
@@ -28,19 +29,19 @@ const Index = () => {
 
   const fetchData = async () => {
     setLoading(true);
-    const province = selectedProvince ? selectedProvince : ""
-    const years = year ? year : ""
-    const competition = competitionSearch ? competitionSearch : ""
-    const id ="id"
+    const province = selectedProvince1 ? selectedProvince1 : "";
+    const years = year ? year : "";
+    const competition = competitionSearch ? competitionSearch : "";
+    const id = "id";
     try {
       const res = await restClient({
-        url: `api/exam/searchbyexampagination?PageIndex=${page}&PageSize=${rows}&Province=${province}&Year=${years}&CompetitionId=${competition}&OrderBy=${id}&IsAscending=false`,
+        url: `api/exam/getallexampagination?PageIndex=${page}&PageSize=${rows}&Province=${province}&Year=${years}&CompetitionId=${competition}&OrderBy=${id}&IsAscending=false`,
         method: "GET",
       });
       const paginationData = JSON.parse(res.headers["x-pagination"]);
       setTotalPage(paginationData.TotalPages);
       console.log(paginationData.TotalPages);
-      
+
       setExamList(Array.isArray(res.data.data) ? res.data.data : []);
     } catch (err) {
       console.error("Error fetching data:", err);
@@ -49,11 +50,11 @@ const Index = () => {
       setLoading(false);
     }
   };
-  
+
   useEffect(() => {
     fetchData();
   }, [page, rows, selectedProvince, year, competitionSearch]);
-  
+
   useEffect(() => {
     if (province?.data) {
       setProvinceList(province?.data);
@@ -75,30 +76,31 @@ const Index = () => {
         console.log("error");
       }
     };
-  
+
     fetchDataCompetition();
   }, [province, years]);
-  
+
   const onPageChange = (event) => {
     const { page, rows, first } = event;
     setRows(rows);
     setPage(page + 1);
     setFirst(first);
   };
-  
+
   const handleProvince = (e) => {
     setSelectedProvince(e.value?.name);
+    setSelectedProvince1(e.value?.name_en);
   };
-  
+
   const handleCompetition = (e) => {
     setCompetition(e.value?.title);
     setCompetitionSearch(e.value?.id);
   };
-  
+
   const handleYear = (e) => {
     setYear(e.value?.year);
   };
-  
+
   return (
     <NotifyProvider>
       <Header />
@@ -145,38 +147,36 @@ const Index = () => {
               />
             </div>
           </div>
-        
-            {examList.length > 0 ? (
-              examList
-                .filter((exam) => exam.isActive)
-                .map((exam) => (
-                  <CardExam id={exam.id} title={exam.title} type={exam.type} />
-                ))
-            ) : (
-              <div className="h-screen flex justify-center items-center">
-              <p className="text-2xl font-bold text-blue-800">Hiện Tại Không Có Đề Thi</p>
 
-              </div>
-            )}
-          
-          </div>
-   
-        
+          {examList.length > 0 ? (
+            examList
+              .filter((exam) => exam.isActive)
+              .map((exam) => (
+                <CardExam id={exam.id} title={exam.title} type={exam.type} />
+              ))
+          ) : (
+            <div className="h-screen flex justify-center items-center">
+              <p className="text-2xl font-bold text-blue-800">
+                Hiện Tại Không Có Đề Thi
+              </p>
+            </div>
+          )}
+        </div>
       )}
-        {examList.length > 0 && (
-              <>
-                <div className="flex-grow"></div>
-                <div>
-                  <Paginator
-                    first={first}
-                    rows={rows}
-                    totalRecords={totalPage * rows}
-                    onPageChange={onPageChange}
-                    className="custom-paginator mx-auto mb-2"
-                  />
-                </div>
-              </>
-            )}
+      {examList.length > 0 && (
+        <>
+          <div className="flex-grow"></div>
+          <div>
+            <Paginator
+              first={first}
+              rows={rows}
+              totalRecords={totalPage * rows}
+              onPageChange={onPageChange}
+              className="custom-paginator mx-auto mb-2"
+            />
+          </div>
+        </>
+      )}
     </NotifyProvider>
   );
 };

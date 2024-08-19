@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
-import PostGrade from "../../layouts/post/PostGrade";
-import PostContent from "../../layouts/post/PostContent";
+import PostGrade from "../../components/Post/PostGrade";
+import PostContent from "../../components/Post/PostContent";
 import PostRank from "../../components/Post/PostRank";
 import Header from "../../components/Header";
 import Menu from "../../components/Menu";
@@ -31,13 +31,14 @@ function Post(props) {
             </div>
             <div
               style={{ paddingTop: `${fixedDivHeight}px` }}
-              className=" flex gap-3 p-3"
+              className="flex flex-col md:flex-row gap-3 p-3"
             >
-              {/* <div className=" flex gap-3 p-3"> */}
+              {/* <div className="lg:w-[17%]"> */}
               <PostGrade />
-              <PostContent />
+              {/* </div> */}
 
-              {/* <PostRank /> */}
+              {/* <div className="lg:flex-1"> */}
+              <PostContent />
               {/* </div> */}
             </div>
           </div>

@@ -4,15 +4,16 @@ import { Formik, Form, ErrorMessage, Field } from "formik";
 import * as Yup from "yup";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
-import PostContentItem from "../../components/Post/PostContentItem";
+import PostContentItem from "./PostContentItem";
 import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
-import LoadingScreen from "../../components/LoadingScreen";
+import LoadingScreen from "../LoadingScreen";
 import UncontrolledEditor from "../../shared/CustomEditorSecond";
 import PostContext from "../../store/PostContext";
 import { ACCEPT, containsRudeWords, isLoggedIn } from "../../utils";
 import "../../shared/CustomDropdown/index.css";
 import { getAllGrade } from "../../services/grade.api";
 import image from "../../assets/img/image.png";
+import restClient from "../../services/restClient";
 const validationSchema = Yup.object({
   grade: Yup.object()
     .test("is-not-empty", "Không được để trống trường này", (value) => {
@@ -21,18 +22,25 @@ const validationSchema = Yup.object({
     .required("Không bỏ trống trường này"),
 });
 
-function PostContent() {
-  const [isCompose, setIsCompose] = useState(false);
-
+function PostContent({ ...props }) {
+  const { compose, setCompose } = useContext(PostContext);
   return (
     <div
-      className="w-[80%] mt-4  flex flex-col gap-5 flex-grow "
+      className="w-full md:w-[80%] mt-4  flex flex-col gap-5 grow "
       // className="w-[80%] mt-4 h-screen flex flex-col gap-5 flex-grow ml-[18%]"
     >
-      {!isCompose ? (
-        <ComposeComment onClick={() => setIsCompose(true)} />
+      {!compose?.isCompose ? (
+        <ComposeComment
+          onClick={() =>
+            setCompose((preValue) => ({ isCompose: true, data: null }))
+          }
+        />
       ) : (
-        <PostWrite setIsCompose={setIsCompose} />
+        <PostWrite
+          setCompose={setCompose}
+          key={compose?.data?.id}
+          compose={compose}
+        />
       )}
       <main>
         <PostContentItem />
@@ -41,17 +49,35 @@ function PostContent() {
   );
 }
 
-function PostWrite({ setIsCompose }) {
+function PostWrite({ setCompose, compose }) {
   const {
     createPost,
     loading,
     setLoading,
     createPostNotification,
-    setRefresh,
+    updatePost,
   } = useContext(PostContext);
+
   const user = useSelector((state) => state.user.value);
   const toast = useRef(null);
-  const [initialValues] = useState({ grade: {} });
+  const [initialValues, setInitialValues] = useState({ grade: {} });
+  useEffect(() => {
+    if (compose?.data != null) {
+      async function getGradeById() {
+        const gradeById = await restClient({
+          url: `api/grade/getgradebyid/${compose?.data?.gradeId}?include=false`,
+          method: "GET",
+        });
+        const gradeByIdData = gradeById.data?.data || {};
+        console.log(gradeByIdData);
+
+        setInitialValues((preValue) => ({ grade: gradeByIdData }));
+      }
+      getGradeById();
+    }
+  }, [compose?.data]);
+  console.log(compose?.data);
+
   const [description, setDescription] = useState("");
   const [gradeList, setListGrade] = useState([]);
   useEffect(() => {
@@ -63,7 +89,7 @@ function PostWrite({ setIsCompose }) {
 
   const onSubmit = (values) => {
     if (description.trim() === "") {
-      ACCEPT(toast, "Bạn cần nhập nội dung bài post ? ");
+      ACCEPT(toast, "Bạn cần nhập thêm nội dung bài post ? ");
       return;
     }
     if (containsRudeWords(description)) {
@@ -80,11 +106,19 @@ function PostWrite({ setIsCompose }) {
       userId: user?.sub,
       gradeId: values.grade?.id,
     };
-    createPost(descriptionPost);
-    notifyPersonalResponse();
-    setIsCompose(false);
+    let postId = compose?.data?.idPost;
+    if (postId) {
+      updatePost({ ...descriptionPost, id: postId });
+    } else {
+      createPost(descriptionPost);
+    }
+    notifyPersonalResponse(postId);
+    setCompose((preValue) => ({
+      data: null,
+      isCompose: false,
+    }));
   };
-  function notifyPersonalResponse() {
+  function notifyPersonalResponse(postId) {
     /* solution: Where is the origin of action from ? 
           - pass body in request :  */
     const body = {
@@ -93,10 +127,10 @@ function PostWrite({ setIsCompose }) {
       userSendName: user?.name,
       userReceiveId: user?.sub,
       userReceiveName: user?.name,
-      description: `Bạn vừa tạo bài post thành công`,
+      description: `Bạn vừa ${postId ? "sửa" : "tạo"} bài post thành công`,
       notificationTime: new Date(),
       isRead: false,
-      link: "",
+      link: "test",
     };
     createPostNotification(body);
   }
@@ -136,7 +170,10 @@ function PostWrite({ setIsCompose }) {
                 />
               </div>
               <div>
-                <UncontrolledEditor onChange={handleEditorChange} />
+                <UncontrolledEditor
+                  onChange={handleEditorChange}
+                  value={compose?.data?.content || ""}
+                />
                 <ErrorMessage name="description" component="div" />
               </div>
               <div className="flex justify-end gap-2 mt-[3rem]">
@@ -144,7 +181,12 @@ function PostWrite({ setIsCompose }) {
                   className="px-3 border-2 hover:bg-gray-100 "
                   type="button"
                   severity="danger"
-                  onClick={() => setIsCompose(false)}
+                  onClick={() =>
+                    setCompose((preValue) => ({
+                      data: null,
+                      isCompose: false,
+                    }))
+                  }
                 >
                   Hủy
                 </Button>
@@ -152,7 +194,7 @@ function PostWrite({ setIsCompose }) {
                   className="p-2 bg-blue-600 hover:bg-blue-500 text-white font-bold"
                   type="submit"
                 >
-                  Tạo bài đăng
+                  {compose?.data ? "Sửa" : "Tạo"} bài đăng
                 </Button>
               </div>
             </Form>
@@ -173,11 +215,18 @@ function ComposeComment({ ...props }) {
       <p className="flex gap-3 items-center">
         {isLoggedIn() ? (
           <span className="flex items-center">
-            <img
-              src={user?.picture}
+            {/* <img
+              src={user?.picture || image}
               alt="Ảnh người dùng"
               width="30px"
               style={{ borderRadius: "25px" }}
+            /> */}
+            <img
+              src={user?.picture || image}
+              alt="Ảnh người dùng"
+              width="30px"
+              className="rounded-full"
+              onError={(e) => (e.target.src = image)}
             />
           </span>
         ) : (

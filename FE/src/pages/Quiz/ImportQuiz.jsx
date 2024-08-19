@@ -1,18 +1,18 @@
 import React from "react";
 import SideBarImport from "../../components/Quiz/SideBarImport";
-import { Outlet } from "react-router-dom";
+import { Outlet, useParams } from "react-router-dom";
 import Footer from "../../components/Quiz/Footer";
 import { FormDataProvider } from "../../store/FormDataContext";
 import Header from "../../components/Header";
 import NotifyProvider from "../../store/NotificationContext";
 
-const Menus = [
-  { title: "1. Chọn tệp nguồn", index: 0, path: "stepOne" },
-  { title: "2. Kiểm tra dữ liệu", index: 1, path: "stepTwo" },
-  { title: "3. Kết quả nhập khẩu ", index: 2, path: "stepThree" },
-];
-
 function ImportQuiz() {
+  const { id } = useParams();
+  const Menus = [
+    { title: "1. Chọn tệp nguồn", index: 0, path: `stepOne/${id}` },
+    { title: "2. Kiểm tra dữ liệu", index: 1, path: "stepTwo" },
+    { title: "3. Kết quả nhập khẩu ", index: 2, path: "stepThree" },
+  ];
   return (
     <NotifyProvider>
       <FormDataProvider>

@@ -42,7 +42,7 @@ export default function Document() {
 
   useEffect(() => {
     restClient({
-      url: "api/grade/getallgrade",
+      url: "api/grade/getallgrade?isInclude=false",
       method: "GET",
     })
       .then((res) => {
@@ -88,7 +88,7 @@ export default function Document() {
       const pageSize = rows || 10;
       const gradeId = filterClass?.id ? `&GradeId=${filterClass.id}` : "";
 
-      const url = `api/document/getalldocumentpagination?PageIndex=${pageIndex}&PageSize=${pageSize}${gradeId}`;
+      const url = `api/document/getalldocumentpagination?PageIndex=${pageIndex}&PageSize=${pageSize}${gradeId}&Value=${textSearch}`;
       restClient({
         url,
         method: "GET",

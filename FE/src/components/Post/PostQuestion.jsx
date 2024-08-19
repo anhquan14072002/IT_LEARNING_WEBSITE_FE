@@ -13,6 +13,8 @@ function PostQuestion({ post, isFavoritePost }) {
     setItemSidebar,
     createFavoritePost,
     createPostNotification,
+    fetchPostById,
+    setCompose,
   } = useContext(PostContext);
   const {
     content,
@@ -24,6 +26,7 @@ function PostQuestion({ post, isFavoritePost }) {
     userId,
     id,
     numberOfComment,
+    roles,
   } = post;
   const [isFavorite, setIsFavorite] = useState(isFavoritePost);
   let contentJsx = <div dangerouslySetInnerHTML={{ __html: content }} />;
@@ -45,7 +48,7 @@ function PostQuestion({ post, isFavoritePost }) {
       description: `Bạn đã thu hồi bài post thành công`,
       notificationTime: new Date(),
       isRead: false,
-      link: "",
+      link: "test",
     };
     createPostNotification(body);
   }
@@ -66,7 +69,16 @@ function PostQuestion({ post, isFavoritePost }) {
     setIsFavorite((preValue) => !preValue);
     createFavoritePost(id);
   }
+  function editPost() {
+    /* solution: Where is the origin of action from ? 
+        -  take id post and call api open 
+        - isCompose
+        - send data for isCompose  */
+    console.log(id);
+    console.log("fetch post");
 
+    fetchPostById(id);
+  }
   return (
     <div className="border-stone-200 border-b-2 ">
       <div className="rounded p-5 flex flex-col gap-3">
@@ -76,12 +88,21 @@ function PostQuestion({ post, isFavoritePost }) {
               <img
                 src={avatar || image}
                 alt="Ảnh người dùng"
-                width="30px"
-                style={{ borderRadius: "25px" }}
+                width="35px"
+                className="rounded-full"
+                onError={(e) => (e.target.src = image)}
               />
             </span>
-            <span className="flex flex-col">
-              <strong>{userName}</strong>
+            <span className="flex flex-col gap-2">
+              <strong className="text-xl font-medium">{userName}</strong>
+              {roles.map((role) => (
+                <Button
+                  label={role}
+                  severity="warning"
+                  style={{ backgroundColor: "#f58220" }}
+                  className="text-white rounded-3xl text-sm w-fit px-2 font-bold"
+                />
+              ))}
               <span className="text-sm text-stone-400">
                 {/* 12 giờ trước (20:28) - SIT18 */}
                 {formattedDate}
@@ -99,7 +120,7 @@ function PostQuestion({ post, isFavoritePost }) {
           <Button
             label={` #Tin học ${gradeTitle}`}
             severity="warning"
-            style={{ backgroundColor: "#FAA500" }}
+            style={{ backgroundColor: "#bc594a" }}
             onClick={handleChooseGrade}
             className="text-white px-2 py-1 rounded-3xl text-sm"
           />
@@ -130,6 +151,13 @@ function PostQuestion({ post, isFavoritePost }) {
             <span>
               <a className="cursor-pointer" onClick={responseAnswer}>
                 Thu hồi
+              </a>
+            </span>
+          )}
+          {userId === user?.sub && isLoggedIn() && (
+            <span>
+              <a className="cursor-pointer" onClick={editPost}>
+                Chỉnh sửa bài post
               </a>
             </span>
           )}
