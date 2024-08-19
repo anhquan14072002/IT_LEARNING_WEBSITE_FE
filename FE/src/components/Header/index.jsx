@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import avatar from "../../assets/img/icons8-male-user-50.png";
-import logo from "../../assets/TNV.svg";
+import logo from "../../assets/THV.svg";
 import arrowDown from "../../assets/img/icons8-sort-down-50.png";
 import "./index.css";
 import { Tooltip } from "primereact/tooltip";
