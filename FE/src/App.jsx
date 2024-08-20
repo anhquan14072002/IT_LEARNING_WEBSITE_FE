@@ -40,6 +40,7 @@ import ListPractice from "./pages/ListPractice";
 import ManageQuestionQuiz from "./components/ManageQuestionQuiz";
 import { useSelector } from "react-redux";
 import HistoryQuiz from "./pages/HistoryQuiz";
+import SearchTag from "./pages/SearchTag";
 
 function App() {
   const user = useSelector((state) => state.user.value);
@@ -136,6 +137,7 @@ function App() {
               <Route path="/examdetail/:id" element={<ExamDetail />} />
               <Route path="/examresult/:id" element={<ExamResult />} />
               <Route path="/examcodedetail/:id" element={<ExamCodeDetail />} />
+              <Route path="/historyQuiz" element={<HistoryQuiz />} />
             </>
           )}
           <Route path="/loginAdmin" element={<LoginAdmin />} />
@@ -166,7 +168,6 @@ function App() {
             path="/dashboard/updateexecutecode/:id"
             element={<UpdateExecuteCode />}
           />
-          <Route path="/detailclass/:id" element={<DetailClass />} />
           <Route
             path="/dashboard/quiz/manageexecutecode/:id"
             element={<ManageExecuteCode />}
@@ -177,7 +178,7 @@ function App() {
             element={<UpdateProblem />}
           />
           <Route path="/detailclass/:id" element={<DetailClass />} />
-          <Route path="/historyQuiz" element={<HistoryQuiz />} />
+          <Route path="/searchTag/:id" element={<SearchTag />} />
         </Routes>
       </Router>
     </>
