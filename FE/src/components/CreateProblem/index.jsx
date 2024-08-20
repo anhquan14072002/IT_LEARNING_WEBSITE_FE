@@ -36,11 +36,7 @@ const validationSchema = Yup.object({
       return Object.keys(value).length !== 0; // Check if object is not empty
     })
     .required("Không bỏ trống trường này"),
-  document: Yup.object()
-    .test("is-not-empty", "Không được để trống trường này", (value) => {
-      return Object.keys(value).length !== 0; // Check if object is not empty
-    })
-    .required("Không bỏ trống trường này"),
+  document: Yup.object().nullable(),
   title: Yup.string().required("Tiêu đề không được bỏ trống"),
   description: Yup.string().required("Mô tả không được bỏ trống"),
   difficulty: Yup.object()
@@ -48,16 +44,8 @@ const validationSchema = Yup.object({
       return Object.keys(value).length !== 0; // Check if object is not empty
     })
     .required("Không bỏ trống trường này"),
-  topic: Yup.object()
-    .test("is-not-empty", "Không được để trống trường này", (value) => {
-      return Object.keys(value).length !== 0; // Check if object is not empty
-    })
-    .required("Không bỏ trống trường này"),
-  lesson: Yup.object()
-    .test("is-not-empty", "Không được để trống trường này", (value) => {
-      return Object.keys(value).length !== 0; // Check if object is not empty
-    })
-    .required("Không bỏ trống trường này"),
+  topic: Yup.object().nullable(),
+  lesson: Yup.object().nullable(),
 });
 
 export default function CreateProblem() {
@@ -142,19 +130,37 @@ export default function CreateProblem() {
       return;
     }
 
+    const data = {
+      title: values?.title,
+      description: values?.description,
+      difficulty: values?.difficulty?.id,
+      isActive: true,
+      tagValues: ["Đề thi tin"],
+    };
+  
+    if (values?.grade?.id) {
+      data.gradeId = values.grade.id;
+    } else if (values?.topic?.id) {
+      data.topicId = values.topic.id;
+    } else if (values?.lesson?.id) {
+      data.lessonId = values.lesson.id;
+    }
+
     setLoading(true);
     await restClient({
       url: "api/problem/createproblem",
       method: "POST",
-      data: {
-        title: values?.title,
-        description: values?.description,
-        difficulty: values?.difficulty?.id,
-        isActive: true,
-        topicId: null,
-        lessonId: values?.lesson?.id,
-        tagValues: ["Đề thi tin"],
-      },
+      data
+      // data: {
+      //   title: values?.title,
+      //   description: values?.description,
+      //   difficulty: values?.difficulty?.id,
+      //   isActive: true,
+      //   topicId: null,
+      //   lessonId: values?.lesson?.id,
+      //   gradeId: values?.grade?.id,
+      //   tagValues: ["Đề thi tin"],
+      // },
     })
       .then((res) => {
         const problemData = res?.data?.data;
@@ -365,6 +371,7 @@ export default function CreateProblem() {
                         name="document"
                         id="document"
                         isClear={true}
+                        isNotRequired={true}
                         clearGrade={clearGrade}
                         setClearGrade={setClearGrade}
                         disabled={!documentList || documentList.length === 0} // Disable if documentList is empty or undefined
@@ -379,6 +386,7 @@ export default function CreateProblem() {
                         id="topic"
                         isClear={true}
                         touched={false}
+                        isNotRequired={true}
                         clearGrade={clearTopic}
                         setClearGrade={setClearTopic}
                         disabled={!topicList || topicList.length === 0}
@@ -391,6 +399,7 @@ export default function CreateProblem() {
                         label="Bài học"
                         name="lesson"
                         id="lesson"
+                        isNotRequired={true}
                         touched={false}
                         clearTopic={clearLesson}
                         setClearTopic={setClearLesson}
