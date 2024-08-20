@@ -60,34 +60,36 @@ export default function DetailClass() {
         >
           <div className="py-6 px-4">
             <div className="text-xl font-bold mb-5">
-              {documentList?.title} | Đề thi, Bài tập, Tài liệu, Câu hỏi ôn tập
+              {documentList?.title} | Tài liệu, Bài tập, Câu hỏi ôn tập, Đề thi
             </div>
-            <ul className="list-disc pl-5 space-y-2">
-              <li className="text-md text-blue-500 underline cursor-pointer font-bold">
-                Tài liệu {documentList?.title}
-              </li>
-              <li className="text-md text-blue-500 underline cursor-pointer font-bold">
-                Câu hỏi ôn tập flashcard {documentList?.title}
-              </li>
-              <li className="text-md text-blue-500 underline cursor-pointer font-bold">
-                Câu hỏi ôn tập trắc nghiệm {documentList?.title}
-              </li>
-              <li className="text-md text-blue-500 underline cursor-pointer font-bold">
-                Đề thi {documentList?.title}
-              </li>
-              <li className="text-md text-blue-500 underline cursor-pointer font-bold">
-                Bài tập {documentList?.title}
-              </li>
-            </ul>
           </div>
 
           {documentList?.documents?.length > 0 && (
             <Section
-              title="Các bộ sách"
+              title="Tài liệu"
               items={documentList.documents}
               navigate={navigate}
               pathPrefix="/document/"
               showAllLink={`/search?classId=${id}`}
+            />
+          )}
+
+          {documentList?.documents?.flatMap(
+            (d) =>
+              d.topics?.flatMap(
+                (t) => t.lessons?.flatMap((l) => l.problems) || []
+              ) || []
+          ).length > 0 && (
+            <Section
+              title="Bài tập"
+              items={documentList.documents.flatMap(
+                (d) =>
+                  d.topics?.flatMap(
+                    (t) => t.lessons?.flatMap((l) => l.problems) || []
+                  ) || []
+              )}
+              navigate={navigate}
+              pathPrefix="/codeEditor/"
             />
           )}
 
@@ -118,25 +120,6 @@ export default function DetailClass() {
               navigate={navigate}
               pathPrefix="/document/"
               showAllLink={`/search?classId=${id}`}
-            />
-          )}
-
-          {documentList?.documents?.flatMap(
-            (d) =>
-              d.topics?.flatMap(
-                (t) => t.lessons?.flatMap((l) => l.problems) || []
-              ) || []
-          ).length > 0 && (
-            <Section
-              title="Bài tập"
-              items={documentList.documents.flatMap(
-                (d) =>
-                  d.topics?.flatMap(
-                    (t) => t.lessons?.flatMap((l) => l.problems) || []
-                  ) || []
-              )}
-              navigate={navigate}
-              pathPrefix="/codeEditor/"
             />
           )}
         </main>

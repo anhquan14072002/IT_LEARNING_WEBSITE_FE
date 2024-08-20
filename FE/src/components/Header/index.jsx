@@ -82,6 +82,11 @@ export default function Header({ params, setParams, textSearchProps }) {
             command: (e) => navigate(getNavigationPath()),
           },
         ]:[] ),
+        {
+          label: "Học bạ",
+          icon: "pi pi-address-book",
+          command: ()=>navigate('/historyQuiz'),
+        },
         
         {
           label: "Đăng xuất",

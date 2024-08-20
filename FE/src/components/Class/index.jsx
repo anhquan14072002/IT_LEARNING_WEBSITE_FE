@@ -38,32 +38,54 @@ export default function Class({ item, index }) {
     setToggle((prevToggle) => !prevToggle);
   };
 
+  // const extractQuizzesByType = (typeId) => {
+  //   return (documentList?.documents ?? []).flatMap((d) =>
+  //     (d.topics ?? []).flatMap((t) =>
+  //       [
+  //         ...(t.quizzes ?? []).filter((q) => q.typeId === typeId),
+  //         ...(t.lessons ?? []).flatMap((l) => (l.quizzes ?? []).filter((q) => q.typeId === typeId)),
+  //       ]
+  //     )
+  //   );
+  // };
+
   const extractQuizzesByType = (typeId) => {
-    return (documentList?.documents ?? []).flatMap((d) =>
-      (d.topics ?? []).flatMap((t) =>
-        [
-          ...(t.quizzes ?? []).filter((q) => q.typeId === typeId),
-          ...(t.lessons ?? []).flatMap((l) => (l.quizzes ?? []).filter((q) => q.typeId === typeId)),
-        ]
-      )
+    // Extract quizzesCustom from the documentList
+    const quizzesCustom = (documentList?.quizzesCustom ?? []).filter(
+      (q) => q.typeId === typeId
     );
+
+    // Extract quizzes from the documents and their nested structures
+    const quizzesFromDocuments = (documentList?.documents ?? []).flatMap(
+      (d) => [
+        ...(d.topics ?? []).flatMap((t) => [
+          ...(t.quizzes ?? []).filter((q) => q.typeId === typeId),
+          ...(t.lessons ?? []).flatMap((l) =>
+            (l.quizzes ?? []).filter((q) => q.typeId === typeId)
+          ),
+        ]),
+      ]
+    );
+
+    // Combine both sources of quizzes
+    return [...quizzesCustom, ...quizzesFromDocuments];
   };
 
   const practiceQuizzes = extractQuizzesByType(1);
-  const testQuizzes = extractQuizzesByType(2);
+  const testQuizzes = extractQuizzesByType(0);
 
   const handleExam = (exam) => {
-    if (user?.sub){
+    if (user?.sub) {
       exam?.type === 1
-      ? navigate(`/examdetail/${exam.id}`)
-      : navigate(`/examcodedetail/${exam.id}`);
-     }else{
+        ? navigate(`/examdetail/${exam.id}`)
+        : navigate(`/examcodedetail/${exam.id}`);
+    } else {
       const confirmed = window.confirm("Vui lòng đăng nhập để được xem đề thi");
       if (confirmed) {
         navigate("/login");
       }
-     }
-  }
+    }
+  };
 
   return (
     <div>
@@ -98,15 +120,17 @@ export default function Class({ item, index }) {
         <div className="flex gap-20 flex-wrap">
           <div>
             <h1 className="font-bold mb-3">Các bộ sách</h1>
-            {(documentList?.documents ?? []).map((d) => (
-              <h1
-                key={d?.id}
-                className="cursor-pointer hover:opacity-85"
-                onClick={() => navigate(`/document/${d?.id}`)}
-              >
-                {d?.title}
-              </h1>
-            )).slice(0, 4)}
+            {(documentList?.documents ?? [])
+              .map((d) => (
+                <h1
+                  key={d?.id}
+                  className="cursor-pointer hover:opacity-85"
+                  onClick={() => navigate(`/document/${d?.id}`)}
+                >
+                  {d?.title}
+                </h1>
+              ))
+              .slice(0, 4)}
             {(documentList?.documents ?? []).length > 4 && (
               <h1
                 className="text-sm text-blue-600 mt-3 cursor-pointer"
@@ -119,15 +143,17 @@ export default function Class({ item, index }) {
 
           <div>
             <h1 className="font-bold mb-3">Câu hỏi ôn tập flashcard</h1>
-            {practiceQuizzes.map((d) => (
-              <h1
-                key={d?.id}
-                className="cursor-pointer hover:opacity-85"
-                onClick={() => navigate(`/flashcard/${d?.id}`)}
-              >
-                {d.title}
-              </h1>
-            )).slice(0, 4)}
+            {practiceQuizzes
+              .map((d) => (
+                <h1
+                  key={d?.id}
+                  className="cursor-pointer hover:opacity-85"
+                  onClick={() => navigate(`/flashcard/${d?.id}`)}
+                >
+                  {d.title}
+                </h1>
+              ))
+              .slice(0, 4)}
             {practiceQuizzes?.length > 4 && (
               <h1
                 className="text-sm text-blue-600 mt-3 cursor-pointer"
@@ -140,15 +166,17 @@ export default function Class({ item, index }) {
 
           <div>
             <h1 className="font-bold mb-3">Câu hỏi ôn tập trắc nghiệm</h1>
-            {testQuizzes?.map((d) => (
-              <h1
-                key={d?.id}
-                className="cursor-pointer hover:opacity-85"
-                onClick={() => navigate(`/testquiz/${d.id}`)}
-              >
-                {d.title}
-              </h1>
-            )).slice(0, 4)}
+            {testQuizzes
+              ?.map((d) => (
+                <h1
+                  key={d?.id}
+                  className="cursor-pointer hover:opacity-85"
+                  onClick={() => navigate(`/testquiz/${d.id}`)}
+                >
+                  {d.title}
+                </h1>
+              ))
+              .slice(0, 4)}
             {testQuizzes.length > 4 && (
               <h1
                 className="text-sm text-blue-600 mt-3 cursor-pointer"
@@ -161,15 +189,17 @@ export default function Class({ item, index }) {
 
           <div>
             <h1 className="font-bold mb-3">Đề thi</h1>
-            {(documentList?.exams ?? []).map((exam) => (
-              <h1
-                key={exam.id}
-                className="cursor-pointer hover:opacity-85"
-                onClick={() => handleExam(exam)}
-              >
-                {exam.title}
-              </h1>
-            )).slice(0, 4)}
+            {(documentList?.exams ?? [])
+              .map((exam) => (
+                <h1
+                  key={exam.id}
+                  className="cursor-pointer hover:opacity-85"
+                  onClick={() => handleExam(exam)}
+                >
+                  {exam.title}
+                </h1>
+              ))
+              .slice(0, 4)}
             {(documentList?.exams ?? []).length > 4 && (
               <h1
                 className="text-sm text-blue-600 mt-3 cursor-pointer"
@@ -179,12 +209,10 @@ export default function Class({ item, index }) {
               </h1>
             )}
           </div>
-          
+
           <div>
             <h1 className="font-bold mb-3">Bài tập</h1>
-            {(
-              documentList?.documents ?? []
-            )
+            {(documentList?.documents ?? [])
               .flatMap((d) =>
                 (d?.topics ?? []).flatMap((t) =>
                   (t.lessons ?? []).flatMap((l) => l?.problems ?? [])
@@ -200,14 +228,11 @@ export default function Class({ item, index }) {
                 </h1>
               ))
               .slice(0, 4)}
-            {(
-              documentList?.documents ?? []
-            )
-              .flatMap((d) =>
-                (d.topics ?? []).flatMap((t) =>
-                  (t.lessons ?? []).flatMap((l) => l?.problems ?? [])
-                )
-              ).length > 4 && (
+            {(documentList?.documents ?? []).flatMap((d) =>
+              (d.topics ?? []).flatMap((t) =>
+                (t.lessons ?? []).flatMap((l) => l?.problems ?? [])
+              )
+            ).length > 4 && (
               <h1
                 className="text-sm text-blue-600 mt-3 cursor-pointer"
                 onClick={() => navigate(`/search?classId=${item?.id}`)}
