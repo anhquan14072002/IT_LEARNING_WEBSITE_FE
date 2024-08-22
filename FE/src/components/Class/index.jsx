@@ -72,7 +72,7 @@ export default function Class({ item, index }) {
   };
 
   const practiceQuizzes = extractQuizzesByType(1);
-  const testQuizzes = extractQuizzesByType(0);
+  const testQuizzes = extractQuizzesByType(2);
 
   const handleExam = (exam) => {
     if (user?.sub) {

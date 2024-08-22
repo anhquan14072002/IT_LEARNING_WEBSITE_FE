@@ -124,7 +124,16 @@ export default function AddQuizLesson({
     //     "topicId": 0,
     //     "lessonId": 0
     //   }
-    const tagValues = tag.map(item => item.keyWord);
+    
+    // Ensure tag is always an array
+    const tagValues = (tag || []).map((item) => item.keyWord);
+
+    // Check if tagValues is empty
+    if (tagValues.length === 0) {
+      REJECT(toast, "Chưa chọn tag. Vui lòng chọn ít nhất một tag.");
+      setLoading(false);
+      return; // Exit the function if no tags are selected
+    }
 
     
     let model = {
@@ -338,7 +347,7 @@ export default function AddQuizLesson({
                 <>
                   <span>
                     Tag 
-                  </span>
+                  </span><span className="text-red-600">*</span>
                 </>
                 <MultiSelect
                   value={tag}

@@ -16,6 +16,7 @@ import ManageCodeOnline from "../../components/ManageCodeOnline";
 import { assets } from "../../assets/assets";
 import NotifyProvider from "../../store/NotificationContext";
 import { useSelector } from "react-redux";
+import ManageStatistic from "../../components/ManageStatistic";
 
 const Dashboard = () => {
   const [open, setOpen] = useState(true);
@@ -154,6 +155,7 @@ const Dashboard = () => {
           </div>
           <div className="ml-20 mt-16 p-7">
             <div className="h-screen" onClick={(e) => setOpen(false)}>
+              {typeId === "statistic" && <ManageStatistic />}
               {typeId === "user" && <ManageAccount />}
               {typeId === "adminManageDocument" && <ManageDocument />}
               {typeId === "lesson" && <ContentLesson />}
