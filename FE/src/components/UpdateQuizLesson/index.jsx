@@ -13,6 +13,7 @@ import Loading from "../Loading";
 import { Dropdown } from "primereact/dropdown";
 import CustomDropdown from "../../shared/CustomDropdown";
 import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
+import { MultiSelect } from "primereact/multiselect";
 
 const validationSchema = Yup.object({
   title: Yup.string().required("Tiêu đề không được bỏ trống"),
@@ -64,6 +65,9 @@ export default function UpdateQuizLesson({
   const [lessonList, setLessonList] = useState([]);
   const [typeList, setTypeList] = useState([]);
 
+  const [tagList, setTagList] = useState([]);
+  const [tag, setTag] = useState(null);
+
   useEffect(() => {
     const fetchInitialData = async () => {
       setLoading(true);
@@ -102,7 +106,7 @@ export default function UpdateQuizLesson({
         const typeFind = transformedData?.find(
           (item, index) => item?.title === updateValue?.type
         );
-        
+
         let selectTopicById;
         if (lessonByIdData) {
           const topicById = await restClient({
@@ -114,7 +118,7 @@ export default function UpdateQuizLesson({
             ...prevValues,
             topic: selectTopicById,
           }));
-        }else if(!lessonByIdData){
+        } else if (!lessonByIdData) {
           const topicById = await restClient({
             url: `api/topic/gettopicbyid?id=${updateValue?.topicId}`,
             method: "GET",
@@ -125,7 +129,6 @@ export default function UpdateQuizLesson({
             topic: selectTopicById,
           }));
         }
-        
 
         const documentById = await restClient({
           url: `api/document/getdocumentbyid/${selectTopicById.documentId}`,
@@ -176,6 +179,15 @@ export default function UpdateQuizLesson({
         });
         const dataLesson = lessonData.data?.data || {};
         setLessonList(dataLesson);
+
+        const tagResponse = await restClient({
+          url: "api/tag/getalltag",
+          method: "GET",
+        });
+        console.log(tagResponse?.data?.data);
+        setTagList(
+          Array.isArray(tagResponse?.data?.data) ? tagResponse?.data?.data : []
+        );
       } catch (err) {
         console.error("Error fetching data:", err);
       } finally {
@@ -197,6 +209,10 @@ export default function UpdateQuizLesson({
     //     "topicId": 0,
     //     "lessonId": 0
     //   }
+
+    // Ensure tag is always an array
+    const tagValues = (tag || []).map((item) => item.keyWord);
+
     let model = {
       id: updateValue.id,
       title: values.title,
@@ -204,6 +220,7 @@ export default function UpdateQuizLesson({
       description: values.description,
       score: values.score,
       topicId: values.topic.id,
+      tagValues,
       isActive: true,
     };
     if (values.lesson && values.lesson.id) {
@@ -409,6 +426,22 @@ export default function UpdateQuizLesson({
                 type="number"
                 id="score"
               />
+
+              <div>
+                <>
+                  <span>Tag</span>
+                </>
+                <MultiSelect
+                  value={tag}
+                  options={tagList}
+                  onChange={(e) => setTag(e.value)}
+                  optionLabel="title"
+                  placeholder="Chọn Tag"
+                  className="w-full shadow-none custom-multiselect border border-gray-300"
+                  display="chip"
+                  filter
+                />
+              </div>
 
               <div>
                 <CustomEditor

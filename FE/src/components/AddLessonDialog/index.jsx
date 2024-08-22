@@ -96,6 +96,12 @@ export default function AddLessonDialog({
     fetchData();
   }, []);
   const onSubmit = (values) => {
+
+    if(tag && tag.length ===0){
+      REJECT(toast,"Vui lòng chọn thẻ tag")
+      return;
+    }
+
     const formData = new FormData();
     formData.append("Title", values.title);
     formData.append("TopicId", values.topic.id);
@@ -273,7 +279,7 @@ export default function AddLessonDialog({
               />
               <div>
                 <>
-                  <span>Tag</span>
+                  <span>Tag</span><span className="text-red-600">*</span>
                 </>
                 <MultiSelect
                   value={tag}

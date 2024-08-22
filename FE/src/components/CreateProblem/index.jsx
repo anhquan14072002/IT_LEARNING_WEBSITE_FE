@@ -9,6 +9,7 @@ import * as Yup from "yup";
 import CustomTextInput from "../../shared/CustomTextInput";
 import { Button } from "primereact/button";
 import CustomDropdown from "../../shared/CustomDropdown";
+import {MultiSelect} from 'primereact/multiselect'
 import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
 import restClient from "../../services/restClient";
 import CustomEditor from "../../shared/CustomEditor";
@@ -81,6 +82,8 @@ export default function CreateProblem() {
   const [visible, setVisible] = useState(false);
 
   const navigate = useNavigate();
+  const [tagList, setTagList] = useState([]);
+  const [tag, setTag] = useState(null);
 
   useEffect(() => {
     setTimeout(() => {
@@ -110,6 +113,15 @@ export default function CreateProblem() {
           id: item?.value,
         }));
         setDifficultyList(transformedData);
+
+        const tagResponse = await restClient({
+          url: "api/tag/getalltag",
+          method: "GET",
+        });
+        console.log(tagResponse?.data?.data);
+        setTagList(
+          Array.isArray(tagResponse?.data?.data) ? tagResponse?.data?.data : []
+        );
       } catch (error) {
         setListGrade([]);
         setDifficultyList([]);
@@ -125,6 +137,17 @@ export default function CreateProblem() {
   };
 
   const onSubmit = async (values) => {
+
+    // Ensure tag is always an array
+    const tagValues = (tag || []).map((item) => item.keyWord);
+
+    // Check if tagValues is empty
+    if (tagValues.length === 0) {
+      REJECT(toast, "Chưa chọn tag. Vui lòng chọn ít nhất một tag.");
+      setLoading(false);
+      return; // Exit the function if no tags are selected
+    }
+
     if (!testCase || testCase.length === 0) {
       REJECT(toast, "Vui lòng tạo test case");
       return;
@@ -135,14 +158,14 @@ export default function CreateProblem() {
       description: values?.description,
       difficulty: values?.difficulty?.id,
       isActive: true,
-      tagValues: ["Đề thi tin"],
+      tagValues,
     };
-  
-    if (values?.grade?.id) {
+
+    if (values?.lesson?.id) {
       data.gradeId = values.grade.id;
     } else if (values?.topic?.id) {
       data.topicId = values.topic.id;
-    } else if (values?.lesson?.id) {
+    } else if (values?.grade?.id) {
       data.lessonId = values.lesson.id;
     }
 
@@ -150,7 +173,7 @@ export default function CreateProblem() {
     await restClient({
       url: "api/problem/createproblem",
       method: "POST",
-      data
+      data,
       // data: {
       //   title: values?.title,
       //   description: values?.description,
@@ -546,6 +569,23 @@ export default function CreateProblem() {
                             component="div"
                           />
                         </CustomEditor>
+                      </div>
+
+                      <div className="mb-5">
+                        <>
+                          <span>Tag</span>
+                          <span className="text-red-600">*</span>
+                        </>
+                        <MultiSelect
+                          value={tag}
+                          options={tagList}
+                          onChange={(e) => setTag(e.value)}
+                          optionLabel="title"
+                          placeholder="Chọn Tag"
+                          className="w-full shadow-none custom-multiselect border border-gray-300"
+                          display="chip"
+                          filter
+                        />
                       </div>
 
                       <div className="flex justify-end gap-2">
