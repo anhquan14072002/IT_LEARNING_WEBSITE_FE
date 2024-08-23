@@ -87,6 +87,33 @@ export default function Class({ item, index }) {
     }
   };
 
+  const getAllProblems = (data) => {
+    console.log('====================================');
+    console.log("data::", data);
+    console.log('====================================');
+    
+    if (!data || typeof data !== 'object') {
+      console.error('Expected data to be an object with an array of documents');
+      return [];
+    }
+  
+    const documents = Array.isArray(data.documents) ? data.documents : [];
+  
+    const problemsCustom = Array.isArray(data.problemsCustom) ? data.problemsCustom : [];
+  
+    const problemsFromDocuments = documents.flatMap((item) =>
+      (Array.isArray(item.topics) ? item.topics : []).flatMap((topic) =>
+        (Array.isArray(topic.problems) ? topic.problems : []).concat(
+          (Array.isArray(topic.lessons) ? topic.lessons : []).flatMap((lesson) =>
+            (Array.isArray(lesson.problems) ? lesson.problems : [])
+          )
+        )
+      )
+    );
+  
+    return [...problemsCustom, ...problemsFromDocuments];
+  };
+
   return (
     <div>
       <div
@@ -203,7 +230,7 @@ export default function Class({ item, index }) {
             {(documentList?.exams ?? []).length > 4 && (
               <h1
                 className="text-sm text-blue-600 mt-3 cursor-pointer"
-                onClick={() => navigate(`/search?classId=${item?.id}`)}
+                onClick={() => navigate(`/viewexam`)}
               >
                 Xem tất cả
               </h1>
@@ -212,13 +239,7 @@ export default function Class({ item, index }) {
 
           <div>
             <h1 className="font-bold mb-3">Bài tập</h1>
-            {(documentList?.documents ?? [])
-              .flatMap((d) =>
-                (d?.topics ?? []).flatMap((t) =>
-                  (t.lessons ?? []).flatMap((l) => l?.problems ?? [])
-                )
-              )
-              .map((problem) => (
+            {getAllProblems(documentList).map((problem) => (
                 <h1
                   key={problem?.id}
                   className="cursor-pointer hover:opacity-85"
@@ -228,14 +249,10 @@ export default function Class({ item, index }) {
                 </h1>
               ))
               .slice(0, 4)}
-            {(documentList?.documents ?? []).flatMap((d) =>
-              (d.topics ?? []).flatMap((t) =>
-                (t.lessons ?? []).flatMap((l) => l?.problems ?? [])
-              )
-            ).length > 4 && (
+            {getAllProblems(documentList).length > 4 && (
               <h1
                 className="text-sm text-blue-600 mt-3 cursor-pointer"
-                onClick={() => navigate(`/search?classId=${item?.id}`)}
+                onClick={() => navigate(`/listpractice`)}
               >
                 Xem tất cả
               </h1>

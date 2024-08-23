@@ -20,19 +20,22 @@ const CustomPractice = ({ document }) => {
         </div>
         {document?.difficulty === 1 && (
           <div className="mt-3 text-center">
-            <span className="bg-yellow-500 text-white rounded-lg p-2">Độ khó:{" "}{document?.difficultyName}</span>
+            <span className="text-green-500 rounded-lg p-2 text-base">{document?.difficultyName}</span>
           </div>
         )}
         {document?.difficulty === 2 && (
           <div className="mt-3 text-center">
-            <span className="bg-green-500 text-white rounded-lg p-2">Độ khó:{" "}{document?.difficultyName}</span>
+            <span className="text-yellow-500 rounded-lg p-2 text-base">{document?.difficultyName}</span>
           </div>
         )}
         {document?.difficulty === 3 && (
           <div className="mt-3 text-center">
-            <span className="bg-red-500 text-white rounded-lg p-2">Độ khó:{" "}{document?.difficultyName}</span>
+            <span className="text-red-500 rounded-lg p-2 text-base">{document?.difficultyName}</span>
           </div>
         )}
+        <div className="flex justify-center mt-5">
+        <div className="bg-green-500 hover:bg-green-300 text-white rounded-lg p-2 text-base">Vào làm</div>
+        </div>
       </div>
     </div>
   );

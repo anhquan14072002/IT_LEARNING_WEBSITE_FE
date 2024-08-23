@@ -162,11 +162,11 @@ export default function CreateProblem() {
     };
 
     if (values?.lesson?.id) {
-      data.gradeId = values.grade.id;
+      data.lessonId = values.lesson.id;
     } else if (values?.topic?.id) {
       data.topicId = values.topic.id;
     } else if (values?.grade?.id) {
-      data.lessonId = values.lesson.id;
+      data.gradeId = values.grade.id;
     }
 
     setLoading(true);

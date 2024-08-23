@@ -16,7 +16,7 @@ import { Column } from "primereact/column";
 const fetchQuizResults = async (userId) => {
   try {
     const response = await restClient({
-      url: `/api/userquiz/getalluserquizbyuserid/${userId}`,
+      url: `api/userquiz/getalluserquizbyuserid/${userId}`,
     });
     return response.data;
   } catch (error) {
@@ -28,7 +28,7 @@ const fetchQuizResults = async (userId) => {
 const fetchExamResults = async (userId) => {
   try {
     const response = await restClient({
-      url: `/api/userexam/getlistresultexamofuserbyuserid/${userId}`,
+      url: `api/userexam/getlistresultexamofuserbyuserid/${userId}`,
     });
     return response.data;
   } catch (error) {
@@ -64,8 +64,12 @@ export default function HistoryQuiz() {
             fetchExamResults(user?.sub),
           ]);
 
-          if (quizRes.isSucceeded && examRes.isSucceeded) {
+          if (quizRes.isSucceeded) {
             setQuizResults(quizRes.data);
+          } else {
+            console.error("Failed to fetch data");
+          }
+          if (examRes.isSucceeded) {
             setExamResults(examRes.data);
           } else {
             console.error("Failed to fetch data");
@@ -113,27 +117,12 @@ export default function HistoryQuiz() {
     return <button className="bg-blue-600 text-white p-2 rounded-md hover:bg-blue-400" onClick={()=>navigate('/examresult/'+rowData?.examCodeId)}>Xem lịch sử làm bài</button>
   }
 
+  useEffect(()=>{
+    console.log("quizResults::",quizResults);
+    console.log("examResults::",examResults);
+  },[quizResults,examResults])
+
   const renderQuizResults = () => (
-    // <div>
-    //   {quizResults.map((result) => (
-    //     <div key={result.id} className="mb-4 p-4 border rounded shadow-md">
-    //       <h3 className="text-xl font-bold">Quiz {result.quizId}</h3>
-    //       <p>Score: {result.score}</p>
-    //       <p>Total Questions: {result.totalQuestion}</p>
-    //       <p>Correct Answers: {result.numberCorrect}</p>
-    //       <ul>
-    //         {result.historyQuizzes.map((quiz) => (
-    //           <li key={quiz.questionId} className="mb-2">
-    //             <h4 className="font-semibold">{quiz.quizQuestionDto.content}</h4>
-    //             <p>Score: {quiz.score}</p>
-    //             <p>Correct: {quiz.isCorrect ? 'Yes' : 'No'}</p>
-    //             <p>Answer(s): {quiz.answerId.join(', ')}</p>
-    //           </li>
-    //         ))}
-    //       </ul>
-    //     </div>
-    //   ))}
-    // </div>
     <DataTable
       value={quizResults}
       loading={loading}
@@ -153,7 +142,7 @@ export default function HistoryQuiz() {
         header="Bộ câu hỏi"
         className="border-b-2 border-t-2"
         style={{ minWidth: "15rem" }}
-        field="quizId"
+        field="quizTitle"
       />
       <Column
         field="score"
