@@ -135,9 +135,9 @@ export default function ListPractice() {
                   className="border border-white outline-none"
                 >
                   <option value={0}>Chọn độ khó</option>
-                  <option value={1}>Easy</option>
-                  <option value={2}>Medium</option>
-                  <option value={3}>Hard</option>
+                  <option value={1}>Dễ</option>
+                  <option value={2}>Trung bình</option>
+                  <option value={3}>Khó</option>
                 </select>
               </div>
             </div>
