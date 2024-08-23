@@ -22,7 +22,7 @@ const baseValidationSchema = Yup.object({
       return Object.keys(value).length !== 0;
     })
     .required("Không bỏ trống trường này"),
-    title: Yup.string()
+  title: Yup.string()
     .required("Tiêu đề không được bỏ trống")
     .min(5, "Tiêu đề phải có ít nhất 5 ký tự")
     .max(50, "Tiêu đề không được vượt quá 50 ký tự"),
@@ -37,6 +37,13 @@ const baseValidationSchema = Yup.object({
       return Object.keys(value).length !== 0;
     })
     .required("Không bỏ trống trường này"),
+  grade: Yup.object().test(
+    "is-not-empty",
+    "Không được để trống trường này",
+    (value) => {
+      return Object.keys(value).length !== 0;
+    }
+  ),
 });
 
 export default function AddExam({
@@ -52,7 +59,6 @@ export default function AddExam({
   const [loading, setLoading] = useState(false);
   const [competitionList, setCompetitionList] = useState([]);
   const [seletedGrade, setSeletedGrade] = useState(null);
-  const [gradeValue, setGradeValue] = useState(null);
   const [tagList, setTagList] = useState([]);
   const [gradeList, setGradeList] = useState([]);
   const [tag, setTag] = useState(null);
@@ -114,36 +120,34 @@ export default function AddExam({
     year: {},
     numberQuestion: "",
     files: [],
+    grade: {},
   });
   useEffect(() => {
     if (years) {
       setYearList(years);
     }
   });
-  const handleGrade = (e) => {
-    setSeletedGrade(e.value.title);
-    setGradeValue(e.value.id);
-  };
+
   const onSubmit = async (values, { resetForm }) => {
     setLoading(true);
     console.log(files);
-    
+
     const formData = new FormData();
     formData.append("Type", types);
     formData.append("CompetitionId", values.competition.id);
     formData.append("Title", values.title);
     formData.append("Province", values.province.name);
     formData.append("Description", values.description);
-    formData.append("NumberQuestion", values.numberQuestion|| 0);
+    formData.append("NumberQuestion", values.numberQuestion || 0);
     formData.append("Year", values.year.year);
     formData.append("isActive", false);
-    formData.append("GradeId", gradeValue || "");
+    formData.append("GradeId", values.grade.id);
     if (tag && tag.length > 0) {
       tag.forEach((item, index) => {
         formData.append(`tagValues[${index}]`, item.keyWord);
       });
     }
-    formData.append("ExamEssayFileUpload",  files[0]);
+    formData.append("ExamEssayFileUpload", files[0]);
     formData.append("ExamSolutionFileUpload", fileSolution[0]);
     try {
       const response = await restClient({
@@ -162,7 +166,6 @@ export default function AddExam({
       setTag([]);
       setSeletedGrade([]);
       REJECT(toast, "Thêm đề thi không thành công ");
-
     } finally {
       setLoading(false);
       setVisible(false);
@@ -178,13 +181,16 @@ export default function AddExam({
   const onFileSolutionSelect = (e) => {
     setFileSolution(e.files);
   };
-  const validationSchema = types === 2
-  ? baseValidationSchema.shape({
-      numberQuestion: Yup.number().required("Không được bỏ trống"),
-    })
-  : baseValidationSchema.shape({
-      files: Yup.array().min(1, "File đề bài là bắt buộc").required("Không được bỏ trống trường này"),
-    });
+  const validationSchema =
+    types === 2
+      ? baseValidationSchema.shape({
+          numberQuestion: Yup.number().required("Không được bỏ trống"),
+        })
+      : baseValidationSchema.shape({
+          files: Yup.array()
+            .min(1, "File đề bài là bắt buộc")
+            .required("Không được bỏ trống trường này"),
+        });
   return (
     <Dialog
       header="Thêm Đề Thi"
@@ -225,17 +231,21 @@ export default function AddExam({
                 name="competition"
                 options={competitionList}
               />
-              <span>Lớp</span>
-              <Dropdown
-                value={seletedGrade}
-                onChange={handleGrade}
+              <CustomDropdown
+                title="Lớp"
+                label={
+                  <>
+                    <span>Lớp</span>
+                  </>
+                }
+                is
+                customTitle="title"
+                id="grade"
+                name="grade"
+                isNotRequired="false"
                 options={gradeList}
-                optionLabel="title"
-                editable
-                placeholder="Lớp"
-                className="border border-gray-300 shadow-none  flex items-center w-full py-2 gap-2.5 "
-                filter
               />
+
               <CustomDropdown
                 title="Tỉnh"
                 label={
@@ -250,9 +260,7 @@ export default function AddExam({
               />
               <div>
                 <>
-                  <span>
-                    Tag <span style={{ color: "red" }}>*</span>
-                  </span>
+                  <span>Tag</span>
                 </>
                 <MultiSelect
                   value={tag}
@@ -303,31 +311,35 @@ export default function AddExam({
               </CustomEditor>
               {types === 1 && (
                 <>
-                  <h1>File Đề Bài <span style={{color:"red"}}>*</span></h1>
+                  <h1>
+                    File Đề Bài <span style={{ color: "red" }}>*</span>
+                  </h1>
                   <Field name="files">
-                {({ field }) => (
-                  <FileUpload
-                    name="ExamFileUpload"
-                    accept=".pdf"
-                    maxFileSize={10485760} // 10MB
-                    emptyTemplate={
-                      <p className="m-0">Kéo và thả file vào đây để tải lên.</p>
-                    }
-                     className="custom-file-upload mb-2"
-                    onSelect={(e) => {
-                      setFieldValue("files", e.files);
-                      onFileSelect(e);
-                    }}
-                    onClear={() => {
-                      setFieldValue("files", []);
-                      setFiles([]); 
-                    }}
-                  />
-                )}
-              </Field>
-              {errors.files && touched.files && (
-                <div className="p-error">{errors.files}</div>
-              )}
+                    {({ field }) => (
+                      <FileUpload
+                        name="ExamFileUpload"
+                        accept=".pdf"
+                        maxFileSize={10485760} // 10MB
+                        emptyTemplate={
+                          <p className="m-0">
+                            Kéo và thả file vào đây để tải lên.
+                          </p>
+                        }
+                        className="custom-file-upload mb-2"
+                        onSelect={(e) => {
+                          setFieldValue("files", e.files);
+                          onFileSelect(e);
+                        }}
+                        onClear={() => {
+                          setFieldValue("files", []);
+                          setFiles([]);
+                        }}
+                      />
+                    )}
+                  </Field>
+                  {errors.files && touched.files && (
+                    <div className="p-error">{errors.files}</div>
+                  )}
                   <h1>File Đề Lời Giải</h1>
                   <FileUpload
                     name="demo[]"

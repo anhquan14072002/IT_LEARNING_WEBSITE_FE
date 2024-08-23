@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import avatar from "../../assets/img/icons8-male-user-50.png";
-import logo from "../../assets/THV.svg";
+import logo from "../../assets/THV1.svg";
 import arrowDown from "../../assets/img/icons8-sort-down-50.png";
 import "./index.css";
 import { Tooltip } from "primereact/tooltip";
@@ -183,17 +183,17 @@ export default function Header({ params, setParams, textSearchProps }) {
   return (
     <>
       <div className="w-full">
-        <div className="bg-[#1976D2] flex justify-between py-4 px-16">
+        <div className="bg-[#1976D2] flex justify-between  py-2 px-10">
           <div className="flex items-center">
             <img
-              className="h-[50px] w-[50px] cursor-pointer"
+              className="h-[70px] w-[150px] cursor-pointer"
               src={logo}
               onClick={() => navigate("/")}
             />
           </div>
 
-          <div className="flex">
-            <div className="border border-white rounded-3xl flex items-center px-2.5 py-2 gap-2.5">
+          <div className="flex items-center">
+            <div className="border max-h-[50px] border-white rounded-3xl flex items-center px-2.5 py-2 gap-2.5">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 x="0px"
@@ -402,14 +402,14 @@ export default function Header({ params, setParams, textSearchProps }) {
                   label="Đăng nhập"
                   text
                   raised
-                  className="text-white px-3"
+                  className="text-white px-3 py-3"
                   onClick={() => navigate("/login")}
                 />
                 <Button
                   label="Đăng kí"
                   severity="warning"
                   style={{ backgroundColor: "#FAA500" }}
-                  className="text-white px-5"
+                  className="text-white px-5 py-3"
                   onClick={() => navigate("/checkmail")}
                 />
               </div>

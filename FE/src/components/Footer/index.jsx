@@ -1,6 +1,6 @@
 import React, { forwardRef } from "react";
 import "./index.css";
-import logo from "../../assets/THV.svg";
+import logo from "../../assets/THV1.svg";
 
 const Footer = forwardRef((props, ref) => {
   return (
@@ -9,8 +9,8 @@ const Footer = forwardRef((props, ref) => {
         <div class="footer-top">
           <a href="https://www.facebook.com/people/SIE18/61562449373390/?notif_id=1721581073983834&notif_t=page_user_activity&ref=notif">
             <img
-              width="100"
-              height="45"
+              width="250"
+              height="100"
               alt="THV Logo"
               title="Logo"
               class="img-fluid lazyloaded"
