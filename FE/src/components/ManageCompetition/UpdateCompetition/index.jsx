@@ -4,14 +4,17 @@ import { Formik, Form } from "formik";
 import * as Yup from "yup";
 import CustomTextInput from "../../../shared/CustomTextInput";
 import { Button } from "primereact/button";
-import { ACCEPT, REJECT } from "../../../utils";
+import { ACCEPT, REJECT, SUCCESS } from "../../../utils";
 import restClient from "../../../services/restClient";
 import Loading from "../../Loading";
 import CustomEditor from "../../../shared/CustomEditor";
 
 const validationSchema = Yup.object({
-  title: Yup.string().required("Tiêu đề không được bỏ trống"),
-  description: Yup.string().required("Mô tả không được bỏ trống"),
+  title: Yup.string()
+  .required("Tiêu đề không được bỏ trống")
+  .min(5, "Tiêu đề phải có ít nhất 5 ký tự")
+  .max(50, "Tiêu đề không được vượt quá 50 ký tự"),
+description: Yup.string().required("Mô tả không được bỏ trống"),
 });
 
 export default function UpdateCompetition({
@@ -41,7 +44,7 @@ export default function UpdateCompetition({
       data: data,
     })
       .then((res) => {
-        ACCEPT(toast, "Cập Nhật Cuộc Thi Thành Công");
+        SUCCESS(toast, "Cập Nhật Cuộc Thi Thành Công");
         fetchData();
         setVisibleUpdate(false);
       })

@@ -231,7 +231,7 @@ export default function ManageExam() {
                 onChange={(e) => {
                   handleSearchInput(removeVietnameseTones(e.target.value));
                 }}
-                placeholder="Search"
+                placeholder="Tìm Kiếm"
                 className="flex-1 focus:outline-none w-36 focus:ring-0"
               />
               <Button

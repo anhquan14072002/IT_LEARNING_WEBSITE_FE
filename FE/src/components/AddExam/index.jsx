@@ -58,7 +58,6 @@ export default function AddExam({
   const [provinceList, setProvinceList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [competitionList, setCompetitionList] = useState([]);
-  const [seletedGrade, setSeletedGrade] = useState(null);
   const [tagList, setTagList] = useState([]);
   const [gradeList, setGradeList] = useState([]);
   const [tag, setTag] = useState(null);
@@ -158,13 +157,11 @@ export default function AddExam({
       });
       setTag([]);
       SUCCESS(toast, "Thêm đề thi thành công");
-      setSeletedGrade([]);
       resetForm(); // Reset form fields
       fetchData(); // Update the exam list
     } catch (error) {
       console.error("Error adding exam:", error);
       setTag([]);
-      setSeletedGrade([]);
       REJECT(toast, "Thêm đề thi không thành công ");
     } finally {
       setLoading(false);
@@ -340,7 +337,7 @@ export default function AddExam({
                   {errors.files && touched.files && (
                     <div className="p-error">{errors.files}</div>
                   )}
-                  <h1>File Đề Lời Giải</h1>
+                  <h1>File Lời Giải</h1>
                   <FileUpload
                     name="demo[]"
                     url={"/api/upload"}
