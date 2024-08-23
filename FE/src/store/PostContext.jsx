@@ -82,8 +82,6 @@ export const PostProvider = ({ children }) => {
         setIsConnect(true);
 
         await conn.invoke("SaveUserConnection", user?.sub);
-
-        // console.log(conn); // Logging the connection object
       } catch (error) {
         console.error("Connection failed: ", error);
       }
@@ -123,7 +121,6 @@ export const PostProvider = ({ children }) => {
       if (id == 0 || !id) {
         fetchData();
       } else {
-        console.log("Please select");
         fetchPostDetailById();
       }
     } else if (itemSidebar.itemTab === "myQuestion") {
@@ -146,8 +143,6 @@ export const PostProvider = ({ children }) => {
   const fetchDataByUserId = () => {
     setLoading(true);
     let url;
-    console.log(itemSidebar?.gradeIdSelected);
-
     if (itemSidebar?.gradeIdSelected) {
       url = `api/post/getallpostbyuserandgradepagination?userId=${user?.sub}&gradeId=${itemSidebar?.gradeIdSelected}&PageIndex=${page}&PageSize=${rows}&OrderBy=createdDate&IsAscending=false`;
     } else {
@@ -192,7 +187,6 @@ export const PostProvider = ({ children }) => {
       .finally(() => setLoading(false));
   };
   const fetchDataById = () => {
-    console.log("fetchDataById");
     setLoading(true);
     restClient({
       url: `api/post/getallpostbygradepagination?gradeId=${itemSidebar.gradeIdSelected}&PageIndex=${page}&PageSize=${rows}&OrderBy=createdDate&IsAscending=false`,
@@ -210,17 +204,12 @@ export const PostProvider = ({ children }) => {
       .finally(() => setLoading(false));
   };
   const fetchPostById = (id) => {
-    console.log("fetchDataById");
     setLoading(true);
     restClient({
       url: `api/post/getpostbyid?id=${id}`,
       method: "GET",
     })
       .then((res) => {
-        console.log("fetch post");
-
-        console.log(res.data.data);
-        // setCompose((preValue) => ({ isCompose: true, data: res.data.data }));
         setCompose((preValue) => ({
           isCompose: true,
           data: { ...res.data.data, idPost: id },
@@ -316,8 +305,6 @@ export const PostProvider = ({ children }) => {
       method: "GET",
     })
       .then((res) => {
-        console.log(res.data.data);
-
         setPosts([res.data.data]);
       })
       .catch((err) => {
