@@ -43,6 +43,10 @@ const baseValidationSchema = Yup.object({
       return Object.keys(value).length !== 0;
     })
     .required("Không bỏ trống trường này"),
+    grade: Yup.object()
+    .test("is-not-empty", "Không được để trống trường này", (value) => {
+      return Object.keys(value).length !== 0;
+    })
 });
 
 export default function UpdateExam({
@@ -59,11 +63,10 @@ export default function UpdateExam({
   const [loading, setLoading] = useState(false);
   const [competitionList, setCompetitionList] = useState([]);
   const [competitionById, setCompetitionById] = useState([]);
-  const [gradeTitle, setGradeTitle] = useState([]);
+  const [gradeItem, setGradeItem] = useState([]);
   const [tagList, setTagList] = useState([]);
   const [tag, setTag] = useState(null);
   const [gradeList, setGradeList] = useState([]);
-  const [seletedGrade, setSeletedGrade] = useState(updateValue.gradeId);
   const [yearList, setYearList] = useState([]);
   const [initialValues, setInitialValues] = useState({
     competition: {},
@@ -72,6 +75,7 @@ export default function UpdateExam({
     description: "",
     year: {},
     numberQuestion: "",
+    grade:{}
   });
   console.log(updateValue);
 
@@ -98,7 +102,7 @@ export default function UpdateExam({
             method: "GET",
           });
           console.log(response?.data?.data);
-          setGradeTitle(response?.data?.data?.title || []);
+          setGradeItem(response?.data?.data || []);
         } catch (error) {
           console.error("Error fetching data:", error);
         }
@@ -118,15 +122,15 @@ export default function UpdateExam({
     const year = getYearByYear(updateValue?.year);
 
     if (province && updateValue) {
-      setProvinceList(province.data || []);
       setYearList(year ? [year] : []); // Ensure `setYearList` gets an array of year objects
       setInitialValues(() => ({
         competition: competitionById,
         title: updateValue?.title || "",
-        province,
+        province:province,
         description: updateValue?.description || "",
         year: year || {}, // Ensure `year` is set to an object or default to empty object
         numberQuestion: updateValue?.numberQuestion || "",
+        grade:gradeItem
       }));
     }
   }, [competitionById, updateValue]);
@@ -235,10 +239,7 @@ export default function UpdateExam({
         })
       : baseValidationSchema;
 
-  const handleGrade = (e) => {
-    setSeletedGrade(e.value.title);
-    setGradeValue(e.value.id);
-  };
+  
 
   return (
     <Dialog
@@ -283,17 +284,20 @@ export default function UpdateExam({
                 name="competition"
                 options={competitionList}
               />
-              <span>Lớp</span>
-              <Dropdown
-                value={seletedGrade}
-                onChange={handleGrade}
+              <CustomDropdown
+                title="Lớp"
+                label={
+                  <>
+                    <span>Lớp</span>
+                  </>
+                }
+                isNotRequired="false"
+                customTitle="title"
+                id="grade"
+                name="grade"
                 options={gradeList}
-                optionLabel="title"
-                editable
-                placeholder={gradeTitle ? gradeTitle : "Lớp"}
-                className="border border-gray-300 shadow-none  flex items-center w-full py-2 gap-2.5 "
-                filter
               />
+
               {console.log(provinceList)}
               <CustomDropdown
                 title={updateValue.province ? updateValue.province : "Tỉnh"}
