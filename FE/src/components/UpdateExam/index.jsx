@@ -28,7 +28,7 @@ const baseValidationSchema = Yup.object({
       return Object.keys(value).length !== 0;
     })
     .required("Không bỏ trống trường này"),
-    title: Yup.string()
+  title: Yup.string()
     .required("Tiêu đề không được bỏ trống")
     .min(5, "Tiêu đề phải có ít nhất 5 ký tự")
     .max(50, "Tiêu đề không được vượt quá 50 ký tự"),
@@ -43,7 +43,14 @@ const baseValidationSchema = Yup.object({
       return Object.keys(value).length !== 0;
     })
     .required("Không bỏ trống trường này"),
-    grade: Yup.object().nullable(),
+
+  grade: Yup.object().test(
+    "is-not-empty",
+    "Không được để trống trường này",
+    (value) => {
+      return Object.keys(value).length !== 0;
+    }
+  ),
 });
 
 export default function UpdateExam({
@@ -54,6 +61,8 @@ export default function UpdateExam({
   toast,
   fetchData,
 }) {
+  console.log(updateValue?.gradeId);
+
   const [files, setFiles] = useState([]);
   const [fileSolution, setFileSolution] = useState([]);
   const [provinceList, setProvinceList] = useState([]);
@@ -76,58 +85,62 @@ export default function UpdateExam({
     numberQuestion: "",
     grade: {}
   });
-  console.log(updateValue);
 
   const [isFormReady , setIsFormReady] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
-      if (updateValue?.competitionId) {
-        try {
-          const response = await restClient({
-            url: `api/competition/getcompetitionbyid?id=${updateValue.competitionId}`,
-            method: "GET",
-          });
-          console.log(response?.data?.data);
-          setCompetitionById(response?.data?.data || []);
-        } catch (error) {
-          console.error("Error fetching data:", error);
+      try {
+        const competitionPromise = updateValue?.competitionId
+          ? restClient({
+              url: `api/competition/getcompetitionbyid?id=${updateValue.competitionId}`,
+              method: "GET",
+            })
+          : null;
+
+        const gradePromise = updateValue?.gradeId
+          ? restClient({
+              url: `api/grade/getgradebyid/${updateValue?.gradeId}?isInclude=false`,
+              method: "GET",
+            })
+          : null;
+
+        const [competitionResponse, gradeResponse] = await Promise.all([
+          competitionPromise,
+          gradePromise,
+        ]);
+
+        if (competitionResponse) {
+          setCompetitionById(competitionResponse?.data?.data || []);
         }
+
+        if (gradeResponse) {
+          console.log("+++++++++++++++++++++++++++++++++++++++++");
+          console.log(gradeResponse?.data?.data);
+          console.log(
+            `api/grade/getgradebyid/${updateValue?.gradeId}?isInclude=false`
+          );
+          console.log("+++++++++++++++++++++++++++++++++++++++++");
+
+          setGradeItem(gradeResponse?.data?.data || []);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
       }
     };
-    const fetchDataGrade = async () => {
-      if (updateValue?.gradeId) {
-        try {
-          const response = await restClient({
-            url: `api/grade/getgradebyid/${updateValue?.gradeId}`,
-            method: "GET",
-          });
-          console.log(response?.data?.data);
-          setGradeTitle(response?.data?.data?.title || []);
-          setGradeItem(response?.data?.data)
-          // setInitialValues(() => ({
-          //   ...initialValues,
-          //   grade: response?.data?.data
-          // }));
-        } catch (error) {
-          console.error("Error fetching data:", error);
-        }
-      }
-    };
+
     fetchData();
-    fetchDataGrade();
-  }, [updateValue]);
-  useEffect(() => {
+
     if (years) {
       setYearList(years);
     }
-  });
+  }, [updateValue, years]);
 
   useEffect(() => {
     // setIsFormReady(false)
     const province = getProvinceByName(updateValue?.province);
     const year = getYearByYear(updateValue?.year);
-
+    console.log(gradeItem);
     if (province && updateValue) {
       setProvinceList(province.data || []);
       setYearList(year ? [year] : []); // Ensure `setYearList` gets an array of year objects
@@ -135,11 +148,12 @@ export default function UpdateExam({
         ...initialValues,
         competition: competitionById,
         title: updateValue?.title || "",
-        province,
+
+        province: province,
         description: updateValue?.description || "",
         year: year || {}, // Ensure `year` is set to an object or default to empty object
         numberQuestion: updateValue?.numberQuestion || "",
-        grade: gradeItem
+        grade: gradeItem,
       }));
     }
     setIsFormReady(true)
@@ -153,7 +167,6 @@ export default function UpdateExam({
           url: "api/competition/getallcompetition",
           method: "GET",
         });
-        console.log(competitionResponse?.data?.data);
         setCompetitionList(
           Array.isArray(competitionResponse?.data?.data)
             ? competitionResponse?.data?.data
@@ -165,7 +178,6 @@ export default function UpdateExam({
           url: "api/tag/getalltag",
           method: "GET",
         });
-        console.log(tagResponse?.data?.data);
         setTagList(
           Array.isArray(tagResponse?.data?.data) ? tagResponse?.data?.data : []
         );
@@ -175,7 +187,6 @@ export default function UpdateExam({
           url: "api/grade/getallgrade?isInclude=false",
           method: "GET",
         });
-        console.log(gradeResponse?.data?.data);
         setGradeList(
           Array.isArray(gradeResponse?.data?.data)
             ? gradeResponse?.data?.data
@@ -193,22 +204,19 @@ export default function UpdateExam({
     fetchData();
   }, [province]);
 
-  console.log(updateValue);
-
   const onSubmit = async (values, { resetForm }) => {
     setLoading(true);
-    console.log(values);
 
     const formData = new FormData();
     formData.append("Id", updateValue.id);
     formData.append("Type", types);
-    formData.append("CompetitionId", values.competition.id || "");
+    formData.append("CompetitionId", values.competition.id);
     formData.append("Title", values.title || "");
-    formData.append("Province", values.province.name|| "");
+    formData.append("Province", values.province.name || "");
     formData.append("Description", values.description || "");
     formData.append("NumberQuestion", values.numberQuestion || 0);
     formData.append("Year", values.year.year || "");
-    formData.append("isActive", updateValue?.isActive );
+    formData.append("isActive", updateValue?.isActive);
     if (tag && tag.length > 0) {
       tag.forEach((item, index) => {
         formData.append(`tagValues[${index}]`, item.keyWord);
@@ -250,10 +258,6 @@ export default function UpdateExam({
         })
       : baseValidationSchema;
 
-  const handleGrade = (e) => {
-    setSeletedGrade(e.value.title);
-    setGradeValue(e.value.id);
-  };
 
   return (
     <Dialog
@@ -284,11 +288,7 @@ export default function UpdateExam({
                 type="text"
               />
               <CustomDropdown
-                title={
-                  updateValue?.competitionTitle
-                    ? updateValue?.competitionTitle
-                    : "Cuộc Thi"
-                }
+                title="Cuộc thi"
                 label={
                   <>
                     <span>Cuộc Thi</span>
@@ -310,7 +310,6 @@ export default function UpdateExam({
                 className="border border-gray-300 shadow-none  flex items-center w-full py-2 gap-2.5 "
                 filter
               />
-              {console.log(provinceList)}
               <CustomDropdown
                 title={updateValue.province ? updateValue.province : "Tỉnh"}
                 label={
@@ -325,9 +324,7 @@ export default function UpdateExam({
               />
               <div>
                 <>
-                  <span>
-                    Tag <span style={{ color: "red" }}>*</span>
-                  </span>
+                  <span>Tag</span>
                 </>
                 <MultiSelect
                   value={tag}
@@ -383,19 +380,19 @@ export default function UpdateExam({
                     name="demo[]"
                     url={"/api/upload"}
                     accept=".pdf, application/pdf"
-                    maxFileSize={10485760} 
+                    maxFileSize={10485760}
                     emptyTemplate={
                       <p className="m-0">Drag and drop files here to upload.</p>
                     }
                     className="custom-file-upload mb-2"
                     onSelect={onFileSelect}
                   />
-                  <h1>File Đề Lời Giải</h1>
+                  <h1>File Lời Giải</h1>
                   <FileUpload
                     name="demo[]"
                     url={"/api/upload"}
                     accept=".pdf, application/pdf"
-                    maxFileSize={10485760} 
+                    maxFileSize={10485760}
                     emptyTemplate={
                       <p className="m-0">Drag and drop files here to upload.</p>
                     }
