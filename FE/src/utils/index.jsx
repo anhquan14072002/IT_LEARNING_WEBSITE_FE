@@ -596,7 +596,7 @@ export const formatDate = (value) => {
 export const SUCCESS = (toast, msg = "") => {
   toast.current.show({
     severity: "success",
-    summary: "Success",
+    summary: "Thành Công",
     detail: msg || "You have succeeded",
     life: 3000,
   });
@@ -605,7 +605,7 @@ export const SUCCESS = (toast, msg = "") => {
 export const ACCEPT = (toast, msg = "") => {
   toast.current.show({
     severity: "info",
-    summary: "Confirmed",
+    summary: "Xác Nhận",
     detail: msg || "You have accepted",
     life: 3000,
   });
@@ -614,7 +614,7 @@ export const ACCEPT = (toast, msg = "") => {
 export const REJECT = (toast, msg = "") => {
   toast.current.show({
     severity: "warn",
-    summary: "Rejected",
+    summary: "Từ Chối",
     detail: msg || "You have rejected",
     life: 3000,
   });
