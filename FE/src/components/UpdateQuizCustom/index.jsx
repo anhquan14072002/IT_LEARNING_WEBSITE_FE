@@ -13,6 +13,7 @@ import Loading from "../Loading";
 import { Dropdown } from "primereact/dropdown";
 import CustomDropdown from "../../shared/CustomDropdown";
 import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
+import { MultiSelect } from "primereact/multiselect";
 
 const validationSchema = Yup.object({
   title: Yup.string().required("Tiêu đề không được bỏ trống"),
@@ -55,6 +56,10 @@ export default function UpdateQuizCustom({
   const [clearLesson, setClearLesson] = useState(false);
   const [lessonList, setLessonList] = useState([]);
   const [typeList, setTypeList] = useState([]);
+
+  const [tagList, setTagList] = useState([]);
+  const [tag, setTag] = useState(null);
+
   useEffect(() => {
     restClient({
       url: `api/grade/getallgrade?isInclude=false`,
@@ -68,7 +73,6 @@ export default function UpdateQuizCustom({
       });
   }, []);
   useEffect(() => {
-    
     const fetchInitialData = async () => {
       setLoading(true);
       try {
@@ -103,7 +107,16 @@ export default function UpdateQuizCustom({
         setTypeList(transformedData);
 
         const typeFind = transformedData?.find(
-          (item, index) => item?.title === updateValue?.type
+          (item, index) => item?.id === updateValue?.typeId
+        );
+
+        const tagResponse = await restClient({
+          url: "api/tag/getalltag",
+          method: "GET",
+        });
+        console.log(tagResponse?.data?.data);
+        setTagList(
+          Array.isArray(tagResponse?.data?.data) ? tagResponse?.data?.data : []
         );
 
         // const topicById = await restClient({
@@ -118,16 +131,16 @@ export default function UpdateQuizCustom({
         // });
         // const documentByIdData = documentById.data?.data || {};
 
-        // const gradeById = await restClient({
-        //   url: `api/grade/getgradebyid/${documentByIdData.gradeId}`,
-        //   method: "GET",
-        // });
-        // const gradeByIdData = gradeById.data?.data || {};
+        const gradeById = await restClient({
+          url: `api/grade/getgradebyid/${updateValue?.gradeId}`,
+          method: "GET",
+        });
+        const gradeByIdData = gradeById.data?.data || {};
 
         setInitialValues((prevValues) => ({
           ...prevValues,
           title: updateValue.title,
-          // grade: gradeByIdData,
+          grade: gradeByIdData,
           description: updateValue.description,
           // document: documentByIdData,
           score: updateValue.score,
@@ -183,6 +196,9 @@ export default function UpdateQuizCustom({
     //     "topicId": 0,
     //     "lessonId": 0
     //   }
+
+    const tagValues = (tag || []).map((item) => item.keyWord);
+
     let model = {
       id: updateValue?.id,
       title: values?.title,
@@ -190,6 +206,7 @@ export default function UpdateQuizCustom({
       description: values.description,
       score: values.score,
       isActive: true,
+      tagValues: tagValues,
       gradeId: values?.grade?.id,
     };
 
@@ -259,6 +276,22 @@ export default function UpdateQuizCustom({
                 type="number"
                 id="score"
               />
+
+              <div>
+                <>
+                  <span>Tag</span>
+                </>
+                <MultiSelect
+                  value={tag}
+                  options={tagList}
+                  onChange={(e) => setTag(e.value)}
+                  optionLabel="title"
+                  placeholder="Chọn Tag"
+                  className="w-full shadow-none custom-multiselect border border-gray-300"
+                  display="chip"
+                  filter
+                />
+              </div>
 
               <div>
                 <CustomEditor

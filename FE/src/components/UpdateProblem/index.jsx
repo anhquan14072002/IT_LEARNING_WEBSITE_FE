@@ -25,6 +25,8 @@ import NotifyProvider from "../../store/NotificationContext";
 import UpdateTestCase from "../UpdateTestCase";
 import AddInUpdateProblem from "../AddInUpdateProblem";
 import UpdateInUpdateTestCase from "../UpdateInUpdateTestcase";
+import LoadingFull from "../LoadingFull";
+import { MultiSelect } from "primereact/multiselect";
 
 const validationSchema = Yup.object({
   titleInstruction: Yup.string().required(
@@ -38,11 +40,7 @@ const validationSchema = Yup.object({
       return Object.keys(value).length !== 0; // Check if object is not empty
     })
     .required("Không bỏ trống trường này"),
-  document: Yup.object()
-    .test("is-not-empty", "Không được để trống trường này", (value) => {
-      return Object.keys(value).length !== 0; // Check if object is not empty
-    })
-    .required("Không bỏ trống trường này"),
+  document: Yup.object().nullable(),
   title: Yup.string().required("Tiêu đề không được bỏ trống"),
   description: Yup.string().required("Mô tả không được bỏ trống"),
   difficulty: Yup.object()
@@ -50,16 +48,8 @@ const validationSchema = Yup.object({
       return Object.keys(value).length !== 0; // Check if object is not empty
     })
     .required("Không bỏ trống trường này"),
-  topic: Yup.object()
-    .test("is-not-empty", "Không được để trống trường này", (value) => {
-      return Object.keys(value).length !== 0; // Check if object is not empty
-    })
-    .required("Không bỏ trống trường này"),
-  lesson: Yup.object()
-    .test("is-not-empty", "Không được để trống trường này", (value) => {
-      return Object.keys(value).length !== 0; // Check if object is not empty
-    })
-    .required("Không bỏ trống trường này"),
+  topic: Yup.object().nullable(),
+  lesson: Yup.object().nullable(),
 });
 
 export default function UpdateProblem() {
@@ -99,6 +89,11 @@ export default function UpdateProblem() {
   const [loadingForm, setLoadingForm] = useState(false);
   const [editorial, setEditoral] = useState();
 
+  const [tagList, setTagList] = useState([]);
+  const [tag, setTag] = useState(null);
+
+  const [isFormReady, setIsFormReady] = useState(false);
+
   useEffect(() => {
     setTimeout(() => {
       if (fixedDivRef.current) {
@@ -116,48 +111,6 @@ export default function UpdateProblem() {
         });
         const problem = problemRes?.data?.data;
 
-        const lessonById = await restClient({
-          url: `api/lesson/getlessonbyid/${problem?.lessonId}`,
-          method: "GET",
-        });
-        const lessonByIdData = lessonById.data?.data || {};
-
-        const topicById = await restClient({
-          url: `api/topic/gettopicbyid?id=${lessonByIdData?.topicId}`,
-          method: "GET",
-        });
-        const selectTopicById = topicById.data?.data || {};
-
-        const documentById = await restClient({
-          url: `api/document/getdocumentbyid/${selectTopicById.documentId}`,
-          method: "GET",
-        });
-        const documentByIdData = documentById.data?.data || {};
-
-        const gradeById = await restClient({
-          url: `api/grade/getgradebyid/${documentByIdData.gradeId}`,
-          method: "GET",
-        });
-        const gradeByIdData = gradeById.data?.data || {};
-
-        const getAllDocumentByGradeId = await restClient({
-          url: `api/document/getalldocumentbygrade/` + gradeByIdData?.id,
-        });
-
-        setDocumentList(getAllDocumentByGradeId?.data?.data);
-
-        const getAllTopicByGradeId = await restClient({
-          url: `api/topic/getalltopicbydocument/` + documentByIdData?.id,
-        });
-
-        setListTopic(getAllTopicByGradeId?.data?.data);
-
-        const getAlllessonByGradeId = await restClient({
-          url: `api/lesson/getalllessonbytopic/` + selectTopicById?.id,
-        });
-
-        setLessonList(getAlllessonByGradeId?.data?.data);
-
         const getEditoral = await restClient({
           url: "api/editorial/geteditorialbyproblemid/" + id,
         });
@@ -170,21 +123,150 @@ export default function UpdateProblem() {
         });
         setTestCaseList(getAllTestcase?.data?.data);
 
-        setInitialValues({
-          ...initialValues,
-          title: problem?.title,
-          description: problem?.description,
-          difficulty: {
-            title: problem?.difficultyName,
-            id: problem?.difficulty,
-          },
-          lesson: lessonByIdData,
-          topic: selectTopicById,
-          document: documentByIdData,
-          grade: gradeByIdData,
-          titleInstruction: editoralData?.title,
-          descriptionInstruction: editoralData?.description,
-        });
+        if (problem && problem.lessonId) {
+          const lessonById = await restClient({
+            url: `api/lesson/getlessonbyid/${problem?.lessonId}`,
+            method: "GET",
+          });
+          const lessonByIdData = lessonById.data?.data || {};
+
+          const topicById = await restClient({
+            url: `api/topic/gettopicbyid?id=${lessonByIdData?.topicId}`,
+            method: "GET",
+          });
+          const selectTopicById = topicById.data?.data || {};
+
+          const documentById = await restClient({
+            url: `api/document/getdocumentbyid/${selectTopicById.documentId}`,
+            method: "GET",
+          });
+          const documentByIdData = documentById.data?.data || {};
+
+          const gradeById = await restClient({
+            url: `api/grade/getgradebyid/${documentByIdData.gradeId}`,
+            method: "GET",
+          });
+          const gradeByIdData = gradeById.data?.data || {};
+
+          const getAllDocumentByGradeId = await restClient({
+            url: `api/document/getalldocumentbygrade/` + gradeByIdData?.id,
+          });
+
+          setDocumentList(getAllDocumentByGradeId?.data?.data);
+
+          const getAllTopicByGradeId = await restClient({
+            url: `api/topic/getalltopicbydocument/` + documentByIdData?.id,
+          });
+
+          setListTopic(getAllTopicByGradeId?.data?.data);
+
+          const getAlllessonByGradeId = await restClient({
+            url: `api/lesson/getalllessonbytopic/` + selectTopicById?.id,
+          });
+
+          setLessonList(getAlllessonByGradeId?.data?.data);
+
+          setInitialValues({
+            ...initialValues,
+            title: problem?.title,
+            description: problem?.description,
+            difficulty: {
+              title: problem?.difficultyName,
+              id: problem?.difficulty,
+            },
+            lesson: lessonByIdData,
+            topic: selectTopicById,
+            document: documentByIdData,
+            grade: gradeByIdData,
+            titleInstruction: editoralData?.title,
+            descriptionInstruction: editoralData?.description,
+          });
+
+          setIsFormReady(true);
+        }
+
+        if (problem && problem.topicId) {
+          const topicById = await restClient({
+            url: `api/topic/gettopicbyid?id=${problem?.topicId}`,
+            method: "GET",
+          });
+          const selectTopicById = topicById.data?.data || {};
+
+          const documentById = await restClient({
+            url: `api/document/getdocumentbyid/${selectTopicById.documentId}`,
+            method: "GET",
+          });
+          const documentByIdData = documentById.data?.data || {};
+
+          const gradeById = await restClient({
+            url: `api/grade/getgradebyid/${documentByIdData.gradeId}`,
+            method: "GET",
+          });
+          const gradeByIdData = gradeById.data?.data || {};
+
+          const getAllDocumentByGradeId = await restClient({
+            url: `api/document/getalldocumentbygrade/` + gradeByIdData?.id,
+          });
+
+          setDocumentList(getAllDocumentByGradeId?.data?.data);
+
+          const getAllTopicByGradeId = await restClient({
+            url: `api/topic/getalltopicbydocument/` + documentByIdData?.id,
+          });
+
+          setListTopic(getAllTopicByGradeId?.data?.data);
+
+          const getAlllessonByGradeId = await restClient({
+            url: `api/lesson/getalllessonbytopic/` + selectTopicById?.id,
+          });
+
+          setLessonList(getAlllessonByGradeId?.data?.data);
+          setInitialValues({
+            ...initialValues,
+            title: problem?.title,
+            description: problem?.description,
+            difficulty: {
+              title: problem?.difficultyName,
+              id: problem?.difficulty,
+            },
+            topic: selectTopicById,
+            document: documentByIdData,
+            grade: gradeByIdData,
+            titleInstruction: editoralData?.title,
+            descriptionInstruction: editoralData?.description,
+          });
+
+          setIsFormReady(true);
+        }
+
+        if (problem && problem.gradeId) {
+          const gradeById = await restClient({
+            url: `api/grade/getgradebyid/${problem.gradeId}`,
+            method: "GET",
+          });
+          const gradeByIdData = gradeById.data?.data || {};
+
+          const getAllDocumentByGradeId = await restClient({
+            url: `api/document/getalldocumentbygrade/` + gradeByIdData?.id,
+          });
+
+          setDocumentList(getAllDocumentByGradeId?.data?.data);
+
+          setInitialValues({
+            ...initialValues,
+            title: problem?.title,
+            description: problem?.description,
+            difficulty: {
+              title: problem?.difficultyName,
+              id: problem?.difficulty,
+            },
+            grade: gradeByIdData,
+            titleInstruction: editoralData?.title,
+            descriptionInstruction: editoralData?.description,
+          });
+
+          setIsFormReady(true);
+        }
       } catch (error) {
       } finally {
         setLoadingForm(false);
@@ -213,10 +295,16 @@ export default function UpdateProblem() {
           id: item?.value,
         }));
         setDifficultyList(transformedData);
-      } catch (error) {
-        setListGrade([]);
-        setDifficultyList([]);
-      }
+
+        const tagResponse = await restClient({
+          url: "api/tag/getalltag",
+          method: "GET",
+        });
+        console.log(tagResponse?.data?.data);
+        setTagList(
+          Array.isArray(tagResponse?.data?.data) ? tagResponse?.data?.data : []
+        );
+      } catch (error) {}
     };
 
     fetchData();
@@ -233,20 +321,31 @@ export default function UpdateProblem() {
       return;
     }
 
+    const tagValues = (tag || []).map((item) => item.keyWord);
+
     setLoading(true);
+
+    const data = {
+      id : Number(id),
+      title: values?.title,
+      description: values?.description,
+      difficulty: values?.difficulty?.id,
+      isActive: true,
+      tagValues,
+    };
+
+    if (values?.lesson?.id) {
+      data.gradeId = values.grade.id;
+    } else if (values?.topic?.id) {
+      data.topicId = values.topic.id;
+    } else if (values?.grade?.id) {
+      data.lessonId = values.lesson.id;
+    }
+
     await restClient({
       url: "api/problem/updateproblem",
       method: "PUT",
-      data: {
-        id,
-        title: values?.title,
-        description: values?.description,
-        difficulty: values?.difficulty?.id,
-        isActive: true,
-        topicId: null,
-        lessonId: values?.lesson?.id,
-        tagValues: ["Đề thi tin"],
-      },
+      data
     })
       .then((res) => {
         const problemData = res?.data?.data;
@@ -470,89 +569,93 @@ export default function UpdateProblem() {
                 <h1 className="font-bold text-3xl my-5 text-center">
                   Cập nhật bài tập thực hành
                 </h1>
-                <Formik
-                  initialValues={initialValues}
-                  validationSchema={validationSchema}
-                  onSubmit={onSubmit}
-                >
-                  {(formik) => (
-                    <Form>
-                      <CustomDropdownInSearch
-                        title="Chọn lớp"
-                        label="Lớp"
-                        name="grade"
-                        id="grade"
-                        isClear={true}
-                        handleOnChange={handleOnChangeGrade}
-                        options={gradeList}
-                      />
+                {isFormReady ? (
+                  <Formik
+                    initialValues={initialValues}
+                    validationSchema={validationSchema}
+                    onSubmit={onSubmit}
+                  >
+                    {(formik) => (
+                      <Form>
+                        <CustomDropdownInSearch
+                          title="Chọn lớp"
+                          label="Lớp"
+                          name="grade"
+                          id="grade"
+                          isClear={true}
+                          handleOnChange={handleOnChangeGrade}
+                          options={gradeList}
+                        />
 
-                      <CustomDropdownInSearch
-                        title="Chọn tài liệu"
-                        label="Tài liệu"
-                        name="document"
-                        id="document"
-                        isClear={true}
-                        clearGrade={clearGrade}
-                        setClearGrade={setClearGrade}
-                        disabled={!documentList || documentList.length === 0} // Disable if documentList is empty or undefined
-                        handleOnChange={handleOnChangeDocument}
-                        options={documentList}
-                      />
+                        <CustomDropdownInSearch
+                          title="Chọn tài liệu"
+                          label="Tài liệu"
+                          name="document"
+                          id="document"
+                          isNotRequired={true}
+                          isClear={true}
+                          clearGrade={clearGrade}
+                          setClearGrade={setClearGrade}
+                          disabled={!documentList || documentList.length === 0} // Disable if documentList is empty or undefined
+                          handleOnChange={handleOnChangeDocument}
+                          options={documentList}
+                        />
 
-                      <CustomDropdownInSearch
-                        title="Chọn chủ đề"
-                        label="Chủ đề"
-                        name="topic"
-                        id="topic"
-                        isClear={true}
-                        touched={false}
-                        clearGrade={clearTopic}
-                        setClearGrade={setClearTopic}
-                        disabled={!topicList || topicList.length === 0}
-                        handleOnChange={handleOnChangeTopic}
-                        options={topicList}
-                      />
+                        <CustomDropdownInSearch
+                          title="Chọn chủ đề"
+                          label="Chủ đề"
+                          name="topic"
+                          id="topic"
+                          isNotRequired={true}
+                          isClear={true}
+                          touched={false}
+                          clearGrade={clearTopic}
+                          setClearGrade={setClearTopic}
+                          disabled={!topicList || topicList.length === 0}
+                          handleOnChange={handleOnChangeTopic}
+                          options={topicList}
+                        />
 
-                      <CustomDropdown
-                        title="Chọn bài học"
-                        label="Bài học"
-                        name="lesson"
-                        id="lesson"
-                        touched={false}
-                        clearTopic={clearLesson}
-                        setClearTopic={setClearLesson}
-                        disabled={!lessonList || lessonList.length === 0}
-                        options={lessonList}
-                      />
+                        <CustomDropdown
+                          title="Chọn bài học"
+                          label="Bài học"
+                          name="lesson"
+                          id="lesson"
+                          isNotRequired={true}
+                          touched={false}
+                          clearTopic={clearLesson}
+                          setClearTopic={setClearLesson}
+                          disabled={!lessonList || lessonList.length === 0}
+                          options={lessonList}
+                        />
 
-                      <CustomDropdown
-                        title="Độ khó"
-                        label="Độ khó"
-                        name="difficulty"
-                        id="difficulty"
-                        isClear={true}
-                        options={difficultyList}
-                      />
+                        <CustomDropdown
+                          title="Độ khó"
+                          label="Độ khó"
+                          name="difficulty"
+                          id="difficulty"
+                          isClear={true}
+                          options={difficultyList}
+                        />
 
-                      <CustomTextInput
-                        label="Tiêu đề"
-                        name="title"
-                        type="text"
-                        id="title"
-                      />
+                        <CustomTextInput
+                          label="Tiêu đề"
+                          name="title"
+                          type="text"
+                          id="title"
+                        />
 
-                      <div>
-                        <CustomEditor
-                          label="Thông tin chi tiết"
-                          name="description"
-                          id="description"
-                        >
-                          <ErrorMessage name="description" component="div" />
-                        </CustomEditor>
-                      </div>
+                        <div>
+                          <CustomEditor
+                            label="Thông tin chi tiết"
+                            name="description"
+                            id="description"
+                          >
+                            <ErrorMessage name="description" component="div" />
+                          </CustomEditor>
+                        </div>
 
-                      {/* <CustomDropdown
+                        {/* <CustomDropdown
                       title="Ngôn ngữ"
                       label="Ngôn ngữ"
                       name="language"
@@ -601,92 +704,111 @@ export default function UpdateProblem() {
                       />
                     </div> */}
 
-                      <div>
-                        <h1>
-                          Test case <span className="text-red-600">*</span>
-                        </h1>
+                        <div>
+                          <h1>
+                            Test case <span className="text-red-600">*</span>
+                          </h1>
 
-                        <Button
-                          icon="pi pi-plus"
-                          className="p-2 bg-green-500 text-white"
-                          type="button"
-                          severity="success"
-                          disabled={testCase?.length > 9}
-                          onClick={handleOpenModal}
-                        >
-                          Tạo test case
-                        </Button>
-                      </div>
-                      {/* Display the test cases */}
-                      <div className="my-4">
-                        {testCase.length > 0 ? (
-                          <ul className="list-disc pl-5 flex gap-5">
-                            {testCase.map((test, index) => (
-                              <li
-                                key={index}
-                                className="flex justify-between p-2 items-center mb-2 rounded-lg border border-gray-400"
-                              >
-                                <span>Test case {index}</span>
-                                <Button
-                                  icon="pi pi-pencil"
-                                  type="button"
-                                  className="p-button-rounded p-button-danger cursor-pointer text-blue-500"
-                                  onClick={() => handleUpdateTestCase(index)}
-                                />
-                                <Button
-                                  icon="pi pi-trash"
-                                  type="button"
-                                  className="p-button-rounded p-button-danger cursor-pointer text-red-500"
-                                  onClick={() =>
-                                    handleDeleteTestCase(index, test)
-                                  }
-                                />
-                              </li>
-                            ))}
-                          </ul>
-                        ) : (
-                          <p>Chưa có test case nào</p>
-                        )}
-                      </div>
+                          <Button
+                            icon="pi pi-plus"
+                            className="p-2 bg-green-500 text-white"
+                            type="button"
+                            severity="success"
+                            disabled={testCase?.length > 9}
+                            onClick={handleOpenModal}
+                          >
+                            Tạo test case
+                          </Button>
+                        </div>
+                        {/* Display the test cases */}
+                        <div className="my-4">
+                          {testCase.length > 0 ? (
+                            <ul className="list-disc pl-5 flex gap-5">
+                              {testCase.map((test, index) => (
+                                <li
+                                  key={index}
+                                  className="flex justify-between p-2 items-center mb-2 rounded-lg border border-gray-400"
+                                >
+                                  <span>Test case {index}</span>
+                                  <Button
+                                    icon="pi pi-pencil"
+                                    type="button"
+                                    className="p-button-rounded p-button-danger cursor-pointer text-blue-500"
+                                    onClick={() => handleUpdateTestCase(index)}
+                                  />
+                                  <Button
+                                    icon="pi pi-trash"
+                                    type="button"
+                                    className="p-button-rounded p-button-danger cursor-pointer text-red-500"
+                                    onClick={() =>
+                                      handleDeleteTestCase(index, test)
+                                    }
+                                  />
+                                </li>
+                              ))}
+                            </ul>
+                          ) : (
+                            <p>Chưa có test case nào</p>
+                          )}
+                        </div>
 
-                      <CustomTextInput
-                        label="Tiêu đề hướng dẫn"
-                        name="titleInstruction"
-                        type="text"
-                        id="titleInstruction"
-                      />
+                        <CustomTextInput
+                          label="Tiêu đề hướng dẫn"
+                          name="titleInstruction"
+                          type="text"
+                          id="titleInstruction"
+                        />
 
-                      <div>
-                        <CustomEditor
-                          label="Thông tin hướng dẫn chi tiết"
-                          name="descriptionInstruction"
-                          id="descriptionInstruction"
-                        >
-                          <ErrorMessage
-                            name="descriptionInstruction"
-                            component="div"
+                        <div>
+                          <>
+                            <span>Tag</span>
+                          </>
+                          <MultiSelect
+                            value={tag}
+                            options={tagList}
+                            onChange={(e) => setTag(e.value)}
+                            optionLabel="title"
+                            placeholder="Chọn Tag"
+                            className="w-full shadow-none custom-multiselect border border-gray-300"
+                            display="chip"
+                            filter
                           />
-                        </CustomEditor>
-                      </div>
+                        </div>
 
-                      <div className="flex justify-end gap-2">
-                        {/* <Button
+                        <div>
+                          <CustomEditor
+                            label="Thông tin hướng dẫn chi tiết"
+                            name="descriptionInstruction"
+                            id="descriptionInstruction"
+                          >
+                            <ErrorMessage
+                              name="descriptionInstruction"
+                              component="div"
+                            />
+                          </CustomEditor>
+                        </div>
+
+                        <div className="flex justify-end gap-2">
+                          {/* <Button
                         className="p-2 bg-red-500 text-white"
                         type="button"
                         severity="danger"
                       >
                         Hủy
                       </Button> */}
-                        <Button
-                          className="p-2 bg-blue-500 text-white"
-                          type="submit"
-                        >
-                          Cập nhật
-                        </Button>
-                      </div>
-                    </Form>
-                  )}
-                </Formik>
+                          <Button
+                            className="p-2 bg-blue-500 text-white"
+                            type="submit"
+                          >
+                            Cập nhật
+                          </Button>
+                        </div>
+                      </Form>
+                    )}
+                  </Formik>
+                ) : (
+                  <LoadingFull />
+                )}
               </div>
             </div>
 

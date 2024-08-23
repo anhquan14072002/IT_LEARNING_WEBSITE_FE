@@ -11,7 +11,7 @@ import { addUser } from "../../redux/userr/userSlice";
 
 // Define the validation schema with regex for password
 const validationSchema = Yup.object().shape({
-  email: Yup.string().email("Email không hợp lệ").required("Tài khoản là bắt buộc"),
+  email: Yup.string().required("Tài khoản là bắt buộc"),
   password: Yup.string()
     .matches(
       /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/,
@@ -28,7 +28,15 @@ export default function About() {
   const [passwordError, setPasswordError] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  const getNavigationPath = (role) => {
+    if (role === "Admin") {
+      return "/dashboard/statistic";
+    }
+    if (role === "ContentManager") {
+      return "/dashboard/lesson";
+    }
+    return ""; 
+  };
   const handleSubmit = async () => {
     // Reset errors
     setEmailError("");
@@ -44,7 +52,7 @@ export default function About() {
         localStorage.setItem("userEmail", response.data.data.admin.email);
         const decodedToken = decodeToken(response?.data?.data?.accessToken);
         dispatch(addUser(decodedToken));
-        navigate("/dashboard/statistic");
+        navigate(getNavigationPath(decodedToken.role))
       } else {
         REJECT(toast, "Sai tài khoản hoặc mật khẩu");
       }

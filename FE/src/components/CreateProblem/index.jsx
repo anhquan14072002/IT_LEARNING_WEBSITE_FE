@@ -9,6 +9,7 @@ import * as Yup from "yup";
 import CustomTextInput from "../../shared/CustomTextInput";
 import { Button } from "primereact/button";
 import CustomDropdown from "../../shared/CustomDropdown";
+import {MultiSelect} from 'primereact/multiselect'
 import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
 import restClient from "../../services/restClient";
 import CustomEditor from "../../shared/CustomEditor";
@@ -36,11 +37,7 @@ const validationSchema = Yup.object({
       return Object.keys(value).length !== 0; // Check if object is not empty
     })
     .required("Không bỏ trống trường này"),
-  document: Yup.object()
-    .test("is-not-empty", "Không được để trống trường này", (value) => {
-      return Object.keys(value).length !== 0; // Check if object is not empty
-    })
-    .required("Không bỏ trống trường này"),
+  document: Yup.object().nullable(),
   title: Yup.string().required("Tiêu đề không được bỏ trống"),
   description: Yup.string().required("Mô tả không được bỏ trống"),
   difficulty: Yup.object()
@@ -48,16 +45,8 @@ const validationSchema = Yup.object({
       return Object.keys(value).length !== 0; // Check if object is not empty
     })
     .required("Không bỏ trống trường này"),
-  topic: Yup.object()
-    .test("is-not-empty", "Không được để trống trường này", (value) => {
-      return Object.keys(value).length !== 0; // Check if object is not empty
-    })
-    .required("Không bỏ trống trường này"),
-  lesson: Yup.object()
-    .test("is-not-empty", "Không được để trống trường này", (value) => {
-      return Object.keys(value).length !== 0; // Check if object is not empty
-    })
-    .required("Không bỏ trống trường này"),
+  topic: Yup.object().nullable(),
+  lesson: Yup.object().nullable(),
 });
 
 export default function CreateProblem() {
@@ -93,6 +82,8 @@ export default function CreateProblem() {
   const [visible, setVisible] = useState(false);
 
   const navigate = useNavigate();
+  const [tagList, setTagList] = useState([]);
+  const [tag, setTag] = useState(null);
 
   useEffect(() => {
     setTimeout(() => {
@@ -122,6 +113,15 @@ export default function CreateProblem() {
           id: item?.value,
         }));
         setDifficultyList(transformedData);
+
+        const tagResponse = await restClient({
+          url: "api/tag/getalltag",
+          method: "GET",
+        });
+        console.log(tagResponse?.data?.data);
+        setTagList(
+          Array.isArray(tagResponse?.data?.data) ? tagResponse?.data?.data : []
+        );
       } catch (error) {
         setListGrade([]);
         setDifficultyList([]);
@@ -137,24 +137,53 @@ export default function CreateProblem() {
   };
 
   const onSubmit = async (values) => {
+
+    // Ensure tag is always an array
+    const tagValues = (tag || []).map((item) => item.keyWord);
+
+    // Check if tagValues is empty
+    if (tagValues.length === 0) {
+      REJECT(toast, "Chưa chọn tag. Vui lòng chọn ít nhất một tag.");
+      setLoading(false);
+      return; // Exit the function if no tags are selected
+    }
+
     if (!testCase || testCase.length === 0) {
       REJECT(toast, "Vui lòng tạo test case");
       return;
+    }
+
+    const data = {
+      title: values?.title,
+      description: values?.description,
+      difficulty: values?.difficulty?.id,
+      isActive: true,
+      tagValues,
+    };
+
+    if (values?.lesson?.id) {
+      data.gradeId = values.grade.id;
+    } else if (values?.topic?.id) {
+      data.topicId = values.topic.id;
+    } else if (values?.grade?.id) {
+      data.lessonId = values.lesson.id;
     }
 
     setLoading(true);
     await restClient({
       url: "api/problem/createproblem",
       method: "POST",
-      data: {
-        title: values?.title,
-        description: values?.description,
-        difficulty: values?.difficulty?.id,
-        isActive: true,
-        topicId: null,
-        lessonId: values?.lesson?.id,
-        tagValues: ["Đề thi tin"],
-      },
+      data,
+      // data: {
+      //   title: values?.title,
+      //   description: values?.description,
+      //   difficulty: values?.difficulty?.id,
+      //   isActive: true,
+      //   topicId: null,
+      //   lessonId: values?.lesson?.id,
+      //   gradeId: values?.grade?.id,
+      //   tagValues: ["Đề thi tin"],
+      // },
     })
       .then((res) => {
         const problemData = res?.data?.data;
@@ -365,6 +394,7 @@ export default function CreateProblem() {
                         name="document"
                         id="document"
                         isClear={true}
+                        isNotRequired={true}
                         clearGrade={clearGrade}
                         setClearGrade={setClearGrade}
                         disabled={!documentList || documentList.length === 0} // Disable if documentList is empty or undefined
@@ -379,6 +409,7 @@ export default function CreateProblem() {
                         id="topic"
                         isClear={true}
                         touched={false}
+                        isNotRequired={true}
                         clearGrade={clearTopic}
                         setClearGrade={setClearTopic}
                         disabled={!topicList || topicList.length === 0}
@@ -391,6 +422,7 @@ export default function CreateProblem() {
                         label="Bài học"
                         name="lesson"
                         id="lesson"
+                        isNotRequired={true}
                         touched={false}
                         clearTopic={clearLesson}
                         setClearTopic={setClearLesson}
@@ -537,6 +569,23 @@ export default function CreateProblem() {
                             component="div"
                           />
                         </CustomEditor>
+                      </div>
+
+                      <div className="mb-5">
+                        <>
+                          <span>Tag</span>
+                          <span className="text-red-600">*</span>
+                        </>
+                        <MultiSelect
+                          value={tag}
+                          options={tagList}
+                          onChange={(e) => setTag(e.value)}
+                          optionLabel="title"
+                          placeholder="Chọn Tag"
+                          className="w-full shadow-none custom-multiselect border border-gray-300"
+                          display="chip"
+                          filter
+                        />
                       </div>
 
                       <div className="flex justify-end gap-2">

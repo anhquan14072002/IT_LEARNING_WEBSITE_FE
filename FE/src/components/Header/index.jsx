@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useRef, useState } from "react";
 import avatar from "../../assets/img/icons8-male-user-50.png";
-import logo from "../../assets/TNV.svg";
+import logo from "../../assets/THV.svg";
 import arrowDown from "../../assets/img/icons8-sort-down-50.png";
 import "./index.css";
 import { Tooltip } from "primereact/tooltip";
@@ -39,11 +39,19 @@ export default function Header({ params, setParams, textSearchProps }) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showOptionNotifications, setShowOptionNotifications] = useState(false);
   // const [activeTabIndex, setActiveTabIndex] = useState(0);
-
+  const getNavigationPathLogout = () => {
+    if (user.role === "Admin" || user.role === "ContentManager") {
+      return "/loginAdmin";
+    }
+    if (user.role === "User") {
+      return "/login";
+    }
+    return "";
+  };
   const handleLogout = () => {
     dispatch(retmoveUser());
     logout();
-    navigate("/login");
+    navigate(getNavigationPathLogout());
   };
   const getNavigationPath = () => {
     if (user.role === "Admin") {
@@ -76,6 +84,11 @@ export default function Header({ params, setParams, textSearchProps }) {
               },
             ]
           : []),
+        {
+          label: "Học bạ",
+          icon: "pi pi-address-book",
+          command: () => navigate("/historyQuiz"),
+        },
 
         {
           label: "Đăng xuất",

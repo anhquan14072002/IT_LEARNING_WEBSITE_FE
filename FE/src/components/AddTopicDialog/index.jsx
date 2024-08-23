@@ -92,7 +92,18 @@ export default function AddTopicDialog({
   }, []);
   const onSubmit = (values) => {
     setLoading(true);
-    const tagValues = tag.map((item) => item.keyWord);
+    // const tagValues = tag.map((item) => item.keyWord);
+
+    // Ensure tag is always an array
+    const tagValues = (tag || []).map((item) => item.keyWord);
+
+    // Check if tagValues is empty
+    if (tagValues.length === 0) {
+      REJECT(toast, "Chưa chọn tag. Vui lòng chọn ít nhất một tag.");
+      setLoading(false);
+      return; // Exit the function if no tags are selected
+    }
+
     const model = {
       title: values.title,
       objectives: values.objectives,
@@ -193,7 +204,7 @@ export default function AddTopicDialog({
               </CustomTextarea>
               <div>
                 <>
-                  <span>Tag</span>
+                  <span>Tag</span><span className="text-red-600">*</span>
                 </>
                 <MultiSelect
                   value={tag}

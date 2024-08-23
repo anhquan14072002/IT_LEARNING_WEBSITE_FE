@@ -12,6 +12,7 @@ import Loading from "../Loading";
 import { decodeIfNeeded, isBase64, REJECT, SUCCESS } from "../../utils";
 import "./index.css";
 import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
+import { MultiSelect } from "primereact/multiselect";
 
 export default function UpdateLessonDialog({
   visibleUpdate,
@@ -27,6 +28,9 @@ export default function UpdateLessonDialog({
   const [isLoadingAddUpdate, setIsLoadingAddUpdate] = useState(false);
   const [initialValuesReady, setInitialValuesReady] = useState(false);
   const [loading, setLoading] = useState(false);
+
+  const [tagList, setTagList] = useState([]);
+  const [tag, setTag] = useState(null);
 
   // Select input content type
   const [inputContent, setInputContent] = useState(!!modelUpdate.content); // Initialize based on modelUpdate.content
@@ -134,6 +138,14 @@ export default function UpdateLessonDialog({
           document: selectedDocument || {},
         };
 
+        const tagResponse = await restClient({
+          url: "api/tag/getalltag",
+          method: "GET",
+        });
+        setTagList(
+          Array.isArray(tagResponse?.data?.data) ? tagResponse?.data?.data : []
+        );
+
         setInitialValues(updatedInitialValues);
         setInitialValuesReady(true); // Data has been fetched and initial values are set
       } catch (err) {
@@ -153,6 +165,11 @@ export default function UpdateLessonDialog({
     formData.append("Id", modelUpdate.id);
     formData.append("Title", values.title);
     formData.append("TopicId", values.topic.id); // Use topic.id for TopicId
+    if (tag && tag.length > 0) {
+      tag.forEach((item, index) => {
+        formData.append(`tagValues[${index}]`, item.keyWord);
+      });
+    }
     if (inputContent) {
       formData.append("Content", values.content);
     }
@@ -317,6 +334,22 @@ export default function UpdateLessonDialog({
                   type="text"
                   id="title"
                 />
+
+               <div>
+                <>
+                  <span>Tag</span>
+                </>
+                <MultiSelect
+                  value={tag}
+                  options={tagList}
+                  onChange={(e) => setTag(e.value)}
+                  optionLabel="title"
+                  placeholder="Chọn Tag"
+                  className="w-full shadow-none custom-multiselect border border-gray-300"
+                  display="chip"
+                  filter
+                />
+              </div>
 
                 <div className="flex justify-between mb-1">
                   <h1>Nội dung bài học</h1>

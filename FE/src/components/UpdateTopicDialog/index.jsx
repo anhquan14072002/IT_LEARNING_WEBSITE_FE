@@ -11,6 +11,7 @@ import CustomTextInput from "../../shared/CustomTextInput";
 import CustomDropdown from "../../shared/CustomDropdown";
 import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
 import { REJECT, SUCCESS } from "../../utils";
+import { MultiSelect } from "primereact/multiselect";
 
 const validationSchema = Yup.object({
   title: Yup.string().required("Tiêu đề không được bỏ trống"),
@@ -46,6 +47,8 @@ const UpdateTopicDialog = ({
     document: {},
     grade: {},
   });
+  const [tag, setTag] = useState(null);
+  const [tagList, setTagList] = useState([]);
 
   useEffect(() => {
     const fetchDocumentsAndGrade = async () => {
@@ -91,10 +94,16 @@ const UpdateTopicDialog = ({
 
         setGradeList(listGrade)
 
+        const tagResponse = await restClient({
+          url: "api/tag/getalltag",
+          method: "GET",
+        });
+        setTagList(
+          Array.isArray(tagResponse?.data?.data) ? tagResponse?.data?.data : []
+        );
+
       } catch (err) {
         console.error("Error fetching documents:", err);
-        setGradeList([]);
-        setDocumentList([]);
       } finally {
         setLoading(false);
       }
@@ -107,12 +116,17 @@ const UpdateTopicDialog = ({
 
   const onSubmit = async (values) => {
     setLoading(true);
+
+    // Ensure tag is always an array
+    const tagValues = (tag || []).map((item) => item.keyWord);
+
     const model = {
       id: updateValue.id,
       title: values.title,
       objectives: values.objectives,
       description: values.description,
       documentId: values.document.id,
+      tagValues: tagValues,
       isActive: true,
     };
 
@@ -201,6 +215,22 @@ const UpdateTopicDialog = ({
               >
                 <ErrorMessage name="objectives" component="div" />
               </CustomTextarea>
+
+              <div>
+                <>
+                  <span>Tag</span>
+                </>
+                <MultiSelect
+                  value={tag}
+                  options={tagList}
+                  onChange={(e) => setTag(e.value)}
+                  optionLabel="title"
+                  placeholder="Chọn Tag"
+                  className="w-full shadow-none custom-multiselect border border-gray-300"
+                  display="chip"
+                  filter
+                />
+              </div>
 
               <div>
                 <CustomEditor
