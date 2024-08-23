@@ -222,17 +222,12 @@ function ComposeComment({ ...props }) {
       <p className="flex gap-3 items-center">
         {isLoggedIn() ? (
           <span className="flex items-center">
-            {/* <img
-              src={user?.picture || image}
-              alt="Ảnh người dùng"
-              width="30px"
-              style={{ borderRadius: "25px" }}
-            /> */}
             <img
               src={user?.picture || image}
               alt="Ảnh người dùng"
               width="30px"
               className="rounded-full"
+              style={{ borderRadius: "25px", height: "30px" }}
               onError={(e) => (e.target.src = image)}
             />
           </span>
@@ -243,7 +238,7 @@ function ComposeComment({ ...props }) {
               src={image}
               alt="Ảnh người dùng"
               width="30px"
-              style={{ borderRadius: "25px" }}
+              style={{ borderRadius: "25px", height: "30px" }}
             />
           </span>
         )}

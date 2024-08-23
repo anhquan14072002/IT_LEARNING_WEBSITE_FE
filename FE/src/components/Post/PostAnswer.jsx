@@ -122,17 +122,20 @@ const PostAnswer = ({ post }) => {
                 src={user?.picture || image}
                 alt="Ảnh người dùng"
                 width="30px"
-                style={{ borderRadius: "25px" }}
+                style={{ borderRadius: "25px", height: "30px" }}
               />
             </span>
-            <InputText
-              type="text"
-              className="p-inputtext-lg border-2 p-1 border-stone-300 rounded w-[72vh]"
-              placeholder="Trả lời nhanh câu hỏi này"
-              onClick={() =>
-                checkUser() && setIsChangeInput({ isChange: true, data: null })
-              }
-            />
+            <span>
+              <InputText
+                type="text"
+                className="p-inputtext-lg border-2 p-1  border-stone-300 rounded w-[72vh]"
+                placeholder="Trả lời nhanh câu hỏi này"
+                onClick={() =>
+                  checkUser() &&
+                  setIsChangeInput({ isChange: true, data: null })
+                }
+              />
+            </span>
           </p>
         ) : (
           <SendAnswer
@@ -313,7 +316,7 @@ const Answer = ({
                 src={avatar || image}
                 alt="Ảnh người dùng"
                 width="30px"
-                style={{ borderRadius: "25px" }}
+                style={{ borderRadius: "25px", height: "30px" }}
               />
             </span>
             <span className="flex flex-col">
@@ -464,7 +467,7 @@ const SendAnswer = forwardRef(function SendAnswer(
                     src={user?.picture || image}
                     alt="Ảnh người dùng"
                     width="30px"
-                    style={{ borderRadius: "25px" }}
+                    style={{ borderRadius: "25px", height: "30px" }}
                   />
                 </span>
                 <div className="flex-grow ml-2">
