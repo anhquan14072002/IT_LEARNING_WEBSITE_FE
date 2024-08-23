@@ -452,7 +452,11 @@ function NotificationList({ notifications }) {
                 <img
                   src={notification?.userSendImage || image}
                   alt="Ảnh người dùng"
-                  width="50px"
+                  style={{
+                    borderRadius: "25px",
+                    height: "50px",
+                    width: "50px",
+                  }}
                   className="rounded-full"
                   onError={(e) => (e.target.src = image)}
                 />
