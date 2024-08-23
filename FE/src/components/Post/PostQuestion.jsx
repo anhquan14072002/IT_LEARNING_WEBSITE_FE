@@ -88,23 +88,28 @@ function PostQuestion({ post, isFavoritePost }) {
           <span className="flex gap-3">
             <span className="flex items-center">
               <img
-                src={avatar || image}
+                // src={avatar || image}
+                src="https://res.cloudinary.com/itsupport18/image/upload/v1724397815/UserImage/IMAGE-afb8ccbb-99f2-430a-a5be-c80c6d871645.jpg"
                 alt="Ảnh người dùng"
-                width="35px"
+                width="30px"
+                style={{ borderRadius: "25px", height: "30px" }}
                 className="rounded-full"
                 onError={(e) => (e.target.src = image)}
               />
             </span>
             <span className="flex flex-col gap-2">
               <strong className="text-xl font-medium">{userName}</strong>
-              {roles.map((role) => (
-                <Button
-                  label={role}
-                  severity="warning"
-                  style={{ backgroundColor: "#f58220" }}
-                  className="text-white rounded-3xl text-sm w-fit px-2 font-bold"
-                />
-              ))}
+              {roles.map(
+                (role) =>
+                  role != "User" && (
+                    <Button
+                      label={role}
+                      severity="warning"
+                      style={{ backgroundColor: "#f58220" }}
+                      className="text-white rounded-3xl text-sm w-fit px-2 font-bold"
+                    />
+                  )
+              )}
               <span className="text-sm text-stone-400">
                 {/* 12 giờ trước (20:28) - SIT18 */}
                 {formattedDate}
