@@ -7,8 +7,10 @@ import Menu from "../../components/Menu";
 import Footer from "../../components/Footer";
 import { PostProvider } from "../../store/PostContext";
 import NotifyProvider from "../../store/NotificationContext";
+import { useParams } from "react-router-dom";
 
 function Post(props) {
+  const { id } = useParams();
   const fixedDivRef = useRef(null);
   const [fixedDivHeight, setFixedDivHeight] = useState(0);
   const displayRef = useRef(null);
@@ -38,7 +40,7 @@ function Post(props) {
               {/* </div> */}
 
               {/* <div className="lg:flex-1"> */}
-              <PostContent />
+              <PostContent id={id} />
               {/* </div> */}
             </div>
           </div>

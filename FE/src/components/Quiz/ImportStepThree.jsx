@@ -21,7 +21,6 @@ function ImportStepThree(props) {
     })
       .then((res) => {
         // Handle success
-        console.log(res);
       })
       .catch((err) => {
         setLoading(true);
@@ -41,7 +40,6 @@ function ImportStepThree(props) {
           responseType: "arraybuffer", // Important to handle binary data
         }
       );
-      console.log(res);
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement("a");
       // Set the href attribute to the Blob URL

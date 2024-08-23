@@ -146,7 +146,7 @@ function App() {
           <Route path="/searchQuiz" element={<SearchQuiz />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
-          <Route path="/post" element={<Post />} />
+          <Route path="/post/:id" element={<Post />} />
           <Route path="/document/:id" element={<Document />} />
           <Route path="/topic/:id" element={<Topic />} />
           {/* <Route path="/quiz/:id" element={<Quiz />} /> */}

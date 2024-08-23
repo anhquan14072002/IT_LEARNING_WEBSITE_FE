@@ -62,13 +62,15 @@ function Menu() {
             ))}
 
           <div
-            onClick={() => navigate("/post")}
+            onClick={() => navigate("/post/0")}
             className="p-2 flex items-center justify-center cursor-pointer hover:bg-[#D1F7FF] flex-1"
           >
-
             Hỏi bài
           </div>
-          <div className="p-2 flex items-center justify-center cursor-pointer hover:bg-[#D1F7FF] flex-1" onClick={()=>navigate('/listpractice')}>
+          <div
+            className="p-2 flex items-center justify-center cursor-pointer hover:bg-[#D1F7FF] flex-1"
+            onClick={() => navigate("/listpractice")}
+          >
             Thực hành
           </div>
           <div

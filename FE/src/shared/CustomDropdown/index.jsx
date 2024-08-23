@@ -25,9 +25,6 @@ const CustomDropdown = ({
   }, [clearTopic]);
 
   const handleOnChange = (e) => {
-    console.log('====================================');
-    console.log(e);
-    console.log('====================================');
     helpers.setValue(e.value);
     setTouchedState(true); // Set touched state to true when onChange is triggered
     if (props.onChange) {
@@ -47,7 +44,10 @@ const CustomDropdown = ({
 
   return (
     <div className="mb-5 flex-1 ">
-      <label htmlFor={props.id || props.name}>{label}{" "}{!props?.isNotRequired && (<span className="text-red-500">*</span>)}</label>
+      <label htmlFor={props.id || props.name}>
+        {label}{" "}
+        {!props?.isNotRequired && <span className="text-red-500">*</span>}
+      </label>
       <Dropdown
         {...field}
         {...props}
@@ -64,11 +64,9 @@ const CustomDropdown = ({
           "border-gray-300": !meta.error || !(meta.touched || touchedState), // Check if meta.error or touchedState are false
         })}
       />
-      {meta.error &&
-        (meta.touched || touchedState) && (
-          <div className="text-red-500">{meta.error}</div>
-        )
-      }
+      {meta.error && (meta.touched || touchedState) && (
+        <div className="text-red-500">{meta.error}</div>
+      )}
     </div>
   );
 };
