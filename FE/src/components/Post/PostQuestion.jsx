@@ -30,6 +30,9 @@ function PostQuestion({ post, isFavoritePost }) {
     roles,
   } = post;
   const [isFavorite, setIsFavorite] = useState(isFavoritePost);
+  const isCheckUser =
+    (userId === user?.sub && isLoggedIn()) ||
+    (user?.name === "admin" && isLoggedIn());
   let contentJsx = <div dangerouslySetInnerHTML={{ __html: content }} />;
   function responseAnswer() {
     if (checkUser()) {
@@ -146,7 +149,7 @@ function PostQuestion({ post, isFavoritePost }) {
             <img src={message} alt="Ảnh tin nhắn" class="w-6 h-6 text-black" />
           </span>
 
-          {userId === user?.sub && isLoggedIn() && (
+          {isCheckUser && (
             <span>
               <a className="cursor-pointer" onClick={responseAnswer}>
                 Thu hồi

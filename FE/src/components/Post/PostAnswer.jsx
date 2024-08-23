@@ -11,7 +11,7 @@ import { Toast } from "primereact/toast";
 import { Button } from "primereact/button";
 import { Formik, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import restClient from "../../services/restClient";
+import restClient, { BASE_URL_FE } from "../../services/restClient";
 import PostContext from "../../store/PostContext";
 import image from "../../assets/img/image.png";
 import like from "../../assets/Icons/like.png";
@@ -52,7 +52,6 @@ const PostAnswer = ({ post }) => {
   };
   const fetchPost = useCallback(async () => {
     // console.log(numberOfCommentFake);
-    console.log(numberOfComment);
     // setTimeout(async () => {
     if (numberOfComment > 0) {
       setLoading(true);
@@ -108,10 +107,8 @@ const PostAnswer = ({ post }) => {
       description: `${user?.name} đã phản hồi bài viết của bạn`,
       notificationTime: new Date(),
       isRead: false,
-      link: "test",
+      link: `${BASE_URL_FE}/post/${id}`,
     };
-    console.log(body);
-
     createPostNotification(body);
   }
   return (
@@ -209,6 +206,12 @@ const Answer = ({
   const toast = useRef(null);
 
   const user = useSelector((state) => state.user.value);
+  const isCheckUser =
+    (userId === user?.sub && isLoggedIn()) ||
+    (user?.name === "admin" && isLoggedIn());
+  console.log("isCheckUser");
+  console.log(isCheckUser);
+
   const {
     createVoteComment,
     createResponseAnswer,
@@ -240,13 +243,11 @@ const Answer = ({
   const deleteAnswer = () => {
     if (checkUser()) {
       deletePostComment(id, fetchPost);
-      notifyAllResponse("Bạn đã thu hồi phản hồi thành công");
+      notifyAllResponse(" đã thu hồi phản hồi thành công", 1);
     }
   };
   const updateAnswer = () => {
     if (checkUser()) {
-      console.log({ content: content, id: id });
-
       setIsChangeInput({ isChange: true, data: { content: content, id: id } });
     }
   };
@@ -282,11 +283,11 @@ const Answer = ({
       description: `${user?.name} ${msg}`,
       notificationTime: new Date(),
       isRead: false,
-      link: "test",
+      link: `${BASE_URL_FE}/post/${id}`,
     };
     createPostNotification(body);
   }
-  function notifyAllResponse(msg) {
+  function notifyAllResponse(msg, deleteResponse = 0) {
     /* solution: Where is the origin of action from ? 
           - pass body in request :  */
     const body = {
@@ -295,10 +296,10 @@ const Answer = ({
       userSendName: user?.name,
       userReceiveId: userId,
       userReceiveName: fullName,
-      description: `${user?.name} ${msg}`,
+      description: deleteResponse === 1 ? `${user?.name} ${msg}` : `${msg}`,
       notificationTime: new Date(),
       isRead: false,
-      link: "test",
+      link: `${BASE_URL_FE}/post/${id}`,
     };
     createPostNotification(body);
   }
@@ -345,14 +346,16 @@ const Answer = ({
               </a>
             </span>
           )} */}
+          {console.log(userId === user?.sub && isLoggedIn())}
 
-          {userId === user?.sub && isLoggedIn() && (
+          {isCheckUser && (
             <span>
               <a className="cursor-pointer" onClick={deleteAnswer}>
                 Thu hồi
               </a>
             </span>
           )}
+
           {userId === user?.sub && isLoggedIn() && (
             <span>
               <a className="cursor-pointer" onClick={updateAnswer}>
@@ -435,7 +438,6 @@ const SendAnswer = forwardRef(function SendAnswer(
 
   const onSubmit = () => {
     if (content.trim() === "") {
-      console.log(1234);
       ACCEPT(ref, "Bạn cần nhập nội dung câu trả lời ? ");
       return;
     }
@@ -447,8 +449,6 @@ const SendAnswer = forwardRef(function SendAnswer(
     onSubmitAnswer(content);
     // }
   };
-  console.log(isChangeInput);
-
   return (
     <div {...props}>
       <Toast ref={ref} />

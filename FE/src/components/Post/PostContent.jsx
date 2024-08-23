@@ -109,13 +109,15 @@ function PostWrite({ setCompose, compose }) {
     let postId = compose?.data?.idPost;
     let postIdResponse;
     if (postId) {
+      postIdResponse = postId;
+      console.log("postIdResponse");
+      console.log(postId);
       updatePost({ ...descriptionPost, id: postId });
     } else {
-      postIdResponse = await createPost(descriptionPost);
-      console.log("postId");
-      console.log(postId?.id);
+      const postIdResponse2 = await createPost(descriptionPost);
+      postIdResponse = postIdResponse2?.id;
     }
-    notifyPersonalResponse(postId, postIdResponse?.id);
+    notifyPersonalResponse(postId, postIdResponse);
     setCompose((preValue) => ({
       data: null,
       isCompose: false,
@@ -124,6 +126,8 @@ function PostWrite({ setCompose, compose }) {
   function notifyPersonalResponse(postId, id = 0) {
     /* solution: Where is the origin of action from ? 
           - pass body in request :  */
+    console.log(id);
+
     const body = {
       notificationType: 1,
       userSendId: user?.sub,
