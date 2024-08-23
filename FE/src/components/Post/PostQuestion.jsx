@@ -88,8 +88,7 @@ function PostQuestion({ post, isFavoritePost }) {
           <span className="flex gap-3">
             <span className="flex items-center">
               <img
-                // src={avatar || image}
-                src="https://res.cloudinary.com/itsupport18/image/upload/v1724397815/UserImage/IMAGE-afb8ccbb-99f2-430a-a5be-c80c6d871645.jpg"
+                src={avatar || image}
                 alt="Ảnh người dùng"
                 width="30px"
                 style={{ borderRadius: "25px", height: "30px" }}
