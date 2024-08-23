@@ -23,7 +23,7 @@ dist-ssr
 *.sln
 *.sw?
 
-# # Ignore restClient.jsx
-# restClient.jsx
-# restClientV2.jsx
-# restClient.js
+# Ignore restClient.jsx
+restClient.jsx
+restClientV2.jsx
+restClient.js
