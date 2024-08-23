@@ -5,6 +5,7 @@ import { Button } from "primereact/button";
 import { useSelector } from "react-redux";
 import PostContext from "../../store/PostContext";
 import { isLoggedIn } from "../../utils";
+import { BASE_URL_FE } from "../../services/restClient";
 function PostQuestion({ post, isFavoritePost }) {
   const user = useSelector((state) => state.user.value);
   const {
@@ -48,7 +49,7 @@ function PostQuestion({ post, isFavoritePost }) {
       description: `Bạn đã thu hồi bài post thành công`,
       notificationTime: new Date(),
       isRead: false,
-      link: "test",
+      link: `${BASE_URL_FE}/post/${-1}`,
     };
     createPostNotification(body);
   }

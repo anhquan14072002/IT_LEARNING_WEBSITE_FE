@@ -39,7 +39,7 @@ export default function Header({ params, setParams, textSearchProps }) {
   const [showNotifications, setShowNotifications] = useState(false);
   const [showOptionNotifications, setShowOptionNotifications] = useState(false);
   // const [activeTabIndex, setActiveTabIndex] = useState(0);
-  
+
   const handleLogout = () => {
     dispatch(retmoveUser());
     logout();
@@ -67,14 +67,16 @@ export default function Header({ params, setParams, textSearchProps }) {
           icon: "pi pi-user-edit",
           command: (e) => navigate("/profile"),
         },
-        ...(user.role === "Admin" || user.role === "ContentManager" ?[
-          {
-            label: "Quản lí",
-            icon: "pi pi-chart-bar",
-            command: (e) => navigate(getNavigationPath()),
-          },
-        ]:[] ),
-        
+        ...(user.role === "Admin" || user.role === "ContentManager"
+          ? [
+              {
+                label: "Quản lí",
+                icon: "pi pi-chart-bar",
+                command: (e) => navigate(getNavigationPath()),
+              },
+            ]
+          : []),
+
         {
           label: "Đăng xuất",
           icon: "pi pi-sign-out",
@@ -409,10 +411,19 @@ export default function Header({ params, setParams, textSearchProps }) {
 }
 
 function NotificationList({ notifications }) {
+  const navigate = useNavigate();
   function detailNotification(notification) {
-    /* solution: Where is the origin of action from ? 
-        -  */
-    console.log(notification);
+    const link = notification?.link;
+
+    if (link) {
+      if (link.startsWith("http://") || link.startsWith("https://")) {
+        // Absolute URL: Use window.location.href for navigation
+        window.location.href = link;
+      } else {
+        // Relative URL: Use navigate from React Router
+        navigate(link, { replace: true });
+      }
+    }
   }
   return (
     <table className="w-full mt-1 ">

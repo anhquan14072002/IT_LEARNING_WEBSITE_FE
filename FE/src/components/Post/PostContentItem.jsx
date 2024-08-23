@@ -4,6 +4,8 @@ import { Paginator } from "primereact/paginator";
 import React, { useContext, useState } from "react";
 
 import PostContext from "../../store/PostContext";
+import { BASE_URL_FE } from "../../services/restClient";
+import { useNavigate } from "react-router-dom";
 const tabsData = [
   {
     label: " Tất cả",
@@ -24,10 +26,22 @@ const tabsData = [
   },
 ];
 function PostContentItem(props) {
+  const navigate = useNavigate();
   const { first, rows, totalPage, onPageChange, setItemSidebar } =
     useContext(PostContext);
-
   const [activeTabIndex, setActiveTabIndex] = useState(0);
+  function detailNotification() {
+    let link = BASE_URL_FE + "/post/0";
+    if (link) {
+      if (link.startsWith("http://") || link.startsWith("https://")) {
+        // Absolute URL: Use window.location.href for navigation
+        window.location.href = link;
+      } else {
+        // Relative URL: Use navigate from React Router
+        navigate(link, { replace: true });
+      }
+    }
+  }
   return (
     <div>
       <ul className="flex flex-wrap text-md font-medium text-center text-gray-500 border-b border-gray-200 dark:border-gray-200 dark:text-gray-400">
@@ -46,6 +60,7 @@ function PostContentItem(props) {
                   setItemSidebar((preValue) => {
                     return { gradeIdSelected: undefined, itemTab: undefined };
                   });
+                  detailNotification();
                 } else if (idx === 3) {
                   setItemSidebar((preValue) => {
                     return {

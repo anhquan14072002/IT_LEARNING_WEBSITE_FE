@@ -13,7 +13,7 @@ import { ACCEPT, containsRudeWords, isLoggedIn } from "../../utils";
 import "../../shared/CustomDropdown/index.css";
 import { getAllGrade } from "../../services/grade.api";
 import image from "../../assets/img/image.png";
-import restClient from "../../services/restClient";
+import restClient, { BASE_URL, BASE_URL_FE } from "../../services/restClient";
 const validationSchema = Yup.object({
   grade: Yup.object()
     .test("is-not-empty", "Không được để trống trường này", (value) => {
@@ -24,6 +24,7 @@ const validationSchema = Yup.object({
 
 function PostContent({ ...props }) {
   const { compose, setCompose } = useContext(PostContext);
+
   return (
     <div
       className="w-full md:w-[80%] mt-4  flex flex-col gap-5 grow "
@@ -76,7 +77,6 @@ function PostWrite({ setCompose, compose }) {
       getGradeById();
     }
   }, [compose?.data]);
-  console.log(compose?.data);
 
   const [description, setDescription] = useState("");
   const [gradeList, setListGrade] = useState([]);
@@ -87,7 +87,7 @@ function PostWrite({ setCompose, compose }) {
     setDescription(htmlContent);
   };
 
-  const onSubmit = (values) => {
+  const onSubmit = async (values) => {
     if (description.trim() === "") {
       ACCEPT(toast, "Bạn cần nhập thêm nội dung bài post ? ");
       return;
@@ -107,18 +107,21 @@ function PostWrite({ setCompose, compose }) {
       gradeId: values.grade?.id,
     };
     let postId = compose?.data?.idPost;
+    let postIdResponse;
     if (postId) {
       updatePost({ ...descriptionPost, id: postId });
     } else {
-      createPost(descriptionPost);
+      postIdResponse = await createPost(descriptionPost);
+      console.log("postId");
+      console.log(postId?.id);
     }
-    notifyPersonalResponse(postId);
+    notifyPersonalResponse(postId, postIdResponse?.id);
     setCompose((preValue) => ({
       data: null,
       isCompose: false,
     }));
   };
-  function notifyPersonalResponse(postId) {
+  function notifyPersonalResponse(postId, id = 0) {
     /* solution: Where is the origin of action from ? 
           - pass body in request :  */
     const body = {
@@ -130,7 +133,7 @@ function PostWrite({ setCompose, compose }) {
       description: `Bạn vừa ${postId ? "sửa" : "tạo"} bài post thành công`,
       notificationTime: new Date(),
       isRead: false,
-      link: "test",
+      link: `${BASE_URL_FE}/post/${id}`,
     };
     createPostNotification(body);
   }
