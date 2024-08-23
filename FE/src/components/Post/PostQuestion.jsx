@@ -5,6 +5,7 @@ import { Button } from "primereact/button";
 import { useSelector } from "react-redux";
 import PostContext from "../../store/PostContext";
 import { isLoggedIn } from "../../utils";
+import { BASE_URL_FE } from "../../services/restClient";
 function PostQuestion({ post, isFavoritePost }) {
   const user = useSelector((state) => state.user.value);
   const {
@@ -29,6 +30,9 @@ function PostQuestion({ post, isFavoritePost }) {
     roles,
   } = post;
   const [isFavorite, setIsFavorite] = useState(isFavoritePost);
+  const isCheckUser =
+    (userId === user?.sub && isLoggedIn()) ||
+    (user?.name === "admin" && isLoggedIn());
   let contentJsx = <div dangerouslySetInnerHTML={{ __html: content }} />;
   function responseAnswer() {
     if (checkUser()) {
@@ -48,7 +52,7 @@ function PostQuestion({ post, isFavoritePost }) {
       description: `Bạn đã thu hồi bài post thành công`,
       notificationTime: new Date(),
       isRead: false,
-      link: "test",
+      link: `${BASE_URL_FE}/post/${-1}`,
     };
     createPostNotification(body);
   }
@@ -145,7 +149,7 @@ function PostQuestion({ post, isFavoritePost }) {
             <img src={message} alt="Ảnh tin nhắn" class="w-6 h-6 text-black" />
           </span>
 
-          {userId === user?.sub && isLoggedIn() && (
+          {isCheckUser && (
             <span>
               <a className="cursor-pointer" onClick={responseAnswer}>
                 Thu hồi

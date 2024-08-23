@@ -34,7 +34,7 @@ export default function NotifyProvider({ children }) {
       })
         .then((res) => {
           setNotifications(res.data.data);
-          console.log(res.data.data);
+          res.data.data;
         })
         .catch((err) => {
           console.error("Error fetching data:", err);
@@ -49,7 +49,6 @@ export default function NotifyProvider({ children }) {
       })
         .then((res) => {
           setNotifications(res.data.data);
-          console.log(res.data.data);
         })
         .catch((err) => {
           console.error("Error fetching data:", err);
@@ -65,7 +64,6 @@ export default function NotifyProvider({ children }) {
         .then((res) => {
           setNotifications(res.data.data);
           setRefresh(new Date());
-          console.log(res.data.data);
         })
         .catch((err) => {
           console.error("Error fetching data:", err);

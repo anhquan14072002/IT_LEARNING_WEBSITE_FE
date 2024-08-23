@@ -40,7 +40,6 @@ function ImportStepOne(props) {
         params: { checkData: 1 },
         responseType: "arraybuffer", // Important to handle binary data
       });
-      console.log(res);
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement("a");
       // Set the href attribute to the Blob URL

@@ -16,6 +16,7 @@ import {
   LogLevel,
 } from "@microsoft/signalr";
 import { NotificationContext } from "./NotificationContext";
+import { useParams } from "react-router-dom";
 const PostContext = createContext();
 
 export const PostProvider = ({ children }) => {
@@ -41,6 +42,7 @@ export const PostProvider = ({ children }) => {
   const hasFetched = useRef(false);
   const isCheck = isLoggedIn();
   const { fetchNumberNotificationByUserId } = useContext(NotificationContext);
+  const { id } = useParams();
   useEffect(() => {
     // if (hasFetched.current) return; // Prevent fetching if already done
     const notification = async () => {
@@ -80,8 +82,6 @@ export const PostProvider = ({ children }) => {
         setIsConnect(true);
 
         await conn.invoke("SaveUserConnection", user?.sub);
-
-        // console.log(conn); // Logging the connection object
       } catch (error) {
         console.error("Connection failed: ", error);
       }
@@ -118,7 +118,11 @@ export const PostProvider = ({ children }) => {
       itemSidebar.itemTab === undefined &&
       itemSidebar.gradeIdSelected === undefined
     ) {
-      fetchData();
+      if (id == 0 || !id) {
+        fetchData();
+      } else {
+        fetchPostDetailById();
+      }
     } else if (itemSidebar.itemTab === "myQuestion") {
       fetchDataByUserId();
     } else if (itemSidebar.itemTab === "notAnswer") {
@@ -128,12 +132,17 @@ export const PostProvider = ({ children }) => {
     } else if (itemSidebar.gradeIdSelected !== undefined) {
       fetchDataById();
     }
-  }, [page, rows, itemSidebar.itemTab, itemSidebar.gradeIdSelected, refresh2]);
+  }, [
+    page,
+    rows,
+    itemSidebar.itemTab,
+    itemSidebar.gradeIdSelected,
+    refresh2,
+    id,
+  ]);
   const fetchDataByUserId = () => {
     setLoading(true);
     let url;
-    console.log(itemSidebar?.gradeIdSelected);
-
     if (itemSidebar?.gradeIdSelected) {
       url = `api/post/getallpostbyuserandgradepagination?userId=${user?.sub}&gradeId=${itemSidebar?.gradeIdSelected}&PageIndex=${page}&PageSize=${rows}&OrderBy=createdDate&IsAscending=false`;
     } else {
@@ -178,7 +187,6 @@ export const PostProvider = ({ children }) => {
       .finally(() => setLoading(false));
   };
   const fetchDataById = () => {
-    console.log("fetchDataById");
     setLoading(true);
     restClient({
       url: `api/post/getallpostbygradepagination?gradeId=${itemSidebar.gradeIdSelected}&PageIndex=${page}&PageSize=${rows}&OrderBy=createdDate&IsAscending=false`,
@@ -196,17 +204,12 @@ export const PostProvider = ({ children }) => {
       .finally(() => setLoading(false));
   };
   const fetchPostById = (id) => {
-    console.log("fetchDataById");
     setLoading(true);
     restClient({
       url: `api/post/getpostbyid?id=${id}`,
       method: "GET",
     })
       .then((res) => {
-        console.log("fetch post");
-
-        console.log(res.data.data);
-        // setCompose((preValue) => ({ isCompose: true, data: res.data.data }));
         setCompose((preValue) => ({
           isCompose: true,
           data: { ...res.data.data, idPost: id },
@@ -295,23 +298,47 @@ export const PostProvider = ({ children }) => {
       })
       .finally(() => setLoading(false));
   };
-
-  const createPost = (contentPost) => {
+  const fetchPostDetailById = () => {
+    setLoading(true);
     restClient({
-      url: "api/post/createpost",
-      method: "POST",
-      data: contentPost,
+      url: `api/post/getpostbyid?id=${id}`,
+      method: "GET",
     })
       .then((res) => {
-        // SUCCESS(toast, "Tạo bài post thành công");
-        setRefresh2(new Date());
-        setLoading(false);
+        setPosts([res.data.data]);
       })
       .catch((err) => {
-        REJECT(toast, err.message);
-        setLoading(false);
-      });
+        console.error("Error fetching data:", err);
+        setPosts([]);
+      })
+      .finally(() => setLoading(false));
   };
+
+  const createPost = async (contentPost) => {
+    try {
+      // Set loading state to true before making the request
+      setLoading(true);
+
+      // Make the API call using restClient
+      const res = await restClient({
+        url: "api/post/createpost",
+        method: "POST",
+        data: contentPost,
+      });
+      // Refresh the UI by updating state
+      setRefresh2(new Date());
+      // Return the result data; this will return a promise
+      return res.data.data;
+    } catch (err) {
+      // Handle errors
+      REJECT(toast, err.message);
+      throw err; // Re-throw error to be handled by the caller
+    } finally {
+      // Set loading state to false, regardless of success or error
+      setLoading(false);
+    }
+  };
+
   const updatePost = (contentPost) => {
     restClient({
       url: "api/post/updatePost",
