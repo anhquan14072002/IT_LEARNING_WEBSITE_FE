@@ -7,32 +7,36 @@ import { Toast } from "primereact/toast";
 import { REJECT, SUCCESS } from "../../utils";
 import { InputText } from "primereact/inputtext";
 import NotifyProvider from "../../store/NotificationContext";
+import { useSelector } from "react-redux";
 
 const Index = () => {
   const toast = useRef(null);
-  const {
-    control,
-    handleSubmit,
-    formState: { errors },
-    getValues,
-    setValue,
-  } = useForm();
-
+  const { control, handleSubmit, formState: { errors }, getValues, setValue } = useForm();
+  const user = useSelector((state) => state.user.value);
+  
+  const loginProvider = user.login_provider;
+  const isLocalLogin = loginProvider === "local";
+  
   const onSubmit = async (data) => {
     const { password, newPassword } = data;
-    const email = localStorage.getItem("userEmail");
+    const email = user.email;
 
     try {
-      await changePassword({ email, password, newPassword });
+      await changePassword({
+        email,
+        password: isLocalLogin ? password : "",
+        newPassword,
+        login: !isLocalLogin,
+      });
       SUCCESS(toast, "Đổi mật khẩu thành công");
       setValue("password", "");
       setValue("newPassword", "");
       setValue("passwordAgain", "");
     } catch (error) {
+      REJECT(toast, "Đổi mật khẩu không thành công");
       setValue("password", "");
       setValue("newPassword", "");
       setValue("passwordAgain", "");
-      REJECT(toast, "Đổi mật khẩu không thành công");
     }
   };
 
@@ -45,47 +49,43 @@ const Index = () => {
             <h1 className="text-center font-extrabold text-3xl text-gray-800">
               Đổi mật khẩu
             </h1>
-            <div>
-              <label
-                htmlFor="password"
-                className="block text-lg font-medium text-gray-700 mb-2"
-              >
-                Mật khẩu cũ<span className="text-red-500">*</span>
-              </label>
-              <Controller
-                name="password"
-                control={control}
-                defaultValue=""
-                rules={{
-                  required: "Mật khẩu không được để trống",
-                  pattern: {
-                    value:
-                      /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{6,}$/,
-                    message:
-                      "Mật khẩu cần ít nhất 6 ký tự, bao gồm chữ cái đầu viết hoa, số và ký tự đặc biệt",
-                  },
-                }}
-                render={({ field }) => (
-                  <InputText
-                    id="password"
-                    type="password"
-                    className="w-full h-10 text-black-800 border border-gray-300 rounded-md px-3"
-                    placeholder="Nhập mật khẩu"
-                    {...field}
-                  />
+
+            {isLocalLogin && (
+              <div>
+                <label htmlFor="password" className="block text-lg font-medium text-gray-700 mb-2">
+                  Mật khẩu cũ <span className="text-red-500">*</span>
+                </label>
+                <Controller
+                  name="password"
+                  control={control}
+                  defaultValue=""
+                  rules={{
+                    required: "Mật khẩu không được để trống",
+                    pattern: {
+                      value: /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{6,}$/,
+                      message: "Mật khẩu cần ít nhất 6 ký tự, bao gồm chữ cái đầu viết hoa, số và ký tự đặc biệt",
+                    },
+                  }}
+                  render={({ field }) => (
+                    <InputText
+                      id="password"
+                      type="password"
+                      className="w-full h-10 text-black-800 border border-gray-300 rounded-md px-3 shadow-none"
+                      placeholder="Nhập mật khẩu"
+                      {...field}
+                    />
+                  )}
+                />
+                {errors.password && (
+                  <span className="text-red-500 text-sm mt-1">
+                    {errors.password.message}
+                  </span>
                 )}
-              />
-              {errors.password && (
-                <span className="text-red-500 text-sm mt-1">
-                  {errors.password.message}
-                </span>
-              )}
-            </div>
+              </div>
+            )}
+
             <div>
-              <label
-                htmlFor="newPassword"
-                className="block text-lg font-medium text-gray-700 mb-2"
-              >
+              <label htmlFor="newPassword" className="block text-lg font-medium text-gray-700 mb-2">
                 Mật khẩu mới <span className="text-red-500">*</span>
               </label>
               <Controller
@@ -95,18 +95,16 @@ const Index = () => {
                 rules={{
                   required: "Mật khẩu không được để trống",
                   pattern: {
-                    value:
-                      /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{6,}$/,
-                    message:
-                      "Mật khẩu cần ít nhất 6 ký tự, bao gồm chữ cái đầu viết hoa, số và ký tự đặc biệt",
+                    value: /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{6,}$/,
+                    message: "Mật khẩu cần ít nhất 6 ký tự, bao gồm chữ cái đầu viết hoa, số và ký tự đặc biệt",
                   },
                 }}
                 render={({ field }) => (
                   <InputText
                     id="newPassword"
                     type="password"
-                    className="w-full h-10 text-black-800 border border-gray-300 rounded-md px-3"
-                    placeholder="Nhập mật khẩu"
+                    className="w-full h-10 text-black-800 border border-gray-300 rounded-md px-3 shadow-none"
+                    placeholder="Nhập mật khẩu mới"
                     {...field}
                   />
                 )}
@@ -117,11 +115,9 @@ const Index = () => {
                 </span>
               )}
             </div>
+
             <div>
-              <label
-                htmlFor="passwordAgain"
-                className="block text-lg font-medium text-gray-700 mb-2"
-              >
+              <label htmlFor="passwordAgain" className="block text-lg font-medium text-gray-700 mb-2">
                 Nhập lại mật khẩu mới <span className="text-red-500">*</span>
               </label>
               <Controller
@@ -130,16 +126,14 @@ const Index = () => {
                 defaultValue=""
                 rules={{
                   required: "Mật khẩu không được để trống",
-                  validate: (value) =>
-                    value === getValues("newPassword") ||
-                    "Mật khẩu nhập lại không khớp",
+                  validate: (value) => value === getValues("newPassword") || "Mật khẩu nhập lại không khớp",
                 }}
                 render={({ field }) => (
                   <InputText
                     id="passwordAgain"
                     type="password"
-                    className="w-full h-10 text-black-800 border border-gray-300 rounded-md px-3"
-                    placeholder="Nhập mật khẩu"
+                    className="w-full h-10 text-black-800 border border-gray-300 rounded-md px-3 shadow-none"
+                    placeholder="Nhập lại mật khẩu mới"
                     {...field}
                   />
                 )}
@@ -150,6 +144,7 @@ const Index = () => {
                 </span>
               )}
             </div>
+
             <div>
               <Button
                 label="Cập Nhật"
