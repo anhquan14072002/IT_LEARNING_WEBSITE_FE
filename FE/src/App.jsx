@@ -41,6 +41,8 @@ import ManageQuestionQuiz from "./components/ManageQuestionQuiz";
 import { useSelector } from "react-redux";
 import HistoryQuiz from "./pages/HistoryQuiz";
 import SearchTag from "./pages/SearchTag";
+import "slick-carousel/slick/slick.css";
+import "slick-carousel/slick/slick-theme.css";
 
 function App() {
   const user = useSelector((state) => state.user.value);

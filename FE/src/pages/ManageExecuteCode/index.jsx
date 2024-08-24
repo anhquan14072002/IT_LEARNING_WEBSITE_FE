@@ -26,6 +26,8 @@ import "codemirror/mode/python/python";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/material.css";
 import NotifyProvider from "../../store/NotificationContext";
+import { useSelector } from "react-redux";
+import { assets } from "../../assets/assets";
 
 export default function ManageExecuteCode() {
   const toast = useRef(null);
@@ -51,18 +53,70 @@ export default function ManageExecuteCode() {
   const [open, setOpen] = useState(false);
   const navigate = useNavigate();
 
+  const user = useSelector((state) => state.user.value);
   const Menus = [
-    { title: "Thống kê", src: "Chart_fill", index: "statistic" },
-    { title: "Quản lí tài khoản", src: "User", index: "user" },
+    // Admin specific menus
+    ...(user.role === "Admin"
+      ? [
+          {
+            title: "Thống kê",
+            src: assets.chart_fill,
+            icon: "pi pi-chart-bar",
+            index: "statistic",
+          },
+          {
+            title: "Quản lí tài khoản",
+            src: assets.user,
+            icon: "pi pi-user",
+            index: "user",
+          },
+
+          {
+            title: "Quản lí tài liệu/chủ đề/bài học",
+            src: assets.folder,
+            icon: "pi pi-book",
+            index: "adminManageDocument",
+          },
+        ]
+      : []),
+
+    // Content Manager specific menus
+    ...(user.role === "ContentManager"
+      ? [
+          {
+            title: "Quản lí bài học",
+            src: assets.folder,
+            icon: "pi pi-book",
+            index: "lesson",
+          },
+        ]
+      : []),
+
+    // Common menus
     {
-      title: "Quản lí tài liệu/chủ đề/bài học ",
-      src: "Folder",
-      index: "adminManageDocument",
+      title: "Quản lí câu hỏi ôn tập",
+      src: assets.folder,
+      icon: "pi pi-question-circle",
+      index: "quiz",
     },
-    { title: "Quản lí bài học ", src: "Folder", index: "lesson" },
-    { title: "Quản lí câu hỏi ôn tập ", src: "Folder", index: "quiz" },
-    { title: "Quản lí đề thi", src: "Folder", index: "test" },
-    { title: "Quản lí tag ", src: "Folder", index: "tag" },
+    {
+      title: "Quản lí đề thi",
+      src: assets.folder,
+      icon: "pi pi-file",
+      index: "test",
+    },
+    {
+      title: "Quản lí tag",
+      src: assets.folder,
+      icon: "pi pi-tag",
+      index: "tag",
+    },
+    {
+      title: "Quản lí bài thực hành",
+      src: assets.folder,
+      icon: "pi pi-ticket",
+      index: "codeeditor",
+    },
   ];
 
   useEffect(() => {
@@ -245,40 +299,53 @@ export default function ManageExecuteCode() {
         <Header />
       </div>
       <div className="fixed left-0 top-16 z-20">
-        <div
-          className={`${
-            open ? "w-72" : "w-20"
-          } bg-dark-purple h-screen p-5 pt-8 duration-300`}
-        >
-          <img
-            src="/src/assets/control.png"
-            className={`absolute cursor-pointer -right-3 top-9 w-7 border-dark-purple
-               border-2 rounded-full ${!open ? "rotate-180" : ""}`}
-            onClick={() => setOpen(!open)}
-          />
-          <ul className="pt-6">
-            {Menus.map((Menu) => (
-              <li
-                key={Menu.index}
-                className={`flex rounded-md p-2 cursor-pointer hover:bg-light-white text-gray-300 text-sm items-center gap-x-4 mt-2`}
-                onClick={() => {
-                  navigate(`/dashboard/${Menu.index}`);
-                }}
-              >
-                <Tooltip target={`menu-${Menu.index}`} content={Menu.title} />
-                <img src={`/src/assets/${Menu.src}.png`} alt={Menu.title} />
-                <span
-                  className={`${
-                    !open ? "hidden" : ""
-                  } origin-left duration-200`}
-                >
-                  {Menu.title}
-                </span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+            <div
+              className={`${
+                open ? "w-72" : "w-20"
+              } bg-dark-purple h-screen p-5 pt-8 duration-300`}
+            >
+              <i
+                className={`pi pi-arrow-circle-right text-white text-xl  absolute cursor-pointer right-2 top-7 w-7 
+   rounded-full ${!open ? "rotate-180" : ""}`}
+                onClick={() => setOpen(!open)}
+              />
+
+              {/* <div className="flex gap-x-4 items-center">
+                <img
+                  src="/src/assets/logo.png"
+                  className={`cursor-pointer duration-500 ${
+                    open ? "rotate-[360deg]" : ""
+                  }`}
+                />
+              </div> */}
+              <ul className="pt-6">
+                {Menus.map((Menu) => (
+                  <li
+                    key={Menu.index}
+                    className={`flex rounded-md p-2 cursor-pointer hover:bg-light-white text-gray-300 text-sm items-center gap-x-4 mt-2
+                    }`}
+                    onClick={() => {
+                      navigate(`/dashboard/${Menu.index}`);
+                    }}
+                  >
+                    <Tooltip
+                      target={`#tooltip-${Menu.index}`}
+                      content={Menu.title}
+                    />
+                    <i id={`tooltip-${Menu.index}`} className={Menu.icon}></i>
+
+                    <span
+                      className={`${
+                        !open ? "hidden" : ""
+                      } origin-left duration-200`}
+                    >
+                      {Menu.title}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
       <div className="ml-20 mt-16 p-7">
         <div className="h-screen">
           <div>

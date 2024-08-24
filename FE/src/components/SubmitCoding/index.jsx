@@ -10,18 +10,24 @@ export default function SubmitCoding({ id }) {
   const indexBodyTemplate = (rowData, { rowIndex }) => {
     return <span>{rowIndex}</span>;
   };
-  const exec = (rowData, { rowIndex }) =>{
+  const exec = (rowData, { rowIndex }) => {
     return <span>{rowData?.executionTime}s</span>;
-  }
+  };
   const execC = (rowData, { rowIndex }) => {
     const formatDate = (dateString) => {
       const date = new Date(dateString);
       return date.toLocaleString(); // Formats the date to a readable format
     };
-  
-    return <span>{rowData?.createdDate ? formatDate(rowData.createdDate) : ''}</span>;
+
+    return (
+      <span>{rowData?.createdDate ? formatDate(rowData.createdDate) : ""}</span>
+    );
   };
-  
+
+  const status = (rowData, { rowIndex }) => {
+    return <span>{rowData?.status === "Accepted" ? "Passed" :rowData?.status}</span>
+  }
+
   useEffect(() => {
     restClient({
       url: `api/submission/getallsubmission?ProblemId=${id}&UserId=${user.sub}`,
@@ -52,8 +58,15 @@ export default function SubmitCoding({ id }) {
         />
 
         <Column
-          field="status"
           header="Trạng thái"
+          className="border-b-2 border-t-2"
+          style={{ minWidth: "15rem" }}
+          body={status}
+        />
+
+        <Column
+          field="languageName"
+          header="Ngôn ngữ"
           className="border-b-2 border-t-2"
           style={{ minWidth: "15rem" }}
         />

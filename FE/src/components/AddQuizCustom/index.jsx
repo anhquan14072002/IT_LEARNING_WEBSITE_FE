@@ -598,30 +598,33 @@ export default function AddQuizLesson({
   };
 
   const onSubmit = (values) => {
-    // const tagValues = tag.map((item) => item.keyWord);
 
-    // Ensure tag is always an array
     const tagValues = (tag || []).map((item) => item.keyWord);
-
-    // Check if tagValues is empty
-    if (tagValues.length === 0) {
-      REJECT(toast, "Chưa chọn tag. Vui lòng chọn ít nhất một tag.");
-      setLoading(false);
-      return; // Exit the function if no tags are selected
-    }
 
     if (!selectedProduct || selectedProduct.length === 0) {
       REJECT(toast, "Vui lòng không để trống lấy câu hỏi");
     } else {
-      let model = {
-        title: values?.title,
-        score: values?.score,
-        type: values?.type?.id,
-        description: values?.description,
-        tagValues: tagValues,
-        isActive: true,
-        gradeId: values?.grade?.id,
-      };
+      let model ;
+      if(tagValues.length === 0){
+        model = {
+          title: values?.title,
+          score: values?.score,
+          type: values?.type?.id,
+          description: values?.description,
+          isActive: true,
+          gradeId: values?.grade?.id,
+        };
+      }else if(tagValues.length>0){
+        model = {
+          title: values?.title,
+          score: values?.score,
+          type: values?.type?.id,
+          description: values?.description,
+          tagValues: tagValues,
+          isActive: true,
+          gradeId: values?.grade?.id,
+        };
+      }
       restClient({
         url: "api/quiz/createquiz",
         method: "POST",
@@ -707,7 +710,7 @@ export default function AddQuizLesson({
               />
               <div>
                 <>
-                  <span>Tag</span><span className="text-red-600">*</span>
+                  <span>Tag</span>
                 </>
                 <MultiSelect
                   value={tag}

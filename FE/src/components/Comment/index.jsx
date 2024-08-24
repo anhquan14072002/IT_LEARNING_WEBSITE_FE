@@ -231,7 +231,7 @@ export default function Comment({
               className="mb-4"
             />
             <textarea
-              className="w-full h-20 border border-gray-400sadf"
+              className="w-full h-20 border border-gray-400"
               defaultValue={newComment}
               onChange={(e) => setNewComment(e.target.value)}
             />
@@ -295,21 +295,12 @@ export default function Comment({
                         />
                       </div>
                       <div className="border border-solid border-gray-300 p-4 rounded-xl flex-1">
-                        <div className="flex justify-between">
+                        <div className="flex justify-between flex-wrap">
                           <div>
                             <p className="font-bold">{comment.fullName}</p>
                           </div>
                           <div>
                             <p className="text-gray-500 flex items-center">
-                              <svg
-                                xmlns="http://www.w3.org/2000/svg"
-                                height="16"
-                                width="14"
-                                viewBox="0 0 448 512"
-                              >
-                                <path d="M96 32V64H48C21.5 64 0 85.5 0 112v48H448V112c0-26.5-21.5-48-48-48H352V32c0-17.7-14.3-32-32-32s-32 14.3-32 32V64H160V32c0-17.7-14.3-32-32-32S96 14.3 96 32zM448 192H0V464c0 26.5 21.5 48 48 48H400c26.5 0 48-21.5 48-48V192z" />
-                              </svg>
-                              {/* &nbsp;{new Date(comment.createdAt).toLocaleString()} */}
                               {comment.lastModifiedDate
                                 ? "Cập nhật lúc " +
                                   formatDate(comment.lastModifiedDate)
@@ -327,7 +318,11 @@ export default function Comment({
                           />
                         </div>
                         <div>
-                          <p>{comment?.note}</p>
+                          <textarea
+                            className="w-full h-20"
+                            defaultValue={comment?.note}
+                            disabled={true}
+                          />
                         </div>
                       </div>
                       {/* Edit and Delete Buttons */}
@@ -392,9 +387,9 @@ export default function Comment({
                             </svg>
                             {/* &nbsp;{new Date(comment.createdAt).toLocaleString()} */}
                             {comment.lastModifiedDate
-                                ? "Cập nhật lúc " +
-                                  formatDate(comment.lastModifiedDate)
-                                : formatDate(comment?.createdDate)}
+                              ? "Cập nhật lúc " +
+                                formatDate(comment.lastModifiedDate)
+                              : formatDate(comment?.createdDate)}
                           </p>
                         </div>
                       </div>

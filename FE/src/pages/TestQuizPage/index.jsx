@@ -82,9 +82,7 @@ export default function TestQuizPage() {
           <ViewQuestionInTest quizData={quizData} quizDetail={quizDetail} />
         </div>
 
-        <LazyComponent>
           <Footer />
-        </LazyComponent>
       </div>
     </NotifyProvider>
   );

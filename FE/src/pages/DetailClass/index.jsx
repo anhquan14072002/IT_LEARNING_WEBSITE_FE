@@ -6,6 +6,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { getDocumentByGradeId } from "../../services/document.api";
 import Loading from "../../components/Loading";
 import NotifyProvider from "../../store/NotificationContext";
+import CustomCard from "../../components/DocumentCard";
 
 export default function DetailClass() {
   const footerRef = useRef(null);
@@ -65,13 +66,25 @@ export default function DetailClass() {
           </div>
 
           {documentList?.documents?.length > 0 && (
-            <Section
-              title="Tài liệu"
-              items={documentList.documents}
-              navigate={navigate}
-              pathPrefix="/document/"
-              showAllLink={`/search?classId=${id}`}
-            />
+            // <Section
+            //   title="Tài liệu"
+            //   items={documentList.documents}
+            //   navigate={navigate}
+            //   pathPrefix="/document/"
+            //   showAllLink={`/search?classId=${id}`}
+            // />
+            <section className="mb-14">
+              <h2 className="text-2xl font-bold mb-4 text-center text-blue-500">
+                Bộ sách
+              </h2>
+              <div className="flex justify-center">
+              {documentList?.documents?.map((item,index)=>{
+                return (
+               <CustomCard document={item} index={index} />
+                )
+              })}
+              </div>
+            </section>
           )}
 
           {documentList?.documents?.flatMap(

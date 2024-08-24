@@ -124,39 +124,55 @@ export default function AddQuizLesson({
     //     "topicId": 0,
     //     "lessonId": 0
     //   }
-    
+
     // Ensure tag is always an array
+    // const tagValues = (tag || []).map((item) => item.keyWord);
+
+    // let model = {
+    //   title: values?.title,
+    //   type: 1,
+    //   description: values?.description,
+    //   score: values?.score,
+    //   topicId: values?.topic.id,
+    //   {...tagValues.length > 0 && tagValues:tagValues,}
+    //   isActive: true,
+    // };
+    // if (values?.lesson && values?.lesson.id) {
+    //   model = {
+    //     title: values?.title,
+    //     type: 1,
+    //     description: values?.description,
+    //     score: values?.score,
+    //     topicId: null,
+    //     lessonId: values?.lesson.id,
+    //     tagValues:tagValues,
+    //     isActive: true,
+    //   };
+    // }
     const tagValues = (tag || []).map((item) => item.keyWord);
 
-    // Check if tagValues is empty
-    if (tagValues.length === 0) {
-      REJECT(toast, "Chưa chọn tag. Vui lòng chọn ít nhất một tag.");
-      setLoading(false);
-      return; // Exit the function if no tags are selected
-    }
-
-    
     let model = {
       title: values?.title,
       type: 1,
       description: values?.description,
       score: values?.score,
-      topicId: values?.topic.id,
-      tagValues:tagValues,
+      topicId: values?.topic?.id || null, // Default to null if topic.id is not present
       isActive: true,
     };
-    if (values?.lesson && values?.lesson.id) {
+
+    if (tagValues.length > 0) {
+      model.tagValues = tagValues;
+    }
+
+    if (values?.lesson?.id) {
       model = {
-        title: values?.title,
-        type: 1,
-        description: values?.description,
-        score: values?.score,
+        ...model,
         topicId: null,
-        lessonId: values?.lesson.id,
-        tagValues:tagValues,
-        isActive: true,
+        lessonId: values.lesson.id,
+        tagValues: tagValues, 
       };
     }
+
     console.log("model: " + model);
     restClient({
       url: "api/quiz/createquiz",
@@ -165,13 +181,13 @@ export default function AddQuizLesson({
     })
       .then((res) => {
         SUCCESS(toast, "Thêm bài quiz thành công");
-        setTag([])
+        setTag([]);
         fetchData();
         setLoading(false);
       })
       .catch((err) => {
         REJECT(toast, err.message);
-        setTag([])
+        setTag([]);
         setLoading(false);
       })
       .finally(() => {
@@ -345,9 +361,7 @@ export default function AddQuizLesson({
               />
               <div>
                 <>
-                  <span>
-                    Tag 
-                  </span><span className="text-red-600">*</span>
+                  <span>Tag</span>
                 </>
                 <MultiSelect
                   value={tag}
