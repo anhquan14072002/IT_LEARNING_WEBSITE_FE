@@ -28,10 +28,11 @@ function useQuery() {
 const Index = () => {
   const [selectClass, setSelectClass] = useState([]);
   const toast = useRef(null);
-  const query = useQuery();
-  const token = query.get("token");
+  const query = new URLSearchParams(location.search);
   const email = query.get("email");
   const navigate = useNavigate();
+  console.log(email);
+  
   const {
     control,
     handleSubmit,
@@ -41,22 +42,6 @@ const Index = () => {
     clearErrors,
   } = useForm();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await verifyEmail(token);
-
-        console.log(response.data.isSucceeded);
-
-        if (!response?.data?.isSucceeded) {
-          navigate("/checkmail");
-        }
-      } catch (error) {
-        console.error("Error verifying email:", error);
-      }
-    };
-    fetchData();
-  }, [token, navigate]);
 
   useEffect(() => {
     if (isSubmitted) {
