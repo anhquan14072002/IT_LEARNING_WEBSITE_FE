@@ -61,12 +61,13 @@ export function sendVerifyEmail(params) {
     },
   });
 }
-export function verifyEmail(token) {
+export function verifyEmail(email,token) {
   return restClient({
     url: `api/user/verifyEmail`,
     method: `GET`,
     params: {
-      token: token,
+      email: email,
+      token: token
     },
   });
 }

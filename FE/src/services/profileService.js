@@ -1,6 +1,6 @@
 import restClient from "./restClient";
 
-export function changePassword({ email, password, newPassword }) {
+export function changePassword({ email, password, newPassword,login }) {
   return restClient({
     url: "api/user/changepassword",
     method: "POST",
@@ -8,6 +8,7 @@ export function changePassword({ email, password, newPassword }) {
       email: email,
       password: password,
       newPassword: newPassword,
+      loginProvider:login
     },
   });
 }

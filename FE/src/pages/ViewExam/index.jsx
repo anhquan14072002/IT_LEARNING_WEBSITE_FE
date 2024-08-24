@@ -26,16 +26,23 @@ const Index = () => {
   const [competitionSearch, setCompetitionSearch] = useState("");
   const [yearList, setYearList] = useState([]);
   const [year, setYear] = useState("");
+  const [levelList, setLevelList] = useState([]);
+  const [level, setLevel] = useState("");
+  const [gradeList, setGradeList] = useState([]);
+  const [grade, setGrade] = useState("");
+  const [levelSearch, setLevelSearch] = useState("");
+  const [gradeSearch, setGradeSearch] = useState("");
 
   const fetchData = async () => {
     setLoading(true);
     const province = selectedProvince1 ? selectedProvince1 : "";
     const years = year ? year : "";
     const competition = competitionSearch ? competitionSearch : "";
-    const id = "id";
+    const level = levelSearch ? levelSearch : "";
+    const grade = gradeSearch ? gradeSearch : "";
     try {
       const res = await restClient({
-        url: `api/exam/getallexampagination?PageIndex=${page}&PageSize=${rows}&Province=${province}&Year=${years}&CompetitionId=${competition}&OrderBy=${id}&IsAscending=false`,
+        url: `api/exam/getallexampagination?PageIndex=${page}&PageSize=${rows}&Province=${province}&Year=${years}&CompetitionId=${competition}&LevelId=${level}&GradeId=${grade}&OrderBy=id&IsAscending=false&Status=true`,
         method: "GET",
       });
       const paginationData = JSON.parse(res.headers["x-pagination"]);
@@ -53,7 +60,7 @@ const Index = () => {
 
   useEffect(() => {
     fetchData();
-  }, [page, rows, selectedProvince, year, competitionSearch]);
+  }, [page, rows, selectedProvince, year, competitionSearch,levelSearch, gradeSearch]);
 
   useEffect(() => {
     if (province?.data) {
@@ -64,14 +71,19 @@ const Index = () => {
     }
     const fetchDataCompetition = async () => {
       try {
-        const response = await restClient({
-          url: "api/competition/getallcompetition",
-          method: "GET",
-        });
-        console.log(response?.data?.data);
-        setCompetitionList(
-          Array.isArray(response?.data?.data) ? response?.data?.data : []
-        );
+        const [competitionResponse, levelResponse, gradeResponse] =
+        await Promise.all([
+          restClient({
+            url: "api/competition/getallcompetition",
+            method: "GET",
+          }),
+          restClient({ url: "api/level/getalllevel", method: "GET" }),
+          restClient({ url: "api/grade/getallgrade?isInclude=false", method: "GET" }),
+        ]);
+
+      setCompetitionList(competitionResponse?.data?.data || []);
+      setLevelList(levelResponse?.data?.data || []);
+      setGradeList(gradeResponse?.data?.data || []);
       } catch (error) {
         console.log("error");
       }
@@ -96,11 +108,55 @@ const Index = () => {
     setCompetition(e.value?.title);
     setCompetitionSearch(e.value?.id);
   };
-
+  const handleLevel = (e) => {
+    setLevel(e.value?.title);
+    setLevelSearch(e.value?.id);
+  };
+  const handleGrade = (e) => {
+    setGrade(e.value?.title);
+    setGradeSearch(e.value?.id);
+  };
   const handleYear = (e) => {
     setYear(e.value?.year);
   };
-
+  const dropdownSearch = [
+    {
+      value: competition,
+      onChange: handleCompetition,
+      options: competitionList,
+      optionLabel: "title",
+      placeholder: "Cuộc Thi",
+    },
+    {
+      value: selectedProvince,
+      onChange: handleProvince,
+      options: provinceList,
+      optionLabel: "name",
+      placeholder: "Tỉnh",
+    },
+   
+    {
+      value: year,
+      onChange: handleYear,
+      options: yearList,
+      optionLabel: "year",
+      placeholder: "Năm",
+    },
+    {
+      value: level,
+      onChange: handleLevel,
+      options: levelList,
+      optionLabel: "title",
+      placeholder: "Cấp Học ",
+    },
+    {
+      value: grade,
+      onChange: handleGrade,
+      options: gradeList,
+      optionLabel: "title",
+      placeholder: "Lớp",
+    },
+  ];
   return (
     <NotifyProvider>
       <Header />
@@ -109,48 +165,26 @@ const Index = () => {
         <Loading />
       ) : (
         <div className="flex flex-col ">
-          <div className=" w-2/3 flex justify-between items-center mx-auto m-4">
-            <div>
-              <Dropdown
-                value={selectedProvince}
-                onChange={handleProvince}
-                options={provinceList}
-                optionLabel="name"
-                editable
-                placeholder="Tỉnh"
-                className="border border-black  rounded-xl  flex items-center w-fit py-2 gap-2.5 shadow-l custom-dropdown"
-                filter
-              />
-            </div>
-            <div>
-              <Dropdown
-                value={competition}
-                onChange={handleCompetition}
-                options={competitionList}
-                optionLabel="title"
-                editable
-                placeholder="Cuộc Thi"
-                className="border border-black  rounded-xl  flex items-center w-fit py-2 gap-2.5 shadow-l custom-dropdown"
-                filter
-              />
-            </div>
-            <div>
-              <Dropdown
-                value={year}
-                onChange={handleYear}
-                options={yearList}
-                optionLabel="year"
-                editable
-                placeholder="Năm"
-                className="border border-black  rounded-xl  flex items-center w-fit py-2 gap-2.5 shadow-l custom-dropdown"
-                filter
-              />
-            </div>
+          <h1 className="ml-8 text-2xl font-bold mb-5 mt-3">Danh Sách Các Đề Thi</h1>
+          <div className="w-full flex justify-center gap-10 items-center mx-auto m-4">
+            {dropdownSearch.map((config, index) => (
+              <div key={index}>
+                <Dropdown
+                  value={config.value}
+                  onChange={config.onChange}
+                  options={config.options}
+                  optionLabel={config.optionLabel}
+                  editable
+                  placeholder={config.placeholder}
+                  className="border border-gray-500 rounded-xl  shadow-l custom-dropdown"
+                  filter
+                />
+              </div>
+            ))}
           </div>
 
           {examList.length > 0 ? (
             examList
-              .filter((exam) => exam.isActive)
               .map((exam) => (
                 <CardExam id={exam.id} title={exam.title} type={exam.type} />
               ))
