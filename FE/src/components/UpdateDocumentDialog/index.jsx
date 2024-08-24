@@ -9,6 +9,7 @@ import { Button } from "primereact/button";
 import Loading from "../Loading";
 import restClient from "../../services/restClient";
 import { ACCEPT, REJECT, SUCCESS } from "../../utils";
+import { FileUpload } from "primereact/fileupload";
 
 const validationSchema = Yup.object({
   title: Yup.string().required("Tiêu đề không được bỏ trống"),
@@ -60,6 +61,7 @@ export default function UpdateDocumentDialog({
   const [bookCollectionList, setBookCollectionList] = useState([]);
   const [typeBookList, setTypeBookList] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [files, setFiles] = useState([]);
 
   useEffect(() => {
     const fetchGrades = async () => {
@@ -158,22 +160,35 @@ export default function UpdateDocumentDialog({
   const onSubmit = async (values, { setSubmitting }) => {
     setLoading(true);
     try {
-      const model = {
-        id: updateValue.id,
-        title: values.title,
-        gradeId: values.grade.id,
-        description: values.description,
-        isActive: true,
-        bookCollection: values.bookCollection.idNumber,
-        author: values.author,
-        publicationYear: values.publicationYear,
-        edition: values.edition,
-        typeOfBook: values.typeBook.idNumber,
-      };
+      const formData = new FormData();
+
+      if (files.length > 0 && files.some((file) => file.size > 2485760)) {
+        REJECT(toast, "Vui lòng chọn file nhỏ hơn hoặc bằng 2mb");
+        setLoading(false);
+        return;
+      } else if (
+        files.length > 0 &&
+        files.some((file) => file.size <= 2485760)
+      ) {
+        files.forEach((file) => {
+          formData.append("Image", file);
+        });
+      }
+
+      formData.append("Id", updateValue?.id);
+      formData.append("Title", values.title);
+      formData.append("GradeId", values.grade.id);
+      formData.append("Description", values.description);
+      formData.append("BookCollection", values.bookCollection.idNumber);
+      formData.append("Author", values.author);
+      formData.append("PublicationYear", values.publicationYear);
+      formData.append("Edition", values.edition);
+      formData.append("TypeOfBook", values.typeBook.idNumber);
+      formData.append("IsActive", true);
       await restClient({
         url: "api/document/updatedocument",
         method: "PUT",
-        data: model,
+        data: formData,
       });
       SUCCESS(toast, "Cập nhật tài liệu thành công");
       fetchData();
@@ -184,6 +199,10 @@ export default function UpdateDocumentDialog({
       setVisibleUpdate(false);
       setSubmitting(false);
     }
+  };
+
+  const onFileSelect = (e) => {
+    setFiles(e.files);
   };
 
   return (
@@ -218,6 +237,26 @@ export default function UpdateDocumentDialog({
                 options={gradeList}
               />
 
+              <div className="flex justify-between mb-1">
+                <h1>Ảnh sách</h1>
+              </div>
+              <div>
+                <FileUpload
+                  id="content"
+                  name="demo[]"
+                  url={"/api/upload"}
+                  accept="image/*"
+                  maxFileSize={2485760} // 2MB
+                  emptyTemplate={
+                    <p className="m-0">Drag and drop files here to upload.</p>
+                  }
+                  className="custom-file-upload mb-2"
+                  onRemove={() => setFiles([])}
+                  onSelect={onFileSelect}
+                  onClear={() => setFiles([])}
+                />
+              </div>
+
               {/* // */}
               <CustomDropdown
                 title="bộ sách"
@@ -250,7 +289,7 @@ export default function UpdateDocumentDialog({
               />
 
               <CustomTextInput
-                label="Phiên bản"
+                label="Tái bản lần thứ"
                 name="edition"
                 type="number"
                 id="edition"

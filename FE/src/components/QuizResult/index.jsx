@@ -13,7 +13,7 @@ const QuizResult = ({ totalQuestions, historyQuizzes, quizResult }) => {
 
   return (
     <div className="min-h-screen flex justify-center bg-gray-100 py-10">
-      <div className="bg-white w-3/4 rounded shadow-md h-4/5 p-20">
+      <div className="bg-white sm:w-3/4 rounded shadow-md h-4/5 p-20">
         <div className="text-center">
           <h2 className="text-xl font-bold mb-4">Kết quả</h2>
           <p className="mb-4">

@@ -7,25 +7,39 @@ const CustomCard = ({ document }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="w-full md:w-1/2 lg:w-1/3 xl:w-1/2 px-2 mb-4">
+    <div className="w-full md:w-1/2 lg:w-1/3 xl:w-1/4 px-4 mb-6">
       <div
-        className="overflow-hidden shadow-lg bg-white border rounded-lg border-gray-300 p-6 cursor-pointer"
+        className="bg-white border border-gray-300 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer transform hover:scale-105"
         onClick={() => navigate(`/document/${document?.id}`)}
       >
-        <div>
-          <p className="text-black hover:text-gray-500 text-2xl h-10 overflow-hidden text-ellipsis">
+        {/* Book Cover Image */}
+        <div className="relative h-48 bg-gray-200 rounded-t-lg overflow-hidden">
+          {/* Replace this placeholder with actual image if available */}
+          <img
+            src={document?.image || "https://via.placeholder.com/150"}
+            alt={document?.title}
+            className="w-full h-full object-cover"
+          />
+        </div>
+
+        {/* Book Title */}
+        <div className="p-4">
+          <p className="text-black text-2xl font-semibold h-16 overflow-hidden text-ellipsis">
             {document?.title}
           </p>
+          <p className="text-gray-600 text-sm mt-1">
+            {document?.author || "Unknown Author"}
+          </p>
         </div>
-        <div
-          className="flex items-center mt-3"
-          data-pr-tooltip="Điểm đánh giá và số lượt đánh giá"
-          data-pr-position="top"
-        >
-          <StarRating stars={document?.averageRating} />
-          <span className="ml-1 text-gray-600">{document?.totalReviewer}</span>
+
+        {/* Rating and Reviews */}
+        <div className="flex items-center justify-between p-4 border-t border-gray-300">
+          <div className="flex items-center" data-pr-tooltip="Điểm đánh giá và số lượt đánh giá" data-pr-position="top">
+            <StarRating stars={document?.averageRating} />
+            <span className="ml-2 text-gray-600">{document?.totalReviewer}</span>
+          </div>
+          <Tooltip target=".flex.items-center" />
         </div>
-        <Tooltip target=".flex.items-center.mt-3" />
       </div>
     </div>
   );

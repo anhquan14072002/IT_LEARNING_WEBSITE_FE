@@ -111,11 +111,11 @@ export default function ListPractice() {
           className="flex gap-5"
         >
           <div className="flex-1 w-[98%] pt-5">
-            <div className="m-4 mb-10 flex justify-between flex-wrap items-center">
+            <div className="m-4 mb-10 flex flex-wrap items-center gap-3 justify-center sm:justify-between">
               <div className="border-2 border-gray-600 rounded-md p-2">
                 <InputText
                   value={textSearch}
-                  placeholder="Search"
+                  placeholder="Tìm kiếm"
                   className="flex-1 focus:outline-none w-36 focus:ring-0"
                   onChange={(e) => {
                     setTextSearch(removeVietnameseTones(e.target.value));
@@ -141,7 +141,7 @@ export default function ListPractice() {
                 </select>
               </div>
             </div>
-            <div className="flex flex-wrap justify-start">
+            <div className="flex flex-wrap justify-center gap-1">
               {products.map((p, index) => (
                 <CustomPractice document={p} key={index} />
               ))}

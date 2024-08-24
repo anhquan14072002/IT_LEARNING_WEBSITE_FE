@@ -11,13 +11,13 @@ import { addUser } from "../../redux/userr/userSlice";
 
 // Define the validation schema with regex for password
 const validationSchema = Yup.object().shape({
-  email: Yup.string().required("Tài khoản là bắt buộc"),
+  email: Yup.string().required("Tài khoản không được bỏ trống"),
   password: Yup.string()
     .matches(
-      /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/,
-      "Mật khẩu phải ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt"
+      /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{6,}$/,
+      "Mật khẩu phải ít nhất 6 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt"
     )
-    .required("Mật khẩu là bắt buộc"),
+    .required("Mật khẩu không được bỏ trống"),
 });
 
 export default function About() {
@@ -35,7 +35,7 @@ export default function About() {
     if (role === "ContentManager") {
       return "/dashboard/lesson";
     }
-    return ""; 
+    return "";
   };
   const handleSubmit = async () => {
     // Reset errors
@@ -43,7 +43,10 @@ export default function About() {
     setPasswordError("");
 
     try {
-      await validationSchema.validate({ email, password }, { abortEarly: false });
+      await validationSchema.validate(
+        { email, password },
+        { abortEarly: false }
+      );
       const response = await loginWithRoleAdmin(email, password);
       if (response.data) {
         localStorage.setItem("accessToken", response.data.data.accessToken);
@@ -52,14 +55,14 @@ export default function About() {
         localStorage.setItem("userEmail", response.data.data.admin.email);
         const decodedToken = decodeToken(response?.data?.data?.accessToken);
         dispatch(addUser(decodedToken));
-        navigate(getNavigationPath(decodedToken.role))
+        navigate(getNavigationPath(decodedToken.role));
       } else {
         REJECT(toast, "Sai tài khoản hoặc mật khẩu");
       }
     } catch (error) {
       if (error.name === "ValidationError") {
         // Show validation error below the input fields
-        error.inner.forEach(err => {
+        error.inner.forEach((err) => {
           if (err.path === "email") {
             setEmailError(err.message);
           }
@@ -94,7 +97,9 @@ export default function About() {
             onChange={(e) => setEmail(e.target.value)}
             className="w-full border-gray-300 border-solid border shadow-none rounded-md py-2 px-3"
           />
-          {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
+          {emailError && (
+            <p className="text-red-500 text-sm mt-1">{emailError}</p>
+          )}
         </div>
         <br />
 
@@ -113,7 +118,9 @@ export default function About() {
             onChange={(e) => setPassword(e.target.value)}
             className="w-full border-gray-300 border-solid border rounded-md shadow-none py-2 px-3"
           />
-          {passwordError && <p className="text-red-500 text-sm mt-1">{passwordError}</p>}
+          {passwordError && (
+            <p className="text-red-500 text-sm mt-1">{passwordError}</p>
+          )}
         </div>
         <br />
         <Button

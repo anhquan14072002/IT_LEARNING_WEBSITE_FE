@@ -13,6 +13,13 @@ import {
 import Loading from "../../components/Loading";
 import { useNavigate } from "react-router-dom";
 import NotifyProvider from "../../store/NotificationContext";
+import Slider from "react-slick";
+import slide1 from "../../assets/anh1.jpg";
+import slide2 from "../../assets/anh2.jpg";
+import slide3 from "../../assets/anh3.jpg";
+import slide4 from "../../assets/anh4.jpg";
+import { useSelector } from "react-redux";
+import { isLoggedIn } from "../../utils";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -22,6 +29,18 @@ export default function Home() {
   const [classList, setListClass] = useState([]);
   const [documentList, setDocumentList] = useState([]);
   const [loadingGet, setLoadingGet] = useState(false);
+  const user = useSelector((state)=> state.user.value)
+
+  var settings = {
+    dots: true,
+    infinite: true,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+    autoplay: true,           
+    autoplaySpeed: 3000,     
+  };
+  
 
   useEffect(() => {
     setTimeout(() => {
@@ -30,6 +49,12 @@ export default function Home() {
       }
     }, 500);
   }, [fixedDivRef.current]);
+
+  useEffect(()=>{
+    if(isLoggedIn()){
+      console.log(user)
+    }
+  },[])
 
   useEffect(() => {
     getAllGrade(setLoading, setListClass);
@@ -50,9 +75,42 @@ export default function Home() {
 
             <div className="min-h-screen">
               <div
-                className="px-20"
+                className="sm:px-20"
                 style={{ paddingTop: `${fixedDivHeight}px` }}
               >
+                <div className="mt-5">
+                  <Slider {...settings}>
+                    <div>
+                      <img
+                        className="w-full h-48 md:h-64 lg:h-80 xl:h-[500px] object-center"
+                        src={slide1}
+                        alt="Slide"
+                      />
+                    </div>
+                    <div>
+                      <img
+                        className="w-full h-48 md:h-64 lg:h-80 xl:h-[500px] object-center"
+                        src={slide2}
+                        alt="Slide"
+                      />
+                    </div>
+                    <div>
+                      <img
+                        className="w-full h-48 md:h-64 lg:h-80 xl:h-[500px] object-center"
+                        src={slide3}
+                        alt="Slide"
+                      />
+                    </div>
+                    <div>
+                      <img
+                        className="w-full h-48 md:h-64 lg:h-80 xl:h-[500px] object-center"
+                        src={slide4}
+                        alt="Slide"
+                      />
+                      </div>
+                  </Slider>
+                </div>
+
                 <h1 className="mt-10 text-2xl font-bold">Bộ sách</h1>
                 <div>
                   {classList &&
@@ -61,11 +119,11 @@ export default function Home() {
                     })}
                 </div>
               </div>
-              <div className="px-20 mt-16 mb-10">
+              <div className="sm:px-20 mt-16 mb-10">
                 <h1 className="mt-10 text-2xl font-bold">
                   Tài liệu online cho giáo viên và học sinh
                 </h1>
-                <div className="my-5 flex justify-between">
+                <div className="my-5 flex flex-wrap justify-between">
                   <h1 className="text-gray-500">
                     Dành cho các học sinh từ lớp 1-12
                   </h1>
@@ -76,18 +134,18 @@ export default function Home() {
                     &gt;&gt; Xem tất cả khóa học
                   </h1>
                 </div>
-                <div className="flex flex-wrap justify-between gap-4 md:gap-3">
-                  {loadingGet ? (
-                    <div className="flex justify-center w-full">
-                      <Loading />
-                    </div>
-                  ) : (
-                    documentList &&
-                    documentList.map((document, index) => (
-                      <DocumentCard key={index} document={document} />
-                    ))
-                  )}
-                </div>
+              </div>
+              <div className="sm:px-20 flex flex-wrap justify-center gap-1">
+                {loadingGet ? (
+                  <div className="flex justify-center w-full">
+                    <Loading />
+                  </div>
+                ) : (
+                  documentList &&
+                  documentList.map((document, index) => (
+                    <DocumentCard key={index} document={document} />
+                  ))
+                )}
               </div>
             </div>
 

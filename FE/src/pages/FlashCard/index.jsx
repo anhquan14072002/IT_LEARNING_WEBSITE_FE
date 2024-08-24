@@ -75,7 +75,7 @@ export default function Quiz() {
 
         <div
           style={{ paddingTop: `${fixedDivHeight}px` }}
-          className="flex flex-col justify-center items-center gap-5 h-screen bg-gray-100"
+          className="flex flex-col justify-center items-center gap-5 h-screen bg-gray-100 mb-36"
         >
           {quiz && (
             <div className="text-center">

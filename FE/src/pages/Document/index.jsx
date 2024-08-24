@@ -108,7 +108,8 @@ export default function Document() {
         >
           <DocumentClass display={isDisplay} />
 
-          <div className="pt-6 flex-1">
+          {/* <div className="pt-6 flex-1"> */}
+          <div className="pt-6 basis-10/12">
             {documentDetailArrayList && (
               <>
                 <div className="min-h-screen">

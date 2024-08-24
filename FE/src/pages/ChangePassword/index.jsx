@@ -60,9 +60,9 @@ const Index = () => {
                   required: "Mật khẩu không được để trống",
                   pattern: {
                     value:
-                      /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/,
+                      /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{6,}$/,
                     message:
-                      "Mật khẩu cần ít nhất 8 ký tự, bao gồm chữ cái đầu viết hoa, số và ký tự đặc biệt",
+                      "Mật khẩu cần ít nhất 6 ký tự, bao gồm chữ cái đầu viết hoa, số và ký tự đặc biệt",
                   },
                 }}
                 render={({ field }) => (
@@ -96,9 +96,9 @@ const Index = () => {
                   required: "Mật khẩu không được để trống",
                   pattern: {
                     value:
-                      /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/,
+                      /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{6,}$/,
                     message:
-                      "Mật khẩu cần ít nhất 8 ký tự, bao gồm chữ cái đầu viết hoa, số và ký tự đặc biệt",
+                      "Mật khẩu cần ít nhất 6 ký tự, bao gồm chữ cái đầu viết hoa, số và ký tự đặc biệt",
                   },
                 }}
                 render={({ field }) => (
