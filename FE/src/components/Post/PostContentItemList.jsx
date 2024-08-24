@@ -8,8 +8,6 @@ import { useSelector } from "react-redux";
 function PostContentItemList() {
   const { posts, refresh } = useContext(PostContext);
   const user = useSelector((state) => state.user.value);
-  console.log("posts");
-  console.log(posts);
 
   return (
     <div className="flex flex-col gap-3" key={refresh}>

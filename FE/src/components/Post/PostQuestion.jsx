@@ -90,8 +90,11 @@ function PostQuestion({ post, isFavoritePost }) {
               <img
                 src={avatar || image}
                 alt="Ảnh người dùng"
-                width="30px"
-                style={{ borderRadius: "25px", height: "30px" }}
+                style={{
+                  borderRadius: "25px",
+                  height: "35px",
+                  maxWidth: "35px",
+                }}
                 className="rounded-full"
                 onError={(e) => (e.target.src = image)}
               />
