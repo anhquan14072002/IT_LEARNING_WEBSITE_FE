@@ -1,6 +1,6 @@
 import axios from "axios";
 
-export const BASE_URL = "http://localhost:8000";
+export const BASE_URL = "https://localhost:7000";
 export const BASE_URL_FE = "http://localhost:5173";
 
 export default function restClient({
@@ -15,6 +15,6 @@ export default function restClient({
     method,
     params,
     data,
-    headers 
+    headers
   })
 }

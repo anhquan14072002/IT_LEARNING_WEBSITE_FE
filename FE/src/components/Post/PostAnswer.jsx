@@ -121,8 +121,11 @@ const PostAnswer = ({ post }) => {
               <img
                 src={user?.picture || image}
                 alt="Ảnh người dùng"
-                width="30px"
-                style={{ borderRadius: "25px", height: "30px" }}
+                style={{
+                  borderRadius: "25px",
+                  height: "30px",
+                  maxWidth: "30px",
+                }}
               />
             </span>
             <span>
@@ -315,8 +318,11 @@ const Answer = ({
               <img
                 src={avatar || image}
                 alt="Ảnh người dùng"
-                width="30px"
-                style={{ borderRadius: "25px", height: "30px" }}
+                style={{
+                  borderRadius: "25px",
+                  height: "30px",
+                  maxWidth: "30px",
+                }}
               />
             </span>
             <span className="flex flex-col">
@@ -466,8 +472,11 @@ const SendAnswer = forwardRef(function SendAnswer(
                   <img
                     src={user?.picture || image}
                     alt="Ảnh người dùng"
-                    width="30px"
-                    style={{ borderRadius: "25px", height: "30px" }}
+                    style={{
+                      borderRadius: "25px",
+                      height: "30px",
+                      maxWidth: "30px",
+                    }}
                   />
                 </span>
                 <div className="flex-grow ml-2">
