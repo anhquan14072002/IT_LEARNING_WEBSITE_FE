@@ -109,7 +109,7 @@ const Index = () => {
       SUCCESS(toast, "Đăng kí thành công");
       setTimeout(() => navigate("/login"), 3000);
     } catch (error) {
-      REJECT(toast, "Không đăng kí được");
+      REJECT(toast, "Tên tài khoản đã tồn tại");
     }
   };
 
@@ -292,9 +292,9 @@ const Index = () => {
                     required: "Mật khẩu không được để trống",
                     pattern: {
                       value:
-                        /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/,
+                        /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{6,}$/,
                       message:
-                        "Mật khẩu cần chứa 8 ký tự, chữ cái đầu viết hoa, số và ký tự đặc biệt",
+                        "Mật khẩu cần chứa 6 ký tự, chữ cái đầu viết hoa, số và ký tự đặc biệt",
                     },
                   }}
                   render={({ field }) => (

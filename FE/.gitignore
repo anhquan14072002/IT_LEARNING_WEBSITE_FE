@@ -26,4 +26,4 @@ dist-ssr
 # Ignore restClient.jsx
 restClient.jsx
 restClientV2.jsx
-
+restClient.js
