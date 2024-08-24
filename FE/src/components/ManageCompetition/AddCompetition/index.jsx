@@ -10,7 +10,11 @@ import Loading from "../../Loading";
 import CustomEditor from "../../../shared/CustomEditor";
 
 const validationSchema = Yup.object({
-  title: Yup.string().required("Tiêu đề không được bỏ trống"),
+  title: Yup.string()
+    .required("Tiêu đề không được bỏ trống")
+    .min(5, "Tiêu đề phải có ít nhất 5 ký tự")
+    .max(50, "Tiêu đề không được vượt quá 50 ký tự"),
+  description: Yup.string().required("Mô tả không được bỏ trống"),
 });
 
 export default function AddCompetition({
