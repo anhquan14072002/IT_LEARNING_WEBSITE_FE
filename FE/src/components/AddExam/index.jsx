@@ -15,6 +15,7 @@ import { MultiSelect } from "primereact/multiselect";
 import "./index.css";
 import { Dropdown } from "primereact/dropdown";
 import { years } from "../../services/year";
+import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
 
 const baseValidationSchema = Yup.object({
   competition: Yup.object()
@@ -37,13 +38,8 @@ const baseValidationSchema = Yup.object({
       return Object.keys(value).length !== 0;
     })
     .required("Không bỏ trống trường này"),
-  grade: Yup.object().test(
-    "is-not-empty",
-    "Không được để trống trường này",
-    (value) => {
-      return Object.keys(value).length !== 0;
-    }
-  ),
+  grade: Yup.object().nullable(),
+  level: Yup.object().nullable(),
 });
 
 export default function AddExam({
@@ -60,56 +56,76 @@ export default function AddExam({
   const [competitionList, setCompetitionList] = useState([]);
   const [tagList, setTagList] = useState([]);
   const [gradeList, setGradeList] = useState([]);
+  const [levelList, setLevelList] = useState([]);
   const [tag, setTag] = useState(null);
+  const [levelId, setLevelId] = useState(null);
   const [yearList, setYearList] = useState([]);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        // Fetch competition list
-        const competitionResponse = await restClient({
-          url: "api/competition/getallcompetition",
-          method: "GET",
-        });
-        console.log(competitionResponse?.data?.data);
-        setCompetitionList(
-          Array.isArray(competitionResponse?.data?.data)
-            ? competitionResponse?.data?.data
-            : []
-        );
+        const [competitionResponse, levelResponse, tagResponse] =
+          await Promise.all([
+            restClient({
+              url: "api/competition/getallcompetition",
+              method: "GET",
+            }),
+            restClient({ url: "api/level/getalllevel", method: "GET" }),
+            restClient({ url: "api/tag/getalltag", method: "GET" }),
+          ]);
 
-        // Fetch tag list
-        const tagResponse = await restClient({
-          url: "api/tag/getalltag",
-          method: "GET",
-        });
-        console.log(tagResponse?.data?.data);
-        setTagList(
-          Array.isArray(tagResponse?.data?.data) ? tagResponse?.data?.data : []
-        );
-
-        // Fetch grade list
-        const gradeResponse = await restClient({
-          url: "api/grade/getallgrade?isInclude=false",
-          method: "GET",
-        });
-        console.log(gradeResponse?.data?.data);
-        setGradeList(
-          Array.isArray(gradeResponse?.data?.data)
-            ? gradeResponse?.data?.data
-            : []
-        );
+        setCompetitionList(competitionResponse?.data?.data || []);
+        setLevelList(levelResponse?.data?.data || []);
+        setTagList(tagResponse?.data?.data || []);
       } catch (error) {
         console.error("An error occurred:", error);
       }
     };
+
     if (province?.data) {
       setProvinceList(province.data);
     }
+    if (years) {
+      setYearList(years);
+    }
 
-    // Call the fetchData function
     fetchData();
-  }, [province]);
+  }, []);
+  const handleOnChangeLevel = async (e, helpers, setTouchedState, props) => {
+    const level = e.target.value;
+
+    // If level or level.id is undefined, reset the grade list and form field
+    if (!level || !level.id) {
+      setGradeList([]);
+      helpers.setValue({});
+      setTouchedState(true); // Mark the field as touched
+      if (props.onChange) {
+        props.onChange(e); // Call the parent's onChange handler if provided
+      }
+      return; // Exit early
+    }
+
+    // Set the selected value
+    helpers.setValue(level);
+    setTouchedState(true); // Mark the field as touched
+
+    // Call the parent's onChange handler if provided
+    if (props.onChange) {
+      props.onChange(e);
+    }
+
+    // Fetch the grades based on the selected level
+    try {
+      const res = await restClient({
+        url: `api/grade/getallgradebylevelid?levelId=${level.id}`,
+        method: "GET",
+      });
+      setGradeList(res.data.data || []); // Set the grade list, or an empty array if data is undefined
+    } catch (err) {
+      setGradeList([]); // Reset the grade list on error
+      console.error("Failed to fetch grades:", err);
+    }
+  };
 
   const [initialValues, setInitialValues] = useState({
     competition: {},
@@ -120,16 +136,13 @@ export default function AddExam({
     numberQuestion: "",
     files: [],
     grade: {},
-  });
-  useEffect(() => {
-    if (years) {
-      setYearList(years);
-    }
+    level: {},
   });
 
   const onSubmit = async (values, { resetForm }) => {
     setLoading(true);
     console.log(files);
+    console.log(values.level.id);
 
     const formData = new FormData();
     formData.append("Type", types);
@@ -140,7 +153,11 @@ export default function AddExam({
     formData.append("NumberQuestion", values.numberQuestion || 0);
     formData.append("Year", values.year.year);
     formData.append("isActive", false);
-    formData.append("GradeId", values.grade.id);
+    if (values.grade && values.grade.id) {
+      formData.append("GradeId", values.grade.id);
+    } else if (values.level && values.level.id) {
+      formData.append("LevelId", values.level.id);
+    }
     if (tag && tag.length > 0) {
       tag.forEach((item, index) => {
         formData.append(`tagValues[${index}]`, item.keyWord);
@@ -181,7 +198,7 @@ export default function AddExam({
   const validationSchema =
     types === 2
       ? baseValidationSchema.shape({
-          numberQuestion: Yup.number().required("Không được bỏ trống"),
+          numberQuestion: Yup.number().required("Không được bỏ trống").max(200, "Số lượng câu hỏi không được lớn hơn 200"),
         })
       : baseValidationSchema.shape({
           files: Yup.array()
@@ -229,21 +246,6 @@ export default function AddExam({
                 options={competitionList}
               />
               <CustomDropdown
-                title="Lớp"
-                label={
-                  <>
-                    <span>Lớp</span>
-                  </>
-                }
-                is
-                customTitle="title"
-                id="grade"
-                name="grade"
-                isNotRequired="false"
-                options={gradeList}
-              />
-
-              <CustomDropdown
                 title="Tỉnh"
                 label={
                   <>
@@ -255,6 +257,47 @@ export default function AddExam({
                 name="province"
                 options={provinceList}
               />
+              <CustomDropdown
+                title="Năm"
+                label={
+                  <>
+                    <span>Năm</span>
+                  </>
+                }
+                customTitle="year"
+                id="year"
+                name="year"
+                options={yearList}
+              />
+              <CustomDropdownInSearch
+                title="Khối"
+                label={
+                  <>
+                    <span>Khối</span>
+                  </>
+                }
+                customTitle="title"
+                id="level"
+                name="level"
+                isNotRequired="false"
+                options={levelList}
+                handleOnChange={handleOnChangeLevel}
+              />
+              <CustomDropdown
+                title="Lớp"
+                label={
+                  <>
+                    <span>Lớp</span>
+                  </>
+                }
+                disabled={!levelList || levelList.length === 0}
+                customTitle="title"
+                id="grade"
+                name="grade"
+                isNotRequired="false"
+                options={gradeList}
+              />
+
               <div>
                 <>
                   <span>Tag</span>
@@ -270,18 +313,7 @@ export default function AddExam({
                   filter
                 />
               </div>
-              <CustomDropdown
-                title="Năm"
-                label={
-                  <>
-                    <span>Năm</span>
-                  </>
-                }
-                customTitle="year"
-                id="year"
-                name="year"
-                options={yearList}
-              />
+
               {types === 2 && (
                 <CustomTextInput
                   label={
