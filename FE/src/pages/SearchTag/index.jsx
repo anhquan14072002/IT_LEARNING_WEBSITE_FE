@@ -36,7 +36,7 @@ export default function SearchTag() {
         .then((res) => {
           restClient({
             url:
-              "api/tag/searchtagpagination?TagValue=" + res?.data?.data?.title,
+              "api/tag/searchtagpagination?TagValue=" + res?.data?.data?.keyWord,
           })
             .then((res) => {
               setData(res?.data?.data);

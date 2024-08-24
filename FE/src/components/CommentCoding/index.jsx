@@ -9,16 +9,16 @@ import { isLoggedIn } from "../../utils";
 import { useNavigate } from "react-router-dom";
 import AddSolution from "../AddSolution";
 import { Toast } from "primereact/toast";
-import { useSelector } from "react-redux";
 import { Paginator } from "primereact/paginator";
 import restClient from "../../services/restClient";
+import { Tooltip } from "primereact/tooltip";
 
 export default function CommentCoding({ id }) {
   const navigate = useNavigate();
   const toast = useRef(null);
   const [isVisibleAdd, setIsVisibleAdd] = useState(false);
   const [solutions, setSolutions] = useState([]);
-  const [isVisibleUpdate, setIsVisibleUpdate] = useState(false); // Add functionality for update if needed
+  const [isVisibleUpdate, setIsVisibleUpdate] = useState(false);
 
   // Pagination
   const [first, setFirst] = useState(0);
@@ -67,53 +67,54 @@ export default function CommentCoding({ id }) {
         id={id}
         fetchSolutions={fetchSolutions}
       />
-      <div>
+      <div className="mb-4">
         {isLoggedIn() ? (
           <Button
             className="pi pi-plus bg-green-600 p-2 rounded-lg text-white hover:bg-green-400"
             onClick={() => setIsVisibleAdd(true)}
           >
-            Thêm lời giải
+            Thêm bình luận
           </Button>
         ) : (
           <Button
             className="bg-green-600 p-2 rounded-lg text-white hover:bg-green-400"
             onClick={() => navigate("/login")}
           >
-            Vui lòng đăng nhập để có thể thêm lời giải
+            Vui lòng đăng nhập để có thể thêm bình luận
           </Button>
         )}
       </div>
       <div>
-        <h2>Danh sách lời giải</h2>
+        <h2 className="text-2xl font-semibold mb-4">Danh sách bình luận</h2>
         {solutions.length > 0 ? (
           <>
             <ul>
               {solutions.map((solution) => (
                 <li
                   key={solution.id}
-                  className="mb-4 p-4 border border-gray-300 rounded-lg"
+                  className="mb-4 p-4 border border-gray-300 rounded-lg overflow-hidden"
                 >
                   <div className="flex gap-5 flex-wrap mb-5">
-                    <div>
+                    <div className="flex-shrink-0">
+                      <Tooltip target=".my-tooltip" content={solution?.fullName} />
                       <img
-                        src={solution.image}
-                        alt={solution.fullName}
-                        className="w-16 h-16 rounded-full"
+                        src={solution?.image}
+                        alt={solution?.fullName}
+                        className="w-16 h-16 rounded-full my-tooltip object-cover"
                       />
                     </div>
-                    <div>
-                      <h3 className="font-bold text-xl">{solution.title}</h3>
+                    <div className="flex-1 min-w-0 w-full max-w-md">
+                      <h3 className="font-bold text-xl break-words">{solution.title}</h3>
                     </div>
                   </div>
                   <div
+                    className="w-full break-words"
                     dangerouslySetInnerHTML={{
                       __html: solution.description,
                     }}
                   />
-                  <pre>
+                  <pre className="mt-4">
                     <CodeMirror
-                      className=""
                       value={atob(solution.coding)}
                       options={{
                         theme: "material",
@@ -127,13 +128,13 @@ export default function CommentCoding({ id }) {
             <Paginator
               first={first}
               rows={rows}
-              totalRecords={totalPage * rows} // Total records should be calculated based on total pages and rows per page
+              totalRecords={totalPage * rows}
               onPageChange={onPageChange}
               className="custom-paginator mx-auto"
             />
           </>
         ) : (
-          <p>Chưa có lời giải nào</p>
+          <p>Chưa có bình luận nào</p>
         )}
       </div>
     </div>

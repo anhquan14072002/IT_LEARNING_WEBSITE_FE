@@ -12,6 +12,7 @@ import { REJECT, SUCCESS } from "../../utils";
 import restClient from "../../services/restClient";
 import Loading from "../Loading";
 import CustomDropdown from "../../shared/CustomDropdown";
+import { FileUpload } from "primereact/fileupload";
 
 const validationSchema = Yup.object({
   title: Yup.string().required("Tiêu đề không được bỏ trống"),
@@ -62,6 +63,7 @@ export default function AddDocumentDialog({
   const [bookCollectionList, setBookCollectionList] = useState([]);
   const [typeBookList, setTypeBookList] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [files, setFiles] = useState([]);
 
   useEffect(() => {
     restClient({ url: "api/grade/getallgrade?isInclude=false", method: "GET" })
@@ -91,7 +93,9 @@ export default function AddDocumentDialog({
           title: item.name,
           idNumber: item.value,
         }));
-        setBookCollectionList(Array.isArray(transformedData) ? transformedData : []);
+        setBookCollectionList(
+          Array.isArray(transformedData) ? transformedData : []
+        );
       })
       .catch((err) => {
         setBookCollectionList([]);
@@ -99,23 +103,35 @@ export default function AddDocumentDialog({
   }, []);
 
   const onSubmit = (values) => {
+    const formData = new FormData();
+
+    if (files.length === 0) {
+      REJECT(toast, "Vui lòng chọn file để tải lên");
+      return;
+    }
+    if (files.some((file) => file.size > 2485760)) {
+      REJECT(toast, "Vui lòng chọn file nhỏ hơn hoặc bằng 2mb");
+      return;
+    }
+    files.forEach((file) => {
+      formData.append("Image", file);
+    });
+
     setLoading(true);
     // const model = { ...values, isActive: true };
-    const model = {
-      title: values.title,
-      gradeId: values.grade.id,
-      description: values.description,
-      bookCollection: values.bookCollection.idNumber,
-      author: values.author,
-      publicationYear: values.publicationYear,
-      edition: values.edition,
-      typeOfBook: values.typeBook.idNumber,
-      isActive: true,
-    };
+    formData.append("title", values.title);
+    formData.append("gradeId", values.grade.id);
+    formData.append("description", values.description);
+    formData.append("bookCollection", values.bookCollection.idNumber);
+    formData.append("author", values.author);
+    formData.append("publicationYear", values.publicationYear);
+    formData.append("edition", values.edition);
+    formData.append("typeOfBook", values.typeBook.idNumber);
+    formData.append("isActive", true);
     restClient({
       url: "api/document/createdocument",
       method: "POST",
-      data: model,
+      data: formData,
     })
       .then((res) => {
         SUCCESS(toast, "Thêm tài liệu thành công");
@@ -128,7 +144,12 @@ export default function AddDocumentDialog({
       })
       .finally(() => {
         setVisible(false);
+        setFiles([])
       });
+  };
+
+  const onFileSelect = (e) => {
+    setFiles(e.files);
   };
 
   return (
@@ -175,6 +196,28 @@ export default function AddDocumentDialog({
                 options={bookCollectionList}
               />
 
+              <div className="flex justify-between mb-1">
+                <h1>
+                  Ảnh sách<span className="text-red-500">*</span>
+                </h1>
+              </div>
+              <div>
+                <FileUpload
+                  id="content"
+                  name="demo[]"
+                  url={"/api/upload"}
+                  accept="image/*"
+                  maxFileSize={2485760} // 2MB
+                  emptyTemplate={
+                    <p className="m-0">Drag and drop files here to upload.</p>
+                  }
+                  className="custom-file-upload mb-2"
+                  onRemove={()=>setFiles([])}
+                  onSelect={onFileSelect}
+                  onClear={()=>setFiles([])}
+                />
+              </div>
+
               <CustomDropdown
                 title="loại sách"
                 label="Loại sách"
@@ -198,7 +241,7 @@ export default function AddDocumentDialog({
               />
 
               <CustomTextInput
-                label="Phiên bản"
+                label="Tái bản lần thứ"
                 name="edition"
                 type="number"
                 id="edition"

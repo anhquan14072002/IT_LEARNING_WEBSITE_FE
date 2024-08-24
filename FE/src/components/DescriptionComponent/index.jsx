@@ -20,7 +20,7 @@ export default function DescriptionComponent({ id }) {
         Tiêu đề : {problem?.title}
       </h1>
       <p className="text-lg mb-4">
-        <strong>Độ khó:</strong> {problem?.difficulty}
+        <strong>Độ khó:</strong> {problem?.difficulty === 1 ? "Dễ" : problem?.difficulty === 2 ? "Trung bình" : problem?.difficulty === 3 && "Khó"}
       </p>
       <p className="text-lg mb-4">
         <strong>Nội dung:</strong>

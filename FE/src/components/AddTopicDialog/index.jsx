@@ -97,21 +97,27 @@ export default function AddTopicDialog({
     // Ensure tag is always an array
     const tagValues = (tag || []).map((item) => item.keyWord);
 
+    let model;
+
     // Check if tagValues is empty
     if (tagValues.length === 0) {
-      REJECT(toast, "Chưa chọn tag. Vui lòng chọn ít nhất một tag.");
-      setLoading(false);
-      return; // Exit the function if no tags are selected
+      model = {
+        title: values.title,
+        objectives: values.objectives,
+        description: values.description,
+        documentId: values.document.id,
+        isActive: true,
+      };
+    } else if (tagValues.length > 0) {
+      model = {
+        title: values.title,
+        objectives: values.objectives,
+        description: values.description,
+        documentId: values.document.id,
+        tagValues: tagValues,
+        isActive: true,
+      };
     }
-
-    const model = {
-      title: values.title,
-      objectives: values.objectives,
-      description: values.description,
-      documentId: values.document.id,
-      tagValues: tagValues,
-      isActive: true,
-    };
     restClient({
       url: "api/topic/createtopic",
       method: "POST",
@@ -204,7 +210,7 @@ export default function AddTopicDialog({
               </CustomTextarea>
               <div>
                 <>
-                  <span>Tag</span><span className="text-red-600">*</span>
+                  <span>Tag</span>
                 </>
                 <MultiSelect
                   value={tag}
