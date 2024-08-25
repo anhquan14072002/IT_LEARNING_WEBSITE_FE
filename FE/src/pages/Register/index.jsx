@@ -28,10 +28,11 @@ function useQuery() {
 const Index = () => {
   const [selectClass, setSelectClass] = useState([]);
   const toast = useRef(null);
-  const query = useQuery();
-  const token = query.get("token");
+  const query = new URLSearchParams(location.search);
   const email = query.get("email");
   const navigate = useNavigate();
+  console.log(email);
+  
   const {
     control,
     handleSubmit,
@@ -41,22 +42,6 @@ const Index = () => {
     clearErrors,
   } = useForm();
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await verifyEmail(token);
-
-        console.log(response.data.isSucceeded);
-
-        if (!response?.data?.isSucceeded) {
-          navigate("/checkmail");
-        }
-      } catch (error) {
-        console.error("Error verifying email:", error);
-      }
-    };
-    fetchData();
-  }, [token, navigate]);
 
   useEffect(() => {
     if (isSubmitted) {
@@ -109,7 +94,7 @@ const Index = () => {
       SUCCESS(toast, "Đăng kí thành công");
       setTimeout(() => navigate("/login"), 3000);
     } catch (error) {
-      REJECT(toast, "Không đăng kí được");
+      REJECT(toast, "Tên tài khoản đã tồn tại");
     }
   };
 
@@ -292,9 +277,9 @@ const Index = () => {
                     required: "Mật khẩu không được để trống",
                     pattern: {
                       value:
-                        /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/,
+                        /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{6,}$/,
                       message:
-                        "Mật khẩu cần chứa 8 ký tự, chữ cái đầu viết hoa, số và ký tự đặc biệt",
+                        "Mật khẩu cần chứa 6 ký tự, chữ cái đầu viết hoa, số và ký tự đặc biệt",
                     },
                   }}
                   render={({ field }) => (

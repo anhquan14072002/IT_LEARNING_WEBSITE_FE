@@ -1,0 +1,10 @@
+.p-inputotp-input {
+    border: 2px solid #464545; 
+    border-radius: 8px; 
+    padding: 8px; 
+    outline: none; /* Remove default outline */
+    transition: border-color 0.3s ease-in-out; /* Smooth transition for border color */
+    box-shadow: none;
+    color: rgb(0, 0, 0);
+  }
+  

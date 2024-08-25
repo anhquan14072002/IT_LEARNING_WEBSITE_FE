@@ -225,9 +225,8 @@ function ComposeComment({ ...props }) {
             <img
               src={user?.picture || image}
               alt="Ảnh người dùng"
-              width="30px"
               className="rounded-full"
-              style={{ borderRadius: "25px", height: "30px" }}
+              style={{ borderRadius: "25px", height: "30px", maxWidth: "30px" }}
               onError={(e) => (e.target.src = image)}
             />
           </span>
@@ -237,8 +236,7 @@ function ComposeComment({ ...props }) {
             <img
               src={image}
               alt="Ảnh người dùng"
-              width="30px"
-              style={{ borderRadius: "25px", height: "30px" }}
+              style={{ borderRadius: "25px", height: "30px", maxWidth: "30px" }}
             />
           </span>
         )}

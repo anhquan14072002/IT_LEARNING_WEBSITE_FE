@@ -14,6 +14,7 @@ import restClient from "../../services/restClient";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
 import NotifyProvider from "../../store/NotificationContext";
+import Menu from "../../components/Menu";
 
 const ExamDetail = () => {
   const toast = useRef(null);
@@ -23,6 +24,7 @@ const ExamDetail = () => {
   const [examList, setExamList] = useState([]);
   const [selectedExamCode, setSelectedExamCode] = useState([]);
   const newPlugin = defaultLayoutPlugin();
+  const [tagList, setTagList] = useState([]);
   const { id } = useParams();
   const navigate = useNavigate();
   const userId = localStorage.getItem("userId");
@@ -36,6 +38,9 @@ const ExamDetail = () => {
         setViewPdf(response?.data?.data[0].examFile);
         initializeAnswers(response?.data?.data?.numberQuestion);
         console.log(response?.data?.data[0]?.numberQuestion);
+
+        const tagResponse = await restClient({ url: `api/exam/getexamidbytag/${id}`, method: "GET" });
+        setTagList(tagResponse?.data?.data);
       } catch (error) {
         console.error("Error fetching exam:", error);
       }
@@ -116,7 +121,8 @@ const ExamDetail = () => {
   return (
     <NotifyProvider>
       <Toast ref={toast} />
-      <Header />
+              <Header />
+              <Menu />
       <div className="m-4 ">
         <div className="text-2xl font-semibold mb-4 flex flex-col  ">
           <div className="mb-5"> {data?.examTitle}</div>
@@ -284,6 +290,24 @@ const ExamDetail = () => {
           )}
           {/* Right frame containing the answer choices */}
         </div>
+        {tagList.length > 0 && (
+                  <div className="mt-6 flex">
+                    <span className="block font-semibold mr-3">
+                      Các từ khóa liên quan:
+                    </span>
+                    <div className="flex flex-wrap gap-3">
+                      {tagList.map((tag) => (
+                        <div
+                          key={tag.id}
+                          className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full shadow-sm hover:bg-blue-200 transition-colors cursor-pointer"
+                          onClick={()=>navigate('/searchTag/' + tag.id)}
+                        >
+                          {tag.title}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
       </div>
     </NotifyProvider>
   );

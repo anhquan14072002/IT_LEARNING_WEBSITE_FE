@@ -20,6 +20,7 @@ import { province } from "../../services/province";
 import { MultiSelect } from "primereact/multiselect";
 import { Dropdown } from "primereact/dropdown";
 import { years } from "../../services/year";
+import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
 // import "./index.css";
 
 const baseValidationSchema = Yup.object({
@@ -43,13 +44,10 @@ const baseValidationSchema = Yup.object({
       return Object.keys(value).length !== 0;
     })
     .required("Không bỏ trống trường này"),
-  grade: Yup.object().test(
-    "is-not-empty",
-    "Không được để trống trường này",
-    (value) => {
-      return Object.keys(value).length !== 0;
-    }
-  ),
+    grade: Yup.object()
+    .nullable(),
+  level: Yup.object()
+    .nullable(),
 });
 
 export default function UpdateExam({
@@ -69,9 +67,11 @@ export default function UpdateExam({
   const [competitionList, setCompetitionList] = useState([]);
   const [competitionById, setCompetitionById] = useState([]);
   const [gradeItem, setGradeItem] = useState([]);
+  const [levelItem, setLevelItem] = useState([]);
   const [tagList, setTagList] = useState([]);
   const [tag, setTag] = useState(null);
   const [gradeList, setGradeList] = useState([]);
+  const [levelList, setLevelList] = useState([]);
   const [yearList, setYearList] = useState([]);
   const [initialValues, setInitialValues] = useState({
     competition: {},
@@ -81,55 +81,47 @@ export default function UpdateExam({
     year: {},
     numberQuestion: "",
     grade: {},
+    level:{}
   });
+console.log(updateValue);
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const competitionPromise = updateValue?.competitionId
-          ? restClient({
-              url: `api/competition/getcompetitionbyid?id=${updateValue.competitionId}`,
-              method: "GET",
-            })
-          : null;
-
-        const gradePromise = updateValue?.gradeId
-          ? restClient({
-              url: `api/grade/getgradebyid/${updateValue?.gradeId}?isInclude=false`,
-              method: "GET",
-            })
-          : null;
-
         const [competitionResponse, gradeResponse] = await Promise.all([
-          competitionPromise,
-          gradePromise,
+          updateValue?.competitionId
+            ? restClient({
+                url: `api/competition/getcompetitionbyid?id=${updateValue.competitionId}`,
+                method: "GET",
+              })
+            : Promise.resolve(null),
+          updateValue?.gradeId
+            ? restClient({
+                url: `api/grade/getallgradebylevelid?levelId=${level.id}`,
+                method: "GET",
+              })
+            : Promise.resolve(null),
         ]);
-
+  
         if (competitionResponse) {
-          setCompetitionById(competitionResponse?.data?.data || []);
+          setCompetitionById(competitionResponse.data?.data || []);
         }
-
+  
         if (gradeResponse) {
-          console.log("+++++++++++++++++++++++++++++++++++++++++");
-          console.log(gradeResponse?.data?.data);
-          console.log(
-            `api/grade/getgradebyid/${updateValue?.gradeId}?isInclude=false`
-          );
-          console.log("+++++++++++++++++++++++++++++++++++++++++");
-
-          setGradeItem(gradeResponse?.data?.data || []);
+          console.log("Grade Response Data:", gradeResponse.data?.data);
+          setGradeItem(gradeResponse.data?.data || []);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
-
+  
     fetchData();
-
     if (years) {
       setYearList(years);
     }
   }, [updateValue, years]);
+  
 
   useEffect(() => {
     const province = getProvinceByName(updateValue?.province);
@@ -145,6 +137,7 @@ export default function UpdateExam({
         year: year || {}, // Ensure `year` is set to an object or default to empty object
         numberQuestion: updateValue?.numberQuestion || "",
         grade: gradeItem,
+        level:levelItem
       }));
     }
   }, [competitionById, updateValue]);
@@ -274,8 +267,9 @@ export default function UpdateExam({
                 name="title"
                 type="text"
               />
+
               <CustomDropdown
-                title="Cuộc thi"
+                title="Chọn Cuộc Thi"
                 label={
                   <>
                     <span>Cuộc Thi</span>
@@ -287,21 +281,7 @@ export default function UpdateExam({
                 options={competitionList}
               />
               <CustomDropdown
-                title="Lớp"
-                label={
-                  <>
-                    <span>Lớp</span>
-                  </>
-                }
-                isNotRequired="false"
-                customTitle="title"
-                id="grade"
-                name="grade"
-                options={gradeList}
-              />
-
-              <CustomDropdown
-                title={updateValue.province ? updateValue.province : "Tỉnh"}
+                title="Tỉnh"
                 label={
                   <>
                     <span>Tỉnh</span>
@@ -311,6 +291,46 @@ export default function UpdateExam({
                 id="province"
                 name="province"
                 options={provinceList}
+              />
+              <CustomDropdown
+                title="Năm"
+                label={
+                  <>
+                    <span>Năm</span>
+                  </>
+                }
+                customTitle="year"
+                id="year"
+                name="year"
+                options={yearList}
+              />
+              <CustomDropdownInSearch
+                title="Khối"
+                label={
+                  <>
+                    <span>Khối</span>
+                  </>
+                }
+                customTitle="title"
+                id="level"
+                name="level"
+                isNotRequired="false"
+                options={levelList}
+                handleOnChange={handleOnChangeLevel}
+              />
+              <CustomDropdown
+                title="Lớp"
+                label={
+                  <>
+                    <span>Lớp</span>
+                  </>
+                }
+                disabled={!levelList || levelList.length === 0}
+                customTitle="title"
+                id="grade"
+                name="grade"
+                isNotRequired="false"
+                options={gradeList}
               />
               <div>
                 <>

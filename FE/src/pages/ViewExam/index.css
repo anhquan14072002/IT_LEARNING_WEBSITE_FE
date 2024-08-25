@@ -2,7 +2,7 @@
 .custom-dropdown {
     border: 10px solid #0a0f14; /* Đổi màu border thành xanh dương */
     border-radius: 0.5rem; /* Bo tròn các góc của Dropdown */
-    width: 100%; /* Đảm bảo chiều rộng là 100% của phần tử chứa */
+ 
     max-width: 400px; /* Đặt chiều rộng tối đa cho Dropdown */
     padding: 0.5rem 1rem; /* Thêm padding bên trong Dropdown */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Thêm hiệu ứng bóng cho Dropdown */
