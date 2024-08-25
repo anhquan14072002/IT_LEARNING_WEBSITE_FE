@@ -258,7 +258,7 @@ export default function UpdateExam({
               <CustomDropdown
                 title="Lớp"
                 label="Lớp"
-                disabled={!levelList.length}
+                disabled={!gradeList || gradeList.length === 0}
                 customTitle="title"
                 id="grade"
                 name="grade"
