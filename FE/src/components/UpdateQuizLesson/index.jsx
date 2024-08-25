@@ -7,7 +7,7 @@ import CustomSelectInput from "../../shared/CustomSelectInput";
 import CustomTextarea from "../../shared/CustomTextarea";
 import { Button } from "primereact/button";
 import CustomEditor from "../../shared/CustomEditor";
-import { REJECT, SUCCESS } from "../../utils";
+import { getTokenFromLocalStorage, REJECT, SUCCESS } from "../../utils";
 import restClient from "../../services/restClient";
 import Loading from "../Loading";
 import { Dropdown } from "primereact/dropdown";
@@ -16,7 +16,11 @@ import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
 import { MultiSelect } from "primereact/multiselect";
 
 const validationSchema = Yup.object({
-  title: Yup.string().required("Tiêu đề không được bỏ trống"),
+  title: Yup.string()
+    .trim()
+    .required("Tiêu đề không được bỏ trống")
+    .min(5, "Tiêu đề phải có ít nhất 5 ký tự")
+    .max(250, "Tiêu đề không được vượt quá 250 ký tự"),
   description: Yup.string().required("Mô tả không được bỏ trống"),
   score: Yup.number()
     .required("Điểm không được bỏ trống và lớn hơn 0")
@@ -229,6 +233,7 @@ export default function UpdateQuizLesson({
       type: 1,
       description: values.description,
       score: values.score,
+      gradeId: values?.grade?.id,
       topicId: values.topic.id,
       tagValues,
       isActive: true,
@@ -250,6 +255,9 @@ export default function UpdateQuizLesson({
       url: "api/quiz/updatequiz",
       method: "PUT",
       data: model,
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
     })
       .then((res) => {
         SUCCESS(toast, "Cập nhật bài quiz thành công");

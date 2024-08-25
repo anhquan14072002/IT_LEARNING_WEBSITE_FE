@@ -16,7 +16,7 @@ import "codemirror/mode/python/python";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/material.css";
 import { Toast } from "primereact/toast";
-import { encodeBase64, REJECT } from "../../utils";
+import { encodeBase64, getTokenFromLocalStorage, REJECT } from "../../utils";
 import NotifyProvider from "../../store/NotificationContext";
 
 const validationSchema = Yup.object({
@@ -93,6 +93,9 @@ export default function CreateCode() {
     restClient({
       url: "api/executecode/createexecutecode",
       method: "POST",
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
       data: {
         mainCode: encodeBase64(codeMain),
         sampleCode: encodeBase64(codeSample),

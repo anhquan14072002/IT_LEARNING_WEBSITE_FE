@@ -9,7 +9,7 @@ import { useNavigate } from "react-router-dom";
 import debounce from "lodash.debounce";
 import restClient from "../../services/restClient";
 import { InputText } from "primereact/inputtext";
-import { ACCEPT, REJECT, removeVietnameseTones } from "../../utils";
+import { ACCEPT, getTokenFromLocalStorage, REJECT, removeVietnameseTones } from "../../utils";
 import { confirmDialog } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
 import { InputSwitch } from "primereact/inputswitch";
@@ -127,11 +127,24 @@ export default function PracticeComponent() {
     return <span>{index}</span>;
   };
 
+  const navigateExecuteCode = (rowData, { rowIndex }) => {
+    // return <InputSwitch checked={rowData.isActive} />;
+    return (
+      <button
+        className="bg-blue-600 hover:bg-blue-400 text-white p-2 rounded-md"
+        onClick={() =>
+          navigate(`/dashboard/quiz/manageexecutecode/${rowData?.id}`)
+        }
+      >
+        Chỉnh sửa mã thực thi
+      </button>
+    );
+  };
+
   const changeStatusLesson = (value, id) => {
     restClient({
       url: "api/problem/updatestatusproblem/" + id,
       method: "PUT",
-     
     })
       .then((res) => {
         ACCEPT(toast, "Thay đổi trạng thái thành công");
@@ -298,6 +311,11 @@ export default function PracticeComponent() {
               header="Trạng thái"
               className="border-b-2 border-t-2"
               body={status}
+              style={{ minWidth: "10rem" }}
+            ></Column>
+            <Column
+              className="border-b-2 border-t-2"
+              body={navigateExecuteCode}
               style={{ minWidth: "10rem" }}
             ></Column>
             <Column

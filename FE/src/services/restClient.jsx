@@ -6,6 +6,7 @@ export const BASE_URL = "http://localhost:8000";
 export default function restClient({
   url,
   method = "GET",
+
   params = {},
   data = {},
   headers = {},
@@ -22,4 +23,5 @@ export default function restClient({
       ...(token && { Authorization: `Bearer ${token}` }), // Only add Authorization header if the token exists
     },
   });
+
 }

@@ -253,7 +253,7 @@ export default function Lesson() {
             fixedDivRef={fixedDivRef}
           />
 
-          <div className="pt-6 flex-1 px-2 md:px-0 pb-5 md-pb-0">
+          <div className="pt-6 flex-1 px-2 md:px-0 pb-5 md-pb-0 min-h-screen">
             {loading ? (
               <Loading />
             ) : Object.keys(lesson).length > 0 ? (
