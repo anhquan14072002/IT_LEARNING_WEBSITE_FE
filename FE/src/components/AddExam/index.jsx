@@ -292,7 +292,7 @@ export default function AddExam({
                     <span>Lớp</span>
                   </>
                 }
-                disabled={!levelList || levelList.length === 0}
+                disabled={!gradeList || gradeList.length === 0}
                 customTitle="title"
                 id="grade"
                 name="grade"
