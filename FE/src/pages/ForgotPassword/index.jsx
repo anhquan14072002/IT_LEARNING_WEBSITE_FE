@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useRef } from "react";
 import { Button } from "primereact/button";
 import { useForm, Controller } from "react-hook-form";
 import Header from "../../components/Header";
@@ -7,12 +7,14 @@ import { resetPassword } from "../../services/authenService";
 import { InputText } from "primereact/inputtext";
 import { assets } from "../../assets/assets";
 import NotifyProvider from "../../store/NotificationContext";
+import { REJECT, SUCCESS } from "../../utils";
 
 function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
 const index = () => {
   const query = useQuery();
+  const toast = useRef(null);
   const token = query.get("token");
   const email = query.get("email");
   const {
@@ -27,9 +29,9 @@ const index = () => {
     const password = data.password;
     try {
       await resetPassword({ token, email, password });
-      alert("sucess");
+      SUCCESS(toast, "Mật khẩu đã được cập nhật");
     } catch (error) {
-      alert("reject");
+      REJECT(toast, "Lấy lại mật khẩu không thành công");
     }
   };
 
@@ -130,6 +132,7 @@ const index = () => {
             </form>
           </div>
         </div>
+        <Toast ref={toast} />
       </div>
     </NotifyProvider>
   );
