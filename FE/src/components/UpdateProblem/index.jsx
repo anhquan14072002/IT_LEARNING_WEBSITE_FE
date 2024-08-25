@@ -134,8 +134,8 @@ export default function UpdateProblem() {
         if (
           problem &&
           problem.gradeId &&
-          problem.topicId === null &&
-          problem.lessonId !== null
+          problem.topicId === 0 &&
+          problem.lessonId !== 0
         ) {
           const lessonById = await restClient({
             url: `api/lesson/getlessonbyid/${problem?.lessonId}`,
@@ -201,8 +201,8 @@ export default function UpdateProblem() {
         if (
           problem &&
           problem.gradeId &&
-          problem.topicId !== null &&
-          problem.lessonId === null
+          problem.topicId !== 0 &&
+          problem.lessonId === 0
         ) {
           const topicById = await restClient({
             url: `api/topic/gettopicbyid?id=${problem?.topicId}`,
@@ -260,8 +260,8 @@ export default function UpdateProblem() {
         if (
           problem &&
           problem.gradeId &&
-          problem.topicId === null &&
-          problem.lessonId === null
+          problem.topicId === 0 &&
+          problem.lessonId === 0
         ) {
           const gradeById = await restClient({
             url: `api/grade/getgradebyid/${problem.gradeId}`,

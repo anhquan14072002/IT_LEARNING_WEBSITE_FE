@@ -41,8 +41,10 @@ export default function UpdateExam({
   updateValue,
   types,
   toast,
-  fetchData,
+  fetchData: propFetchData,
 }) {
+  console.log(updateValue);
+  
   const [files, setFiles] = useState([]);
   const [fileSolution, setFileSolution] = useState([]);
   const [provinceList, setProvinceList] = useState([]);
@@ -65,14 +67,14 @@ export default function UpdateExam({
   });
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchDataFromApi = async () => {
       try {
         const [competitionResponse, gradeResponse, levelResponse] = await Promise.all([
           updateValue?.competitionId
             ? restClient({ url: `api/competition/getcompetitionbyid?id=${updateValue.competitionId}`, method: "GET" })
             : Promise.resolve(null),
           updateValue?.gradeId
-            ? restClient({ url: `api/grade/getgradebyid?id=${updateValue.gradeId}&isInclude=false`, method: "GET" })
+            ? restClient({ url: `api/grade/getgradebyid/${updateValue.gradeId}?isInclude=false`, method: "GET" })
             : Promise.resolve(null),
           updateValue?.levelId
             ? restClient({ url: `api/level/getlevelbyid?id=${updateValue.levelId}`, method: "GET" })
@@ -115,7 +117,7 @@ export default function UpdateExam({
     if (years) setYearList(years);
     if (province?.data) setProvinceList(province.data);
 
-    if (visibleUpdate) fetchData();
+    fetchDataFromApi();
   }, [updateValue, visibleUpdate]);
 
   const handleOnChangeLevel = async (e, helpers, setTouchedState, props) => {
@@ -177,7 +179,7 @@ export default function UpdateExam({
       });
       SUCCESS(toast, "Sửa đề thi thành công");
       resetForm();
-      fetchData();
+      if (propFetchData) propFetchData(); // Ensure propFetchData is called if provided
     } catch (error) {
       console.error("Error updating exam:", error);
       REJECT(toast, "Sửa đề thi không thành công");

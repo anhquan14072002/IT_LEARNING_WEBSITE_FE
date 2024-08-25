@@ -244,6 +244,7 @@ export default function UpdateQuizLesson({
         title: values.title,
         type: 1,
         description: values.description,
+        gradeId: values?.grade?.id,
         score: values.score,
         topicId: null,
         lessonId: values.lesson.id,
