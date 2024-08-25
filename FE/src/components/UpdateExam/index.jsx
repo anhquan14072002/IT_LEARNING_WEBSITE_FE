@@ -6,13 +6,7 @@ import CustomTextInput from "../../shared/CustomTextInput";
 import CustomEditor from "../../shared/CustomEditor";
 import { Button } from "primereact/button";
 import Loading from "../Loading";
-import {
-  getProvinceByName,
-  getYearByYear,
-  REJECT,
-  SUCCESS,
-  TYPE,
-} from "../../utils";
+import { getProvinceByName, getYearByYear, REJECT, SUCCESS, TYPE } from "../../utils";
 import { FileUpload } from "primereact/fileupload";
 import CustomDropdown from "../../shared/CustomDropdown";
 import restClient from "../../services/restClient";
@@ -20,13 +14,11 @@ import { province } from "../../services/province";
 import { MultiSelect } from "primereact/multiselect";
 import { Dropdown } from "primereact/dropdown";
 import { years } from "../../services/year";
-// import "./index.css";
+import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
 
 const baseValidationSchema = Yup.object({
   competition: Yup.object()
-    .test("is-not-empty", "Không được để trống trường này", (value) => {
-      return Object.keys(value).length !== 0;
-    })
+    .test("is-not-empty", "Không được để trống trường này", (value) => Object.keys(value).length !== 0)
     .required("Không bỏ trống trường này"),
   title: Yup.string()
     .required("Tiêu đề không được bỏ trống")
@@ -34,23 +26,13 @@ const baseValidationSchema = Yup.object({
     .max(50, "Tiêu đề không được vượt quá 50 ký tự"),
   description: Yup.string().required("Mô tả không được bỏ trống"),
   province: Yup.object()
-    .test("is-not-empty", "Không được để trống trường này", (value) => {
-      return Object.keys(value).length !== 0;
-    })
+    .test("is-not-empty", "Không được để trống trường này", (value) => Object.keys(value).length !== 0)
     .required("Không bỏ trống trường này"),
   year: Yup.object()
-    .test("is-not-empty", "Không được để trống trường này", (value) => {
-      return Object.keys(value).length !== 0;
-    })
+    .test("is-not-empty", "Không được để trống trường này", (value) => Object.keys(value).length !== 0)
     .required("Không bỏ trống trường này"),
-
-  grade: Yup.object().test(
-    "is-not-empty",
-    "Không được để trống trường này",
-    (value) => {
-      return Object.keys(value).length !== 0;
-    }
-  ),
+  grade: Yup.object().nullable(),
+  level: Yup.object().nullable(),
 });
 
 export default function UpdateExam({
@@ -61,21 +43,16 @@ export default function UpdateExam({
   toast,
   fetchData,
 }) {
-  console.log(updateValue?.gradeId);
-
   const [files, setFiles] = useState([]);
   const [fileSolution, setFileSolution] = useState([]);
   const [provinceList, setProvinceList] = useState([]);
   const [loading, setLoading] = useState(false);
   const [competitionList, setCompetitionList] = useState([]);
-  const [competitionById, setCompetitionById] = useState([]);
-  const [gradeTitle, setGradeTitle] = useState([]);
-  const [tagList, setTagList] = useState([]);
-  const [tag, setTag] = useState(null);
   const [gradeList, setGradeList] = useState([]);
-  const [gradeItem,setGradeItem] = useState()
-  const [seletedGrade, setSeletedGrade] = useState(updateValue.gradeId);
+  const [levelList, setLevelList] = useState([]);
   const [yearList, setYearList] = useState([]);
+  const [tagList, setTagList] = useState([]);
+  const [tag, setTag] = useState([]);
   const [initialValues, setInitialValues] = useState({
     competition: {},
     title: "",
@@ -83,126 +60,90 @@ export default function UpdateExam({
     description: "",
     year: {},
     numberQuestion: "",
-    grade: {}
+    grade: {},
+    level: {}
   });
-
-  const [isFormReady , setIsFormReady] = useState(false)
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const competitionPromise = updateValue?.competitionId
-          ? restClient({
-              url: `api/competition/getcompetitionbyid?id=${updateValue.competitionId}`,
-              method: "GET",
-            })
-          : null;
-
-        const gradePromise = updateValue?.gradeId
-          ? restClient({
-              url: `api/grade/getgradebyid/${updateValue?.gradeId}?isInclude=false`,
-              method: "GET",
-            })
-          : null;
-
-        const [competitionResponse, gradeResponse] = await Promise.all([
-          competitionPromise,
-          gradePromise,
+        const [competitionResponse, gradeResponse, levelResponse] = await Promise.all([
+          updateValue?.competitionId
+            ? restClient({ url: `api/competition/getcompetitionbyid?id=${updateValue.competitionId}`, method: "GET" })
+            : Promise.resolve(null),
+          updateValue?.gradeId
+            ? restClient({ url: `api/grade/getgradebyid?id=${updateValue.gradeId}&isInclude=false`, method: "GET" })
+            : Promise.resolve(null),
+          updateValue?.levelId
+            ? restClient({ url: `api/level/getlevelbyid?id=${updateValue.levelId}`, method: "GET" })
+            : Promise.resolve(null),
         ]);
 
-        if (competitionResponse) {
-          setCompetitionById(competitionResponse?.data?.data || []);
-        }
+        const competitionItem = competitionResponse?.data?.data || {};
+        const gradeItem = gradeResponse?.data?.data || {};
+        const levelItem = levelResponse?.data?.data || {};
+        const provinceItem = getProvinceByName(updateValue?.province) || {};
+        const yearItem = getYearByYear(updateValue?.year) || {};
 
-        if (gradeResponse) {
-          console.log("+++++++++++++++++++++++++++++++++++++++++");
-          console.log(gradeResponse?.data?.data);
-          console.log(
-            `api/grade/getgradebyid/${updateValue?.gradeId}?isInclude=false`
-          );
-          console.log("+++++++++++++++++++++++++++++++++++++++++");
+        const [competitionListResponse, tagResponse, gradeListResponse, levelListResponse] = await Promise.all([
+          restClient({ url: "api/competition/getallcompetition?status=true", method: "GET" }),
+          restClient({ url: "api/tag/getalltag?status=true", method: "GET" }),
+          restClient({ url: `api/grade/getallgradebylevelid?levelId=${updateValue?.levelId}`, method: "GET" }),
+          restClient({ url: "api/level/getalllevel", method: "GET" }),
+        ]);
 
-          setGradeItem(gradeResponse?.data?.data || []);
-        }
+        setCompetitionList(competitionListResponse?.data?.data || []);
+        setTagList(tagResponse?.data?.data || []);
+        setGradeList(gradeListResponse?.data?.data || []);
+        setLevelList(levelListResponse?.data?.data || []);
+
+        setInitialValues({
+          competition: competitionItem,
+          title: updateValue?.title || "",
+          province: provinceItem,
+          description: updateValue?.description || "",
+          year: yearItem,
+          numberQuestion: updateValue?.numberQuestion || "",
+          grade: gradeItem,
+          level: levelItem,
+        });
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
-    fetchData();
+    if (years) setYearList(years);
+    if (province?.data) setProvinceList(province.data);
 
-    if (years) {
-      setYearList(years);
-    }
-  }, [updateValue, years]);
+    if (visibleUpdate) fetchData();
+  }, [updateValue, visibleUpdate]);
 
-  useEffect(() => {
-    // setIsFormReady(false)
-    const province = getProvinceByName(updateValue?.province);
-    const year = getYearByYear(updateValue?.year);
-    console.log(gradeItem);
-    if (province && updateValue) {
-      setProvinceList(province.data || []);
-      setYearList(year ? [year] : []); // Ensure `setYearList` gets an array of year objects
-      setInitialValues(() => ({
-        ...initialValues,
-        competition: competitionById,
-        title: updateValue?.title || "",
+  const handleOnChangeLevel = async (e, helpers, setTouchedState, props) => {
+    const level = e.target.value;
 
-        province: province,
-        description: updateValue?.description || "",
-        year: year || {}, // Ensure `year` is set to an object or default to empty object
-        numberQuestion: updateValue?.numberQuestion || "",
-        grade: gradeItem,
-      }));
-    }
-    setIsFormReady(true)
-  }, [competitionById, updateValue, gradeItem]);
-
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // Fetch competition list
-        const competitionResponse = await restClient({
-          url: "api/competition/getallcompetition",
-          method: "GET",
-        });
-        setCompetitionList(
-          Array.isArray(competitionResponse?.data?.data)
-            ? competitionResponse?.data?.data
-            : []
-        );
-
-        // Fetch tag list
-        const tagResponse = await restClient({
-          url: "api/tag/getalltag",
-          method: "GET",
-        });
-        setTagList(
-          Array.isArray(tagResponse?.data?.data) ? tagResponse?.data?.data : []
-        );
-
-        // Fetch grade list
-        const gradeResponse = await restClient({
-          url: "api/grade/getallgrade?isInclude=false",
-          method: "GET",
-        });
-        setGradeList(
-          Array.isArray(gradeResponse?.data?.data)
-            ? gradeResponse?.data?.data
-            : []
-        );
-      } catch (error) {
-        console.error("An error occurred:", error);
-      }
-    };
-    if (province?.data) {
-      setProvinceList(province.data);
+    if (!level || !level.id) {
+      setGradeList([]);
+      helpers.setValue({});
+      setTouchedState(true);
+      if (props.onChange) props.onChange(e);
+      return;
     }
 
-    // Call the fetchData function
-    fetchData();
-  }, [province]);
+    helpers.setValue(level);
+    setTouchedState(true);
+    if (props.onChange) props.onChange(e);
+
+    try {
+      const res = await restClient({
+        url: `api/grade/getallgradebylevelid?levelId=${level.id}`,
+        method: "GET",
+      });
+      setGradeList(res.data.data || []);
+    } catch (err) {
+      setGradeList([]);
+      console.error("Failed to fetch grades:", err);
+    }
+  };
 
   const onSubmit = async (values, { resetForm }) => {
     setLoading(true);
@@ -217,60 +158,56 @@ export default function UpdateExam({
     formData.append("NumberQuestion", values.numberQuestion || 0);
     formData.append("Year", values.year.year || "");
     formData.append("isActive", updateValue?.isActive);
-    if (tag && tag.length > 0) {
-      tag.forEach((item, index) => {
-        formData.append(`tagValues[${index}]`, item.keyWord);
-      });
+    if (values.grade && values.grade.id) {
+      formData.append("GradeId", values.grade.id);
+    } else if (values.level && values.level.id) {
+      formData.append("LevelId", values.level.id);
     }
-    formData.append("ExamEssayFileUpload", files[0]);
-    formData.append("ExamSolutionFileUpload", fileSolution[0]);
+    tag.forEach((item, index) => formData.append(`tagValues[${index}]`, item.keyWord));
+
+    if (files.length > 0) formData.append("ExamEssayFileUpload", files[0]);
+    if (fileSolution.length > 0) formData.append("ExamSolutionFileUpload", fileSolution[0]);
+
     try {
-      const response = await restClient({
+      await restClient({
         url: "api/exam/updateexam",
         method: "PUT",
         data: formData,
         headers: { "Content-Type": "multipart/form-data" },
       });
-      setTag([]);
       SUCCESS(toast, "Sửa đề thi thành công");
-      resetForm(); // Reset form fields
-      fetchData(); // Update the exam list
+      resetForm();
+      fetchData();
     } catch (error) {
-      console.error("Error adding exam:", error);
-      setTag([]);
-      REJECT(toast, "Sửa đề thi không thành công ");
+      console.error("Error updating exam:", error);
+      REJECT(toast, "Sửa đề thi không thành công");
     } finally {
       setLoading(false);
       setVisibleUpdate(false);
+      setTag([]);
     }
   };
 
-  const onFileSelect = (e) => {
-    setFiles(e.files);
-  };
-  const onFileSolutionSelect = (e) => {
-    setFileSolution(e.files);
-  };
-  const validationSchema =
-    types === 2
-      ? baseValidationSchema.shape({
-          numberQuestion: Yup.number().required("Không được bỏ trống"),
-        })
-      : baseValidationSchema;
+  const onFileSelect = (e) => setFiles(e.files);
+  const onFileSolutionSelect = (e) => setFileSolution(e.files);
 
+  const validationSchema = types === 2
+    ? baseValidationSchema.shape({
+        numberQuestion: Yup.number().required("Không được bỏ trống"),
+      })
+    : baseValidationSchema;
 
   return (
     <Dialog
-      header=" Sửa Đề Thi"
+      header="Sửa Đề Thi"
       visible={visibleUpdate}
       style={{ width: "50vw" }}
-      onHide={() => (setVisibleUpdate(false), setTag([]))}
+      onHide={() => { setVisibleUpdate(false); setTag([]); }}
     >
       {loading ? (
         <Loading />
       ) : (
-        !isFormReady ? (<Loading />) : 
-        (<Formik
+        <Formik
           initialValues={initialValues}
           validationSchema={validationSchema}
           onSubmit={onSubmit}
@@ -278,54 +215,55 @@ export default function UpdateExam({
           {(formik) => (
             <Form>
               <CustomTextInput
-                label={
-                  <>
-                    <span>Tiêu đề</span>
-                  </>
-                }
+                label="Tiêu đề"
                 id="title"
                 name="title"
                 type="text"
               />
               <CustomDropdown
-                title="Cuộc thi"
-                label={
-                  <>
-                    <span>Cuộc Thi</span>
-                  </>
-                }
+                title="Chọn Cuộc Thi"
+                label="Cuộc Thi"
                 customTitle="title"
                 id="competition"
                 name="competition"
                 options={competitionList}
               />
-              <span>Lớp</span>
-              <Dropdown
-                value={seletedGrade}
-                onChange={handleGrade}
-                options={gradeList}
-                optionLabel="title"
-                editable
-                placeholder={gradeTitle ? gradeTitle : "Lớp"}
-                className="border border-gray-300 shadow-none  flex items-center w-full py-2 gap-2.5 "
-                filter
-              />
               <CustomDropdown
-                title={updateValue.province ? updateValue.province : "Tỉnh"}
-                label={
-                  <>
-                    <span>Tỉnh</span>
-                  </>
-                }
+                title="Tỉnh"
+                label="Tỉnh"
                 customTitle="name"
                 id="province"
                 name="province"
                 options={provinceList}
               />
+              <CustomDropdown
+                title="Năm"
+                label="Năm"
+                customTitle="year"
+                id="year"
+                name="year"
+                options={yearList}
+              />
+              <CustomDropdownInSearch
+                title="Khối"
+                label="Khối"
+                customTitle="title"
+                id="level"
+                name="level"
+                options={levelList}
+                handleOnChange={handleOnChangeLevel}
+              />
+              <CustomDropdown
+                title="Lớp"
+                label="Lớp"
+                disabled={!levelList.length}
+                customTitle="title"
+                id="grade"
+                name="grade"
+                options={gradeList}
+              />
               <div>
-                <>
-                  <span>Tag</span>
-                </>
+                <span>Tag</span>
                 <MultiSelect
                   value={tag}
                   options={tagList}
@@ -337,37 +275,16 @@ export default function UpdateExam({
                   required
                 />
               </div>
-              <CustomDropdown
-                title={updateValue?.year ? updateValue?.year : "Năm"}
-                label={
-                  <>
-                    <span>Năm</span>
-                  </>
-                }
-                customTitle="year"
-                id="year"
-                name="year"
-                options={yearList}
-              />
               {types === 2 && (
                 <CustomTextInput
-                  label={
-                    <>
-                      <span>Số lượng câu hỏi</span>
-                    </>
-                  }
+                  label="Số lượng câu hỏi"
                   id="numberQuestion"
                   name="numberQuestion"
                   type="number"
                 />
               )}
-
               <CustomEditor
-                label={
-                  <>
-                    <span>Thông tin chi tiết</span>
-                  </>
-                }
+                label="Thông tin chi tiết"
                 id="description"
                 name="description"
               >
@@ -378,35 +295,30 @@ export default function UpdateExam({
                   <h1>File Đề Bài</h1>
                   <FileUpload
                     name="demo[]"
-                    url={"/api/upload"}
+                    url="/api/upload"
                     accept=".pdf, application/pdf"
                     maxFileSize={10485760}
-                    emptyTemplate={
-                      <p className="m-0">Drag and drop files here to upload.</p>
-                    }
+                    emptyTemplate={<p className="m-0">Drag and drop files here to upload.</p>}
                     className="custom-file-upload mb-2"
                     onSelect={onFileSelect}
                   />
                   <h1>File Lời Giải</h1>
                   <FileUpload
                     name="demo[]"
-                    url={"/api/upload"}
+                    url="/api/upload"
                     accept=".pdf, application/pdf"
                     maxFileSize={10485760}
-                    emptyTemplate={
-                      <p className="m-0">Drag and drop files here to upload.</p>
-                    }
+                    emptyTemplate={<p className="m-0">Drag and drop files here to upload.</p>}
                     className="custom-file-upload mb-2"
                     onSelect={onFileSolutionSelect}
                   />
                 </>
               )}
-
               <div className="flex justify-end gap-2">
                 <Button
                   className="p-2 bg-red-500 text-white"
                   type="button"
-                  onClick={() => setVisibleUpdate(false)}
+                  onClick={() => { setVisibleUpdate(false); setTag([]); }}
                 >
                   Hủy
                 </Button>
@@ -416,7 +328,7 @@ export default function UpdateExam({
               </div>
             </Form>
           )}
-        </Formik>)
+        </Formik>
       )}
     </Dialog>
   );
