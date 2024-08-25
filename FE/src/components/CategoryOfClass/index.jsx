@@ -3,12 +3,12 @@ import restClient from "../../services/restClient";
 import Loading from "../Loading";
 import { useNavigate, useLocation } from "react-router-dom";
 
-export default function CategoryOfClass({ display, params, setParams, setPage }) {
+export default function CategoryOfClass({ display, params, setParams, setPage, setSelectedClassId, selectedClassId }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [listClast, setListClass] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [selectedClassId, setSelectedClassId] = useState(null); 
+  
 
   useEffect(() => {
     setLoading(true);

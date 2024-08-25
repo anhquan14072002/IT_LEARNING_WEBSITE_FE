@@ -36,7 +36,11 @@ export default function UpdateLessonDialog({
   const [inputContent, setInputContent] = useState(!!modelUpdate.content); // Initialize based on modelUpdate.content
 
   const validationSchema = Yup.object({
-    title: Yup.string().required("Tiêu đề không được bỏ trống"),
+    title: Yup.string()
+      .trim()
+      .required("Tiêu đề không được bỏ trống")
+      .min(5, "Tiêu đề phải có ít nhất 5 ký tự")
+      .max(250, "Tiêu đề không được vượt quá 250 ký tự"),
     ...(inputContent && {
       content: Yup.string().required("Mô tả không được bỏ trống"),
     }),
@@ -55,7 +59,11 @@ export default function UpdateLessonDialog({
         return Object.keys(value).length !== 0; // Check if object is not empty
       })
       .required("Không bỏ trống trường này"),
-    index: Yup.number().required("Vui lòng nhập số thứ tự của bài học"),
+    index: Yup.number()
+      .required("Vui lòng nhập số thứ tự của bài học")
+      .integer("Số thứ tự phải là số nguyên")
+      .min(1, "Số thứ tự phải từ 1 trở lên")
+      .max(100, "Số thứ tự không được vượt quá 100"),
   });
 
   const [clearTopic, setClearTopic] = useState(false);
@@ -211,7 +219,16 @@ export default function UpdateLessonDialog({
       setFiles([]);
       getData(); // Fetch updated data
     } catch (err) {
-      REJECT(toast, "Cập nhật không thành công");
+      if (err.response && err.response.data) {
+        const { message } = err.response.data;
+        if (message === "Lesson Index is Duplicate !!!") {
+          REJECT(toast, "Số thứ tự của bài học đã tồn tại!");
+        } else {
+          REJECT(toast, "Xảy ra lỗi khi thêm bài học");
+        }
+      } else {
+        REJECT(toast, "Xảy ra lỗi khi thêm bài học");
+      }
     } finally {
       setIsLoadingAddUpdate(false);
       setVisibleUpdate(false);
@@ -333,7 +350,7 @@ export default function UpdateLessonDialog({
                 />
 
                 <CustomTextInput
-                  label="Số thứ tự bài học"
+                  label="Bài số"
                   name="index"
                   type="number"
                   id="index"
@@ -363,7 +380,7 @@ export default function UpdateLessonDialog({
                 </div>
 
                 <div className="flex justify-between mb-1">
-                  <h1>Nội dung bài học</h1>
+                  <h1>Nội dung bài học{" "}<span className="text-red-500">*</span></h1>
                   <select
                     value={inputContent.toString()} // Ensure this matches with the state variable
                     onChange={handleChangeInputType} // Make sure handleChangeInputType is correctly defined
@@ -396,8 +413,8 @@ export default function UpdateLessonDialog({
                       }
                       className="custom-file-upload mb-2"
                       onSelect={onFileSelect}
-                      onRemove={()=>setFiles([])}
-                      onClear={()=>setFiles([])}
+                      onRemove={() => setFiles([])}
+                      onClear={() => setFiles([])}
                     />
                   </div>
                 )}

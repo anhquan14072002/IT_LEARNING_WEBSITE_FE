@@ -121,8 +121,8 @@ export default function ManageQuestionOfQuizlist() {
   ];
 
   useEffect(() => {
-    console.log("textchange::",textSearch);
-    
+    console.log("textchange::", textSearch);
+
     fetchData();
   }, [page, rows, textSearch]);
 
@@ -149,9 +149,7 @@ export default function ManageQuestionOfQuizlist() {
   };
 
   const fetchData = () => {
-   
     pagination(page, rows);
-   
   };
 
   const onPageChange = (event) => {
@@ -193,7 +191,24 @@ export default function ManageQuestionOfQuizlist() {
           icon="pi pi-trash"
           className="text-red-600 shadow-none"
           onClick={() => {
-            confirmDelete(rowData.id);
+            if (
+              rowData?.quizQuestionRelations &&
+              Array.isArray(rowData.quizQuestionRelations)
+            ) {
+              const quizQuestionRelations = rowData.quizQuestionRelations;
+
+              // Filter quizQuestionRelations by quizId with type consistency
+              const filteredRelations = quizQuestionRelations.filter(
+                (item) => Number(item.quizId) === Number(id)
+              );
+
+              if (
+                Array.isArray(filteredRelations) &&
+                filteredRelations.length > 0
+              ) {
+                confirmDelete(filteredRelations[0].id);
+              }
+            }
           }}
         />
       </div>
@@ -233,7 +248,7 @@ export default function ManageQuestionOfQuizlist() {
 
   const deleteDocument = (id) => {
     restClient({
-      url: `api/quizquestion/deletequizquestion/${id}`,
+      url: `api/quizquestionrelation/deletequizquestionrelation/${id}`,
       method: "DELETE",
     })
       .then((res) => {
@@ -256,6 +271,9 @@ export default function ManageQuestionOfQuizlist() {
     restClient({
       url: "api/quizquestion/updatestatusquizquestion?id=" + id,
       method: "PUT",
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
     })
       .then((res) => {
         ACCEPT(toast, "Thay đổi trạng thái thành công");
@@ -279,23 +297,23 @@ export default function ManageQuestionOfQuizlist() {
   const typeQuestion = (rowData, { rowIndex }) => {
     return (
       <p>
-        {rowData && rowData?.type === 1 && "Loại true false" }
-        {rowData && rowData?.type === 2 && "Loại một câu trả lời" }
-        {rowData && rowData?.type === 3 && "Loại nhiều câu trả lời" }
+        {rowData && rowData?.type === 1 && "Loại true false"}
+        {rowData && rowData?.type === 2 && "Loại một câu trả lời"}
+        {rowData && rowData?.type === 3 && "Loại nhiều câu trả lời"}
       </p>
-    )
-  }
+    );
+  };
 
   const level = (rowData, { rowIndex }) => {
     return (
       <p>
-        {rowData && rowData?.questionLevel === 1 && "Cấp độ rất dễ" }
-        {rowData && rowData?.questionLevel === 2 && "Cấp độ dễ" }
-        {rowData && rowData?.questionLevel === 3 && "Cấp độ trung bình" }
-        {rowData && rowData?.questionLevel === 4 && "Cấp độ khó" }
+        {rowData && rowData?.questionLevel === 1 && "Cấp độ rất dễ"}
+        {rowData && rowData?.questionLevel === 2 && "Cấp độ dễ"}
+        {rowData && rowData?.questionLevel === 3 && "Cấp độ trung bình"}
+        {rowData && rowData?.questionLevel === 4 && "Cấp độ khó"}
       </p>
-    )
-  }
+    );
+  };
 
   return (
     <NotifyProvider>

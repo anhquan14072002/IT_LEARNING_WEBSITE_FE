@@ -9,6 +9,7 @@ import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
 import restClient from "../../services/restClient";
 import Loading from "../Loading";
 import {
+  getTokenFromLocalStorage,
   handleMultipleContent,
   handleMultipleCorrect,
   hasCorrectAnswer,
@@ -342,7 +343,7 @@ const UpdateQuestion = ({
           formData.append("quizId", values?.quiz?.id);
         }
         formData.append("hint", values?.hint);
-
+        
         multipleAnswer.forEach((obj, index) => {
           Object.entries(obj).forEach(([key, value]) => {
             if(Number(typeQuestion) === Number(updateValue?.type)){
@@ -623,20 +624,7 @@ const UpdateQuestion = ({
 
               {typeQuestion && Number(typeQuestion) === 3 && (
                 <>
-                  <div className="mb-5">
-                    <label
-                      htmlFor="QuestionTrueFalse"
-                      className="block text-md text-gray-700"
-                    >
-                      Số lượng đáp án <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      className="w-full shadow-none p-1 border rounded-md"
-                      type="number"
-                      value={numberAnswerOfMultichoice}
-                      onChange={handleNumberAnswer}
-                    />
-                  </div>
+                  
                   {numberAnswerOfMultichoice > 0 && (
                     <div className="my-4">
                       <label

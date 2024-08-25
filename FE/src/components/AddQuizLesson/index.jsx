@@ -7,7 +7,7 @@ import CustomSelectInput from "../../shared/CustomSelectInput";
 import CustomTextarea from "../../shared/CustomTextarea";
 import { Button } from "primereact/button";
 import CustomEditor from "../../shared/CustomEditor";
-import { REJECT, SUCCESS } from "../../utils";
+import { getTokenFromLocalStorage, REJECT, SUCCESS } from "../../utils";
 import restClient from "../../services/restClient";
 import Loading from "../Loading";
 import { Dropdown } from "primereact/dropdown";
@@ -16,7 +16,11 @@ import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
 import { MultiSelect } from "primereact/multiselect";
 
 const validationSchema = Yup.object({
-  title: Yup.string().required("Tiêu đề không được bỏ trống"),
+  title: Yup.string()
+    .trim()
+    .required("Tiêu đề không được bỏ trống")
+    .min(5, "Tiêu đề phải có ít nhất 5 ký tự")
+    .max(250, "Tiêu đề không được vượt quá 250 ký tự"),
   description: Yup.string().required("Mô tả không được bỏ trống"),
   score: Yup.number()
     .required("Điểm không được bỏ trống và lớn hơn 0")
@@ -154,6 +158,7 @@ export default function AddQuizLesson({
     let model = {
       title: values?.title,
       type: 1,
+      gradeId: values?.grade?.id,
       description: values?.description,
       score: values?.score,
       topicId: values?.topic?.id || null, // Default to null if topic.id is not present
@@ -169,7 +174,7 @@ export default function AddQuizLesson({
         ...model,
         topicId: null,
         lessonId: values.lesson.id,
-        tagValues: tagValues, 
+        tagValues: tagValues,
       };
     }
 
@@ -178,6 +183,9 @@ export default function AddQuizLesson({
       url: "api/quiz/createquiz",
       method: "POST",
       data: model,
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
     })
       .then((res) => {
         SUCCESS(toast, "Thêm bài quiz thành công");
