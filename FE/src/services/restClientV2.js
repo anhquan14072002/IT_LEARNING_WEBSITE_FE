@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "http://localhost:2358";
+const BASE_URL = "https://lw-api.azurewebsites.net";
 
 export default function restClientV2({
   url,

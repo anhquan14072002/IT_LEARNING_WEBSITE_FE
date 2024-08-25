@@ -16,6 +16,7 @@ import restClient from "../../services/restClient";
 import Loading from "../Loading";
 import "./index.css";
 import debounce from "lodash.debounce";
+import { InputSwitch } from "primereact/inputswitch";
 
 export default function Document() {
   const toast = useRef(null);
@@ -188,6 +189,34 @@ export default function Document() {
     setTextSearch(text);
   }, 300);
 
+  const status = (rowData, { rowIndex }) => {
+    return (  
+      <InputSwitch
+        checked={rowData.isActive}
+        onChange={(e) => changeStatusLesson(e.value, rowData.id)}
+        tooltip={
+          rowData.isActive
+            ? "Tài liệu này đã được duyệt"
+            : "Tài liệu chưa được duyệt"
+        }
+      />
+    );
+  };
+
+  const changeStatusLesson = (value, id) => {
+    restClient({
+      url: "api/document/updatestatusdocument/" + id,
+      method: "PUT"
+    })
+      .then((res) => {
+        ACCEPT(toast, "Thay đổi trạng thái thành công");
+        fetchData();
+      })
+      .catch((err) => {
+        REJECT(toast, "Lỗi khi thay đổi trạng thái");
+      });
+  };
+
   return (
     <div>
       <Toast ref={toast} />
@@ -302,6 +331,12 @@ export default function Document() {
                   style={{ minWidth: "12rem" }}
                   className="border-b-2 border-t-2"
                 />
+                <Column
+                header="Trạng thái"
+                className="border-b-2 border-t-2"
+                body={status}
+                style={{ minWidth: '10rem' }}
+              ></Column>
                 <Column
                   field="createdDate"
                   header="Ngày tạo"

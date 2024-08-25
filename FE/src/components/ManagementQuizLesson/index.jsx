@@ -188,11 +188,8 @@ export default function ManagementQuizLesson() {
 
   const changeStatusLesson = (value, id) => {
     restClient({
-      url: "api/quiz/updatestatusquiz?id=" + id,
+      url: "api/quiz/updatestatusquiz/" + id,
       method: "PUT",
-      headers: {
-        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
-      },
     })
       .then((res) => {
         ACCEPT(toast, "Thay đổi trạng thái thành công");

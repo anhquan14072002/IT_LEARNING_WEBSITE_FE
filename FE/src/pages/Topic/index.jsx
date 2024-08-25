@@ -31,6 +31,10 @@ export default function Topic() {
   const [documentList, setDocumentList] = useState({});
   const [tableContentId, setTableContentId] = useState([]);
   const { id } = useParams();
+  const [quizFlashcard, setQuizFlashcard] = useState([]);
+  const [quizExam, setQuizExam] = useState([]);
+  const [problemTopic, setProblemTopic] = useState([]);
+  const [tagTopic, setTagTopic] = useState([]);
 
   const fetchData = async () => {
     try {
@@ -51,8 +55,35 @@ export default function Topic() {
   };
 
   useEffect(() => {
-    getTopicById(id, setLoading, setTopic);
+    restClient({
+      url: `api/topic/gettopicbyid?id=${id}`,
+      method: "GET",
+    })
+      .then((res) => {
+        if(res.data?.data?.isActive === false){
+          navigate('/notfound')
+        }
+        setTopic(res.data.data || {});
+        setLoading(false);
+      })
+      .catch((err) => {
+        setTopic({});
+        setLoading(false);
+      });
     fetchData();
+
+    restClient({
+      url: "api/topic/gettopicidbytag/" + id,
+    })
+      .then((res) => {
+        if (res?.data?.data?.isActive === false) {
+          navigate("/notfound");
+        }
+        setTagTopic(res?.data?.data);
+      })
+      .catch((err) => {
+        setTagTopic([]);
+      });
   }, [id]);
 
   useEffect(() => {
@@ -206,12 +237,12 @@ export default function Topic() {
             topicId={id}
           />
 
-          <div className="pt-6 flex-1">
+          <div className="pt-6 flex-1 px-2 md:px-0 pb-5 md-pb-0">
             {loading ? (
               <Loading />
             ) : Object.keys(topic).length > 0 ? (
               <div>
-                <div className="flex justify-between mb-10">
+                <div className="flex flex-wrap gap-2 justify-between mb-10">
                   <button
                     onClick={handlePrevious}
                     className="flex items-center bg-blue-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -239,6 +270,26 @@ export default function Topic() {
                     dangerouslySetInnerHTML={{ __html: topic?.description }}
                   />
                 </div>
+
+                {/* tag */}
+                {tagTopic.length > 0 && (
+                  <div className="mt-6">
+                    <span className="block font-semibold mb-3">
+                      Các từ khóa liên quan đến chủ đề
+                    </span>
+                    <div className="flex flex-wrap gap-3">
+                      {tagTopic.map((tag) => (
+                        <div
+                          key={tag.id}
+                          className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full shadow-sm hover:bg-blue-200 transition-colors cursor-pointer"
+                          onClick={() => navigate("/searchTag/" + tag.id)}
+                        >
+                          {tag.title}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             ) : (
               <p>No topic data found.</p>

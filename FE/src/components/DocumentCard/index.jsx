@@ -40,13 +40,13 @@ const CustomCard = ({ document }) => {
           <img
             src={document?.image || "https://via.placeholder.com/150"}
             alt={document?.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full"
           />
         </div>
 
         {/* Book Title */}
         <div className="p-4">
-          <p className="text-black text-2xl font-semibold h-16 overflow-hidden text-ellipsis">
+          <p className="text-black text-2xl font-semibold h-16 overflow-hidden whitespace-nowrap text-ellipsis">
             {document?.title}
           </p>
           <p className="text-gray-600 text-sm mt-1">

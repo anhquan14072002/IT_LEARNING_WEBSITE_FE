@@ -2,12 +2,9 @@ import React, { useEffect, useRef, useState } from "react";
 import Footer from "../../components/Footer";
 import Header from "../../components/Header";
 import Menu from "../../components/Menu";
-import CategoryOfClass from "../../components/CategoryOfClass";
-import CustomCard from "../../components/CustomCard";
 import { Paginator } from "primereact/paginator";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
-import { Dropdown } from "primereact/dropdown";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import restClient from "../../services/restClient";
 import NotifyProvider from "../../store/NotificationContext";
@@ -16,26 +13,33 @@ import CustomPractice from "../../components/CustomPractice";
 
 export default function ListPractice() {
   const fixedDivRef = useRef(null);
-
   const [fixedDivHeight, setFixedDivHeight] = useState(0);
   const navigate = useNavigate();
-
-  // Document state
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(false);
   const [textSearch, setTextSearch] = useState("");
-
   const [difficult, setDifficult] = useState(0);
-
-  // Pagination state
+  const [listGrade, setListGrade] = useState([]);
   const [first, setFirst] = useState(0);
   const [page, setPage] = useState(1);
-  const [rows, setRows] = useState(9);
+  const [rows, setRows] = useState(12);
   const [totalPage, setTotalPage] = useState(0);
+  const [params, setParams] = useSearchParams();
+  const [classId, setClassId] = useState();
 
-  const handleChange = (e) => {
-    setDifficult(e?.target?.value);
-  };
+  // Handle URL parameter changes
+  useEffect(() => {
+    const textSearchParam = params.get("text") || "";
+    const difficultyParam = parseInt(params.get("difficulty")) || 0;
+    const classIdParam = params.get("classId") || "";
+
+    setDifficult(difficultyParam);
+    setClassId(classIdParam);
+  }, [params]);
+
+  useEffect(() => {
+    fetchData(page, rows);
+  }, [page, rows, textSearch, difficult, classId]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -46,50 +50,81 @@ export default function ListPractice() {
   }, [fixedDivRef.current]);
 
   useEffect(() => {
-    fetchData(page, rows);
-  }, [page, rows, textSearch,difficult]);
-
-  const getData = () => {
-    fetchData(page, rows);
-  };
+    restClient({
+      url: `api/grade/getallgrade?isInclude=false`,
+      method: "GET",
+    })
+      .then((res) => {
+        setListGrade(res.data.data || []);
+      })
+      .catch(() => {
+        setListGrade([]);
+      });
+  }, []);
 
   const fetchData = (page, rows) => {
-    if (textSearch.trim()) {
-      setLoading(true);
-      restClient({
-        url: `api/problem/getallproblempagination?PageSize=${rows}&Value=${textSearch.trim()}${difficult > 0 ? `&Difficulty=${difficult}` : ''}`,
-        method: "GET",
-      })
-        .then((res) => {
-          const paginationData = JSON.parse(res.headers["x-pagination"]);
-          setTotalPage(paginationData.TotalPages);
-          setProducts(Array.isArray(res.data.data) ? res.data.data : []);
-        })
-        .catch((err) => {
-          console.error("Error fetching data:", err);
-          setProducts([]);
-        })
-        .finally(() => setLoading(false));
-    } else {
-      setLoading(true);
+    let url = "api/problem/getallproblempagination?StatusProblem=true&";
+    const params = new URLSearchParams();
 
-      restClient({
-        url: `api/problem/getallproblempagination?PageSize=${rows}${difficult > 0 ? `&Difficulty=${difficult}` : ''}`,
-        method: "GET",
-      })
-        .then((res) => {
-          const paginationData = JSON.parse(res.headers["x-pagination"]);
-          setTotalPage(paginationData.TotalPages);
-          setProducts(Array.isArray(res.data.data) ? res.data.data : []);
-        })
-        .catch((err) => {
-          console.error("Error fetching data:", err);
-          setProducts([]);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+    if (textSearch) {
+      params.append("Value", removeVietnameseTones(textSearch.trim()));
     }
+
+    if (page) {
+      params.append("PageIndex", page.toString());
+    }
+
+    if (rows) {
+      params.append("PageSize", rows.toString());
+    }
+
+    if (difficult > 0) {
+      params.append("Difficulty", difficult.toString());
+    }
+
+    if (classId) {
+      params.append("GradeId", classId);
+    }
+
+    url += params.toString();
+
+    setLoading(true);
+    restClient({
+      url,
+      method: "GET",
+    })
+      .then((res) => {
+        const paginationData = JSON.parse(res.headers["x-pagination"]);
+        setTotalPage(paginationData.TotalPages);
+        setProducts(Array.isArray(res.data.data) ? res.data.data : []);
+      })
+      .catch((err) => {
+        console.error("Error fetching data:", err);
+        setProducts([]);
+      })
+      .finally(() => setLoading(false));
+  };
+
+  const handleChange = (e) => {
+    const newDifficulty = e.target.value;
+    setPage(1)
+    setDifficult(newDifficulty);
+    navigate(
+      `?text=${removeVietnameseTones(
+        textSearch
+      )}&difficulty=${newDifficulty}&classId=${classId}`
+    );
+  };
+
+  const handleGradeChange = (e) => {
+    const newClassId = e.target.value;
+    setClassId(newClassId);
+    setPage(1)
+    navigate(
+      `?text=${removeVietnameseTones(
+        textSearch
+      )}&difficulty=${difficult}&classId=${newClassId}`
+    );
   };
 
   const onPageChange = (event) => {
@@ -118,7 +153,12 @@ export default function ListPractice() {
                   placeholder="Tìm kiếm"
                   className="flex-1 focus:outline-none w-36 focus:ring-0"
                   onChange={(e) => {
-                    setTextSearch(removeVietnameseTones(e.target.value));
+                    setTextSearch(e.target.value);
+                    navigate(
+                      `?text=${removeVietnameseTones(
+                        e.target.value
+                      )}&difficulty=${difficult}&classId=${classId}`
+                    );
                   }}
                 />
                 <Button
@@ -126,19 +166,37 @@ export default function ListPractice() {
                   className="p-button-warning focus:outline-none focus:ring-0 flex-shrink-0 cursor-pointer"
                 />
               </div>
-              <div className="border-2 border-gray-600 rounded-md p-2">
-                <select
-                  name="difficulty"
-                  id="difficulty"
-                  value={difficult}
-                  onChange={handleChange}
-                  className="border border-white outline-none"
-                >
-                  <option value={0}>Chọn độ khó</option>
-                  <option value={1}>Dễ</option>
-                  <option value={2}>Trung bình</option>
-                  <option value={3}>Khó</option>
-                </select>
+              <div className="flex gap-2 flex-wrap">
+                <div className="border-2 border-gray-600 rounded-md p-2">
+                  <select
+                    name="difficulty"
+                    id="difficulty"
+                    value={difficult}
+                    onChange={handleChange}
+                    className="border border-white outline-none"
+                  >
+                    <option value={0}>Chọn độ khó</option>
+                    <option value={1}>Dễ</option>
+                    <option value={2}>Trung bình</option>
+                    <option value={3}>Khó</option>
+                  </select>
+                </div>
+                <div className="border-2 border-gray-600 rounded-md p-2">
+                  <select
+                    name="grade"
+                    id="grade"
+                    value={classId}
+                    onChange={handleGradeChange}
+                    className="border border-white outline-none"
+                  >
+                    <option value={0}>Chọn lớp</option>
+                    {listGrade.map((item, index) => (
+                      <option value={item.id} key={index}>
+                        {item.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
               </div>
             </div>
             <div className="flex flex-wrap justify-center gap-1">

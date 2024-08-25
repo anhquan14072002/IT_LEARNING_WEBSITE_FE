@@ -15,8 +15,8 @@ import Loading from "../../components/Loading";
 import { Button } from "primereact/button";
 import restClient from "../../services/restClient";
 import { decodeIfNeeded, isBase64 } from "../../utils";
-import FlashcardList from "../../components/FlashcardList";
 import NotifyProvider from "../../store/NotificationContext";
+import Flashcard from "../../components/FlashCard";
 
 export default function Quiz() {
   const fixedDivRef = useRef(null);
@@ -37,19 +37,25 @@ export default function Quiz() {
         url: `api/quiz/getquizbyid/${id}`,
         method: "GET",
       });
+      if (
+        quizDetailRes?.data?.data &&
+        quizDetailRes?.data?.data?.isActive === false
+      ) {
+        navigate("/notfound");
+      }
       setQuizDetails(quizDetailRes?.data?.data);
 
       const quizResponse = await restClient({
-        url: `api/quizquestion/getallquizquestionbyquizid?QuizId=${id}`,
+        url: `api/quizquestion/getallquizquestionbyquizid?Status=true&QuizId=${id}`,
         method: "GET",
       });
       if (Array.isArray(quizResponse.data?.data)) {
-        setQuiz(quizResponse?.data?.data);
+        setQuiz(Array.isArray(quizResponse?.data?.data) ? quizResponse?.data?.data : []);
       } else {
-        setQuiz(null); // Set quiz to null if not found
+        setQuiz([]); // Set quiz to null if not found
       }
     } catch (e) {
-      setQuiz(null); // Set quiz to null if there's an error
+      setQuiz([]); // Set quiz to null if there's an error
     } finally {
       setLoading(false);
     }
@@ -65,6 +71,22 @@ export default function Quiz() {
     }
   }, [fixedDivRef]);
 
+  const handleNextCard = (e) => {
+    e.stopPropagation();
+    setShowAnswer(false);
+    setCurrentCardIndex((prevIndex) =>
+      prevIndex === quiz.length - 1 ? 0 : prevIndex + 1
+    );
+  };
+
+  const handlePreviousCard = (e) => {
+    e.stopPropagation();
+    setShowAnswer(false);
+    setCurrentCardIndex((prevIndex) =>
+      prevIndex === 0 ? quiz.length - 1 : prevIndex - 1
+    );
+  };
+
   return (
     <NotifyProvider>
       <div className="min-h-screen flex flex-col">
@@ -75,9 +97,9 @@ export default function Quiz() {
 
         <div
           style={{ paddingTop: `${fixedDivHeight}px` }}
-          className="flex flex-col justify-center items-center gap-5 h-screen bg-gray-100 mb-36"
+          className="flex flex-col justify-center items-center gap-5 h-screen mb-36"
         >
-          {quiz && (
+          {quiz.length > 0 && (
             <div className="text-center">
               <p className="mb-3 font-bold text-xl">{quizDetails?.title}</p>
               <p className="font-semibold">
@@ -86,7 +108,7 @@ export default function Quiz() {
             </div>
           )}
           <div
-            className={`w-full sm:w-full md:w-3/4 lg:w-1/2 xl:w-1/2 
+            className={`w-full sm:w-full md:w-3/4 lg:w-1/2 xl:w-1/2  border-2 border-gray-200
   shadow-lg rounded-md bg-white h-4/5 p-5 flex items-center justify-center cursor-pointer overflow-y-auto ${
     showAnswer ? "flip" : ""
   }`}
@@ -98,20 +120,41 @@ export default function Quiz() {
               <Loading />
             ) : (
               <div className="w-full">
-                {!quiz ? (
+                {quiz.length === 0 ? (
                   <p className="text-center">Quiz không tồn tại.</p>
                 ) : (
-                  <FlashcardList
-                    flashcards={quiz}
-                    currentCardIndex={currentCardIndex}
-                    setCurrentCardIndex={setCurrentCardIndex}
-                    showAnswer={showAnswer}
-                    setShowAnswer={setShowAnswer}
-                  />
+                  <>
+                    {/* Flashcard Display */}
+                    <div className="flex items-center justify-center">
+                      <div>
+                        <Flashcard
+                          flashcard={quiz[currentCardIndex]}
+                          showAnswer={showAnswer}
+                          setShowAnswer={setShowAnswer}
+                        />
+                      </div>
+                    </div>
+                  </>
                 )}
               </div>
             )}
           </div>
+          {quiz.length > 0 && (
+            <div className="flex justify-center gap-5">
+              <Button
+                tooltip="Câu trước"
+                icon="pi pi-chevron-left"
+                className="rounded-full h-10 w-10 bg-blue-500 text-white font-bold"
+                onClick={handlePreviousCard}
+              ></Button>
+              <Button
+                tooltip="Câu tiếp theo"
+                icon="pi pi-chevron-right"
+                className="rounded-full h-10 w-10 bg-blue-500 text-white font-bold"
+                onClick={handleNextCard}
+              ></Button>
+            </div>
+          )}
         </div>
 
         <Footer ref={displayRef} />
