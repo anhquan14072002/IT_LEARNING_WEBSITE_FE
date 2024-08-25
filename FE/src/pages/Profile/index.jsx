@@ -80,8 +80,7 @@ const Index = () => {
       setImageURL(URL.createObjectURL(file));
       field.onChange(file);
     } else {
-      console.log("File không hợp lệ:", file);
-      alert("Vui lòng chọn tệp JPG hoặc PNG.");
+      REJECT(toast, "Ảnh phải có định dạng JPG hoặc PNG");
     }
   };
 
