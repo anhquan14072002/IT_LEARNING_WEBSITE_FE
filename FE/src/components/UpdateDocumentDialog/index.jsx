@@ -12,16 +12,28 @@ import { ACCEPT, REJECT, SUCCESS } from "../../utils";
 import { FileUpload } from "primereact/fileupload";
 
 const validationSchema = Yup.object({
-  title: Yup.string().required("Tiêu đề không được bỏ trống"),
-  author: Yup.string().required("Tác giả không được bỏ trống"),
+  title: Yup.string()
+    .trim()
+    .required("Tiêu đề không được bỏ trống")
+    .min(5, "Tiêu đề phải có ít nhất 5 ký tự")
+    .max(250, "Tiêu đề không được vượt quá 250 ký tự"),
+  author: Yup.string()
+    .trim()
+    .required("Tên tác giả không được bỏ trống")
+    .min(5, "Tên tác giả phải có ít nhất 5 ký tự")
+    .max(100, "Tên tác giả không được vượt quá 250 ký tự"),
   edition: Yup.number()
-    .required("Phiên bản không được bỏ trống")
-    .positive("Phiên bản phải lớn hơn 0")
-    .integer("Phiên bản phải là số nguyên"),
+    .required("Tái bản không được bỏ trống")
+    .positive("Tái bản phải lớn hơn 0")
+    .integer("Tái bản phải là số nguyên")
+    .min(1, "Tái bản phải từ 1 trở lên")
+    .max(100, "Tái bản không được vượt quá 100"),
   publicationYear: Yup.number()
     .required("Năm xuất bản không được bỏ trống")
     .positive("Năm xuất bản phải lớn hơn 0")
-    .integer("Năm xuất bản phải là số nguyên"),
+    .integer("Năm xuất bản phải là số nguyên")
+    .min(1910, "Năm xuất bản phải từ 1910 trở lên")
+    .max(2023, "Năm xuất bản không được vượt quá 2023"),
   bookCollection: Yup.object()
     .test("is-not-empty", "Không được để trống trường này", (value) => {
       return Object.keys(value).length !== 0; // Check if object is not empty

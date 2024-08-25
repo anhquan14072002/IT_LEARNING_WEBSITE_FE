@@ -11,7 +11,7 @@ import { Button } from "primereact/button";
 import CustomDropdown from "../../shared/CustomDropdown";
 import restClient from "../../services/restClient";
 import { Toast } from "primereact/toast";
-import { decodeBase64, encodeBase64, REJECT } from "../../utils";
+import { decodeBase64, encodeBase64, getTokenFromLocalStorage, REJECT } from "../../utils";
 import NotifyProvider from "../../store/NotificationContext";
 import { Controlled as CodeMirror } from "react-codemirror2";
 import "codemirror/mode/javascript/javascript";
@@ -111,6 +111,9 @@ export default function UpdateExecuteCode() {
     restClient({
       url: "api/executecode/updateexecutecode",
       method: "PUT",
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
       data: {
         id,
         mainCode: encodeBase64(codeMain),

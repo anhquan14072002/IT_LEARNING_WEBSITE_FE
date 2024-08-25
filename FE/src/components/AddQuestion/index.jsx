@@ -9,6 +9,7 @@ import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
 import restClient from "../../services/restClient";
 import Loading from "../Loading";
 import {
+  getTokenFromLocalStorage,
   handleMultipleContent,
   handleMultipleCorrect,
   hasCorrectAnswer,
@@ -83,7 +84,7 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData, id }) => {
           levelName: item.value,
         }));
 
-        setInitialValues({...initialValues,type: typeData[0]})
+        setInitialValues({ ...initialValues, type: typeData[0] });
         settypeList(typeData);
         setquestionLevelList(questionLevelData);
       } catch (e) {
@@ -193,6 +194,9 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData, id }) => {
           url: "api/quizquestion/createquizquestion",
           method: "POST",
           data: formData,
+          headers: {
+            Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+          },
         })
           .then((res) => {
             SUCCESS(toast, "Thêm câu hỏi thành công thành công");
@@ -244,6 +248,9 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData, id }) => {
           url: "api/quizquestion/createquizquestion",
           method: "POST",
           data: formData,
+          headers: {
+            Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+          },
         })
           .then((res) => {
             SUCCESS(toast, "Thêm câu hỏi thành công thành công");
@@ -264,9 +271,9 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData, id }) => {
 
   const handleChangeType = (e, helpers, setTouchedState, props) => {
     setTypeQuestion(e?.value?.typeName); // Update typeQuestion based on selection
-   console.log('====================================');
-   console.log(e);
-   console.log('====================================');
+    console.log("====================================");
+    console.log(e);
+    console.log("====================================");
     const selectedType = {
       title: e?.value?.title,
       typeName: e?.value?.typeName,
@@ -515,20 +522,6 @@ const AddQuestion = ({ visible, setVisible, toast, fetchData, id }) => {
 
               {typeQuestion && typeQuestion === 3 && (
                 <>
-                  <div className="mb-5">
-                    <label
-                      htmlFor="QuestionTrueFalse"
-                      className="block text-md text-gray-700"
-                    >
-                      Số lượng đáp án <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      className="w-full shadow-none p-1 border rounded-md"
-                      type="number"
-                      value={numberAnswerOfMultichoice}
-                      onChange={handleNumberAnswer}
-                    />
-                  </div>
                   {numberAnswerOfMultichoice > 0 && (
                     <div className="my-4">
                       <label

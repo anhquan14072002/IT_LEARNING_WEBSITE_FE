@@ -25,6 +25,8 @@ export default function Search() {
   const [selectedCity, setSelectedCity] = useState(null);
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
+  const [listGrade, setListGrade] = useState([]);
+  const [selectedClassId, setSelectedClassId] = useState(null);
 
   //document
   const [products, setProducts] = useState([]);
@@ -43,6 +45,19 @@ export default function Search() {
   const [totalPage, setTotalPage] = useState(0);
 
   const cities = [{ name: "Bộ câu hỏi", code: "searchQuiz" }];
+
+  useEffect(() => {
+    restClient({
+      url: `api/grade/getallgrade?isInclude=false`,
+      method: "GET",
+    })
+      .then((res) => {
+        setListGrade(res.data.data || []);
+      })
+      .catch(() => {
+        setListGrade([]);
+      });
+  }, []);
 
   useEffect(() => {
     if (params) {
@@ -103,7 +118,7 @@ export default function Search() {
   };
 
   const handleOnChange = (e) => {
-    setPage(1)
+    setPage(1);
     navigate(`/${e?.value?.code}?text=${textSearch}`);
   };
 
@@ -158,6 +173,31 @@ export default function Search() {
     setFirst(first);
   };
 
+  const handleGradeChange = (e) => {
+    // setClassId(newClassId);
+    // setPage(1);
+    // navigate(
+    //   `?text=${removeVietnameseTones(
+    //     textSearch
+    //   )}&difficulty=${difficult}&classId=${newClassId}`
+    // );
+    const newClassId = e.target.value;
+    if (newClassId === classId) {
+      setSelectedClassId(null);
+      setPage(1);
+      const updatedParams = { ...Object.fromEntries(params.entries()) };
+      delete updatedParams.classId;
+      setParams(updatedParams);
+    } else {
+      setPage(1);
+      setSelectedClassId(classId);
+      setParams({
+        ...Object.fromEntries(params.entries()),
+        classId: newClassId,
+      });
+    }
+  };
+
   return (
     <NotifyProvider>
       <div className="min-h-screen">
@@ -175,12 +215,14 @@ export default function Search() {
           className="flex gap-5"
         >
           <div className="w-[15%] bg-gray-100 border-r-2  flex-col gap-3 min-h-screen pt-5 hidden md:block">
-          <CategoryOfClass
-            display={isFooterVisible}
-            setPage={setPage}
-            params={params}
-            setParams={setParams}
-          />
+            <CategoryOfClass
+              display={isFooterVisible}
+              setPage={setPage}
+              params={params}
+              setParams={setParams}
+              selectedClassId={selectedClassId}
+              setSelectedClassId={setSelectedClassId}
+            />
           </div>
           <div className="flex-1 w-[98%] pt-5">
             <div className="m-4 mb-10 flex flex-wrap items-center justify-center gap-2 sm:justify-between">
@@ -204,6 +246,7 @@ export default function Search() {
                 />
               </div>
 
+              <div className="flex gap-2 flex-wrap">
                 <div className="border-2 rounded-md mt-auto mb-auto">
                   <Dropdown
                     filter
@@ -217,8 +260,24 @@ export default function Search() {
                     className="w-full md:w-14rem shadow-none h-full"
                   />
                 </div>
+                <div className="border-2 rounded-md p-2 block md:hidden">
+                  <select
+                    name="grade"
+                    id="grade"
+                    value={classId}
+                    onChange={handleGradeChange}
+                    className="border border-white outline-none"
+                  >
+                    <option value={0}>Chọn lớp</option>
+                    {listGrade.map((item, index) => (
+                      <option value={item.id} key={index}>
+                        {item.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
             </div>
-            
 
             {/* {loading ? (
               <Loading />
@@ -240,17 +299,17 @@ export default function Search() {
             )}
 
             {Array.isArray(products) &&
-              products.length > 0 &&
-              totalPage > 1 && (
-                <Paginator
-                  first={first}
-                  rows={rows}
-                  totalRecords={totalPage}
-                  onPageChange={onPageChange}
-                  rowsPerPageOptions={[12, 20, 30]}
-                  className="custom-paginator mx-auto"
-                />
-              )}
+              products.length >
+                0 && (
+                  <Paginator
+                    first={first}
+                    rows={rows}
+                    totalRecords={totalPage * rows}
+                    onPageChange={onPageChange}
+                    rowsPerPageOptions={[12, 20, 30]}
+                    className="custom-paginator mx-auto"
+                  />
+                )}
             {/* </>
             )} */}
           </div>

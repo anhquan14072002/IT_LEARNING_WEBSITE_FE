@@ -12,6 +12,7 @@ import { useSearchParams, useLocation, useNavigate } from "react-router-dom";
 import restClient from "../../services/restClient";
 import CustomQuiz from "../../components/CustomQuiz";
 import NotifyProvider from "../../store/NotificationContext";
+import { removeVietnameseTones } from "../../utils";
 
 export default function SearchQuiz() {
   const footerRef = useRef(null);
@@ -23,6 +24,9 @@ export default function SearchQuiz() {
   const [selectedCity, setSelectedCity] = useState(null);
   const [params, setParams] = useSearchParams();
   const navigate = useNavigate();
+  const [classId, setClassId] = useState();
+  const [type, setType] = useState();
+  const [listGrade, setListGrade] = useState([]);
 
   //document
   const [products, setProducts] = useState([]);
@@ -40,11 +44,28 @@ export default function SearchQuiz() {
   const cities = [{ name: "Tài liệu", code: "search" }];
 
   useEffect(() => {
+    restClient({
+      url: `api/grade/getallgrade?isInclude=false`,
+      method: "GET",
+    })
+      .then((res) => {
+        setListGrade(res.data.data || []);
+      })
+      .catch(() => {
+        setListGrade([]);
+      });
+  }, []);
+
+  useEffect(() => {
     if (params) {
+      const classIdParam = params.get("classId") || "";
+      const typeParam = params.get("type") || "";
       const decodedText = decodeURIComponent(
         Object.fromEntries(params.entries()).text || ""
       );
+      setClassId(classIdParam);
       setTextSearch(decodedText);
+      setType(typeParam);
     }
   }, [params]);
 
@@ -99,7 +120,7 @@ export default function SearchQuiz() {
   //pagination and search
   useEffect(() => {
     fetchData();
-  }, [page, rows, textSearch]);
+  }, [page, rows, textSearch, classId, type]);
 
   const fetchData = () => {
     let url = "api/quiz/getallquizpagination?Status=true&";
@@ -111,6 +132,14 @@ export default function SearchQuiz() {
 
     if (page) {
       params.append("PageIndex", page.toString());
+    }
+
+    if (classId) {
+      params.append("GradeId", classId);
+    }
+
+    if (type && type > 0) {
+      params.append("Type", type);
     }
 
     if (rows) {
@@ -145,6 +174,28 @@ export default function SearchQuiz() {
 
   const handleOnChange = (e) => {
     navigate(`/${e?.value?.code}?text=${textSearch}`);
+  };
+
+  const handleGradeChange = (e) => {
+    const newClassId = e.target.value;
+    setClassId(newClassId);
+    setPage(1);
+    navigate(
+      `?text=${removeVietnameseTones(textSearch)}&classId=${newClassId}${
+        type && type > 0 && `&type=${type}`
+      }`
+    );
+  };
+
+  const handleOnChangeType = (e) => {
+    const typeNew = e.target.value;
+    setType(typeNew);
+    setPage(1);
+    navigate(
+      `?text=${removeVietnameseTones(textSearch)}&type=${typeNew}${
+        classId && classId > 0 && `&classId=${classId}`
+      }`
+    );
   };
 
   return (
@@ -185,7 +236,7 @@ export default function SearchQuiz() {
                 />
               </div>
 
-                {/* <div className="border-2 rounded-md mt-4">
+              {/* <div className="border-2 rounded-md mt-4">
                   <Dropdown
                     filter
                     ref={dropDownRef1}
@@ -198,6 +249,7 @@ export default function SearchQuiz() {
                     className="w-full md:w-14rem shadow-none h-full"
                   />
                 </div> */}
+              <div className="flex gap-2 flex-wrap justify-center">
                 <div className="border-2 rounded-md my-auto">
                   <Dropdown
                     filter
@@ -211,6 +263,37 @@ export default function SearchQuiz() {
                     className="w-full md:w-14rem shadow-none h-full"
                   />
                 </div>
+                <div className="border-2 rounded-md p-2">
+                  <select
+                    name="grade"
+                    id="grade"
+                    value={classId}
+                    onChange={handleGradeChange}
+                    className="border border-white outline-none"
+                  >
+                    <option value={0}>Chọn lớp</option>
+                    {listGrade.map((item, index) => (
+                      <option value={item.id} key={index}>
+                        {item.title}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className="border-2 rounded-md p-2">
+                  <select
+                    name="type"
+                    id="type"
+                    value={type}
+                    onChange={handleOnChangeType}
+                    className="border border-white outline-none"
+                  >
+                    <option value={0}>Chọn thể loại</option>
+                    <option value={1}>Luyện tập</option>
+                    <option value={2}>Kiểm tra</option>
+                  </select>
+                </div>
+              </div>
             </div>
 
             {/* {loading ? (
@@ -232,18 +315,16 @@ export default function SearchQuiz() {
               </div>
             )}
 
-            {Array.isArray(products) &&
-              products.length > 0 &&
-              totalPage > 1 && (
-                <Paginator
-                  first={first}
-                  rows={rows}
-                  totalRecords={totalPage}
-                  onPageChange={onPageChange}
-                  rowsPerPageOptions={[10, 20, 30]}
-                  className="custom-paginator mx-auto"
-                />
-              )}
+            {Array.isArray(products) && products.length > 0 && (
+              <Paginator
+                first={first}
+                rows={rows}
+                totalRecords={totalPage}
+                onPageChange={onPageChange}
+                rowsPerPageOptions={[10, 20, 30]}
+                className="custom-paginator mx-auto"
+              />
+            )}
             {/* </>
             )} */}
           </div>

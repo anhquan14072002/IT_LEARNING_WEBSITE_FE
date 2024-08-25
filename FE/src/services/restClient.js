@@ -13,6 +13,7 @@ export default function restClient({
   data = {},
   headers = {},
 }) {
+
   const token = getTokenFromLocalStorage();
 
   return axios({
@@ -25,5 +26,6 @@ export default function restClient({
       ...(token && { Authorization: `Bearer ${token}` }), // Only add Authorization header if the token exists
     },
   });
+
 }
 

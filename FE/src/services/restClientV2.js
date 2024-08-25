@@ -1,7 +1,7 @@
 import axios from "axios";
 
-
 const BASE_URL = "https://judge0-ce.p.rapidapi.com";
+
 
 
 export default function restClientV2({
@@ -22,4 +22,5 @@ export default function restClientV2({
       "x-rapidapi-key": "d4945d8336mshc741e0914347dccp167230jsn0dd36c7b7999", 
     },
   });
+
 }

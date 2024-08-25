@@ -143,9 +143,6 @@ export default function ManageCodeOnline() {
     restClient({
       url: "api/lesson/updatestatuslesson?id=" + id,
       method: "PUT",
-      headers: {
-        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
-      },
     })
       .then((res) => {
         ACCEPT(toast, "Thay đổi trạng thái thành công");

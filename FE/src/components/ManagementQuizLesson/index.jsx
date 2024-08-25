@@ -105,8 +105,6 @@ export default function ManagementQuizLesson() {
     return <span>{index}</span>;
   };
 
- 
-
   const actionBodyTemplate = (rowData) => {
     return (
       <div style={{ display: "flex", gap: "2rem" }}>
@@ -169,7 +167,13 @@ export default function ManagementQuizLesson() {
   };
 
   const deleteDocument = (id) => {
-    restClient({ url: `api/quiz/deletequiz/${id}`, method: "DELETE" })
+    restClient({
+      url: `api/quiz/deletequiz/${id}`,
+      method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
+    })
       .then((res) => {
         fetchData();
         ACCEPT(toast, "Xóa thành công");
@@ -190,6 +194,9 @@ export default function ManagementQuizLesson() {
     restClient({
       url: "api/quiz/updatestatusquiz/" + id,
       method: "PUT",
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
     })
       .then((res) => {
         ACCEPT(toast, "Thay đổi trạng thái thành công");
@@ -266,8 +273,6 @@ export default function ManagementQuizLesson() {
                 className="p-button-warning focus:outline-none focus:ring-0 flex-shrink-0"
               />
             </div>
-
-           
           </div>
           {loading ? (
             <Loading />

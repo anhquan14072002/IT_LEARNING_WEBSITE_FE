@@ -43,7 +43,7 @@ import HistoryQuiz from "./pages/HistoryQuiz";
 import SearchTag from "./pages/SearchTag";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
-import { isLoggedIn, logout } from "./utils";
+import { getTokenFromLocalStorage, isLoggedIn, logout } from "./utils";
 import { useEffect } from "react";
 
 function App() {
@@ -52,8 +52,11 @@ function App() {
 
   useEffect(() => {
     const checkToken = setInterval(() => {
-      if (isLoggedIn() == false) {
-        logout()
+      if (getTokenFromLocalStorage()) {
+        if (isLoggedIn() == false) {
+          logout();
+          window.location.href = "/login";
+        }
       }
     }, 5000);
 
@@ -147,7 +150,6 @@ function App() {
             user?.role === "User") && (
             <>
               <Route path="/testquiz/:id" element={<TestQuizPage />} />
-              <Route path="/document/lesson/:id" element={<Lesson />} />
               <Route path="/flashcard/:id" element={<FlashCard />} />
               <Route path="/examdetail/:id" element={<ExamDetail />} />
               <Route path="/examresult/:id" element={<ExamResult />} />
@@ -164,14 +166,13 @@ function App() {
           <Route path="/post/:id" element={<Post />} />
           <Route path="/document/:id" element={<Document />} />
           <Route path="/topic/:id" element={<Topic />} />
+          <Route path="/document/lesson/:id" element={<Lesson />} />
           {/* <Route path="/quiz/:id" element={<Quiz />} /> */}
           <Route path="/viewexam" element={<ViewExam />} />
           <Route path="/forgotpassword" element={<ForgotPassword />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/checkmail" element={<CheckMail />} />
           <Route path="/changepassword" element={<ChangePassword />} />
-
-          <Route path="*" element={<NotFound />} />
           <Route
             path="/exampleAddQuizQuestion"
             element={<ExampleAddQuizQuestion />}
@@ -194,6 +195,7 @@ function App() {
           />
           <Route path="/detailclass/:id" element={<DetailClass />} />
           <Route path="/searchTag/:id" element={<SearchTag />} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
     </>

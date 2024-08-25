@@ -31,7 +31,7 @@ export default function AddLanguage({ visible, setVisible, toast, fetchData }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    restClientV2({
+    restClientV2 ({
       url: `languages`,
       method: "GET",
     })

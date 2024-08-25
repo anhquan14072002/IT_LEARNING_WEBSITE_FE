@@ -14,19 +14,27 @@ import { REJECT, SUCCESS } from "../../utils";
 import { MultiSelect } from "primereact/multiselect";
 
 const validationSchema = Yup.object({
-  title: Yup.string().required("Tiêu đề không được bỏ trống"),
-  objectives: Yup.string().required("Mục tiêu chủ đề không được bỏ trống"),
+  title: Yup.string()
+    .trim()
+    .required("Tiêu đề không được bỏ trống")
+    .min(5, "Tiêu đề phải có ít nhất 5 ký tự")
+    .max(250, "Tiêu đề không được vượt quá 250 ký tự"),
+  objectives: Yup.string()
+    .trim()
+    .required("Mục tiêu chủ đề không được bỏ trống")
+    .min(5, "Mục tiêu chủ đề phải có ít nhất 5 ký tự")
+    .max(250, "Mục tiêu chủ đề không được vượt quá 250 ký tự"),
   description: Yup.string().required("Mô tả không được bỏ trống"),
   grade: Yup.object()
-  .test("is-not-empty", "Không được để trống trường này", (value) => {
-    return Object.keys(value).length !== 0; // Check if object is not empty
-  })
-  .required("Không bỏ trống trường này"),
+    .test("is-not-empty", "Không được để trống trường này", (value) => {
+      return Object.keys(value).length !== 0; // Check if object is not empty
+    })
+    .required("Không bỏ trống trường này"),
   document: Yup.object()
-  .test("is-not-empty", "Không được để trống trường này", (value) => {
-    return Object.keys(value).length !== 0; // Check if object is not empty
-  })
-  .required("Không bỏ trống trường này"),
+    .test("is-not-empty", "Không được để trống trường này", (value) => {
+      return Object.keys(value).length !== 0; // Check if object is not empty
+    })
+    .required("Không bỏ trống trường này"),
 });
 
 const UpdateTopicDialog = ({
@@ -65,7 +73,7 @@ const UpdateTopicDialog = ({
         const gradeResponse = await restClient({
           url: `api/grade/getgradebyid/${selecteddocumentById.gradeId}`,
           method: "GET",
-        }); 
+        });
         const selectedGrade = gradeResponse.data?.data || [];
 
         // Fetch documents based on grade
@@ -89,10 +97,10 @@ const UpdateTopicDialog = ({
         const gradeAllResponse = await restClient({
           url: `api/grade/getallgrade?isInclude=false`,
           method: "GET",
-        }); 
+        });
         const listGrade = gradeAllResponse.data?.data || [];
 
-        setGradeList(listGrade)
+        setGradeList(listGrade);
 
         const tagResponse = await restClient({
           url: "api/tag/getalltag",
@@ -101,7 +109,6 @@ const UpdateTopicDialog = ({
         setTagList(
           Array.isArray(tagResponse?.data?.data) ? tagResponse?.data?.data : []
         );
-
       } catch (err) {
         console.error("Error fetching documents:", err);
       } finally {
@@ -112,7 +119,7 @@ const UpdateTopicDialog = ({
     if (visibleUpdate) {
       fetchDocumentsAndGrade();
     }
-  }, [visibleUpdate, updateValue ]);
+  }, [visibleUpdate, updateValue]);
 
   const onSubmit = async (values) => {
     setLoading(true);
@@ -131,23 +138,25 @@ const UpdateTopicDialog = ({
     };
 
     restClient({
-        url: "api/topic/updatetopic",
-        method: "PUT",
-        data: model,
-      }).then((res)=>{
+      url: "api/topic/updatetopic",
+      method: "PUT",
+      data: model,
+    })
+      .then((res) => {
         SUCCESS(toast, "Cập nhật chủ đề thành công");
         fetchData();
         setVisibleUpdate(false);
-      }).catch((error) => {
-        REJECT(toast, error.message || "Cập nhật không thành công");
-      }).finally(()=>{
-        setLoading(false);
       })
-   
+      .catch((error) => {
+        REJECT(toast, error.message || "Cập nhật không thành công");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   const handleOnChangeGrade = async (e, helpers, setTouchedState, props) => {
-    setIsClear(true)
+    setIsClear(true);
     helpers.setValue(e.value);
     setTouchedState(true);
     if (props.onChange) {
