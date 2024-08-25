@@ -1,7 +1,9 @@
 import axios from "axios";
 import { getTokenFromLocalStorage } from "../utils";
 
-const BASE_URL = "http://localhost:8000";
+
+const BASE_URL = "http://localhost:2358";
+
 
 export default function restClientV2({
   url,
