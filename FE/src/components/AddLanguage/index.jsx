@@ -13,6 +13,7 @@ import Loading from "../Loading";
 import { Dropdown } from "primereact/dropdown";
 import CustomDropdown from "../../shared/CustomDropdown";
 import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
+import restClientV2 from "../../services/restClientV2";
 
 const validationSchema = Yup.object({
   language: Yup.object()
@@ -30,7 +31,7 @@ export default function AddLanguage({ visible, setVisible, toast, fetchData }) {
   const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    restClient({
+    restClientV2({
       url: `languages`,
       method: "GET",
     })
