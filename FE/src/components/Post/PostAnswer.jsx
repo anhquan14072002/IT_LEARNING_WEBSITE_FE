@@ -11,7 +11,7 @@ import { Toast } from "primereact/toast";
 import { Button } from "primereact/button";
 import { Formik, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
-import restClient, { BASE_URL } from "../../services/restClient";
+import restClient, { BASE_URL, BASE_URL_FE } from "../../services/restClient";
 import PostContext from "../../store/PostContext";
 import image from "../../assets/img/image.png";
 import like from "../../assets/Icons/like.png";
@@ -89,6 +89,8 @@ const PostAnswer = ({ post }) => {
           fetchPost
         );
       }
+      console.log(user?.sub != userId);
+
       if (user?.sub != userId) {
         notifyPersonalResponse();
       }

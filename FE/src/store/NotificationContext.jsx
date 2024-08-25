@@ -1,7 +1,7 @@
 import { createContext, useCallback, useEffect, useState } from "react";
 import restClient from "../services/restClient";
 import { useSelector } from "react-redux";
-import { isLoggedIn } from "../utils";
+import { getTokenFromLocalStorage, isLoggedIn } from "../utils";
 
 export const NotificationContext = createContext();
 
@@ -17,6 +17,9 @@ export default function NotifyProvider({ children }) {
       restClient({
         url: `api/notifications/getnumberofnotificationbyuser/${user?.sub}`,
         method: "GET",
+        headers: {
+          Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+        },
       })
         .then((res) => {
           setNumberOfNotification(res.data.data);
@@ -31,6 +34,9 @@ export default function NotifyProvider({ children }) {
       restClient({
         url: `api/notifications/getallnotificationbyuser/${user?.sub}?PageIndex=1&PageSize=${rows}`,
         method: "GET",
+        headers: {
+          Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+        },
       })
         .then((res) => {
           setNotifications(res.data.data);
@@ -46,6 +52,9 @@ export default function NotifyProvider({ children }) {
       restClient({
         url: `api/notifications/getallnotificationnotreadbyuser?userId=${user?.sub}&PageIndex=1&PageSize=${rows}`,
         method: "GET",
+        headers: {
+          Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+        },
       })
         .then((res) => {
           setNotifications(res.data.data);
@@ -60,6 +69,9 @@ export default function NotifyProvider({ children }) {
       restClient({
         url: `api/notifications/deleteallnotificationbyuser/${user?.sub}`,
         method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+        },
       })
         .then((res) => {
           setNotifications(res.data.data);
@@ -75,6 +87,9 @@ export default function NotifyProvider({ children }) {
       restClient({
         url: `api/notifications/markallasreadasync?userId=${user?.sub}`,
         method: "POST",
+        headers: {
+          Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+        },
       })
         .then((res) => {
           setRefresh(new Date());

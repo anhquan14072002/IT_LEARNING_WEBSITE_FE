@@ -7,7 +7,13 @@ import React, {
   useState,
 } from "react";
 import restClient, { BASE_URL } from "../services/restClient";
-import { ACCEPT, isLoggedIn, REJECT, SUCCESS } from "../utils";
+import {
+  ACCEPT,
+  getTokenFromLocalStorage,
+  isLoggedIn,
+  REJECT,
+  SUCCESS,
+} from "../utils";
 import { Toast } from "primereact/toast";
 import { useSelector } from "react-redux";
 import {
@@ -101,6 +107,9 @@ export const PostProvider = ({ children }) => {
     restClient({
       url: "api/notifications/createnotificationpersonal",
       method: "POST",
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
       data: contentPost,
     })
       .then((res) => {
@@ -151,6 +160,9 @@ export const PostProvider = ({ children }) => {
     restClient({
       url: url,
       method: "GET",
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
     })
       .then((res) => {
         setPosts(Array.isArray(res.data.data) ? res.data.data : []);
@@ -174,6 +186,9 @@ export const PostProvider = ({ children }) => {
     restClient({
       url: url,
       method: "GET",
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
     })
       .then((res) => {
         setPosts(Array.isArray(res.data.data) ? res.data.data : []);
@@ -191,6 +206,9 @@ export const PostProvider = ({ children }) => {
     restClient({
       url: `api/post/getallpostbygradepagination?gradeId=${itemSidebar.gradeIdSelected}&PageIndex=${page}&PageSize=${rows}&OrderBy=createdDate&IsAscending=false`,
       method: "GET",
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
     })
       .then((res) => {
         setPosts(Array.isArray(res.data.data) ? res.data.data : []);
@@ -208,6 +226,9 @@ export const PostProvider = ({ children }) => {
     restClient({
       url: `api/post/getpostbyid?id=${id}`,
       method: "GET",
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
     })
       .then((res) => {
         setCompose((preValue) => ({
@@ -226,6 +247,9 @@ export const PostProvider = ({ children }) => {
     restClient({
       url: `api/post/getallfavoritepostbyuserpagination?userId=${user?.sub}&PageIndex=${page}&PageSize=${rows}`,
       method: "GET",
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
     })
       .then((res) => {
         setPosts(Array.isArray(res.data.data) ? res.data.data : []);
@@ -243,6 +267,9 @@ export const PostProvider = ({ children }) => {
     restClient({
       url: `api/post/getpostcommentbyid/${id}`,
       method: "GET",
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
     })
       .then((res) => {
         setPostCommentChilds(Array.isArray(res.data.data) ? res.data.data : []);
@@ -259,6 +286,9 @@ export const PostProvider = ({ children }) => {
     await restClient({
       url: `api/post/deletepost/${id}`,
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
     })
       .then((res) => {
         // SUCCESS(toast, "Thu hôi bài post thành công");
@@ -272,6 +302,9 @@ export const PostProvider = ({ children }) => {
     await restClient({
       url: `api/postcomment/deletepostcomment/${id}`,
       method: "DELETE",
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
     })
       .then((res) => {
         SUCCESS(toast, "Thu hôi bình luận thành công");
@@ -286,6 +319,9 @@ export const PostProvider = ({ children }) => {
     restClient({
       url: `api/post/getallpostpagination?PageIndex=${page}&PageSize=${rows}&OrderBy=createdDate&IsAscending=false`,
       method: "GET",
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
     })
       .then((res) => {
         const paginationData = JSON.parse(res.headers["x-pagination"]);
@@ -303,6 +339,9 @@ export const PostProvider = ({ children }) => {
     restClient({
       url: `api/post/getpostbyid?id=${id}`,
       method: "GET",
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
     })
       .then((res) => {
         setPosts([res.data.data]);
@@ -324,6 +363,9 @@ export const PostProvider = ({ children }) => {
         url: "api/post/createpost",
         method: "POST",
         data: contentPost,
+        headers: {
+          Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+        },
       });
       // Refresh the UI by updating state
       setRefresh2(new Date());
@@ -343,6 +385,9 @@ export const PostProvider = ({ children }) => {
     restClient({
       url: "api/post/updatePost",
       method: "PUT",
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
       data: contentPost,
     })
       .then((res) => {
@@ -361,6 +406,9 @@ export const PostProvider = ({ children }) => {
     restClient({
       url: `api/post/votefavoritepost?userId=${user?.sub}&postId=${postId}`,
       method: "POST",
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
     })
       .then((res) => {
         // SUCCESS(toast, "Thích bài post thành công");
@@ -376,6 +424,9 @@ export const PostProvider = ({ children }) => {
     restClient({
       url: "api/postcomment/createpostcomment",
       method: "POST",
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
       data: contentPost,
     })
       .then((res) => {
@@ -394,6 +445,9 @@ export const PostProvider = ({ children }) => {
     restClient({
       url: "api/postcomment/updatepostcomment",
       method: "PUT",
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
       data: contentPost,
     })
       .then((res) => {
@@ -410,6 +464,9 @@ export const PostProvider = ({ children }) => {
     restClient({
       url: "api/postcomment/createpostcomment",
       method: "POST",
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
       data: contentPost,
     })
       .then((res) => {
@@ -427,6 +484,9 @@ export const PostProvider = ({ children }) => {
     restClient({
       url: `api/postcomment/votepostcomment?commentId=${id}&userId=${user?.sub}`,
       method: "POST",
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
     })
       .then((res) => {
         fetchPost();
