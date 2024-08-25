@@ -39,7 +39,7 @@ export default function Search() {
   //pagination
   const [first, setFirst] = useState(0);
   const [page, setPage] = useState(1);
-  const [rows, setRows] = useState(10);
+  const [rows, setRows] = useState(12);
   const [totalPage, setTotalPage] = useState(0);
 
   const cities = [{ name: "Bộ câu hỏi", code: "searchQuiz" }];
@@ -103,6 +103,7 @@ export default function Search() {
   };
 
   const handleOnChange = (e) => {
+    setPage(1)
     navigate(`/${e?.value?.code}?text=${textSearch}`);
   };
 
@@ -112,7 +113,7 @@ export default function Search() {
   }, [page, rows, textSearch, classId]);
 
   const fetchData = () => {
-    let url = "api/document/getalldocumentpagination?";
+    let url = "api/document/getalldocumentpagination?Status=true&";
     const params = new URLSearchParams();
 
     if (textSearch) {
@@ -173,11 +174,14 @@ export default function Search() {
           style={{ paddingTop: `${fixedDivHeight}px` }}
           className="flex gap-5"
         >
+          <div className="w-[15%] bg-gray-100 border-r-2  flex-col gap-3 min-h-screen pt-5 hidden md:block">
           <CategoryOfClass
             display={isFooterVisible}
+            setPage={setPage}
             params={params}
             setParams={setParams}
           />
+          </div>
           <div className="flex-1 w-[98%] pt-5">
             <div className="m-4 mb-10 flex flex-wrap items-center justify-center gap-2 sm:justify-between">
               <div className="border-2 rounded-md p-2">
@@ -243,7 +247,7 @@ export default function Search() {
                   rows={rows}
                   totalRecords={totalPage}
                   onPageChange={onPageChange}
-                  rowsPerPageOptions={[10, 20, 30]}
+                  rowsPerPageOptions={[12, 20, 30]}
                   className="custom-paginator mx-auto"
                 />
               )}

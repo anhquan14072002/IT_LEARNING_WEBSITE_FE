@@ -13,7 +13,7 @@ export default function DetailClass() {
   const fixedDivRef = useRef(null);
   const [fixedDivHeight, setFixedDivHeight] = useState(0);
   const [loading, setLoading] = useState(false);
-  const [documentList, setDocumentList] = useState([]);
+  const [documentList, setDocumentList] = useState({});
   const navigate = useNavigate();
   const { id } = useParams();
 
@@ -39,9 +39,24 @@ export default function DetailClass() {
     );
   };
 
-  // Extract quizzes
-  const practiceQuizzes = extractQuizzesByType(documentList, "Practice");
-  const testQuizzes = extractQuizzesByType(documentList, "Test");
+  const extractProblems = (documentList) => {
+    return [
+      // Problems from problemsCustom
+      ...(documentList?.problemsCustom ?? []),
+      // Problems from documents
+      ...(documentList?.documents ?? []).flatMap((d) =>
+        (d.topics ?? []).flatMap((t) => [
+          ...(t.problems ?? []), // Problems directly in topics
+          ...(t.lessons ?? []).flatMap((l) => l.problems ?? []), // Problems in lessons within topics
+        ])
+      ),
+    ];
+  };
+
+  // Extract quizzes and problems
+  const practiceQuizzes = extractQuizzesByType("Practice");
+  const problemExtract = extractProblems(documentList);
+  const testQuizzes = extractQuizzesByType("Test");
 
   if (loading) return <Loading />;
 
@@ -66,41 +81,23 @@ export default function DetailClass() {
           </div>
 
           {documentList?.documents?.length > 0 && (
-            // <Section
-            //   title="Tài liệu"
-            //   items={documentList.documents}
-            //   navigate={navigate}
-            //   pathPrefix="/document/"
-            //   showAllLink={`/search?classId=${id}`}
-            // />
             <section className="mb-14">
               <h2 className="text-2xl font-bold mb-4 text-center text-blue-500">
                 Bộ sách
               </h2>
-              <div className="flex justify-center">
-              {documentList?.documents?.map((item,index)=>{
-                return (
-               <CustomCard document={item} index={index} />
-                )
-              })}
+              <div className="flex flex-wrap justify-center">
+                {documentList?.documents?.map((item, index) => (
+                  <CustomCard key={index} document={item} index={index} />
+                ))}
               </div>
+              <hr />
             </section>
           )}
 
-          {documentList?.documents?.flatMap(
-            (d) =>
-              d.topics?.flatMap(
-                (t) => t.lessons?.flatMap((l) => l.problems) || []
-              ) || []
-          ).length > 0 && (
+          {problemExtract.length > 0 && (
             <Section
               title="Bài tập"
-              items={documentList.documents.flatMap(
-                (d) =>
-                  d.topics?.flatMap(
-                    (t) => t.lessons?.flatMap((l) => l.problems) || []
-                  ) || []
-              )}
+              items={problemExtract}
               navigate={navigate}
               pathPrefix="/codeEditor/"
             />
@@ -149,11 +146,17 @@ const Section = ({ title, items, navigate, pathPrefix, showAllLink }) => (
       {title}
     </h2>
     <div className="space-y-2">
-      <div className="grid grid-cols-2 gap-4 text-center">
+      <div className="flex flex-wrap justify-center gap-10 text-center">
         {items.map((item) => (
           <div
             key={item.id}
-            className="cursor-pointer text-lg transition text-green-600 font-semibold"
+            className="cursor-pointer text-lg transition text-green-600 hover:text-green-400 underline font-semibold md:flex-1"
+            style={{
+              width: '300px',  // Fixed width
+              overflow: 'hidden',
+              textOverflow: 'ellipsis',
+              whiteSpace: 'nowrap'
+            }}
             onClick={() => navigate(`${pathPrefix}${item.id}`)}
           >
             {item.title}
@@ -161,14 +164,13 @@ const Section = ({ title, items, navigate, pathPrefix, showAllLink }) => (
         ))}
       </div>
       {items.length > 4 && (
-        <div className="grid grid-cols-2 gap-4 text-center">
-          <p></p>
-          <p
+        <div className="text-center">
+          <a
             href={showAllLink}
-            className="text-sm text-blue-600 underline mt-3 text-center"
+            className="text-sm text-blue-600 underline mt-3"
           >
-            {">>> "}Xem tất cả
-          </p>
+            Xem tất cả
+          </a>
         </div>
       )}
       <hr />

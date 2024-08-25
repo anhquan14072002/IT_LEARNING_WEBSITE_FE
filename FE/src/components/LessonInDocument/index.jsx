@@ -59,7 +59,7 @@ export default function LessonInDocument({
   };
 
   return (
-    <div className="w-[18%] bg-gray-100 border-r-2 flex flex-col gap-3 min-h-screen">
+    <div className="w-[18%] bg-gray-100 border-r-2  flex-col gap-3 min-h-screen hidden md:flex">
       <div
         className={`fixed w-[18%] ${
           display

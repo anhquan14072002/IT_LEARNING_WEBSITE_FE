@@ -3,7 +3,7 @@ import restClient from "../../services/restClient";
 import Loading from "../Loading";
 import { useNavigate, useLocation } from "react-router-dom";
 
-export default function CategoryOfClass({ display, params, setParams }) {
+export default function CategoryOfClass({ display, params, setParams, setPage }) {
   const navigate = useNavigate();
   const location = useLocation();
   const [listClast, setListClass] = useState([]);
@@ -41,17 +41,19 @@ export default function CategoryOfClass({ display, params, setParams }) {
   const handleClick = (classId) => {
     if (selectedClassId === classId) {
       setSelectedClassId(null);
+      setPage(1)
       const updatedParams = { ...Object.fromEntries(params.entries()) };
       delete updatedParams.classId;
       setParams(updatedParams);
     } else {
+      setPage(1)
       setSelectedClassId(classId);
       setParams({ ...Object.fromEntries(params.entries()), classId });
     }
   };
 
   return (
-    <div className="w-[15%] bg-gray-100 border-r-2 flex flex-col gap-3 min-h-screen pt-5">
+    <div>
       {loading ? (
         <Loading />
       ) : (

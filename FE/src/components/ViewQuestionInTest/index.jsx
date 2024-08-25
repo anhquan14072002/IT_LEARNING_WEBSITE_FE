@@ -343,7 +343,7 @@ const ViewQuestionInTest = ({ quizData, quizDetail }) => {
       </div>
 
       {/* Lesson Box */}
-      <div className="question-box p-4">
+      <div className="question-box p-4 bg-white">
         <Button
           label="Nộp bài"
           className="text-center bg-blue-600 hover:bg-blue-400 text-white w-full mb-2 py-1"

@@ -43,10 +43,23 @@ import HistoryQuiz from "./pages/HistoryQuiz";
 import SearchTag from "./pages/SearchTag";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
+import { isLoggedIn, logout } from "./utils";
+import { useEffect } from "react";
 
 function App() {
   const user = useSelector((state) => state.user.value);
   console.log(user?.role);
+
+  useEffect(() => {
+    const checkToken = setInterval(() => {
+      if (isLoggedIn() == false) {
+        logout()
+      }
+    }, 5000);
+
+    return () => clearInterval(checkToken);
+  }, []);
+
   return (
     //     <Router>
     //       <Routes>

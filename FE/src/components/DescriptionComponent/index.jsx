@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
 import restClient from "../../services/restClient";
+import { useNavigate } from "react-router-dom";
 
 export default function DescriptionComponent({ id }) {
   const [problem, setProblem] = useState(null);
-
+  const navigate = useNavigate()
   useEffect(() => {
     restClient({ url: "api/problem/getproblembyid/" + id })
       .then((res) => {
+        if(res.data?.data && res.data?.data?.isActive === false){
+          navigate('/notfound')
+        }
         setProblem(res.data?.data);
       })
       .catch((err) => {

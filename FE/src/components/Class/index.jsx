@@ -38,24 +38,11 @@ export default function Class({ item, index }) {
     setToggle((prevToggle) => !prevToggle);
   };
 
-  // const extractQuizzesByType = (typeId) => {
-  //   return (documentList?.documents ?? []).flatMap((d) =>
-  //     (d.topics ?? []).flatMap((t) =>
-  //       [
-  //         ...(t.quizzes ?? []).filter((q) => q.typeId === typeId),
-  //         ...(t.lessons ?? []).flatMap((l) => (l.quizzes ?? []).filter((q) => q.typeId === typeId)),
-  //       ]
-  //     )
-  //   );
-  // };
-
   const extractQuizzesByType = (typeId) => {
-    // Extract quizzesCustom from the documentList
     const quizzesCustom = (documentList?.quizzesCustom ?? []).filter(
       (q) => q.typeId === typeId
     );
 
-    // Extract quizzes from the documents and their nested structures
     const quizzesFromDocuments = (documentList?.documents ?? []).flatMap(
       (d) => [
         ...(d.topics ?? []).flatMap((t) => [
@@ -67,7 +54,6 @@ export default function Class({ item, index }) {
       ]
     );
 
-    // Combine both sources of quizzes
     return [...quizzesCustom, ...quizzesFromDocuments];
   };
 
@@ -88,10 +74,6 @@ export default function Class({ item, index }) {
   };
 
   const getAllProblems = (data) => {
-    console.log('====================================');
-    console.log("data::", data);
-    console.log('====================================');
-    
     if (!data || typeof data !== 'object') {
       console.error('Expected data to be an object with an array of documents');
       return [];
@@ -151,7 +133,8 @@ export default function Class({ item, index }) {
               .map((d) => (
                 <h1
                   key={d?.id}
-                  className="cursor-pointer hover:opacity-85"
+                  className="cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis"
+                  style={{ width: '200px' }}  // Fixed width
                   onClick={() => navigate(`/document/${d?.id}`)}
                 >
                   {d?.title}
@@ -174,7 +157,8 @@ export default function Class({ item, index }) {
               .map((d) => (
                 <h1
                   key={d?.id}
-                  className="cursor-pointer hover:opacity-85"
+                  className="cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis"
+                  style={{ width: '200px' }}  // Fixed width
                   onClick={() => navigate(`/flashcard/${d?.id}`)}
                 >
                   {d.title}
@@ -197,7 +181,8 @@ export default function Class({ item, index }) {
               ?.map((d) => (
                 <h1
                   key={d?.id}
-                  className="cursor-pointer hover:opacity-85"
+                  className="cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis"
+                  style={{ width: '200px' }}  // Fixed width
                   onClick={() => navigate(`/testquiz/${d.id}`)}
                 >
                   {d.title}
@@ -220,7 +205,8 @@ export default function Class({ item, index }) {
               .map((exam) => (
                 <h1
                   key={exam.id}
-                  className="cursor-pointer hover:opacity-85"
+                  className="cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis"
+                  style={{ width: '200px' }}  // Fixed width
                   onClick={() => handleExam(exam)}
                 >
                   {exam.title}
@@ -242,7 +228,8 @@ export default function Class({ item, index }) {
             {getAllProblems(documentList).map((problem) => (
                 <h1
                   key={problem?.id}
-                  className="cursor-pointer hover:opacity-85"
+                  className="cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis"
+                  style={{ width: '200px' }}  // Fixed width
                   onClick={() => navigate(`/codeEditor/${problem?.id}`)}
                 >
                   {problem?.title}
@@ -252,7 +239,7 @@ export default function Class({ item, index }) {
             {getAllProblems(documentList).length > 4 && (
               <h1
                 className="text-sm text-blue-600 mt-3 cursor-pointer"
-                onClick={() => navigate(`/listpractice`)}
+                onClick={() => navigate(`/listpractice?classId=${item?.id}`)}
               >
                 Xem tất cả
               </h1>

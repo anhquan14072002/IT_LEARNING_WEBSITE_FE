@@ -26,7 +26,7 @@ export default function DocumentClass({ display }) {
   }, []);
 
   return (
-    <div className="w-[15%] bg-gray-100 border-r-2 flex flex-col gap-3 min-h-screen pt-5 basis-1/6">
+    <div className="w-[15%] bg-gray-100 border-r-2 flex-col gap-3 min-h-screen pt-5 basis-1/6 hidden md:block">
       {loading ? (
         <Loading />
       ) : (
