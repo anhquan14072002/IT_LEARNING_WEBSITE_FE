@@ -120,39 +120,7 @@ export default function AddQuizLesson({
     fetchData();
   }, []);
   const onSubmit = (values) => {
-    // {
-    //     "title": "string",
-    //     "description": "string",
-    //     "score": 0,
-    //     "isActive": true,
-    //     "topicId": 0,
-    //     "lessonId": 0
-    //   }
-
-    // Ensure tag is always an array
-    // const tagValues = (tag || []).map((item) => item.keyWord);
-
-    // let model = {
-    //   title: values?.title,
-    //   type: 1,
-    //   description: values?.description,
-    //   score: values?.score,
-    //   topicId: values?.topic.id,
-    //   {...tagValues.length > 0 && tagValues:tagValues,}
-    //   isActive: true,
-    // };
-    // if (values?.lesson && values?.lesson.id) {
-    //   model = {
-    //     title: values?.title,
-    //     type: 1,
-    //     description: values?.description,
-    //     score: values?.score,
-    //     topicId: null,
-    //     lessonId: values?.lesson.id,
-    //     tagValues:tagValues,
-    //     isActive: true,
-    //   };
-    // }
+   
     const tagValues = (tag || []).map((item) => item.keyWord);
 
     let model = {
@@ -183,9 +151,6 @@ export default function AddQuizLesson({
       url: "api/quiz/createquiz",
       method: "POST",
       data: model,
-      headers: {
-        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
-      },
     })
       .then((res) => {
         SUCCESS(toast, "Thêm bài quiz thành công");

@@ -124,7 +124,7 @@ export default function Class({ item, index }) {
           opacity: toggle ? 1 : 0,
           transition: "max-height 0.3s ease-out, opacity 0.3s ease-out",
         }}
-        className="overflow-hidden"
+        className="flex justify-center gap-5 flex-wrap"
       >
         <div className="flex gap-20 flex-wrap">
           <div>
@@ -168,7 +168,7 @@ export default function Class({ item, index }) {
             {practiceQuizzes?.length > 4 && (
               <h1
                 className="text-sm text-blue-600 mt-3 cursor-pointer"
-                onClick={() => navigate(`/searchquiz`)}
+                onClick={() => navigate(`/searchquiz?type=1&classId=${item?.id}`)}
               >
                 Xem tất cả
               </h1>
@@ -192,7 +192,7 @@ export default function Class({ item, index }) {
             {testQuizzes.length > 4 && (
               <h1
                 className="text-sm text-blue-600 mt-3 cursor-pointer"
-                onClick={() => navigate(`/searchquiz`)}
+                onClick={() =>  navigate(`/searchquiz?type=2&classId=${item?.id}`)}
               >
                 Xem tất cả
               </h1>
