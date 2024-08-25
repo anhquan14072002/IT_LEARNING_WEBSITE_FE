@@ -157,6 +157,7 @@ export default function Comment({
           SUCCESS(toast, "Thêm đánh giá thành công");
           fetchComment();
           fetDocumentByUser();
+          window.location.reload();
         })
         .catch((err) => {
           REJECT(toast, "Xảy ra lỗi khi thêm đánh giá");
@@ -403,7 +404,11 @@ export default function Comment({
                         />
                       </div>
                       <div>
-                        <p>{comment?.note}</p>
+                        <textarea
+                            className="w-full h-20"
+                            defaultValue={comment?.note}
+                            disabled={true}
+                          />
                       </div>
                     </div>
                   </div>

@@ -49,7 +49,7 @@ const CustomCard = ({ document }) => {
           <p className="text-black text-2xl font-semibold h-16 overflow-hidden whitespace-nowrap text-ellipsis">
             {document?.title}
           </p>
-          <p className="text-gray-600 text-sm mt-1">
+          <p className="text-gray-600 text-sm mt-1 truncate">
             {document?.author || "Unknown Author"}
           </p>
         </div>

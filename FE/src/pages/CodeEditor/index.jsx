@@ -259,7 +259,7 @@ const CodeEditor = () => {
             style={{ paddingTop: `${fixedDivHeight}px` }}
           >
             <div className="p-5 h-screen overflow-y-auto custom-scrollbar min-w-[30%]">
-              <nav className="flex space-x-4 mb-10">
+              <nav className="flex flex-wrap justify-center gap-5 space-x-4 mb-10">
                 <button
                   onClick={() => setNavIndex(1)}
                   className={`py-2 px-4 rounded-lg ${
@@ -547,7 +547,7 @@ const CodeEditor = () => {
         <div className="block lg:hidden">
          
             <div className="px-5 pb-5 h-screen overflow-y-auto custom-scrollbar min-w-[30%]" style={{ paddingTop: `${fixedDivHeight+10}px` }}>
-              <nav className="flex space-x-4 mb-10">
+              <nav className="flex flex-wrap justify-center gap-5 space-x-4 mb-10">
                 <button
                   onClick={() => setNavIndex(1)}
                   className={`py-2 px-4 rounded-lg ${
