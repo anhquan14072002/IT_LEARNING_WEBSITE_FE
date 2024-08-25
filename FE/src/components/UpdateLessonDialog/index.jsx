@@ -55,6 +55,7 @@ export default function UpdateLessonDialog({
         return Object.keys(value).length !== 0; // Check if object is not empty
       })
       .required("Không bỏ trống trường này"),
+    index: Yup.number().required("Vui lòng nhập số thứ tự của bài học"),
   });
 
   const [clearTopic, setClearTopic] = useState(false);
@@ -68,6 +69,7 @@ export default function UpdateLessonDialog({
     }),
     document: {},
     grade: {},
+    index: null,
   });
 
   const handleChangeInputType = (e) => {
@@ -136,6 +138,7 @@ export default function UpdateLessonDialog({
           topic: selectedTopic || {},
           grade: selectedGrade || {},
           document: selectedDocument || {},
+          index: modelUpdate?.index || null,
         };
 
         const tagResponse = await restClient({
@@ -164,6 +167,7 @@ export default function UpdateLessonDialog({
     const formData = new FormData();
     formData.append("Id", modelUpdate.id);
     formData.append("Title", values.title);
+    formData.append("Index", values.index);
     formData.append("TopicId", values.topic.id); // Use topic.id for TopicId
     if (tag && tag.length > 0) {
       tag.forEach((item, index) => {
@@ -329,27 +333,34 @@ export default function UpdateLessonDialog({
                 />
 
                 <CustomTextInput
+                  label="Số thứ tự bài học"
+                  name="index"
+                  type="number"
+                  id="index"
+                />
+
+                <CustomTextInput
                   label="Tiêu đề"
                   name="title"
                   type="text"
                   id="title"
                 />
 
-               <div>
-                <>
-                  <span>Tag</span>
-                </>
-                <MultiSelect
-                  value={tag}
-                  options={tagList}
-                  onChange={(e) => setTag(e.value)}
-                  optionLabel="title"
-                  placeholder="Chọn Tag"
-                  className="w-full shadow-none custom-multiselect border border-gray-300"
-                  display="chip"
-                  filter
-                />
-              </div>
+                <div>
+                  <>
+                    <span>Tag</span>
+                  </>
+                  <MultiSelect
+                    value={tag}
+                    options={tagList}
+                    onChange={(e) => setTag(e.value)}
+                    optionLabel="title"
+                    placeholder="Chọn Tag"
+                    className="w-full shadow-none custom-multiselect border border-gray-300"
+                    display="chip"
+                    filter
+                  />
+                </div>
 
                 <div className="flex justify-between mb-1">
                   <h1>Nội dung bài học</h1>
@@ -385,6 +396,8 @@ export default function UpdateLessonDialog({
                       }
                       className="custom-file-upload mb-2"
                       onSelect={onFileSelect}
+                      onRemove={()=>setFiles([])}
+                      onClear={()=>setFiles([])}
                     />
                   </div>
                 )}

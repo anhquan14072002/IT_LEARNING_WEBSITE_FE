@@ -8,11 +8,14 @@ import Loading from "../../components/Loading";
 import NotifyProvider from "../../store/NotificationContext";
 import restClient from "../../services/restClient";
 import LoadingFull from "../../components/LoadingFull";
+import CustomPractice from "../../components/CustomPractice";
+import CustomPracticeInTag from "../../components/CustomPracticeInTag";
 
 export default function SearchTag() {
   const fixedDivRef = useRef(null);
   const [fixedDivHeight, setFixedDivHeight] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [tag, setTag] = useState();
   const [data, setData] = useState({
     exams: [],
     documents: [],
@@ -34,9 +37,11 @@ export default function SearchTag() {
     if (id) {
       restClient({ url: "api/tag/gettagbyid?id=" + id })
         .then((res) => {
+          setTag(res?.data?.data || null);
           restClient({
             url:
-              "api/tag/searchtagpagination?TagValue=" + res?.data?.data?.title,
+              "api/tag/searchtagpagination?TagValue=" +
+              res?.data?.data?.keyWord,
           })
             .then((res) => {
               setData(res?.data?.data);
@@ -82,103 +87,125 @@ export default function SearchTag() {
           style={{ paddingTop: fixedDivHeight }}
           className="p-4 min-h-screen"
         >
+          <div className="text-center font-bold text-xl mt-10">
+            Dữ liệu của thẻ "{(tag && tag?.title) || ""}"
+          </div>
+
           {loading ? (
             <LoadingFull />
           ) : (
-            <div>
-              {/* Display Problems */}
-              {data.problems.length > 0 && (
+            <div className="mt-10">
+              {/* Display Topics */}
+              {data?.topics?.length > 0 && (
                 <section className="mb-8">
-                  <h2 className="text-2xl font-bold mb-4">Bài tập</h2>
-                  <div className="flex flex-wrap justify-center gap-5">
-                  {data.problems.map((problem) => (
-                    <div
-                      key={problem.id}
-                      className="bg-white p-4 mb-4 shadow-md rounded cursor-pointer"
-                      style={{width: '48%'}}
-                      onClick={()=> { navigate('/codeEditor/'+problem?.id)}}
-                    >
-                      <h3 className="text-xl font-bold">{problem.title}</h3>
-                      <p className="text-gray-500">
-                        Độ khó:{" "}
-                        {problem.difficulty && problem.difficulty === 1 && "Dễ"}
-                        {problem.difficulty &&
-                          problem.difficulty === 2 &&
-                          "Trung bình"}
-                        {problem.difficulty &&
-                          problem.difficulty === 3 &&
-                          "Khó"}
-                      </p>
-                      <p className="text-gray-500">
-                        Từ khóa: {problem.keyWord}
-                      </p>
-                    </div>
-                  ))}
+                  <h2 className="text-lg font-semibold mb-4">Chủ đề</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {data?.topics?.map((topic) => (
+                      <div
+                        key={topic?.id}
+                        className="bg-white p-4 shadow-md rounded flex flex-col cursor-pointer"
+                        onClick={()=>navigate('/topic/'+topic?.id)}
+                      >
+                        <h3 className="text-base truncate">{topic?.title} </h3>
+                        {/* Render topic details here */}
+                      </div>
+                    ))}
                   </div>
                 </section>
               )}
 
-              {/* Display Exams */}
-              {data.exams.length > 0 && (
-                <section className="mb-8">
-                  <h2 className="text-2xl font-bold mb-4">Exams</h2>
-                  {data.exams.map((exam) => (
-                    <div
-                      key={exam.id}
-                      className="bg-white p-4 mb-4 shadow-md rounded"
-                    >
-                      <h3 className="text-xl font-bold">{exam.title}</h3>
-                      {/* Render exam details here */}
-                    </div>
-                  ))}
-                </section>
-              )}
-
-              {/* Display Topics */}
-              {data.topics.length > 0 && (
-                <section className="mb-8">
-                  <h2 className="text-2xl font-bold mb-4">Topics</h2>
-                  {data.topics.map((topic) => (
-                    <div
-                      key={topic.id}
-                      className="bg-white p-4 mb-4 shadow-md rounded"
-                    >
-                      <h3 className="text-xl font-bold">{topic.title}</h3>
-                      {/* Render topic details here */}
-                    </div>
-                  ))}
-                </section>
-              )}
-
               {/* Display Lessons */}
-              {data.lessons.length > 0 && (
+              {/* {data.lessons.length > 0 && (
                 <section className="mb-8">
-                  <h2 className="text-2xl font-bold mb-4">Lessons</h2>
+                  <h2 className="text-lg font-semibold mb-4">Bài học</h2>
                   {data.lessons.map((lesson) => (
                     <div
                       key={lesson.id}
                       className="bg-white p-4 mb-4 shadow-md rounded"
                     >
-                      <h3 className="text-xl font-bold">{lesson.title}</h3>
-                      {/* Render lesson details here */}
+                      <h3 className="text-base">{lesson.title}</h3>
+                    
                     </div>
                   ))}
+                </section>
+              )} */}
+              {data?.lessons?.length > 0 && (
+                <section className="mb-8">
+                  <h2 className="text-lg font-semibold mb-4">Bài học</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {data?.lessons?.map((lesson) => (
+                      <div
+                        key={lesson?.id}
+                        className="bg-white p-4 shadow-md rounded flex flex-col cursor-pointer"
+                        onClick={()=>navigate('/topic/'+lesson?.id)}
+                      >
+                        <h3 className="text-base truncate">{lesson?.title} </h3>
+                        {/* Render topic details here */}
+                      </div>
+                    ))}
+                  </div>
                 </section>
               )}
 
               {/* Display Quizzes */}
-              {data.quizzes.length > 0 && (
+              {data?.quizzes?.length > 0 && (
                 <section className="mb-8">
-                  <h2 className="text-2xl font-bold mb-4">Quizzes</h2>
-                  {data.quizzes.map((quiz) => (
-                    <div
-                      key={quiz.id}
-                      className="bg-white p-4 mb-4 shadow-md rounded"
-                    >
-                      <h3 className="text-xl font-bold">{quiz.title}</h3>
-                      {/* Render quiz details here */}
-                    </div>
-                  ))}
+                  <h2 className="text-lg font-semibold mb-4">
+                    Bộ câu hỏi ôn tập flashcards
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {data?.quizzes?.map((quiz) => {
+                    if (Number(quiz?.type) === 1) {
+                      return (
+                        <div
+                          key={quiz?.id}
+                          className="bg-white p-4 mb-4 shadow-md rounded cursor-pointer"
+                          onClick={()=>navigate('/flashcard/'+quiz?.id)}
+                        >
+                          <h3 className="text-base truncate">{quiz?.title}</h3>
+                          {/* Render quiz details here */}
+                        </div>
+                      );
+                    }
+                  })}
+                  </div>
+                </section>
+              )}
+
+              {/* Display Quizzes */}
+              {data?.quizzes.length > 0 && (
+                <section className="mb-8">
+                  <h2 className="text-lg font-semibold mb-4">
+                    Bộ câu hỏi trắc nghiệm
+                  </h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {data?.quizzes?.map((quiz) =>{
+                    if (Number(quiz?.type) === 2) {
+                      return (
+                        <div
+                          key={quiz?.id}
+                          className="bg-white p-4 mb-4 shadow-md rounded cursor-pointer"
+                          onClick={()=>navigate('/testquiz/'+quiz?.id)}
+                        >
+                          <h3 className="text-base truncate">{quiz?.title}</h3>
+                          {/* Render quiz details here */}
+                        </div>
+                      );
+                    }
+                  })}
+                  </div>
+                </section>
+              )}
+
+              {/* Display Problems */}
+              {data?.problems?.length > 0 && (
+                <section className="mb-8">
+                  <h2 className="text-lg font-semibold mb-4">Bài tập</h2>
+                  <div className="flex flex-wrap justify-center gap-5">
+                    {data?.problems?.map((problem, index) => (
+                      <CustomPracticeInTag document={problem} key={index} />
+                    ))}
+                  </div>
                 </section>
               )}
 
@@ -188,7 +215,9 @@ export default function SearchTag() {
                 data.documents.length === 0 &&
                 data.topics.length === 0 &&
                 data.lessons.length === 0 &&
-                data.quizzes.length === 0 && <p>No data found.</p>}
+                data.quizzes.length === 0 && (
+                  <p className="text-center">Không có dữ liệu cho thẻ này.</p>
+                )}
             </div>
           )}
         </div>

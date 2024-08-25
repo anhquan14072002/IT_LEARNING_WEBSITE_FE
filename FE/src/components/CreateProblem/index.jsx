@@ -18,7 +18,6 @@ import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/python/python";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/material.css";
-import restClientV2 from "../../services/restClientV2";
 import AddTestCase from "../AddTestCase";
 import { Toast } from "primereact/toast";
 import { encodeBase64, REJECT } from "../../utils";
@@ -138,35 +137,28 @@ export default function CreateProblem() {
 
   const onSubmit = async (values) => {
 
-    // Ensure tag is always an array
-    const tagValues = (tag || []).map((item) => item.keyWord);
-
-    // Check if tagValues is empty
-    if (tagValues.length === 0) {
-      REJECT(toast, "Chưa chọn tag. Vui lòng chọn ít nhất một tag.");
-      setLoading(false);
-      return; // Exit the function if no tags are selected
-    }
-
     if (!testCase || testCase.length === 0) {
       REJECT(toast, "Vui lòng tạo test case");
       return;
     }
+
+    const tagValues = (tag || []).map((item) => item.keyWord);
 
     const data = {
       title: values?.title,
       description: values?.description,
       difficulty: values?.difficulty?.id,
       isActive: true,
-      tagValues,
+      gradeId: values.grade.id
     };
 
+    if(tagValues.length > 0){
+      data.tagValues = tagValues;
+    }
     if (values?.lesson?.id) {
       data.lessonId = values.lesson.id;
     } else if (values?.topic?.id) {
       data.topicId = values.topic.id;
-    } else if (values?.grade?.id) {
-      data.gradeId = values.grade.id;
     }
 
     setLoading(true);
@@ -574,7 +566,6 @@ export default function CreateProblem() {
                       <div className="mb-5">
                         <>
                           <span>Tag</span>
-                          <span className="text-red-600">*</span>
                         </>
                         <MultiSelect
                           value={tag}

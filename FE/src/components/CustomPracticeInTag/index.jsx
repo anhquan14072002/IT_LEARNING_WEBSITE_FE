@@ -2,7 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Tooltip } from "primereact/tooltip";
 
-const CustomPractice = ({ document }) => {
+const CustomPracticeInTag = ({ document }) => {
   const navigate = useNavigate();
 
   return (
@@ -19,17 +19,17 @@ const CustomPractice = ({ document }) => {
         <div className="flex justify-center mb-4">
           {document?.difficulty === 1 && (
             <span className="text-green-500 rounded-lg p-2 text-base font-mono bg-green-100 border border-green-200">
-              {document?.difficultyName}
+              Dễ
             </span>
           )}
           {document?.difficulty === 2 && (
             <span className="text-yellow-500 rounded-lg p-2 text-base font-mono bg-yellow-100 border border-yellow-200">
-              {document?.difficultyName}
+              Trung bình
             </span>
           )}
           {document?.difficulty === 3 && (
             <span className="text-red-500 rounded-lg p-2 text-base font-mono bg-red-100 border border-red-200">
-              {document?.difficultyName}
+             Khó
             </span>
           )}
         </div>
@@ -43,4 +43,4 @@ const CustomPractice = ({ document }) => {
   );
 };
 
-export default CustomPractice;
+export default CustomPracticeInTag;

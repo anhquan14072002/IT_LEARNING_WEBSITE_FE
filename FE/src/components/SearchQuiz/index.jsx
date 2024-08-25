@@ -102,7 +102,7 @@ export default function SearchQuiz() {
   }, [page, rows, textSearch]);
 
   const fetchData = () => {
-    let url = "api/quiz/getallquizpagination?";
+    let url = "api/quiz/getallquizpagination?Status=true&";
     const params = new URLSearchParams();
 
     if (textSearch) {
@@ -164,11 +164,11 @@ export default function SearchQuiz() {
           className="flex gap-5"
         >
           <div className="flex-1 w-[98%] pt-5">
-            <div className="m-4 mb-10 flex flex-wrap items-center">
+            <div className="m-4 mb-10 flex flex-wrap items-center justify-center gap-2 sm:justify-between">
               <div className="border-2 rounded-md p-2">
                 <InputText
                   value={textSearch} // Bind value to local state
-                  placeholder="Search"
+                  placeholder="Tìm kiếm"
                   className="flex-1 focus:outline-none w-36 focus:ring-0"
                   onChange={(e) => {
                     setTextSearch(e.target.value);
@@ -185,7 +185,6 @@ export default function SearchQuiz() {
                 />
               </div>
 
-              <div className="flex-1 flex gap-3 justify-end">
                 {/* <div className="border-2 rounded-md mt-4">
                   <Dropdown
                     filter
@@ -199,7 +198,7 @@ export default function SearchQuiz() {
                     className="w-full md:w-14rem shadow-none h-full"
                   />
                 </div> */}
-                <div className="border-2 rounded-md mt-4">
+                <div className="border-2 rounded-md my-auto">
                   <Dropdown
                     filter
                     ref={dropDownRef2}
@@ -212,19 +211,26 @@ export default function SearchQuiz() {
                     className="w-full md:w-14rem shadow-none h-full"
                   />
                 </div>
-              </div>
             </div>
 
             {/* {loading ? (
               <Loading />
             ) : (
               <> */}
-            <div className="flex flex-wrap justify-start">
+            <div className="flex flex-wrap justify-center">
               {products &&
                 products?.map((p, index) => {
                   return <CustomQuiz document={p} key={index} />;
                 })}
             </div>
+
+            {products && products.length === 0 && (
+              <div>
+                <h1 className="text-gray-400 font-bold text-4xl text-center mt-20">
+                  Bộ câu hỏi không tồn tại
+                </h1>
+              </div>
+            )}
 
             {Array.isArray(products) &&
               products.length > 0 &&

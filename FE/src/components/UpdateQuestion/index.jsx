@@ -69,6 +69,8 @@ const UpdateQuestion = ({
   ];
 
   useEffect(() => {
+    console.log(updateValue);
+    
     const fetchFormData = async () => {
       console.log("typeQuestion::", typeQuestion);
       setLoading(true);
@@ -143,7 +145,7 @@ const UpdateQuestion = ({
                 type: typeObject || {},
                 questionLevel:
                   questionLevelData.find(
-                    (item) => item?.title === updateValue.questionLevel
+                    (item) => item?.levelName === updateValue.questionLevel
                   ) || {},
                 shuffle: shuffle.find(
                   (s, index) => updateValue?.isShuffle === s?.valueTitle
@@ -170,7 +172,7 @@ const UpdateQuestion = ({
                 type: typeObject || {},
                 questionLevel:
                   questionLevelData.find(
-                    (item) => item?.title === updateValue.questionLevel
+                    (item) => item?.levelName === updateValue.questionLevel
                   ) || {},
                 shuffle: shuffle.find(
                   (s, index) => updateValue?.isShuffle === s?.valueTitle

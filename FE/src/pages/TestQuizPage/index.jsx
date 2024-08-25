@@ -37,7 +37,7 @@ export default function TestQuizPage() {
       setLoading(true);
       try {
         const quizResponse = await restClient({
-          url: `api/quizquestion/getallquizquestionbyquizid?QuizId=${id}`,
+          url: `api/quizquestion/getallquizquestionbyquizid?Status=true&QuizId=${id}`,
           method: "GET",
         });
 
@@ -45,6 +45,10 @@ export default function TestQuizPage() {
           url: `api/quiz/getquizbyid/${id}`,
           method: "GET",
         });
+
+        if (quizDetailResponse.data?.data?.isActive === false) {
+          navigate("/notfound");
+        }
 
         if (quizDetailResponse.data?.data) {
           setQuizDetail(quizDetailResponse.data.data);
@@ -75,16 +79,23 @@ export default function TestQuizPage() {
           <Menu />
         </div>
 
-        <div
-          style={{ paddingTop: `${fixedDivHeight}px` }}
-          className="min-h-screen"
-        >
-          <ViewQuestionInTest quizData={quizData} quizDetail={quizDetail} />
-        </div>
+        {!quizData || (Array.isArray(quizData) && quizData.length === 0) ? (
+          <div
+            style={{ paddingTop: `${fixedDivHeight}px` }}
+            className="min-h-screen"
+          >
+            <div className="text-center mt-16 text-2xl font-bold text-gray-500">Đề thi không có câu hỏi sẵn có</div>
+          </div>
+        ) : (
+          <div
+            style={{ paddingTop: `${fixedDivHeight}px` }}
+            className="min-h-screen"
+          >
+            <ViewQuestionInTest quizData={quizData} quizDetail={quizDetail} />
+          </div>
+        )}
 
-        <LazyComponent>
-          <Footer />
-        </LazyComponent>
+        <Footer />
       </div>
     </NotifyProvider>
   );

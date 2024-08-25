@@ -40,6 +40,7 @@ export default function AddLessonDialog({
     ...(inputContet && {
       content: Yup.string().required("Mô tả không được bỏ trống"),
     }),
+    index: Yup.number().required("Vui lòng nhập số thứ tự của bài học"),
     topic: Yup.object()
       .test("is-not-empty", "Không được để trống trường này", (value) => {
         return Object.keys(value).length !== 0; // Check if object is not empty
@@ -63,6 +64,7 @@ export default function AddLessonDialog({
     grade: {},
     document: {},
     content: "",
+    index: null,
   };
 
   useEffect(() => {
@@ -96,14 +98,9 @@ export default function AddLessonDialog({
     fetchData();
   }, []);
   const onSubmit = (values) => {
-
-    if(tag && tag.length ===0){
-      REJECT(toast,"Vui lòng chọn thẻ tag")
-      return;
-    }
-
     const formData = new FormData();
     formData.append("Title", values.title);
+    formData.append("Index", values.index);
     formData.append("TopicId", values.topic.id);
     if (inputContet) {
       formData.append("Content", values.content);
@@ -144,7 +141,7 @@ export default function AddLessonDialog({
       .catch((err) => {
         REJECT(toast, "Xảy ra lỗi khi thêm bài học");
         setIsLoadingAddLesson(false);
-      setTag([])
+        setTag([]);
       })
       .finally(() => {
         setVisible(false);
@@ -272,14 +269,22 @@ export default function AddLessonDialog({
               />
 
               <CustomTextInput
+                label="Số thứ tự bài học"
+                name="index"
+                type="number"
+                id="index"
+              />
+
+              <CustomTextInput
                 label="Tiêu đề"
                 name="title"
                 type="text"
                 id="title"
               />
+
               <div>
                 <>
-                  <span>Tag</span><span className="text-red-600">*</span>
+                  <span>Tag</span>
                 </>
                 <MultiSelect
                   value={tag}
@@ -315,13 +320,15 @@ export default function AddLessonDialog({
                     id="content"
                     name="demo[]"
                     url={"/api/upload"}
-                    accept=".docx, application/vnd.openxmlformats-officedocument.wordprocessingml.document, .pdf, application/pdf"
+                    accept=".pdf, application/pdf"
                     maxFileSize={10485760} // 10MB
                     emptyTemplate={
                       <p className="m-0">Drag and drop files here to upload.</p>
                     }
                     className="custom-file-upload mb-2"
                     onSelect={onFileSelect}
+                    onRemove={()=>setFiles([])}
+                    onClear={()=>setFiles([])}
                   />
                 </div>
               )}

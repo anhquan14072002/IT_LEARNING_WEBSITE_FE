@@ -1,12 +1,16 @@
 import React, { useEffect, useState } from "react";
 import restClient from "../../services/restClient";
+import { useNavigate } from "react-router-dom";
 
 export default function DescriptionComponent({ id }) {
   const [problem, setProblem] = useState(null);
-
+  const navigate = useNavigate()
   useEffect(() => {
     restClient({ url: "api/problem/getproblembyid/" + id })
       .then((res) => {
+        if(res.data?.data && res.data?.data?.isActive === false){
+          navigate('/notfound')
+        }
         setProblem(res.data?.data);
       })
       .catch((err) => {
@@ -20,7 +24,7 @@ export default function DescriptionComponent({ id }) {
         Tiêu đề : {problem?.title}
       </h1>
       <p className="text-lg mb-4">
-        <strong>Độ khó:</strong> {problem?.difficulty}
+        <strong>Độ khó:</strong> {problem?.difficulty === 1 ? "Dễ" : problem?.difficulty === 2 ? "Trung bình" : problem?.difficulty === 3 && "Khó"}
       </p>
       <p className="text-lg mb-4">
         <strong>Nội dung:</strong>

@@ -26,12 +26,12 @@ export default function DocumentClass({ display }) {
   }, []);
 
   return (
-    <div className="w-[15%] bg-gray-100 border-r-2 flex flex-col gap-3 min-h-screen pt-5">
+    <div className="w-[15%] bg-gray-100 border-r-2 flex-col gap-3 min-h-screen pt-5 basis-1/6 hidden md:block">
       {loading ? (
         <Loading />
       ) : (
         <div
-          className={`fixed w-[15%] ${
+          className={`fixed w-1/6 ${
             display
               ? "transition duration-200 ease-in-out hidden"
               : "transition duration-200 ease-in-out block"
@@ -47,7 +47,7 @@ export default function DocumentClass({ display }) {
                   style={{ maxWidth: '100%', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}
                   onClick={() => navigate(`/search?classId=`+clast.id)}
                 >
-                  Bộ sách {clast?.title}
+                  {clast?.title}
                 </div>
               ))}
           </div>

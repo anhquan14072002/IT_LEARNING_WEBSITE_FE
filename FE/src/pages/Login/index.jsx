@@ -20,7 +20,12 @@ const Index = () => {
   const [currState, setCurrState] = useState("Login");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const { control, handleSubmit, formState: { errors }, reset } = useForm();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+    reset,
+  } = useForm();
 
   useEffect(() => {
     // Retrieve saved email and password from localStorage
@@ -66,7 +71,7 @@ const Index = () => {
         await forgotPassword(email);
         CHECKMAIL(toast, "Vui lòng kiểm tra mail để xác thực");
       } catch (error) {
-        alert("Reject");
+        REJECT(toast, "Mail này chưa được đăng kí tài khoản");
       }
     }
   };
@@ -100,24 +105,42 @@ const Index = () => {
                 <div className="mb-4">
                   <label htmlFor="email" className="cursor-pointer">
                     <h4 className="text-xl text-black font-medium">
-                      Tài khoản <span className="text-red-500">*</span>
+                      {currState === "ForgotPassword" ? "Email" : "Tài khoản"}{" "}
+                      <span className="text-red-500">*</span>
                     </h4>
                   </label>
                   <Controller
                     name="email"
                     control={control}
                     defaultValue=""
-                    rules={{ required: "Tài khoản không được để trống" }}
+                    rules={{
+                      required:
+                        currState === "ForgotPassword"
+                          ? "Email không được để trống"
+                          : "Tài khoản không được để trống",
+                      pattern:
+                        currState === "ForgotPassword"
+                          ? {
+                              value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                              message: "Email không hợp lệ",
+                            }
+                          : undefined,
+                    }}
                     render={({ field }) => (
                       <InputText
                         id="email"
                         type="text"
                         className="w-full h-10 text-black-800 border border-solid border-gray-600 pb-2 pl-1 rounded-md shadow-none"
-                        placeholder="Nhập email hoặc tài khoản"
+                        placeholder={
+                          currState === "ForgotPassword"
+                            ? "Nhập email"
+                            : "Nhập tài khoản hoặc email"
+                        }
                         {...field}
                       />
                     )}
                   />
+
                   <br />
                   {errors.email && (
                     <span className="text-red-500 text-sm">
@@ -140,9 +163,9 @@ const Index = () => {
                         required: "Mật khẩu không được để trống",
                         pattern: {
                           value:
-                            /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/,
+                            /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{6,}$/,
                           message:
-                            "Mật khẩu cần ít nhất 8 ký tự, bao gồm chữ cái đầu viết hoa, số và ký tự đặc biệt",
+                            "Mật khẩu cần ít nhất 6 ký tự, bao gồm chữ cái đầu viết hoa, số và ký tự đặc biệt",
                         },
                       }}
                       render={({ field }) => (

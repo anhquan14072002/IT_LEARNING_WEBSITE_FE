@@ -39,7 +39,7 @@ export default function Search() {
   //pagination
   const [first, setFirst] = useState(0);
   const [page, setPage] = useState(1);
-  const [rows, setRows] = useState(10);
+  const [rows, setRows] = useState(12);
   const [totalPage, setTotalPage] = useState(0);
 
   const cities = [{ name: "Bộ câu hỏi", code: "searchQuiz" }];
@@ -103,6 +103,7 @@ export default function Search() {
   };
 
   const handleOnChange = (e) => {
+    setPage(1)
     navigate(`/${e?.value?.code}?text=${textSearch}`);
   };
 
@@ -112,7 +113,7 @@ export default function Search() {
   }, [page, rows, textSearch, classId]);
 
   const fetchData = () => {
-    let url = "api/document/getalldocumentpagination?";
+    let url = "api/document/getalldocumentpagination?Status=true&";
     const params = new URLSearchParams();
 
     if (textSearch) {
@@ -173,17 +174,20 @@ export default function Search() {
           style={{ paddingTop: `${fixedDivHeight}px` }}
           className="flex gap-5"
         >
+          <div className="w-[15%] bg-gray-100 border-r-2  flex-col gap-3 min-h-screen pt-5 hidden md:block">
           <CategoryOfClass
             display={isFooterVisible}
+            setPage={setPage}
             params={params}
             setParams={setParams}
           />
+          </div>
           <div className="flex-1 w-[98%] pt-5">
-            <div className="m-4 mb-10 flex flex-wrap items-center">
+            <div className="m-4 mb-10 flex flex-wrap items-center justify-center gap-2 sm:justify-between">
               <div className="border-2 rounded-md p-2">
                 <InputText
                   value={textSearch} // Bind value to local state
-                  placeholder="Search"
+                  placeholder="Tìm kiếm"
                   className="flex-1 focus:outline-none w-36 focus:ring-0"
                   onChange={(e) => {
                     setTextSearch(e.target.value);
@@ -200,21 +204,7 @@ export default function Search() {
                 />
               </div>
 
-              <div className="flex-1 flex gap-3 justify-end">
-                {/* <div className="border-2 rounded-md mt-4">
-                  <Dropdown
-                    filter
-                    ref={dropDownRef1}
-                    value={selectedCity}
-                    onChange={(e) => setSelectedCity(e.value)}
-                    options={cities}
-                    optionLabel="name"
-                    showClear
-                    placeholder="Thể loại"
-                    className="w-full md:w-14rem shadow-none h-full"
-                  />
-                </div> */}
-                <div className="border-2 rounded-md mt-4">
+                <div className="border-2 rounded-md mt-auto mb-auto">
                   <Dropdown
                     filter
                     ref={dropDownRef2}
@@ -227,7 +217,6 @@ export default function Search() {
                     className="w-full md:w-14rem shadow-none h-full"
                   />
                 </div>
-              </div>
             </div>
             
 
@@ -242,6 +231,14 @@ export default function Search() {
                 })}
             </div>
 
+            {products && products.length === 0 && (
+              <div>
+                <h1 className="text-gray-400 font-bold text-4xl text-center mt-20">
+                  Bộ sách không tồn tại
+                </h1>
+              </div>
+            )}
+
             {Array.isArray(products) &&
               products.length > 0 &&
               totalPage > 1 && (
@@ -250,7 +247,7 @@ export default function Search() {
                   rows={rows}
                   totalRecords={totalPage}
                   onPageChange={onPageChange}
-                  rowsPerPageOptions={[10, 20, 30]}
+                  rowsPerPageOptions={[12, 20, 30]}
                   className="custom-paginator mx-auto"
                 />
               )}

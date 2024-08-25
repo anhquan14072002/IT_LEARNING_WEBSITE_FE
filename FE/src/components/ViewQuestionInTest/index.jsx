@@ -343,7 +343,7 @@ const ViewQuestionInTest = ({ quizData, quizDetail }) => {
       </div>
 
       {/* Lesson Box */}
-      <div className="question-box p-4 z-10">
+      <div className="question-box p-4 bg-white">
         <Button
           label="Nộp bài"
           className="text-center bg-blue-600 hover:bg-blue-400 text-white w-full mb-2 py-1"
@@ -358,7 +358,7 @@ const ViewQuestionInTest = ({ quizData, quizDetail }) => {
             : "0:00"}
         </div>
 
-        <ul className="flex flex-wrap gap-2 border p-5 justify-center shadow-lg">
+        <ul className="flex flex-wrap gap-2 border p-5 justify-center shadow-lg bg-white">
           {quizData?.map((question, index) => (
             <li
               key={question.id}

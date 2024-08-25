@@ -17,12 +17,9 @@ import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/python/python";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/material.css";
-import restClientV2 from "../../services/restClientV2";
-import AddTestCase from "../AddTestCase";
 import { Toast } from "primereact/toast";
 import { encodeBase64, isBase64, REJECT } from "../../utils";
 import NotifyProvider from "../../store/NotificationContext";
-import UpdateTestCase from "../UpdateTestCase";
 import AddInUpdateProblem from "../AddInUpdateProblem";
 import UpdateInUpdateTestCase from "../UpdateInUpdateTestcase";
 import LoadingFull from "../LoadingFull";
@@ -123,7 +120,7 @@ export default function UpdateProblem() {
         });
         setTestCaseList(getAllTestcase?.data?.data);
 
-        if (problem && problem.lessonId) {
+        if (problem && problem.gradeId && problem.topicId === null && problem.lessonId !== null) {
           const lessonById = await restClient({
             url: `api/lesson/getlessonbyid/${problem?.lessonId}`,
             method: "GET",
@@ -185,7 +182,7 @@ export default function UpdateProblem() {
           setIsFormReady(true);
         }
 
-        if (problem && problem.topicId) {
+        if (problem && problem.gradeId && problem.topicId !== null && problem.lessonId === null) {
           const topicById = await restClient({
             url: `api/topic/gettopicbyid?id=${problem?.topicId}`,
             method: "GET",
@@ -239,7 +236,7 @@ export default function UpdateProblem() {
           setIsFormReady(true);
         }
 
-        if (problem && problem.gradeId) {
+        if (problem && problem.gradeId && problem.topicId === null && problem.lessonId === null) {
           const gradeById = await restClient({
             url: `api/grade/getgradebyid/${problem.gradeId}`,
             method: "GET",
@@ -330,17 +327,16 @@ export default function UpdateProblem() {
       title: values?.title,
       description: values?.description,
       difficulty: values?.difficulty?.id,
+      gradeId: values.grade.id,
       isActive: true,
       tagValues,
     };
 
     if (values?.lesson?.id) {
-      data.gradeId = values.grade.id;
+      data.lessonId = values.lesson.id;
     } else if (values?.topic?.id) {
       data.topicId = values.topic.id;
-    } else if (values?.grade?.id) {
-      data.lessonId = values.lesson.id;
-    }
+    } 
 
     await restClient({
       url: "api/problem/updateproblem",

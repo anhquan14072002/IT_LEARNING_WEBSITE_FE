@@ -1,128 +1,147 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { InputText } from "primereact/inputtext";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
-import { loginWithRoleAdmin } from "../../services/authenService";
-import { decodeToken, REJECT } from "../../utils";
+import { loginWithRoleAdmin, forgotPassword } from "../../services/authenService";
+import { decodeToken, REJECT, CHECKMAIL } from "../../utils";
 import { Toast } from "primereact/toast";
-import * as Yup from "yup";
 import { useDispatch } from "react-redux";
 import { addUser } from "../../redux/userr/userSlice";
+import { Controller, useForm } from "react-hook-form";
 
-// Define the validation schema with regex for password
-const validationSchema = Yup.object().shape({
-  email: Yup.string().required("Tài khoản là bắt buộc"),
-  password: Yup.string()
-    .matches(
-      /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{8,}$/,
-      "Mật khẩu phải ít nhất 8 ký tự, bao gồm chữ hoa, chữ thường, số và ký tự đặc biệt"
-    )
-    .required("Mật khẩu là bắt buộc"),
-});
 
 export default function About() {
   const toast = useRef(null);
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [emailError, setEmailError] = useState("");
-  const [passwordError, setPasswordError] = useState("");
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const getNavigationPath = (role) => {
-    if (role === "Admin") {
-      return "/dashboard/statistic";
-    }
-    if (role === "ContentManager") {
-      return "/dashboard/lesson";
-    }
-    return ""; 
-  };
-  const handleSubmit = async () => {
-    // Reset errors
-    setEmailError("");
-    setPasswordError("");
 
+  const { control, handleSubmit, formState: { errors }, reset } = useForm({
+    defaultValues: {
+      email: "",
+      password: "",
+    }
+  });
+
+  const getNavigationPath = (role) => {
+    switch (role) {
+      case "Admin":
+        return "/dashboard/statistic";
+      case "ContentManager":
+        return "/dashboard/lesson";
+      default:
+        return "/";
+    }
+  };
+
+  const onSubmit = async (data) => {
+    const { email, password } = data;
     try {
-      await validationSchema.validate({ email, password }, { abortEarly: false });
+      // Handle login or forgot password based on `currState` logic
       const response = await loginWithRoleAdmin(email, password);
       if (response.data) {
         localStorage.setItem("accessToken", response.data.data.accessToken);
         localStorage.setItem("refreshToken", response.data.data.refreshToken);
         localStorage.setItem("userId", response.data.data.admin.id);
         localStorage.setItem("userEmail", response.data.data.admin.email);
-        const decodedToken = decodeToken(response?.data?.data?.accessToken);
+        const decodedToken = decodeToken(response.data.data.accessToken);
         dispatch(addUser(decodedToken));
-        navigate(getNavigationPath(decodedToken.role))
+        navigate(getNavigationPath(decodedToken.role));
       } else {
         REJECT(toast, "Sai tài khoản hoặc mật khẩu");
       }
     } catch (error) {
-      if (error.name === "ValidationError") {
-        // Show validation error below the input fields
-        error.inner.forEach(err => {
-          if (err.path === "email") {
-            setEmailError(err.message);
-          }
-          if (err.path === "password") {
-            setPasswordError(err.message);
-          }
-        });
-      } else {
-        REJECT(toast, "Sai tài khoản hoặc mật khẩu");
-      }
+          REJECT(toast, "Sai tài khoản hoặc mật khẩu");
     }
   };
+
+ 
 
   return (
     <div className="h-screen bg-gray-100 flex items-center justify-center">
       <div className="bg-white shadow-md rounded-lg p-8 w-full max-w-md">
-        <div className="text-center mb-8">
+      <div className="text-center mb-8">
           <h1 className="text-3xl font-medium text-gray-900">Quản Lý</h1>
         </div>
-        <div>
-          <label
-            htmlFor="email"
-            className="block text-gray-900 text-xl font-medium mb-2"
-          >
-            Tài Khoản <span className="text-red-500">*</span>
+      <form onSubmit={handleSubmit(onSubmit)} className="w-full max-w-md">
+        <div className="mb-4">
+          <label htmlFor="email" className="cursor-pointer">
+            <h4 className="text-xl text-black font-medium">
+              Email <span className="text-red-500">*</span>
+            </h4>
           </label>
-          <InputText
-            id="email"
-            type="text"
-            placeholder="Nhập tài khoản"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="w-full border-gray-300 border-solid border shadow-none rounded-md py-2 px-3"
+          <Controller
+            name="email"
+            control={control}
+            rules={{
+              required: "Email không được để trống",
+              pattern: {
+                value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                message: "Email không hợp lệ",
+              },
+            }}
+            render={({ field }) => (
+              <InputText
+                id="email"
+                type="text"
+                className="w-full h-10 text-black-800 border border-solid border-gray-600 pb-2 pl-1 rounded-md shadow-none"
+                placeholder="Nhập email"
+                {...field}
+              />
+            )}
           />
-          {emailError && <p className="text-red-500 text-sm mt-1">{emailError}</p>}
+          {errors.email && (
+            <span className="text-red-500 text-sm">{errors.email.message}</span>
+          )}
         </div>
-        <br />
 
-        <div>
-          <label
-            htmlFor="password"
-            className="block text-gray-900 text-xl font-medium mb-2"
-          >
-            Mật Khẩu<span className="text-red-500">*</span>
-          </label>
-          <InputText
-            id="password"
-            type="password"
-            placeholder="Nhập mật khẩu"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full border-gray-300 border-solid border rounded-md shadow-none py-2 px-3"
-          />
-          {passwordError && <p className="text-red-500 text-sm mt-1">{passwordError}</p>}
-        </div>
-        <br />
-        <Button
-          label="Đăng Nhập"
-          onClick={handleSubmit}
-          className="w-full bg-blue-500 text-white py-3 rounded-md shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
-        />
-      </div>
+        <div className="mb-4">
+                    <label htmlFor="password" className="cursor-pointer">
+                      <h4 className="text-xl text-black font-medium">
+                        Mật Khẩu <span className="text-red-500">*</span>
+                      </h4>
+                    </label>
+                    <Controller
+                      name="password"
+                      control={control}
+                      defaultValue=""
+                      rules={{
+                        required: "Mật khẩu không được để trống",
+                        pattern: {
+                          value:
+                            /^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])(?=.*[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]).{6,}$/,
+                          message:
+                            "Mật khẩu cần ít nhất 6 ký tự, bao gồm chữ cái đầu viết hoa, số và ký tự đặc biệt",
+                        },
+                      }}
+                      render={({ field }) => (
+                        <InputText
+                          id="password"
+                          type="password"
+                          className="w-full h-10 text-black-800 border border-solid border-gray-600 pb-2 pl-1 rounded-md shadow-none"
+                          placeholder="Nhập mật khẩu"
+                          {...field}
+                        />
+                      )}
+                    />
+                    <br />
+                    {errors.password && (
+                      <span className="text-red-500 text-sm">
+                        {errors.password.message}
+                      </span>
+                    )}
+                  </div>
+          <div className="mb-4">
+            <Button
+              label="Đăng Nhập"
+              type="submit"
+              severity="info"
+              className="w-full px-6 py-3 bg-blue-500 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-opacity-75"
+            />
+          </div>
+       
+      </form>
       <Toast ref={toast} />
+      </div>
     </div>
   );
 }

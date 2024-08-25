@@ -12,6 +12,7 @@ import { InputText } from "primereact/inputtext";
 import { ACCEPT, REJECT, removeVietnameseTones } from "../../utils";
 import { confirmDialog } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
+import { InputSwitch } from "primereact/inputswitch";
 
 export default function PracticeComponent() {
   const toast = useRef(null);
@@ -128,11 +129,9 @@ export default function PracticeComponent() {
 
   const changeStatusLesson = (value, id) => {
     restClient({
-      url: "api/lesson/updatestatuslesson?id=" + id,
+      url: "api/problem/updatestatusproblem/" + id,
       method: "PUT",
-      headers: {
-        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
-      },
+     
     })
       .then((res) => {
         ACCEPT(toast, "Thay đổi trạng thái thành công");
@@ -144,16 +143,16 @@ export default function PracticeComponent() {
   };
 
   const status = (rowData, { rowIndex }) => {
-    // return <InputSwitch checked={rowData.isActive} />;
     return (
-      <button
-        className="bg-blue-600 hover:bg-blue-400 text-white p-2 rounded-md"
-        onClick={() =>
-          navigate(`/dashboard/quiz/manageexecutecode/${rowData?.id}`)
+      <InputSwitch
+        checked={rowData.isActive}
+        onChange={(e) => changeStatusLesson(e.value, rowData.id)}
+        tooltip={
+          rowData.isActive
+            ? "Bài này đã được duyệt"
+            : "Bài chưa được duyệt"
         }
-      >
-        Chỉnh sửa mã thực thi
-      </button>
+      />
     );
   };
 
@@ -292,11 +291,11 @@ export default function PracticeComponent() {
             <Column
               header="Độ khó"
               className="border-b-2 border-t-2"
-              field="difficulty"
+              field="difficultyName"
               style={{ minWidth: "12rem" }}
             ></Column>
             <Column
-              // header="Trạng thái"
+              header="Trạng thái"
               className="border-b-2 border-t-2"
               body={status}
               style={{ minWidth: "10rem" }}
