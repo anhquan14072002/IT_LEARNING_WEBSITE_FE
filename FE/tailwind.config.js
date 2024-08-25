@@ -16,6 +16,9 @@ export default {
         '32p': '32%',
         '49p': '49%', 
       },
+      screens: {
+        'menuBar' : '1279px'
+      }
     },
   },
   plugins: [],

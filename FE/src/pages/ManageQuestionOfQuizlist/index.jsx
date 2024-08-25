@@ -15,6 +15,7 @@ import {
   formatDate,
   getTokenFromLocalStorage,
   REJECT,
+  removeVietnameseTones,
 } from "../../utils";
 import { InputSwitch } from "primereact/inputswitch";
 import AddQuizLesson from "../../components/AddQuizLesson";
@@ -61,20 +62,20 @@ export default function ManageQuestionOfQuizlist() {
       ? [
           {
             title: "Thống kê",
-          
+
             icon: "pi pi-chart-bar",
             index: "statistic",
           },
           {
             title: "Quản lí tài khoản",
-        
+
             icon: "pi pi-user",
             index: "user",
           },
 
           {
             title: "Quản lí tài liệu/chủ đề/bài học",
-       
+
             icon: "pi pi-book",
             index: "adminManageDocument",
           },
@@ -86,7 +87,7 @@ export default function ManageQuestionOfQuizlist() {
       ? [
           {
             title: "Quản lí bài học",
-      
+
             icon: "pi pi-book",
             index: "lesson",
           },
@@ -120,6 +121,8 @@ export default function ManageQuestionOfQuizlist() {
   ];
 
   useEffect(() => {
+    console.log("textchange::",textSearch);
+    
     fetchData();
   }, [page, rows, textSearch]);
 
@@ -127,7 +130,9 @@ export default function ManageQuestionOfQuizlist() {
     setLoading(true);
 
     restClient({
-      url: `api/quizquestion/getallquizquestionpagination?QuizId=${id}&PageIndex=${page}&PageSize=${rows}`,
+      url: `api/quizquestion/getallquizquestionpagination?QuizId=${id}&PageIndex=${page}&PageSize=${rows}${
+        textSearch && `&Value=${textSearch}`
+      }`,
       method: "GET",
     })
       .then((res) => {
@@ -144,25 +149,9 @@ export default function ManageQuestionOfQuizlist() {
   };
 
   const fetchData = () => {
-    // if (textSearch.trim()) {
-    //   setLoading(true);
-    //   restClient({
-    //     url: `api/topic/searchbytopicpagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}`,
-    //     method: "GET",
-    //   })
-    //     .then((res) => {
-    //       const paginationData = JSON.parse(res.headers["x-pagination"]);
-    //       setTotalPage(paginationData.TotalPages);
-    //       setProducts(Array.isArray(res.data.data) ? res.data.data : []);
-    //     })
-    //     .catch((err) => {
-    //       console.error("Error fetching data:", err);
-    //       setProducts([]);
-    //     })
-    //     .finally(() => setLoading(false));
-    // } else {
+   
     pagination(page, rows);
-    // }
+   
   };
 
   const onPageChange = (event) => {
@@ -267,9 +256,6 @@ export default function ManageQuestionOfQuizlist() {
     restClient({
       url: "api/quizquestion/updatestatusquizquestion?id=" + id,
       method: "PUT",
-      headers: {
-        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
-      },
     })
       .then((res) => {
         ACCEPT(toast, "Thay đổi trạng thái thành công");
@@ -290,6 +276,27 @@ export default function ManageQuestionOfQuizlist() {
     );
   };
 
+  const typeQuestion = (rowData, { rowIndex }) => {
+    return (
+      <p>
+        {rowData && rowData?.type === 1 && "Loại true false" }
+        {rowData && rowData?.type === 2 && "Loại một câu trả lời" }
+        {rowData && rowData?.type === 3 && "Loại nhiều câu trả lời" }
+      </p>
+    )
+  }
+
+  const level = (rowData, { rowIndex }) => {
+    return (
+      <p>
+        {rowData && rowData?.questionLevel === 1 && "Cấp độ rất dễ" }
+        {rowData && rowData?.questionLevel === 2 && "Cấp độ dễ" }
+        {rowData && rowData?.questionLevel === 3 && "Cấp độ trung bình" }
+        {rowData && rowData?.questionLevel === 4 && "Cấp độ khó" }
+      </p>
+    )
+  }
+
   return (
     <NotifyProvider>
       <div className="fixed top-0 w-full z-30">
@@ -301,11 +308,11 @@ export default function ManageQuestionOfQuizlist() {
             open ? "w-72" : "w-20"
           } bg-dark-purple h-screen p-5 pt-8 duration-300`}
         >
-            <i
-                className={`pi pi-arrow-circle-right text-white text-xl  absolute cursor-pointer right-2 top-7 w-7 
+          <i
+            className={`pi pi-arrow-circle-right text-white text-xl  absolute cursor-pointer right-2 top-7 w-7 
    rounded-full ${!open ? "rotate-180" : ""}`}
-                onClick={() => setOpen(!open)}
-              />
+            onClick={() => setOpen(!open)}
+          />
 
           <ul className="pt-6">
             {Menus.map((Menu) => (
@@ -316,11 +323,11 @@ export default function ManageQuestionOfQuizlist() {
                   navigate(`/dashboard/${Menu.index}`);
                 }}
               >
-               <Tooltip
-                      target={`#tooltip-${Menu.index}`}
-                      content={Menu.title}
-                    />
-                    <i id={`tooltip-${Menu.index}`} className={Menu.icon}></i>
+                <Tooltip
+                  target={`#tooltip-${Menu.index}`}
+                  content={Menu.title}
+                />
+                <i id={`tooltip-${Menu.index}`} className={Menu.icon}></i>
                 <span
                   className={`${
                     !open ? "hidden" : ""
@@ -338,13 +345,6 @@ export default function ManageQuestionOfQuizlist() {
           <div>
             <Toast ref={toast} />
             <ConfirmDialog visible={visibleDelete} />
-            {/* <ImportFromQuiz
-              visible={visibleImport}
-              setVisible={setVisibleImport}
-              toast={toast}
-              fetchData={fetchData}
-              id={id}
-            /> */}
             <AddQuestion
               id={id}
               visible={visible}
@@ -377,16 +377,6 @@ export default function ManageQuestionOfQuizlist() {
                     className="bg-blue-600 text-white p-2 text-sm font-normal"
                     onClick={() => setVisible(true)}
                   />
-                  {/* <Button
-              label="Xóa"
-              icon="pi pi-trash"
-              disabled={!selectedProduct || selectedProduct.length === 0}
-              severity="danger"
-              className="bg-red-600 text-white p-2 text-sm font-normal ml-3"
-              onClick={() => {
-                console.log("product list ::", selectedProduct);
-              }}
-            /> */}
                 </div>
               </div>
 
@@ -399,29 +389,13 @@ export default function ManageQuestionOfQuizlist() {
                           removeVietnameseTones(e.target.value)
                         );
                       }}
-                      placeholder="Search"
+                      placeholder="Tìm kiếm"
                       className="flex-1 focus:outline-none w-36 focus:ring-0"
                     />
                     <Button
                       icon="pi pi-search"
                       className="p-button-warning focus:outline-none focus:ring-0 flex-shrink-0"
                     />
-                  </div>
-
-                  <div className="flex-1 flex flex-wrap gap-3 justify-end">
-                    <div className="border-2 rounded-md mt-4">
-                      <Dropdown
-                        filter
-                        ref={dropDownRef2}
-                        value={selectedCity}
-                        onChange={(e) => setSelectedCity(e.value)}
-                        options={cities}
-                        optionLabel="name"
-                        showClear
-                        placeholder="Tài liệu"
-                        className="w-full md:w-14rem shadow-none h-full"
-                      />
-                    </div>
                   </div>
                 </div>
                 {loading ? (
@@ -456,22 +430,16 @@ export default function ManageQuestionOfQuizlist() {
                         body={content}
                       />
                       <Column
-                        field="type"
                         header="Loại câu hỏi"
                         className="border-b-2 border-t-2"
                         style={{ minWidth: "15rem" }}
+                        body={typeQuestion}
                       />
                       <Column
-                        field="questionLevel"
                         header="Mức độ"
                         className="border-b-2 border-t-2"
                         style={{ minWidth: "15rem" }}
-                      />
-                      <Column
-                        field="score"
-                        header="Điểm"
-                        className="border-b-2 border-t-2"
-                        style={{ width: "15%" }}
+                        body={level}
                       />
                       <Column
                         header="Trạng thái"

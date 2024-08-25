@@ -20,6 +20,7 @@ import slide3 from "../../assets/anh3.jpg";
 import slide4 from "../../assets/anh4.jpg";
 import { useSelector } from "react-redux";
 import { isLoggedIn } from "../../utils";
+import restClient from "../../services/restClient";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ export default function Home() {
   const [classList, setListClass] = useState([]);
   const [documentList, setDocumentList] = useState([]);
   const [loadingGet, setLoadingGet] = useState(false);
-  const user = useSelector((state)=> state.user.value)
+  const user = useSelector((state) => state.user.value);
 
   var settings = {
     dots: true,
@@ -37,10 +38,9 @@ export default function Home() {
     speed: 500,
     slidesToShow: 1,
     slidesToScroll: 1,
-    autoplay: true,           
-    autoplaySpeed: 3000,     
+    autoplay: true,
+    autoplaySpeed: 3000,
   };
-  
 
   useEffect(() => {
     setTimeout(() => {
@@ -50,15 +50,26 @@ export default function Home() {
     }, 500);
   }, [fixedDivRef.current]);
 
-  useEffect(()=>{
-    if(isLoggedIn()){
-      console.log(user)
+  useEffect(() => {
+    if (isLoggedIn()) {
+      console.log(user);
     }
-  },[])
+  }, []);
 
   useEffect(() => {
     getAllGrade(setLoading, setListClass);
-    getAllDocumentSortByAvg(setLoadingGet, setDocumentList);
+    restClient({
+      url: `api/document/getalldocumentpagination?PageSize=5&OrderBy=averageRating&IsAscending=false&Status=true`,
+      method: "GET",
+    })
+      .then((res) => {
+        setDocumentList(res.data.data || []);
+        setLoading(false);
+      })
+      .catch((err) => {
+        setDocumentList([]);
+        setLoading(false);
+      });
   }, []);
 
   return (
@@ -67,13 +78,12 @@ export default function Home() {
         <LoadingScreen setLoading={setLoading} />
       ) : (
         <NotifyProvider>
-          <div>
+          <div className="min-h-screen">
             <div ref={fixedDivRef} className="fixed top-0 w-full z-10">
               <Header />
               <Menu />
             </div>
 
-            <div className="min-h-screen">
               <div
                 className="sm:px-20"
                 style={{ paddingTop: `${fixedDivHeight}px` }}
@@ -107,7 +117,7 @@ export default function Home() {
                         src={slide4}
                         alt="Slide"
                       />
-                      </div>
+                    </div>
                   </Slider>
                 </div>
 
@@ -147,7 +157,6 @@ export default function Home() {
                   ))
                 )}
               </div>
-            </div>
 
             <Footer />
           </div>

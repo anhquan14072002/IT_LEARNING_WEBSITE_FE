@@ -102,7 +102,7 @@ export default function SearchQuiz() {
   }, [page, rows, textSearch]);
 
   const fetchData = () => {
-    let url = "api/quiz/getallquizpagination?";
+    let url = "api/quiz/getallquizpagination?Status=true&";
     const params = new URLSearchParams();
 
     if (textSearch) {

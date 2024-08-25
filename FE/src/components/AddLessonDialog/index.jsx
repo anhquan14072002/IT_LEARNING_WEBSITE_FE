@@ -327,6 +327,8 @@ export default function AddLessonDialog({
                     }
                     className="custom-file-upload mb-2"
                     onSelect={onFileSelect}
+                    onRemove={()=>setFiles([])}
+                    onClear={()=>setFiles([])}
                   />
                 </div>
               )}

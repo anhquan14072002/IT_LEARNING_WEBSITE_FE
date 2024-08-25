@@ -39,6 +39,7 @@ export default function Lesson() {
   const { id } = useParams();
   const [isNext, setIsNext] = useState(true);
   const [isPrevious, setisPrevious] = useState(true);
+  const [tagTopic, setTagTopic] = useState([]);
 
   const fetchData = async () => {
     try {
@@ -68,8 +69,32 @@ export default function Lesson() {
   };
 
   useEffect(() => {
-    getLessonById(id, setLoading, setLesson);
+    restClient({
+      url: `api/lesson/getlessonbyid/${id}`,
+      method: "GET",
+    })
+      .then((res) => {
+        if (res?.data?.data?.isActive === false) {
+          navigate("/notfound");
+        }
+        setLesson(res.data.data || {});
+        setLoading(false);
+      })
+      .catch((err) => {
+        setLesson({});
+        setLoading(false);
+      });
+
     fetchData();
+    restClient({
+      url: "api/lesson/getlessonidbytag/" + id,
+    })
+      .then((res) => {
+        setTagTopic(res?.data?.data);
+      })
+      .catch((err) => {
+        setTagTopic([]);
+      });
   }, [id]);
 
   useEffect(() => {
@@ -228,13 +253,13 @@ export default function Lesson() {
             fixedDivRef={fixedDivRef}
           />
 
-          <div className="pt-6 flex-1">
+          <div className="pt-6 flex-1 px-2 md:px-0 pb-5 md-pb-0">
             {loading ? (
               <Loading />
             ) : Object.keys(lesson).length > 0 ? (
               <>
                 <div>
-                  <div className="flex justify-between mb-10">
+                  <div className="flex flex-wrap gap-2 justify-between mb-10">
                     <button
                       onClick={handlePrevious}
                       className="flex items-center bg-blue-500 text-white py-2 px-4 rounded-md shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -289,6 +314,26 @@ export default function Lesson() {
                   //     __html: lesson.content,
                   //   }}
                   // />
+                )}
+
+                {/* tag */}
+                {tagTopic.length > 0 && (
+                  <div className="mt-6">
+                    <span className="block font-semibold mb-3">
+                      Các từ khóa liên quan đến chủ đề
+                    </span>
+                    <div className="flex flex-wrap gap-3">
+                      {tagTopic.map((tag) => (
+                        <div
+                          key={tag.id}
+                          className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full shadow-sm hover:bg-blue-200 transition-colors cursor-pointer"
+                          onClick={() => navigate("/searchTag/" + tag.id)}
+                        >
+                          {tag.title}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 )}
               </>
             ) : (

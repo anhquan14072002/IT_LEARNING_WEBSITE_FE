@@ -327,15 +327,14 @@ export default function UpdateProblem() {
       title: values?.title,
       description: values?.description,
       difficulty: values?.difficulty?.id,
+      gradeId: values.grade.id,
       isActive: true,
       tagValues,
     };
 
     if (values?.lesson?.id) {
-      data.gradeId = values.grade.id;
       data.lessonId = values.lesson.id;
     } else if (values?.topic?.id) {
-      data.gradeId = values.grade.id;
       data.topicId = values.topic.id;
     } 
 

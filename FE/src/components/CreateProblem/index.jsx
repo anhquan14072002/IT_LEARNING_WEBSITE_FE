@@ -137,6 +137,11 @@ export default function CreateProblem() {
 
   const onSubmit = async (values) => {
 
+    if (!testCase || testCase.length === 0) {
+      REJECT(toast, "Vui lòng tạo test case");
+      return;
+    }
+
     const tagValues = (tag || []).map((item) => item.keyWord);
 
     const data = {
@@ -144,6 +149,7 @@ export default function CreateProblem() {
       description: values?.description,
       difficulty: values?.difficulty?.id,
       isActive: true,
+      gradeId: values.grade.id
     };
 
     if(tagValues.length > 0){
@@ -151,10 +157,8 @@ export default function CreateProblem() {
     }
     if (values?.lesson?.id) {
       data.lessonId = values.lesson.id;
-      data.gradeId = values.grade.id;
     } else if (values?.topic?.id) {
       data.topicId = values.topic.id;
-      data.gradeId = values.grade.id;
     }
 
     setLoading(true);

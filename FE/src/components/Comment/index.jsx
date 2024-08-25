@@ -287,7 +287,7 @@ export default function Comment({
               listCommentByUser.map((comment, index) => (
                 <>
                   <div className="my-5">
-                    <div className="flex gap-5 items-center" key={index}>
+                    <div className="flex gap-5" key={index}>
                       <div>
                         <img
                           src={comment?.avatar}

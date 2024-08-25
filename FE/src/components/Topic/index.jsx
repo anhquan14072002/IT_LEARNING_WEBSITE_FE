@@ -18,6 +18,7 @@ import "./index.css";
 import AddTopicDialog from "../AddTopicDialog";
 import UpdateTopicDialog from "../UpdateTopicDialog";
 import debounce from "lodash.debounce";
+import { InputSwitch } from "primereact/inputswitch";
 
 export default function Topic() {
   const toast = useRef(null);
@@ -189,6 +190,34 @@ export default function Topic() {
     setTextSearch(text);
   }, 300);
 
+  const status = (rowData, { rowIndex }) => {
+    return (
+      <InputSwitch
+        checked={rowData.isActive}
+        onChange={(e) => changeStatusLesson(e.value, rowData.id)}
+        tooltip={
+          rowData.isActive
+            ? "Chủ đề này đã được duyệt"
+            : "Chủ đề chưa được duyệt"
+        }
+      />
+    );
+  };
+
+  const changeStatusLesson = (value, id) => {
+    restClient({
+      url: "api/topic/updatestatustopic/" + id,
+      method: "PUT"
+    })
+      .then((res) => {
+        ACCEPT(toast, "Thay đổi trạng thái thành công");
+        fetchData();
+      })
+      .catch((err) => {
+        REJECT(toast, "Lỗi khi thay đổi trạng thái");
+      });
+  };
+
   return (
     <div>
       <Toast ref={toast} />
@@ -299,38 +328,46 @@ export default function Topic() {
                   header="#"
                   body={indexBodyTemplate}
                   className="border-b-2 border-t-2"
-                  style={{ minWidth: '5rem' }}
+                  style={{ minWidth: "5rem" }}
                 />
                 <Column
                   field="title"
                   header="Tiêu đề"
                   className="border-b-2 border-t-2"
-                  style={{ minWidth: '12rem' }}
+                  style={{ minWidth: "12rem" }}
                 />
                 <Column
                   field="documentTitle"
                   header="Tài liệu"
                   className="border-b-2 border-t-2"
-                  style={{ minWidth: '12rem' }}
+                  style={{ minWidth: "12rem" }}
                 />
                 <Column
                   field="objectives"
                   header="Mục tiêu chủ đề"
                   className="border-b-2 border-t-2"
-                  style={{ minWidth: '15rem' }}
+                  style={{ minWidth: "15rem" }}
                 />
+
+                <Column
+                  header="Trạng thái"
+                  className="border-b-2 border-t-2"
+                  body={status}
+                  style={{ minWidth: "10rem" }}
+                ></Column>
+
                 <Column
                   field="createdDate"
                   header="Ngày tạo"
                   className="border-b-2 border-t-2"
-                  style={{ minWidth: '20rem' }}
+                  style={{ minWidth: "20rem" }}
                   body={(rowData) => formatDate(rowData.createdDate)}
                 />
                 <Column
                   field="lastModifiedDate"
                   header="Ngày cập nhật"
                   className="border-b-2 border-t-2"
-                  style={{ minWidth: '20rem' }}
+                  style={{ minWidth: "20rem" }}
                   body={(rowData) => formatDate(rowData.lastModifiedDate)}
                 />
                 <Column

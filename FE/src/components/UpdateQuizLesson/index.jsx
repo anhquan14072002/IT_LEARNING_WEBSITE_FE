@@ -69,6 +69,25 @@ export default function UpdateQuizLesson({
   const [tag, setTag] = useState(null);
 
   useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const tagResponse = await restClient({
+          url: "api/tag/getalltag",
+          method: "GET",
+        });
+        console.log(tagResponse?.data?.data);
+        setTagList(
+          Array.isArray(tagResponse?.data?.data) ? tagResponse?.data?.data : []
+        );
+      } catch (error) {
+        console.error("Failed to fetch tags:", error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  useEffect(() => {
     const fetchInitialData = async () => {
       setLoading(true);
       try {
@@ -179,15 +198,6 @@ export default function UpdateQuizLesson({
         });
         const dataLesson = lessonData.data?.data || {};
         setLessonList(dataLesson);
-
-        const tagResponse = await restClient({
-          url: "api/tag/getalltag",
-          method: "GET",
-        });
-        console.log(tagResponse?.data?.data);
-        setTagList(
-          Array.isArray(tagResponse?.data?.data) ? tagResponse?.data?.data : []
-        );
       } catch (err) {
         console.error("Error fetching data:", err);
       } finally {

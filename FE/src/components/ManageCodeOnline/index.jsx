@@ -100,45 +100,6 @@ export default function ManageCodeOnline() {
     }
   };
 
-  // const fetchData = (page, rows) => {
-  //   if (textSearch.trim()) {
-  //     setLoading(true);
-  //     restClient({
-  //       url: `api/problem/getallproblempagination?Value=${textSearch}&PageIndex=${page}&PageSize=${rows}`,
-  //       method: "GET",
-  //     })
-  //       .then((res) => {
-  //         const paginationData = JSON.parse(res.headers["x-pagination"]);
-  //         setTotalPage(paginationData.TotalPages);
-  //         setProducts(Array.isArray(res.data.data) ? res.data.data : []);
-  //       })
-  //       .catch((err) => {
-  //         console.error("Error fetching data:", err);
-  //         setProducts([]);
-  //       })
-  //       .finally(() => setLoading(false));
-  //   } else {
-  //     setLoading(true);
-
-  //     restClient({
-  //       url: `api/problem/getallproblempagination?PageIndex=${page}&PageSize=${rows}`,
-  //       method: "GET",
-  //     })
-  //       .then((res) => {
-  //         const paginationData = JSON.parse(res.headers["x-pagination"]);
-  //         setTotalPage(paginationData.TotalPages);
-  //         setProducts(Array.isArray(res.data.data) ? res.data.data : []);
-  //       })
-  //       .catch((err) => {
-  //         console.error("Error fetching data:", err);
-  //         setProducts([]);
-  //       })
-  //       .finally(() => {
-  //         setLoading(false);
-  //       });
-  //   }
-  // };
-
   const actionBodyTemplate = (rowData) => {
     return (
       <div style={{ display: "flex" }}>
