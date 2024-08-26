@@ -126,6 +126,16 @@ export default function UpdateProblem() {
 
         setEditoral(editoralData);
 
+        try {
+          const tagTopic = await restClient({
+            url: `api/problem/getproblemidbytag/${id}`,
+            method: "GET",
+          });
+          setTag(tagTopic?.data?.data || null);
+        } catch (error) {
+          setTag(null);
+        }
+
         const getAllTestcase = await restClient({
           url: "api/testcase/getalltestcasebyproblemid/" + id,
         });

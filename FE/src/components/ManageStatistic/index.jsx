@@ -73,7 +73,7 @@ export default function ManageStatistic() {
           labels: lessonData.labels,
           datasets: [
             {
-              label: "Radar Bài học",
+              label: "Bài học",
               data: lessonData.dataValues,
               backgroundColor: "rgba(66, 165, 245, 0.2)",
               borderColor: "#42A5F5",

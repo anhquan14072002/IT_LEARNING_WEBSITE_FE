@@ -149,6 +149,16 @@ export default function UpdateLessonDialog({
           index: modelUpdate?.index || null,
         };
 
+        try {
+          const tagTopic = await restClient({
+            url: `api/lesson/getlessonidbytag/${modelUpdate?.id}`,
+            method: "GET",
+          });
+          setTag(tagTopic?.data?.data || null);
+        } catch (error) {
+          setTag(null);
+        }
+
         const tagResponse = await restClient({
           url: "api/tag/getalltag",
           method: "GET",
