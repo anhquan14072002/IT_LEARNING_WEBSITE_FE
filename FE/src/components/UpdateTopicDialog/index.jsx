@@ -102,6 +102,16 @@ const UpdateTopicDialog = ({
 
         setGradeList(listGrade);
 
+        try {
+          const tagTopic = await restClient({
+            url: `api/topic/gettopicidbytag/${updateValue?.id}`,
+            method: "GET",
+          });
+          setTag(tagTopic?.data?.data || null);
+        } catch (error) {
+          setTag(null);
+        }
+
         const tagResponse = await restClient({
           url: "api/tag/getalltag",
           method: "GET",

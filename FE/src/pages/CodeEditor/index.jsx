@@ -489,12 +489,15 @@ const CodeEditor = () => {
                         <div className="h-auto p-3 bg-transparent text-red-500 font-semibold text-base ml-5 w-5/6 overflow-x-auto">
                           {errorResult}
                           <br />
-                          {/* {Array.isArray(result) && result[0]?.compileOutput &&
-                          decodeBase64(result[0]?.compileOutput)}
-                          {Array.isArray(result) && result[0]?.standardError &&
-                          decodeBase64(result[0]?.standardError)}
-                          {Array.isArray(result) && result[0]?.message &&
-                          decodeBase64(result[0]?.message)} */}
+                          {Array.isArray(result) &&
+                            result[0]?.compileOutput &&
+                            decodeBase64(result[0]?.compileOutput)}
+                          {Array.isArray(result) &&
+                            result[0]?.standardError &&
+                            decodeBase64(result[0]?.standardError)}
+                          {Array.isArray(result) &&
+                            result[0]?.message &&
+                            decodeBase64(result[0]?.message)}
 
                           {result?.map((item, index) => {
                             const status = item?.status;
