@@ -67,13 +67,13 @@ export default function Lesson() {
       }
 
       const quizByTopicResponse = await restClient({
-        url: `api/quiz/getallquiznopagination?TopicId=${id}&Status=true`,
+        url: `api/quiz/getallquiznopagination?LessonId=${id}&Status=true`,
         method: "GET",
       });
       setQuizByTopic(quizByTopicResponse?.data?.data);
 
       const problemByTopicResponse = await restClient({
-        url: `api/problem/getallproblempagination?TopicId=${id}&StatusProblem=true`,
+        url: `api/problem/getallproblempagination?LessonId=${id}&StatusProblem=true`,
         method: "GET",
       });
       console.log(
