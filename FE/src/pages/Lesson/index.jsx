@@ -25,7 +25,7 @@ import { Editor } from "primereact/editor";
 import "./index.css";
 import NotifyProvider from "../../store/NotificationContext";
 
-export default function Lesson() {
+export default function   Lesson() {
   const navigate = useNavigate();
   const fixedDivRef = useRef(null);
   const [fixedDivHeight, setFixedDivHeight] = useState(0);
@@ -320,7 +320,7 @@ export default function Lesson() {
                 {tagTopic.length > 0 && (
                   <div className="mt-6">
                     <span className="block font-semibold mb-3">
-                      Các từ khóa liên quan đến chủ đề
+                      Các từ khóa liên quan đến bài học
                     </span>
                     <div className="flex flex-wrap gap-3">
                       {tagTopic.map((tag) => (

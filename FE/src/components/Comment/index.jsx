@@ -331,7 +331,7 @@ export default function Comment({
                     <div className="flex justify-end gap-5">
                       <div>
                         <Button
-                          label="Edit"
+                          label="Cập nhật"
                           className="p-button-success p-button-outlined bg-green-500 text-white p-1"
                           icon="pi pi-pencil"
                           onClick={() => {
@@ -343,7 +343,7 @@ export default function Comment({
                       </div>
                       <div>
                         <Button
-                          label="Delete"
+                          label="Xóa"
                           className="p-button-danger p-button-outlined bg-red-500 text-white p-1"
                           icon="pi pi-trash"
                           onClick={() => confirmDelete(comment.id)}

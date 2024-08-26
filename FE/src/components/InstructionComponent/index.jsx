@@ -3,6 +3,7 @@ import restClient from "../../services/restClient";
 
 export default function InstructionComponent({ id }) {
   const [problem, setProblem] = useState(null);
+  const [tagTopic, setTagTopic] = useState([]);
 
   useEffect(() => {
     restClient({ url: "api/editorial/geteditorialbyproblemid/" + id })
@@ -12,6 +13,17 @@ export default function InstructionComponent({ id }) {
       .catch((err) => {
         setProblem(null);
       });
+
+      restClient({
+        url: "api/problem/getproblemidbytag/" + id,
+      })
+        .then((res) => {
+          setTagTopic(res?.data?.data);
+        })
+        .catch((err) => {
+          setTagTopic([]);
+        });
+
   }, [id]);
 
   return (
@@ -23,6 +35,25 @@ export default function InstructionComponent({ id }) {
         <strong>Nội dung:</strong>
         <span dangerouslySetInnerHTML={{ __html: problem?.description }}></span>
       </p>
+       {/* tag */}
+       {tagTopic.length > 0 && (
+        <div className="mt-6">
+          <span className="block font-semibold mb-3">
+            Các từ khóa liên quan
+          </span>
+          <div className="flex flex-wrap gap-3">
+            {tagTopic.map((tag) => (
+              <div
+                key={tag.id}
+                className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full shadow-sm hover:bg-blue-200 transition-colors cursor-pointer"
+                onClick={() => navigate("/searchTag/" + tag.id)}
+              >
+                {tag.title}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </>
   );
 }

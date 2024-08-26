@@ -135,7 +135,7 @@ const CodeEditor = () => {
         setExecuteCode(res.data?.data);
         setCode(decodeBase64(res.data?.data[0]?.sampleCode) || "");
         restClient({
-          url: `api/submission/getsubmission?ProblemId=${id}&UserId=${user?.sub}&LanguageId=${res.data?.data[0]?.languageId}`,
+          url: `api/submission/getsubmission?ProblemId=${id}&UserId=${localStorage.getItem('userId')}&LanguageId=${res.data?.data[0]?.languageId}`,
         })
           .then((res) => {
             setCode(decodeBase64(res?.data?.data?.sourceCode));
@@ -188,7 +188,7 @@ const CodeEditor = () => {
   const handleLanguageChange = (event) => {
     const selectedLanguageId = event.target.value;
     restClient({
-      url: `api/submission/getsubmission?ProblemId=${id}&UserId=${user?.sub}&LanguageId=${selectedLanguageId}`,
+      url: `api/submission/getsubmission?ProblemId=${id}&UserId=${localStorage.getItem('userId')}&LanguageId=${selectedLanguageId}`,
     })
       .then((res) => {
         const selectedLanguage = executeCode?.find(
@@ -598,7 +598,6 @@ const CodeEditor = () => {
             </div>
 
             <div className="min-w-[30%] bg-[#182537]">
-              {/* Code Editor */}
               <div
                 className="h-screen overflow-y-auto custom-scrollbar"
                 style={{ height: "100vh" }}
@@ -681,7 +680,6 @@ const CodeEditor = () => {
                     style={{ backgroundColor: "#182537", height: "auto" }}
                     className="p-2 flex"
                   >
-                    {/* Test Case Navigation Bar */}
                     <nav className="flex flex-col gap-2 w-1/6">
                       {errorResult !== "WrongAnswer" &&
                         errorResult !== "Accepted" &&
@@ -746,18 +744,10 @@ const CodeEditor = () => {
                       <div className="h-auto p-3 bg-transparent text-red-500 font-semibold text-base ml-5 w-5/6 overflow-x-auto">
                         {errorResult}
                         <br />
-                        {/* {Array.isArray(result) && result[0]?.compileOutput &&
-                          decodeBase64(result[0]?.compileOutput)}
-                          {Array.isArray(result) && result[0]?.standardError &&
-                          decodeBase64(result[0]?.standardError)}
-                          {Array.isArray(result) && result[0]?.message &&
-                          decodeBase64(result[0]?.message)} */}
-
-
+                        
                         {result?.map((item, index) => {
                           const status = item?.status;
 
-                          // Check if status is not "Accepted" or "WrongAnswer"
                           if (
                             status !== "Accepted" &&
                             status !== "WrongAnswer"
@@ -777,7 +767,7 @@ const CodeEditor = () => {
                             );
                           }
 
-                          return null; // Return null if status is "Accepted" or "WrongAnswer"
+                          return null; 
                         })}
                       </div>
                     )}

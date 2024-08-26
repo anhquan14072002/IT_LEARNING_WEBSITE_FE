@@ -234,11 +234,16 @@ export default function UpdateProblem() {
 
           setListTopic(getAllTopicByGradeId?.data?.data);
 
-          const getAlllessonByGradeId = await restClient({
-            url: `api/lesson/getalllessonbytopic/` + selectTopicById?.id,
-          });
+          try {
+            const getAlllessonByGradeId = await restClient({
+              url: `api/lesson/getalllessonbytopic/` + selectTopicById?.id,
+            });
 
-          setLessonList(getAlllessonByGradeId?.data?.data);
+            setLessonList(getAlllessonByGradeId?.data?.data);
+          } catch (e) {
+            setLessonList([]);
+          }
+
           setInitialValues({
             ...initialValues,
             title: problem?.title,
