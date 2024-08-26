@@ -131,7 +131,7 @@ export default function Document() {
                     <img
                       src={document?.image}
                       alt={document?.title}
-                      className="w-52 h-52 object-cover rounded-lg shadow-lg"
+                      className="w-52 h-72 object-cover rounded-lg shadow-lg"
                     />
                     <div className="ml-6">
                       <h1 className="text-3xl font-bold text-gray-800 mb-2">
