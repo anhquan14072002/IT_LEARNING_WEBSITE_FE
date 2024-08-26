@@ -42,16 +42,6 @@ export default function AddLanguage({ visible, setVisible, toast, fetchData }) {
       });
   }, []);
 
-  // useEffect(() => {
-  //   restClient({ url: "api/document/getalldocument", method: "GET" })
-  //     .then((res) => {
-  //       setDocumentList(Array.isArray(res.data.data) ? res.data.data : []);
-  //     })
-  //     .catch((err) => {
-  //       setDocumentList([]);
-  //     });
-  // }, []);
-
   const onSubmit = (values) => {
     setLoading(true);
     const model = {
