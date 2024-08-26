@@ -42,12 +42,12 @@ const CustomPractice = ({ document }) => {
         {isLoggedIn() && document?.status === 2 ? (
           <div className="flex justify-center">
             <div className="bg-green-500 hover:bg-green-400 text-white rounded-lg p-2 text-base font-semibold cursor-pointer transition-colors duration-300">
-              Làm lại
+              <span className="pi pi-check-circle font-bold"></span> Làm lại
             </div>
           </div>
         ) : (
           <div className="flex justify-center">
-            <div className="bg-green-500 hover:bg-green-400 text-white rounded-lg p-2 text-base font-semibold cursor-pointer transition-colors duration-300">
+            <div className="bg-blue-500 hover:bg-blue-400 text-white rounded-lg p-2 text-base font-semibold cursor-pointer transition-colors duration-300">
               Vào làm
             </div>
           </div>
