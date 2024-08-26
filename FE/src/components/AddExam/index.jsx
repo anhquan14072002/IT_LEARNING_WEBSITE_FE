@@ -61,6 +61,8 @@ export default function AddExam({
   const [levelId, setLevelId] = useState(null);
   const [yearList, setYearList] = useState([]);
 
+
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -290,7 +292,7 @@ export default function AddExam({
                     <span>Lớp</span>
                   </>
                 }
-                disabled={!levelList || levelList.length === 0}
+                disabled={!gradeList || gradeList.length === 0}
                 customTitle="title"
                 id="grade"
                 name="grade"

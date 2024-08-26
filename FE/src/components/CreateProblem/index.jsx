@@ -9,7 +9,7 @@ import * as Yup from "yup";
 import CustomTextInput from "../../shared/CustomTextInput";
 import { Button } from "primereact/button";
 import CustomDropdown from "../../shared/CustomDropdown";
-import {MultiSelect} from 'primereact/multiselect'
+import { MultiSelect } from "primereact/multiselect";
 import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
 import restClient from "../../services/restClient";
 import CustomEditor from "../../shared/CustomEditor";
@@ -20,14 +20,16 @@ import "codemirror/lib/codemirror.css";
 import "codemirror/theme/material.css";
 import AddTestCase from "../AddTestCase";
 import { Toast } from "primereact/toast";
-import { encodeBase64, REJECT } from "../../utils";
+import { encodeBase64, getTokenFromLocalStorage, REJECT } from "../../utils";
 import NotifyProvider from "../../store/NotificationContext";
 import UpdateTestCase from "../UpdateTestCase";
 
 const validationSchema = Yup.object({
-  titleInstruction: Yup.string().required(
-    "Tiêu đề hướng dẫn không được bỏ trống"
-  ),
+  titleInstruction: Yup.string()
+    .trim()
+    .required("Tiêu đề hướng dẫn không được bỏ trống")
+    .min(5, "Tiêu đề hướng dẫn phải có ít nhất 5 ký tự")
+    .max(250, "Tiêu đề hướng dẫn không được vượt quá 250 ký tự"),
   descriptionInstruction: Yup.string().required(
     "Trường này không được bỏ trống"
   ),
@@ -37,7 +39,11 @@ const validationSchema = Yup.object({
     })
     .required("Không bỏ trống trường này"),
   document: Yup.object().nullable(),
-  title: Yup.string().required("Tiêu đề không được bỏ trống"),
+  title: Yup.string()
+    .trim()
+    .required("Tiêu đề không được bỏ trống")
+    .min(5, "Tiêu đề phải có ít nhất 5 ký tự")
+    .max(250, "Tiêu đề không được vượt quá 250 ký tự"),
   description: Yup.string().required("Mô tả không được bỏ trống"),
   difficulty: Yup.object()
     .test("is-not-empty", "Không được để trống trường này", (value) => {
@@ -136,7 +142,6 @@ export default function CreateProblem() {
   };
 
   const onSubmit = async (values) => {
-
     if (!testCase || testCase.length === 0) {
       REJECT(toast, "Vui lòng tạo test case");
       return;
@@ -149,10 +154,10 @@ export default function CreateProblem() {
       description: values?.description,
       difficulty: values?.difficulty?.id,
       isActive: true,
-      gradeId: values.grade.id
+      gradeId: values.grade.id,
     };
 
-    if(tagValues.length > 0){
+    if (tagValues.length > 0) {
       data.tagValues = tagValues;
     }
     if (values?.lesson?.id) {
@@ -161,21 +166,18 @@ export default function CreateProblem() {
       data.topicId = values.topic.id;
     }
 
+    console.log("====================================");
+    console.log("Run add problem");
+    console.log("====================================");
+
     setLoading(true);
     await restClient({
       url: "api/problem/createproblem",
       method: "POST",
       data,
-      // data: {
-      //   title: values?.title,
-      //   description: values?.description,
-      //   difficulty: values?.difficulty?.id,
-      //   isActive: true,
-      //   topicId: null,
-      //   lessonId: values?.lesson?.id,
-      //   gradeId: values?.grade?.id,
-      //   tagValues: ["Đề thi tin"],
-      // },
+      headers: {
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
     })
       .then((res) => {
         const problemData = res?.data?.data;
@@ -191,12 +193,18 @@ export default function CreateProblem() {
           url: "api/editorial/createeditorial",
           method: "POST",
           data: formData,
+          headers: {
+            Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+          },
         })
           .then((res) => {
             testCase.forEach((item, index) => {
               restClient({
                 url: "api/testcase/createtestcase",
                 method: "POST",
+                headers: {
+                  Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+                },
                 data: {
                   input:
                     item?.input === null ? null : encodeBase64(item?.input),

@@ -1,22 +1,21 @@
-import React from "react";
+import React, { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import "primeicons/primeicons.css";
 import { useSelector } from "react-redux";
+import { ACCEPT } from "../../utils";
+import { Toast } from "primereact/toast";
 const Index = ({ id, title, type }) => {
   const navigate = useNavigate();
   const user = useSelector((state) => state.user.value);
   console.log(user?.sub);
-
+  const toast = useRef(null);
   const handleNavigate = () => {
     if (user?.sub) {
       type === 1
         ? navigate(`/examdetail/${id}`)
         : navigate(`/examcodedetail/${id}`);
     } else {
-      const confirmed = window.confirm("Vui lòng đăng nhập để được xem đề thi");
-      if (confirmed) {
-        navigate("/login");
-      }
+      ACCEPT(toast,"Vui lòng đăng nhập để được xem")
     }
   };
   return (
@@ -42,6 +41,8 @@ const Index = ({ id, title, type }) => {
           </p>
         </div>
       </div>
+      <Toast ref={toast} />
+
     </div>
   );
 };

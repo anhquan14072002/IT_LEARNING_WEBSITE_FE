@@ -249,7 +249,7 @@ function ImportStepTwo() {
           />
           <Column
             field="quizAnswers"
-            header="Quiz Answers"
+            header="Câu trả lời"
             body={renderQuizAnswers}
             className="border-b-2 border-t-2"
           />

@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Dialog } from "primereact/dialog";
 import { Button } from "primereact/button";
-import { ACCEPT, encodeBase64, REJECT } from "../../utils";
+import { ACCEPT, decodeBase64, encodeBase64, REJECT } from "../../utils";
 import { Controlled as CodeMirror } from "react-codemirror2";
 import "codemirror/mode/javascript/javascript";
 import "codemirror/mode/python/python";
@@ -11,11 +11,26 @@ import { Editor } from "primereact/editor";
 import { useSelector } from "react-redux";
 import restClient from "../../services/restClient";
 
-const AddSoltution = ({ visible, setVisible, toast, id, fetchSolutions }) => {
+const UpdateSolution = ({
+  visible,
+  setVisible,
+  toast,
+  fetchSolutions,
+  updateValue,
+  id,
+}) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [code, setCode] = useState("");
   const user = useSelector((state) => state.user.value);
+
+  useEffect(() => {
+    if (visible) {
+      setTitle(updateValue?.title);
+      setDescription(updateValue?.description);
+      setCode(decodeBase64(updateValue?.coding));
+    }
+  }, [updateValue]);
 
   const handleSubmit = () => {
     if (title.trim().length < 5) {
@@ -26,6 +41,13 @@ const AddSoltution = ({ visible, setVisible, toast, id, fetchSolutions }) => {
       REJECT(toast, "Vui lòng nhập tiêu đề nhỏ hơn 250 kí tự");
       return;
     }
+    if (!title || !description || !code) {
+      REJECT(
+        toast,
+        "Vui lòng không để trống các trường đánh dấu bắt buộc nhập"
+      );
+      return;
+    }
     if (!title.trim() || !description.trim() || !code.trim()) {
       REJECT(
         toast,
@@ -33,10 +55,22 @@ const AddSoltution = ({ visible, setVisible, toast, id, fetchSolutions }) => {
       );
       return;
     }
+    if (
+      title.trim() === "" ||
+      description.trim() === "" ||
+      code.trim() === ""
+    ) {
+      REJECT(
+        toast,
+        "Vui lòng không để trống các trường đánh dấu bắt buộc nhập"
+      );
+      return;
+    }
     restClient({
-      url: "api/solution/createsolution",
-      method: "POST",
+      url: "api/solution/updatesolution",
+      method: "PUT",
       data: {
+        id: updateValue?.id,
         title: title.trim(),
         description: description.trim(),
         coding: encodeBase64(code.trim()),
@@ -46,11 +80,11 @@ const AddSoltution = ({ visible, setVisible, toast, id, fetchSolutions }) => {
       },
     })
       .then((res) => {
-        ACCEPT(toast, "Thêm thành công!!!");
+        ACCEPT(toast, "Cập nhật thành công!!!");
         fetchSolutions();
       })
       .catch((err) => {
-        REJECT(toast, "Thêm không thành công!!!");
+        REJECT(toast, "Cập nhật không thành công!!!");
       })
       .finally(() => {
         setVisible(false);
@@ -62,7 +96,7 @@ const AddSoltution = ({ visible, setVisible, toast, id, fetchSolutions }) => {
 
   return (
     <Dialog
-      header="Thêm lời giải"
+      header="Cập nhật lời giải"
       visible={visible}
       style={{ width: "50vw" }}
       onHide={() => {
@@ -82,7 +116,9 @@ const AddSoltution = ({ visible, setVisible, toast, id, fetchSolutions }) => {
       </div>
 
       <div>
-        <h1>Mô tả</h1>
+        <h1>
+          Mô tả
+        </h1>
         <Editor
           style={{ height: "300px" }}
           className="mb-5 border"
@@ -129,11 +165,11 @@ const AddSoltution = ({ visible, setVisible, toast, id, fetchSolutions }) => {
           type="submit"
           onClick={handleSubmit}
         >
-          Thêm
+          Cập nhật
         </Button>
       </div>
     </Dialog>
   );
 };
 
-export default AddSoltution;
+export default UpdateSolution;

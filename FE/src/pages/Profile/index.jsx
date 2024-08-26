@@ -8,6 +8,7 @@ import { Toast } from "primereact/toast";
 import Loading from "../../components/Loading";
 import NotifyProvider from "../../store/NotificationContext";
 import { useNavigate } from "react-router-dom";
+import Menu from "../../components/Menu";
 const Index = () => {
   const toast = useRef(null);
   const [imageURL, setImageURL] = useState(null);
@@ -80,14 +81,14 @@ const Index = () => {
       setImageURL(URL.createObjectURL(file));
       field.onChange(file);
     } else {
-      console.log("File không hợp lệ:", file);
-      alert("Vui lòng chọn tệp JPG hoặc PNG.");
+      REJECT(toast, "Ảnh phải có định dạng JPG hoặc PNG");
     }
   };
 
   return (
     <NotifyProvider>
       <Header />
+      <Menu />
       <div className="min-w-screen min-h-screen flex justify-center items-center bg-gray-100 ">
         <form
           onSubmit={handleSubmit(onSubmit)}

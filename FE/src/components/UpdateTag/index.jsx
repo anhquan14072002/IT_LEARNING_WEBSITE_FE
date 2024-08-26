@@ -76,7 +76,7 @@ export default function UpdateTag({
                 label={
                   <>
                     <span>Tiêu đề</span>
-                    <span style={{ color: "red" }}>*</span>
+                   
                   </>
                 }
                 name="title"

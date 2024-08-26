@@ -11,7 +11,12 @@ import { Button } from "primereact/button";
 import CustomDropdown from "../../shared/CustomDropdown";
 import restClient from "../../services/restClient";
 import { Toast } from "primereact/toast";
-import { decodeBase64, encodeBase64, REJECT } from "../../utils";
+import {
+  decodeBase64,
+  encodeBase64,
+  getTokenFromLocalStorage,
+  REJECT,
+} from "../../utils";
 import NotifyProvider from "../../store/NotificationContext";
 import { Controlled as CodeMirror } from "react-codemirror2";
 import "codemirror/mode/javascript/javascript";
@@ -39,7 +44,7 @@ export default function UpdateExecuteCode() {
   const toast = useRef(null);
 
   const [languagesList, setLanguagesList] = useState([]);
-  const [item,setItem] = useState()
+  const [item, setItem] = useState();
   const [language, setLanguage] = useState("javascript");
   const [codeMain, setCodeMain] = useState("");
   const [library, setLibrary] = useState("");
@@ -61,10 +66,12 @@ export default function UpdateExecuteCode() {
       .then((res) => {
         setLibrary(decodeBase64(res?.data?.data?.libraries));
         setCodeMain(decodeBase64(res?.data?.data?.mainCode));
-        setItem(res?.data?.data)
+        setItem(res?.data?.data);
         setCodeSample(decodeBase64(res?.data?.data?.sampleCode));
         return restClient({
-          url: "api/programlanguage/getprogramlanguagebyid/" + res?.data?.data?.languageId,
+          url:
+            "api/programlanguage/getprogramlanguagebyid/" +
+            res?.data?.data?.languageId,
         });
       })
       .then((res) => {
@@ -106,7 +113,10 @@ export default function UpdateExecuteCode() {
   }, []);
 
   const onSubmit = async (values) => {
-    setLoading(true);
+    if (!codeSample || codeSample.trim() === "") {
+      REJECT(toast, "Vui lòng nhập sample code");
+      return;
+    }
 
     restClient({
       url: "api/executecode/updateexecutecode",
@@ -121,15 +131,23 @@ export default function UpdateExecuteCode() {
       },
     })
       .then((res) => {
-        // Handle successful response
+        window.location.href = `/dashboard/quiz/manageexecutecode/${item?.problemId}`;
       })
       .catch((err) => {
-        REJECT(toast, "Xảy ra lỗi khi thêm mã thực thi");
+        let errorMessage =
+          err.response?.data?.message || "Xảy ra lỗi khi thêm mã thực thi";
+
+        if (
+          errorMessage &&
+          typeof errorMessage === "string" &&
+          errorMessage === "ExecuteCode is duplicate !!!"
+        ) {
+          errorMessage = "Ngôn ngữ bạn muốn tạo đã tồn tại";
+        }
+
+        REJECT(toast, errorMessage);
       })
-      .finally(() => {
-        setLoading(false);
-        window.location.href = `/dashboard/quiz/manageexecutecode/${item?.problemId}`;
-      });
+      .finally(() => {});
   };
 
   return (
@@ -173,7 +191,6 @@ export default function UpdateExecuteCode() {
                         <div className="mb-2">
                           <h1>
                             Import thư viện{" "}
-                            <span className="text-red-600">*</span>
                           </h1>
                           <CodeMirror
                             value={library}
@@ -192,7 +209,7 @@ export default function UpdateExecuteCode() {
                         </div>
                         <div className="mb-2">
                           <h1>
-                            Main code <span className="text-red-600">*</span>
+                            Main code 
                           </h1>
                           <CodeMirror
                             value={codeMain}

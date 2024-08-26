@@ -82,14 +82,18 @@ const Index = () => {
         <Header />
         <Menu />
         <div className="flex h-screen">
-          <div className="w-1/2">
-            <div className="w-auto h-full">
+          <div className="w-1/2 hidden md:block">
+            <div className="w-auto h-full  ">
               <img src={assets.image} alt="" className="w-full h-full" />
             </div>
           </div>
 
-          <div className="w-1/2 h-full flex items-center justify-center">
-            <div className="w-1/2 h-min">
+          <div className="w-full md:w-1/2 h-full flex items-center justify-center p-4 md:p-8">
+            <div
+              className="w-full max-w-md p-6 
+        sm:border sm:border-gray-300 sm:rounded-lg sm:shadow-md sm:bg-white 
+        lg:border-0 lg:rounded-none lg:shadow-none lg:bg-transparent"
+            >
               {currState === "Login" && (
                 <h1 className="text-left mb-4 font-bold text-black text-3xl">
                   Đăng Nhập

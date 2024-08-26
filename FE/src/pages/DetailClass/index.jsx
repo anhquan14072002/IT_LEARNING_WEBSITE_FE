@@ -28,15 +28,23 @@ export default function DetailClass() {
   }, [fixedDivRef.current]);
 
   // Helper function to extract quizzes by type
-  const extractQuizzesByType = (type) => {
-    return (documentList?.documents ?? []).flatMap((d) =>
-      (d.topics ?? []).flatMap((t) => [
-        ...(t.quizzes ?? []).filter((q) => q.type === type),
-        ...(t.lessons ?? []).flatMap((l) =>
-          (l.quizzes ?? []).filter((q) => q.type === type)
-        ),
-      ])
+  const extractQuizzesByType = (typeId) => {
+    const quizzesCustom = (documentList?.quizzesCustom ?? []).filter(
+      (q) => q.typeId === typeId
     );
+
+    const quizzesFromDocuments = (documentList?.documents ?? []).flatMap(
+      (d) => [
+        ...(d.topics ?? []).flatMap((t) => [
+          ...(t.quizzes ?? []).filter((q) => q.typeId === typeId),
+          ...(t.lessons ?? []).flatMap((l) =>
+            (l.quizzes ?? []).filter((q) => q.typeId === typeId)
+          ),
+        ]),
+      ]
+    );
+
+    return [...quizzesCustom, ...quizzesFromDocuments];
   };
 
   const extractProblems = (documentList) => {
@@ -54,9 +62,9 @@ export default function DetailClass() {
   };
 
   // Extract quizzes and problems
-  const practiceQuizzes = extractQuizzesByType("Practice");
+  const practiceQuizzes = extractQuizzesByType(1);
   const problemExtract = extractProblems(documentList);
-  const testQuizzes = extractQuizzesByType("Test");
+  const testQuizzes = extractQuizzesByType(2);
 
   if (loading) return <Loading />;
 
@@ -119,7 +127,6 @@ export default function DetailClass() {
               items={testQuizzes}
               navigate={navigate}
               pathPrefix="/testquiz/"
-              showAllLink="/searchquiz"
             />
           )}
 
@@ -128,8 +135,7 @@ export default function DetailClass() {
               title="Đề thi"
               items={documentList.exams}
               navigate={navigate}
-              pathPrefix="/document/"
-              showAllLink={`/search?classId=${id}`}
+              pathPrefix="/examdetail/"
             />
           )}
         </main>
@@ -145,14 +151,13 @@ const Section = ({ title, items, navigate, pathPrefix, showAllLink }) => (
     <h2 className="text-2xl font-bold mb-4 text-center text-blue-500">
       {title}
     </h2>
-    <div className="space-y-2">
-      <div className="flex flex-wrap justify-center gap-10 text-center">
+    <div className="space-y-2 mt-16">
+      <div className="flex flex-wrap justify-center text-center">
         {items.map((item) => (
           <div
             key={item.id}
-            className="cursor-pointer text-lg transition text-green-600 hover:text-green-400 underline font-semibold md:flex-1"
+            className="cursor-pointer text-lg transition text-green-600 hover:text-green-400 underline font-semibold w-full sm:w-1/2 mb-10"
             style={{
-              width: '300px',  // Fixed width
               overflow: 'hidden',
               textOverflow: 'ellipsis',
               whiteSpace: 'nowrap'
@@ -163,16 +168,6 @@ const Section = ({ title, items, navigate, pathPrefix, showAllLink }) => (
           </div>
         ))}
       </div>
-      {items.length > 4 && (
-        <div className="text-center">
-          <a
-            href={showAllLink}
-            className="text-sm text-blue-600 underline mt-3"
-          >
-            Xem tất cả
-          </a>
-        </div>
-      )}
       <hr />
     </div>
   </section>

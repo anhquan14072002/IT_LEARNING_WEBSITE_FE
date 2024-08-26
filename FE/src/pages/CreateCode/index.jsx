@@ -16,7 +16,7 @@ import "codemirror/mode/python/python";
 import "codemirror/lib/codemirror.css";
 import "codemirror/theme/material.css";
 import { Toast } from "primereact/toast";
-import { encodeBase64, REJECT } from "../../utils";
+import { encodeBase64, getTokenFromLocalStorage, REJECT } from "../../utils";
 import NotifyProvider from "../../store/NotificationContext";
 
 const validationSchema = Yup.object({
@@ -77,19 +77,11 @@ export default function CreateCode() {
   }, []);
 
   const onSubmit = async (values) => {
-    setLoading(true);
+    if (!codeSample || codeSample.trim() === "") {
+      REJECT(toast, "Vui lòng nhập sample code");
+      return;
+    }
 
-    // await restClient({
-    //   url: "api/programlanguage/createprogramlanguage",
-    //   method: "POST",
-    //   data: {
-    //     name: values?.language?.title,
-    //     baseId: values?.language?.idBase,
-    //     isActive: true,
-    //   },
-    // })
-    //   .then((res) => {
-    //     const programLanguage = res?.data?.data;
     restClient({
       url: "api/executecode/createexecutecode",
       method: "POST",
@@ -101,21 +93,24 @@ export default function CreateCode() {
         libraries: encodeBase64(library),
       },
     })
-      .then((res) => {})
-      .catch((err) => {
-        REJECT(toast, "Xảy ra lỗi khi thêm mã thực thi");
-      })
-      .finally(() => {
+      .then((res) => {
         window.location.href = `/dashboard/quiz/manageexecutecode/${id}`;
-      });
-    // })
-    // .catch((err) => {
-    //   REJECT(toast, "Xảy ra lỗi khi thêm mã thực thi");
-    // })
-    // .finally(() => {
-    //   setLoading(false);
-    //   window.location.href = `/dashboard/quiz/manageexecutecode/${id}`;
-    // });
+      })
+      .catch((err) => {
+        let errorMessage =
+          err.response?.data?.message || "Xảy ra lỗi khi thêm mã thực thi";
+
+        if (
+          errorMessage &&
+          typeof errorMessage === "string" &&
+          errorMessage === "ExecuteCode is duplicate !!!"
+        ) {
+          errorMessage = "Ngôn ngữ bạn muốn tạo đã tồn tại";
+        }
+
+        REJECT(toast, errorMessage);
+      })
+      .finally(() => {});
   };
 
   return (
@@ -156,10 +151,7 @@ export default function CreateCode() {
                       />
 
                       <div className="mb-2">
-                        <h1>
-                          Import thư viện{" "}
-                          <span className="text-red-600">*</span>
-                        </h1>
+                        <h1>Import thư viện </h1>
                         <CodeMirror
                           value={library}
                           options={{
@@ -176,9 +168,7 @@ export default function CreateCode() {
                         />
                       </div>
                       <div className="mb-2">
-                        <h1>
-                          Main code <span className="text-red-600">*</span>
-                        </h1>
+                        <h1>Main code</h1>
                         <CodeMirror
                           value={codeMain}
                           options={{
