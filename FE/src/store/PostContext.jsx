@@ -295,7 +295,7 @@ export const PostProvider = ({ children }) => {
         setRefresh2(new Date());
       })
       .catch((err) => {
-        REJECT(toast, "Xảy ra lỗi khi xóa đề thi này");
+        REJECT(toast, "Xảy ra lỗi khi xóa bài đăng");
       });
   };
   const deletePostComment = async (id, fetchPost) => {
@@ -311,7 +311,7 @@ export const PostProvider = ({ children }) => {
         fetchPost();
       })
       .catch((err) => {
-        REJECT(toast, "Xảy ra lỗi khi xóa đề thi này");
+        REJECT(toast, "Xảy ra lỗi khi xóa bình luận");
       });
   };
   const fetchData = () => {
