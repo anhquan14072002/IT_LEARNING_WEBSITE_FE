@@ -143,6 +143,30 @@ function App() {
                 path="/dashboard/quiz/manageexecutecode/:id"
                 element={<ManageExecuteCode />}
               />
+              <Route
+                path="/question/:quizId"
+                element={<ManageQuestionQuiz />}
+              />
+              <Route
+                path="/dashboard/createproblem"
+                element={<CreateProblem />}
+              />
+              <Route
+                path="/dashboard/createcode/:id"
+                element={<CreateCode />}
+              />
+              <Route
+                path="/dashboard/updateexecutecode/:id"
+                element={<UpdateExecuteCode />}
+              />
+              <Route
+                path="/dashboard/quiz/manageexecutecode/:id"
+                element={<ManageExecuteCode />}
+              />
+              <Route
+                path="/dashboard/updateproblem/:id"
+                element={<UpdateProblem />}
+              />
             </>
           )}
           {(user?.role === "Admin" ||
@@ -158,7 +182,6 @@ function App() {
           <Route path="/testquiz/:id" element={<TestQuizPage />} />
           <Route path="/flashcard/:id" element={<FlashCard />} />
           <Route path="/loginAdmin" element={<LoginAdmin />} />
-          <Route path="/question/:quizId" element={<ManageQuestionQuiz />} />
           <Route path="/search" element={<Search />} />
           <Route path="/searchQuiz" element={<SearchQuiz />} />
           <Route path="/login" element={<Login />} />
@@ -178,21 +201,9 @@ function App() {
             element={<ExampleAddQuizQuestion />}
           />
           <Route path="/codeEditor/:id" element={<CodeEditor />} />
-          <Route path="/dashboard/createproblem" element={<CreateProblem />} />
-          <Route path="/dashboard/createcode/:id" element={<CreateCode />} />
-          <Route
-            path="/dashboard/updateexecutecode/:id"
-            element={<UpdateExecuteCode />}
-          />
-          <Route
-            path="/dashboard/quiz/manageexecutecode/:id"
-            element={<ManageExecuteCode />}
-          />
+
           <Route path="/listpractice" element={<ListPractice />} />
-          <Route
-            path="/dashboard/updateproblem/:id"
-            element={<UpdateProblem />}
-          />
+
           <Route path="/detailclass/:id" element={<DetailClass />} />
           <Route path="/searchTag/:id" element={<SearchTag />} />
           <Route path="*" element={<NotFound />} />

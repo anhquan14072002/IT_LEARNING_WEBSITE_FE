@@ -80,6 +80,19 @@ export default function UpdateLessonDialog({
     index: null,
   });
 
+  const removeBeforeFirstColon = (inputString) => {
+    // Find the index of the first colon
+    let colonIndex = inputString.indexOf(":");
+
+    // If there's no colon, return the original string
+    if (colonIndex === -1) {
+      return inputString;
+    }
+
+    // Return the substring after the colon, trimmed to remove any leading whitespace
+    return inputString.substring(colonIndex + 1).trim();
+  };
+
   const handleChangeInputType = (e) => {
     setInputContent(e.target.value === "true"); // Convert the selected value to a boolean
   };
@@ -141,7 +154,7 @@ export default function UpdateLessonDialog({
         console.log("decoded content::", decodeIfNeeded(modelUpdate.content));
 
         const updatedInitialValues = {
-          title: modelUpdate.title,
+          title: removeBeforeFirstColon(modelUpdate.title),
           content: decodeIfNeeded(modelUpdate.content),
           topic: selectedTopic || {},
           grade: selectedGrade || {},
@@ -390,7 +403,9 @@ export default function UpdateLessonDialog({
                 </div>
 
                 <div className="flex justify-between mb-1">
-                  <h1>Nội dung bài học{" "}<span className="text-red-500">*</span></h1>
+                  <h1>
+                    Nội dung bài học <span className="text-red-500">*</span>
+                  </h1>
                   <select
                     value={inputContent.toString()} // Ensure this matches with the state variable
                     onChange={handleChangeInputType} // Make sure handleChangeInputType is correctly defined
