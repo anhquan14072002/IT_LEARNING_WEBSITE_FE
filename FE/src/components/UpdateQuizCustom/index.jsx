@@ -7,13 +7,15 @@ import CustomSelectInput from "../../shared/CustomSelectInput";
 import CustomTextarea from "../../shared/CustomTextarea";
 import { Button } from "primereact/button";
 import CustomEditor from "../../shared/CustomEditor";
-import { getTokenFromLocalStorage, REJECT, SUCCESS } from "../../utils";
+import { ACCEPT, getTokenFromLocalStorage, REJECT, SUCCESS } from "../../utils";
 import restClient from "../../services/restClient";
 import Loading from "../Loading";
 import { Dropdown } from "primereact/dropdown";
 import CustomDropdown from "../../shared/CustomDropdown";
 import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
 import { MultiSelect } from "primereact/multiselect";
+import { Column } from "primereact/column";
+import { DataTable } from "primereact/datatable";
 
 const validationSchema = Yup.object({
   title: Yup.string()
@@ -60,9 +62,108 @@ export default function UpdateQuizCustom({
   const [clearLesson, setClearLesson] = useState(false);
   const [lessonList, setLessonList] = useState([]);
   const [typeList, setTypeList] = useState([]);
-
+  const [quizList, setQuizList] = useState([]);
+  const [realQuizList, setRealQuizList] = useState([]);
   const [tagList, setTagList] = useState([]);
   const [tag, setTag] = useState(null);
+  const [selectedProduct, setSelectedProduct] = useState([]);
+
+  //choose custom question
+  const check1 = (rowData) => {
+    return (
+      <input
+        id={`${rowData?.id}check1`}
+        type="checkbox"
+        checked={selectedProduct.some((item) => item.id === rowData.id)}
+        onChange={() => handleCheckboxChange(rowData)}
+      />
+    );
+  };
+
+  const check2 = (rowData) => {
+    return (
+      <input
+        id={`${rowData?.id}check2`}
+        type="checkbox"
+        onChange={() => handleCheckboxChange2(rowData)}
+      />
+    );
+  };
+
+  const handleCheckboxChange2 = (rowData) => {
+    setQuizList((prevQuizList) => {
+      // Determine if the item is already selected
+      const isAlreadySelected = selectedProduct.some(
+        (item) => item.id === rowData.id
+      );
+
+      const updatedQuizList = prevQuizList.map((item) =>
+        item.id === rowData.id
+          ? {
+              ...item,
+              shuffle: isAlreadySelected ? !item.shuffle : !rowData.shuffle,
+            }
+          : item
+      );
+
+      if (isAlreadySelected) {
+        setSelectedProduct((prevSelected) =>
+          prevSelected.map((item) =>
+            item.id === rowData.id ? { ...item, shuffle: !item.shuffle } : item
+          )
+        );
+      }
+
+      return updatedQuizList;
+    });
+  };
+
+  const handleCheckboxChange = (rowData) => {
+    setSelectedProduct((prevSelected) =>
+      prevSelected.some((item) => item.id === rowData.id)
+        ? prevSelected.filter((item) => item.id !== rowData.id)
+        : [...prevSelected, rowData]
+    );
+  };
+
+  const handleInputChange = (e, index, rowData) => {
+    const newValue = Number(e.target.value);
+
+    // Ensure the new value is within the valid range
+    const totalQuestion = realQuizList[index]?.totalQuestion || 0;
+    const validatedValue = Math.max(1, Math.min(newValue, totalQuestion));
+
+    // Update quizList with new value
+    setQuizList((prevQuizList) => {
+      const updatedQuizList = prevQuizList.map((item) =>
+        item.id === rowData.id
+          ? { ...item, totalQuestion: validatedValue }
+          : item
+      );
+
+      // Update selectedProduct with new totalQuestion value if the item is selected
+      setSelectedProduct((prevSelected) =>
+        prevSelected.map((item) =>
+          item.id === rowData.id
+            ? { ...item, totalQuestion: validatedValue }
+            : item
+        )
+      );
+
+      return updatedQuizList;
+    });
+  };
+
+  const inputTotal = (rowData, { rowIndex }) => {
+    return (
+      <input
+        type="number"
+        value={rowData?.totalQuestion || ""}
+        className="outline-none border border-gray-300 p-1"
+        onChange={(e) => handleInputChange(e, rowIndex, rowData)}
+      />
+    );
+  };
 
   useEffect(() => {
     restClient({
@@ -99,6 +200,23 @@ export default function UpdateQuizCustom({
         //   }));
         // }
 
+        const res = await restClient({
+          url: "api/quiz/getallquiznopagination?Custom=3",
+          method: "GET",
+        });
+
+        if (Array.isArray(res?.data?.data)) {
+          setQuizList(
+            res?.data?.data?.filter((item) => Number(item?.totalQuestion) > 0)
+          );
+          setRealQuizList(
+            res?.data?.data?.filter((item) => Number(item?.totalQuestion) > 0)
+          );
+        } else {
+          setRealQuizList([]);
+          setQuizList([]);
+        }
+
         // Fetch type quizzes
         const typeQuizResponse = await restClient({
           url: `api/enum/gettypequiz`,
@@ -113,6 +231,16 @@ export default function UpdateQuizCustom({
         const typeFind = transformedData?.find(
           (item, index) => item?.id === updateValue?.typeId
         );
+
+        try {
+          const tagTopic = await restClient({
+            url: `api/quiz/getquizidbytag/${updateValue?.id}`,
+            method: "GET",
+          });
+          setTag(tagTopic?.data?.data || null);
+        } catch (error) {
+          setTag(null);
+        }
 
         const tagResponse = await restClient({
           url: "api/tag/getalltag",
@@ -191,6 +319,17 @@ export default function UpdateQuizCustom({
     }
   }, [visibleUpdate, updateValue]);
 
+  const generateResponseBody = (id) => {
+    return {
+      quizId: id,
+      quiQuestionRelationCustomCreate: selectedProduct?.map((item) => ({
+        quizChildId: item?.id,
+        numberOfQuestion: item?.totalQuestion || 0,
+        shuffle: item?.shuffle || false, // Using the shuffle property value
+      })),
+    };
+  };
+
   const onSubmit = (values) => {
     // {
     //     "title": "string",
@@ -218,14 +357,30 @@ export default function UpdateQuizCustom({
       url: "api/quiz/updatequiz",
       method: "PUT",
       data: model,
-      headers: {
-        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
-      },
     })
       .then((res) => {
-        SUCCESS(toast, "Cập nhật bài quiz thành công");
-        fetchData();
-        setLoading(false);
+        if (selectedProduct || selectedProduct.length > 0) {
+          restClient({
+            url: "api/quizquestionrelation/createquizquestionrelationbyquizcustom",
+            method: "POST",
+            data: generateResponseBody(res?.data?.data?.id),
+          })
+            .then((res) => {
+              ACCEPT(toast, "Cập nhật bộ đề thành công");
+              setTag(null);
+            })
+            .catch((err) => {
+              // REJECT(toast, "Xảy ra lỗi khi thêm 1 ");
+            })
+            .finally(() => {
+              setSelectedProduct([]);
+            });
+        } else {
+          SUCCESS(toast, "Cập nhật bộ đề thành công");
+          fetchData();
+          setTag(null);
+          setLoading(false);
+        }
       })
       .catch((err) => {
         REJECT(toast, err.message);
@@ -238,7 +393,7 @@ export default function UpdateQuizCustom({
 
   return (
     <Dialog
-      header="Cập nhật bài quiz"
+      header="Cập nhật bộ đề"
       visible={visibleUpdate}
       style={{ width: "50vw" }}
       onHide={() => {
@@ -308,6 +463,43 @@ export default function UpdateQuizCustom({
                 >
                   <ErrorMessage name="description" component="div" />
                 </CustomEditor>
+              </div>
+
+              {/* custom quiz */}
+              <div>
+                <h1>
+                  Lấy câu hỏi <span className="text-red-600">*</span>
+                </h1>
+                <DataTable
+                  value={quizList}
+                  className="border-t-2"
+                  scrollable
+                  scrollHeight="30rem"
+                >
+                  <Column
+                    style={{ minWidth: "3rem" }}
+                    body={check1}
+                    className="border-b-2 border-t-2 custom-checkbox-column"
+                  />
+                  <Column
+                    field="title"
+                    style={{ minWidth: "15rem" }}
+                    header="Bộ câu hỏi"
+                    className="border-b-2 border-t-2"
+                  />
+                  <Column
+                    style={{ minWidth: "5rem" }}
+                    header="Lấy ngẫu nhiên"
+                    body={check2} // If needed
+                    className="border-b-2 border-t-2"
+                  />
+                  <Column
+                    style={{ minWidth: "5rem" }}
+                    body={inputTotal}
+                    header="Tổng số câu hỏi"
+                    className="border-b-2 border-t-2"
+                  />
+                </DataTable>
               </div>
 
               <div className="flex justify-end gap-2">

@@ -258,7 +258,7 @@ export default function AddQuizLesson({
 
   return (
     <Dialog
-      header="Thêm bài quiz"
+      header="Thêm bộ câu hỏi theo chủ đề , bài học"
       visible={visible}
       style={{ width: "50vw" }}
       onHide={() => {

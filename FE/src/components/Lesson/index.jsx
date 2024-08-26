@@ -193,8 +193,7 @@ export default function Lesson() {
   const confirm = (id) => {
     setVisibleDelete(true);
     confirmDialog({
-      message: "Do you want to delete this record?",
-      header: "Delete Confirmation",
+      message: "Bạn có chắc chắn muốn xóa bài học này?",
       icon: "pi pi-info-circle",
       defaultFocus: "reject",
       acceptClassName: "p-button-danger",
@@ -225,8 +224,7 @@ export default function Lesson() {
   const confirmDeleteMany = () => {
     setVisibleDelete(true);
     confirmDialog({
-      message: "Do you want to delete this record?",
-      header: "Delete Confirmation",
+      message: "Bạn có chắc chắn muốn xóa các bài học vừa chọn?",
       icon: "pi pi-info-circle",
       defaultFocus: "reject",
       acceptClassName: "p-button-danger",
