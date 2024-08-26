@@ -18,9 +18,14 @@ const AddSoltution = ({ visible, setVisible, toast, id, fetchSolutions }) => {
   const user = useSelector((state) => state.user.value);
 
   const handleSubmit = () => {
-    console.log('====================================');
-    console.log(title.trim() , description.trim() , code.trim());
-    console.log('====================================');
+    if (title.trim().length < 5) {
+      REJECT(toast, "Vui lòng nhập tiêu đề lớn hơn 5 kí tự");
+      return;
+    }
+    if (title.trim().length > 250) {
+      REJECT(toast, "Vui lòng nhập tiêu đề nhỏ hơn 250 kí tự");
+      return;
+    }
     if (!title.trim() || !description.trim() || !code.trim()) {
       REJECT(
         toast,
@@ -39,17 +44,20 @@ const AddSoltution = ({ visible, setVisible, toast, id, fetchSolutions }) => {
         userId: user?.sub,
         isActive: true,
       },
-    }).then((res)=>{
-      ACCEPT(toast,"Thêm thành công!!!")
-      fetchSolutions()
-    }).catch((err)=>{
-      REJECT(toast, "Thêm không thành công!!!")
-    }).finally(()=>{
-      setVisible(false)
-      setTitle("")
-      setDescription("")
-      setCode('')
-    });
+    })
+      .then((res) => {
+        ACCEPT(toast, "Thêm thành công!!!");
+        fetchSolutions();
+      })
+      .catch((err) => {
+        REJECT(toast, "Thêm không thành công!!!");
+      })
+      .finally(() => {
+        setVisible(false);
+        setTitle("");
+        setDescription("");
+        setCode("");
+      });
   };
 
   return (
@@ -74,14 +82,12 @@ const AddSoltution = ({ visible, setVisible, toast, id, fetchSolutions }) => {
       </div>
 
       <div>
-        <h1>
-          Mô tả<span className="text-red-500">*</span>
-        </h1>
+        <h1>Mô tả</h1>
         <Editor
           style={{ height: "300px" }}
           className="mb-5 border"
           value={description}
-          onTextChange={(e) => setDescription(e.htmlValue)} 
+          onTextChange={(e) => setDescription(e.htmlValue)}
         />
       </div>
 
@@ -110,10 +116,10 @@ const AddSoltution = ({ visible, setVisible, toast, id, fetchSolutions }) => {
           type="button"
           severity="danger"
           onClick={() => {
-            setVisible(false)
-            setTitle("")
-            setDescription("")
-            setCode('')
+            setVisible(false);
+            setTitle("");
+            setDescription("");
+            setCode("");
           }}
         >
           Hủy
