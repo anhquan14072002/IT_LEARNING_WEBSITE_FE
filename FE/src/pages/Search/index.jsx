@@ -224,7 +224,7 @@ export default function Search() {
               setSelectedClassId={setSelectedClassId}
             />
           </div>
-          <div className="flex-1 w-[98%] pt-5">
+          <div className="flex-1 w-[85%] pt-5">
             <div className="m-4 mb-10 flex flex-wrap items-center justify-center gap-2 sm:justify-between">
               <div className="border-2 rounded-md p-2">
                 <InputText
