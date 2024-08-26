@@ -21,6 +21,7 @@ function ImportStepTwo() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const toast = useRef(null);
+  console.log(quizId);
 
   useEffect(() => {
     const handleUpload = async () => {
@@ -217,7 +218,7 @@ function ImportStepTwo() {
           {excelValidateResponse.countSuccess ?? 0} /{" "}
           {(excelValidateResponse.countSuccess ?? 0) +
             (excelValidateResponse.countFail ?? 0)}
-          dòng hợp lệ
+          &nbsp; dòng hợp lệ
         </span>
         <span className="font-bold ">
           {excelValidateResponse.countFail ?? 0} /{" "}
