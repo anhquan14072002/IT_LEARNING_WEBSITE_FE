@@ -223,7 +223,7 @@ export default function ManageExam() {
       />
       <div>
         <div className="flex justify-between pt-1">
-          <h1 className="font-bold text-3xl">Các Đề Kiểm Tra</h1>
+          <h1 className="font-bold text-3xl">Danh sách các đề thi</h1>
           <div>
             <Button
               label="Thêm mới"
