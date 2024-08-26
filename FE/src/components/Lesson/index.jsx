@@ -81,6 +81,7 @@ export default function Lesson() {
         .catch((err) => {
           console.error("Error fetching data:", err);
           setProducts([]);
+          setTotalPage(0)
         })
         .finally(() => setLoading(false));
     } else {
@@ -98,6 +99,7 @@ export default function Lesson() {
         .catch((err) => {
           console.error("Error fetching data:", err);
           setProducts([]);
+          setTotalPage(0)
         })
         .finally(() => {
           setLoading(false);

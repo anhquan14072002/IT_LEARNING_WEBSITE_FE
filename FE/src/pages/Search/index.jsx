@@ -162,6 +162,7 @@ export default function Search() {
       .catch((err) => {
         console.error("Error fetching data:", err);
         setProducts([]);
+        setTotalPage(0)
       })
       .finally(() => setLoading(false));
   };

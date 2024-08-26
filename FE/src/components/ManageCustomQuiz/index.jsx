@@ -67,6 +67,7 @@ export default function ManageCustomQuiz() {
         console.error("Error fetching data:", err);
         setProducts([]);
         setLoading(false);
+        setTotalPage(0)
       });
   };
 
