@@ -27,7 +27,7 @@ export default function UpdateExamCode({
   console.log(updateExamCodeValue.id);
   console.log(addExamCodeValue);
   const initialValues = {
-    code: "",
+    code: updateExamCodeValue?.code,
     files: [],
   };
 

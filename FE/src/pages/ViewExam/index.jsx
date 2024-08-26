@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Header from "../../components/Header";
 import Menu from "../../components/Menu";
 import CardExam from "../../components/CardExam";
@@ -10,6 +10,7 @@ import "./index.css";
 import { province } from "../../services/province";
 import { years } from "../../services/year";
 import NotifyProvider from "../../store/NotificationContext";
+import { Toast } from "primereact/toast";
 
 const Index = () => {
   const [first, setFirst] = useState(0);
@@ -32,7 +33,7 @@ const Index = () => {
   const [grade, setGrade] = useState("");
   const [levelSearch, setLevelSearch] = useState("");
   const [gradeSearch, setGradeSearch] = useState("");
-
+  const toast = useRef(null);
   const fetchData = async () => {
     setLoading(true);
     const province = selectedProvince1 ? selectedProvince1 : "";
@@ -211,6 +212,7 @@ const Index = () => {
           </div>
         </>
       )}
+       <Toast ref={toast} />
     </NotifyProvider>
   );
 };
