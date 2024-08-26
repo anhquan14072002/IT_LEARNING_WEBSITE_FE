@@ -359,28 +359,24 @@ export default function UpdateQuizCustom({
       data: model,
     })
       .then((res) => {
-        if (selectedProduct || selectedProduct.length > 0) {
-          restClient({
-            url: "api/quizquestionrelation/createquizquestionrelationbyquizcustom",
-            method: "POST",
-            data: generateResponseBody(res?.data?.data?.id),
+        restClient({
+          url: "api/quizquestionrelation/createquizquestionrelationbyquizcustom",
+          method: "POST",
+          data: generateResponseBody(res?.data?.data?.id),
+        })
+          .then((res) => {
+            setTag(null);
           })
-            .then((res) => {
-              ACCEPT(toast, "Cập nhật bộ đề thành công");
-              setTag(null);
-            })
-            .catch((err) => {
-              // REJECT(toast, "Xảy ra lỗi khi thêm 1 ");
-            })
-            .finally(() => {
-              setSelectedProduct([]);
-            });
-        } else {
-          SUCCESS(toast, "Cập nhật bộ đề thành công");
-          fetchData();
-          setTag(null);
-          setLoading(false);
-        }
+          .catch((err) => {
+            // REJECT(toast, "Xảy ra lỗi khi thêm 1 ");
+          })
+          .finally(() => {
+            setSelectedProduct([]);
+            SUCCESS(toast, "Cập nhật bộ đề thành công");
+            fetchData();
+            setTag(null);
+            setLoading(false);
+          });
       })
       .catch((err) => {
         REJECT(toast, err.message);
@@ -467,9 +463,7 @@ export default function UpdateQuizCustom({
 
               {/* custom quiz */}
               <div>
-                <h1>
-                  Lấy câu hỏi <span className="text-red-600">*</span>
-                </h1>
+                <h1>Lấy câu hỏi</h1>
                 <DataTable
                   value={quizList}
                   className="border-t-2"

@@ -40,7 +40,7 @@ const CustomCard = ({ document }) => {
           <img
             src={document?.image || "https://via.placeholder.com/150"}
             alt={document?.title}
-            className="w-full h-full"
+            className="w-full h-56"
           />
         </div>
 
