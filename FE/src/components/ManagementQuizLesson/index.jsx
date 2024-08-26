@@ -324,12 +324,7 @@ export default function ManagementQuizLesson() {
                   className="border-b-2 border-t-2"
                   style={{ minWidth: "15rem" }}
                 />
-                <Column
-                  field="score"
-                  header="Điểm"
-                  className="border-b-2 border-t-2"
-                  style={{ minWidth: "15rem" }}
-                />
+        
                 <Column
                   header="Trạng thái"
                   className="border-b-2 border-t-2"
