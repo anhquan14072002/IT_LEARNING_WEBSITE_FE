@@ -3,7 +3,7 @@ import FormDataContext from "../../store/FormDataContext";
 import restClient, { BASE_URL } from "../../services/restClient";
 import Loading from "../Loading";
 import axios from "axios";
-import { REJECT } from "../../utils";
+import { getTokenFromLocalStorage, REJECT } from "../../utils";
 import { Toast } from "primereact/toast";
 function ImportStepThree(props) {
   const [loading, setLoading] = useState(false);
@@ -18,6 +18,10 @@ function ImportStepThree(props) {
     restClient({
       url: `api/quizquestion/ImportDatabase/${idImport}/${quizId}`,
       method: "GET",
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+      },
     })
       .then((res) => {
         // Handle success
@@ -38,6 +42,10 @@ function ImportStepThree(props) {
         `${BASE_URL}/api/quizquestion/ExportExcelResult/${idImportResult}`,
         {
           responseType: "arraybuffer", // Important to handle binary data
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+          },
         }
       );
       const url = window.URL.createObjectURL(new Blob([res.data]));

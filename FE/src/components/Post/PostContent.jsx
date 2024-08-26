@@ -39,7 +39,7 @@ function PostContent({ ...props }) {
       ) : (
         <PostWrite
           setCompose={setCompose}
-          key={compose?.data?.id}
+          key={compose?.data?.data}
           compose={compose}
         />
       )}
@@ -62,6 +62,8 @@ function PostWrite({ setCompose, compose }) {
   const user = useSelector((state) => state.user.value);
   const toast = useRef(null);
   const [initialValues, setInitialValues] = useState({ grade: {} });
+  const [description, setDescription] = useState("");
+  const [gradeList, setListGrade] = useState([]);
   useEffect(() => {
     if (compose?.data != null) {
       async function getGradeById() {
@@ -72,14 +74,13 @@ function PostWrite({ setCompose, compose }) {
         const gradeByIdData = gradeById.data?.data || {};
         console.log(gradeByIdData);
 
+        setDescription(compose?.data?.content);
         setInitialValues((preValue) => ({ grade: gradeByIdData }));
       }
       getGradeById();
     }
   }, [compose?.data]);
 
-  const [description, setDescription] = useState("");
-  const [gradeList, setListGrade] = useState([]);
   useEffect(() => {
     getAllGrade(setLoading, setListGrade);
   }, []);

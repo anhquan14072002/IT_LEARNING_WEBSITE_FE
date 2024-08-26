@@ -8,7 +8,7 @@ import { InputText } from "primereact/inputtext";
 import { assets } from "../../assets/assets";
 import NotifyProvider from "../../store/NotificationContext";
 import { REJECT, SUCCESS } from "../../utils";
-
+import { Toast } from "primereact/toast";
 function useQuery() {
   return new URLSearchParams(useLocation().search);
 }

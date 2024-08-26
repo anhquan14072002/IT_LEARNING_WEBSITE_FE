@@ -8,7 +8,7 @@ import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { Button } from "primereact/button";
 import { useNavigate } from "react-router-dom";
 import Loading from "../Loading";
-import { REJECT } from "../../utils";
+import { getTokenFromLocalStorage, REJECT } from "../../utils";
 import { Toast } from "primereact/toast";
 
 import { Dialog } from "primereact/dialog";
@@ -51,7 +51,12 @@ function ImportStepTwo() {
         const response = await axios.post(
           `${BASE_URL}/api/quizquestion/ImportValidate?quizId=${quizId}`,
           formData,
-          { headers: { "Content-Type": "multipart/form-data" } }
+          {
+            headers: {
+              "Content-Type": "multipart/form-data",
+              Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+            },
+          }
         );
 
         if (response.status === 200) {
@@ -104,6 +109,10 @@ function ImportStepTwo() {
         `${BASE_URL}/api/quizquestion/exportexcelresult/${idImportResult}`,
         {
           responseType: "arraybuffer", // Important to handle binary data
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+          },
         }
       );
       const url = window.URL.createObjectURL(new Blob([res.data]));
