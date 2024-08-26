@@ -3,6 +3,7 @@ import restClient from "../../services/restClient";
 import { useParams } from "react-router-dom";
 import Header from "../../components/Header";
 import NotifyProvider from "../../store/NotificationContext";
+import Menu from "../../components/Menu";
 
 const Index = () => {
   const [score, setScore] = useState(null);
@@ -32,8 +33,9 @@ const Index = () => {
   return (
     <NotifyProvider>
       <Header />
-      <div className="text-center h-full font-sans bg-white ">
-        <h1 className="text-3xl text-gray-800 mb-4">Điểm của bạn</h1>
+      <Menu />
+      <div className="text-center h-full font-sans bg-white mt-3 ">
+        <h1 className="text-3xl text-gray-800 font-bold mb-4">Điểm của bạn</h1>
         <p className="text-3xl mb-6 text-red-600 font-bold">{score}</p>
         {openResult ? (
           <button
@@ -45,7 +47,7 @@ const Index = () => {
         ) : (
           <div>
             <h1 className="text-2xl text-gray-800 mb-4">Chi tiết kết quả</h1><button
-            className="bg-blue-600 text-white p-2 text-sm font-normal"
+            className="bg-blue-600 text-white p-2 text-sm font-normal mb-2"
             onClick={() => setOpenResult(true)}
           >
             Ẩn Kết Quả

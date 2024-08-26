@@ -163,7 +163,7 @@ function App() {
                 path="/dashboard/quiz/manageexecutecode/:id"
                 element={<ManageExecuteCode />}
               />
-              <Route
+                <Route
                 path="/dashboard/updateproblem/:id"
                 element={<UpdateProblem />}
               />
@@ -177,10 +177,12 @@ function App() {
               <Route path="/examresult/:id" element={<ExamResult />} />
               <Route path="/examcodedetail/:id" element={<ExamCodeDetail />} />
               <Route path="/historyQuiz" element={<HistoryQuiz />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/testquiz/:id" element={<TestQuizPage />} />
+              <Route path="/flashcard/:id" element={<FlashCard />} />
             </>
           )}
-          <Route path="/testquiz/:id" element={<TestQuizPage />} />
-          <Route path="/flashcard/:id" element={<FlashCard />} />
+         
           <Route path="/loginAdmin" element={<LoginAdmin />} />
           <Route path="/search" element={<Search />} />
           <Route path="/searchQuiz" element={<SearchQuiz />} />
@@ -193,7 +195,6 @@ function App() {
           {/* <Route path="/quiz/:id" element={<Quiz />} /> */}
           <Route path="/viewexam" element={<ViewExam />} />
           <Route path="/forgotpassword" element={<ForgotPassword />} />
-          <Route path="/profile" element={<Profile />} />
           <Route path="/checkmail" element={<CheckMail />} />
           <Route path="/changepassword" element={<ChangePassword />} />
           <Route
@@ -202,8 +203,8 @@ function App() {
           />
           <Route path="/codeEditor/:id" element={<CodeEditor />} />
 
-          <Route path="/listpractice" element={<ListPractice />} />
 
+          <Route path="/listpractice" element={<ListPractice />} />
           <Route path="/detailclass/:id" element={<DetailClass />} />
           <Route path="/searchTag/:id" element={<SearchTag />} />
           <Route path="*" element={<NotFound />} />
