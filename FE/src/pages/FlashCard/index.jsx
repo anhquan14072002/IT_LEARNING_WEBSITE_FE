@@ -14,7 +14,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import Loading from "../../components/Loading";
 import { Button } from "primereact/button";
 import restClient from "../../services/restClient";
-import { decodeIfNeeded, isBase64 } from "../../utils";
+import { decodeIfNeeded, isBase64, isLoggedIn } from "../../utils";
 import NotifyProvider from "../../store/NotificationContext";
 import Flashcard from "../../components/FlashCard";
 
@@ -86,6 +86,20 @@ export default function Quiz() {
       prevIndex === 0 ? quiz.length - 1 : prevIndex - 1
     );
   };
+
+  if (!isLoggedIn()) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <p className="text-xl font-bold mb-4">Bạn phải đăng nhập để xem flashcard này</p>
+        <button
+          onClick={() => navigate("/login")}
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+        >
+          Đăng nhập
+        </button>
+      </div>
+    );
+  }
 
   return (
     <NotifyProvider>
