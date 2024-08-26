@@ -135,7 +135,7 @@ export default function Quiz() {
             ) : (
               <div className="w-full">
                 {quiz.length === 0 ? (
-                  <p className="text-center">Quiz không tồn tại.</p>
+                  <p className="text-center">Quiz rỗng.</p>
                 ) : (
                   <>
                     {/* Flashcard Display */}

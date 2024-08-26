@@ -144,6 +144,10 @@ function App() {
                 element={<ManageExecuteCode />}
               />
               <Route
+                path="/question/:quizId"
+                element={<ManageQuestionQuiz />}
+              />
+              <Route
                 path="/dashboard/createproblem"
                 element={<CreateProblem />}
               />
@@ -159,7 +163,7 @@ function App() {
                 path="/dashboard/quiz/manageexecutecode/:id"
                 element={<ManageExecuteCode />}
               />
-                <Route
+              <Route
                 path="/dashboard/updateproblem/:id"
                 element={<UpdateProblem />}
               />
@@ -174,13 +178,11 @@ function App() {
               <Route path="/examcodedetail/:id" element={<ExamCodeDetail />} />
               <Route path="/historyQuiz" element={<HistoryQuiz />} />
               <Route path="/profile" element={<Profile />} />
-              <Route path="/testquiz/:id" element={<TestQuizPage />} />
-              <Route path="/flashcard/:id" element={<FlashCard />} />
             </>
           )}
-         
+          <Route path="/testquiz/:id" element={<TestQuizPage />} />
+          <Route path="/flashcard/:id" element={<FlashCard />} />
           <Route path="/loginAdmin" element={<LoginAdmin />} />
-          <Route path="/question/:quizId" element={<ManageQuestionQuiz />} />
           <Route path="/search" element={<Search />} />
           <Route path="/searchQuiz" element={<SearchQuiz />} />
           <Route path="/login" element={<Login />} />
@@ -199,6 +201,7 @@ function App() {
             element={<ExampleAddQuizQuestion />}
           />
           <Route path="/codeEditor/:id" element={<CodeEditor />} />
+
           <Route path="/listpractice" element={<ListPractice />} />
           <Route path="/detailclass/:id" element={<DetailClass />} />
           <Route path="/searchTag/:id" element={<SearchTag />} />
