@@ -39,7 +39,8 @@ const baseValidationSchema = Yup.object({
     })
     .required("Không bỏ trống trường này"),
   grade: Yup.object().nullable(),
-  level: Yup.object().nullable(),
+  level: Yup.object().test("is-not-empty", "Không được để trống trường này", (value) => Object.keys(value).length !== 0)
+  .required("Không bỏ trống trường này"),
 });
 
 export default function AddExam({
@@ -272,16 +273,16 @@ export default function AddExam({
                 options={yearList}
               />
               <CustomDropdownInSearch
-                title="Khối"
+                title="Cấp Học"
                 label={
                   <>
-                    <span>Khối</span>
+                    <span>Cấp Học</span>
                   </>
                 }
                 customTitle="title"
                 id="level"
                 name="level"
-                isNotRequired="false"
+            
                 options={levelList}
                 handleOnChange={handleOnChangeLevel}
               />

@@ -8,13 +8,13 @@ const CustomCard = ({ document }) => {
   const navigate = useNavigate();
 
   return (
-    <div className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/5 px-4 mb-6">
+    <div className="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-1/4 px-4 mb-6">
       <div
         className="bg-white border border-gray-300 rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 cursor-pointer transform hover:scale-105"
         onClick={() => navigate(`/document/${document?.id}`)}
       >
         {/* Book Cover Image */}
-        <div className="relative h-56 bg-gray-200 rounded-t-lg overflow-hidden">
+        <div className="relative h-64 bg-gray-200 rounded-t-lg overflow-hidden">
           {/* Replace this placeholder with actual image if available */}
           <img
             src={document?.image || "https://via.placeholder.com/150"}
