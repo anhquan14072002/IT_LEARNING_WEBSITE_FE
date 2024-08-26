@@ -35,6 +35,9 @@ export default function Topic() {
   const [quizExam, setQuizExam] = useState([]);
   const [problemTopic, setProblemTopic] = useState([]);
   const [tagTopic, setTagTopic] = useState([]);
+  const [showBackToTop, setShowBackToTop] = useState(false);
+  const [quizByTopic, setQuizByTopic] = useState([]);
+  const [problemByTopic, setproblemByTopic] = useState([]);
 
   const fetchData = async () => {
     try {
@@ -48,10 +51,47 @@ export default function Topic() {
         method: "GET",
       });
       setDocumentList(responseMenu.data?.data);
-      console.log("====================================");
-      console.log(responseMenu.data?.data);
-      console.log("====================================");
+
+      const quizByTopicResponse = await restClient({
+        url: `api/quiz/getallquiznopagination?TopicId=${id}&Status=true`,
+        method: "GET",
+      });
+      setQuizByTopic(quizByTopicResponse?.data?.data);
+
+      const problemByTopicResponse = await restClient({
+        url: `api/problem/getallproblempagination?TopicId=${id}&StatusProblem=true`,
+        method: "GET",
+      });
+      console.log(
+        "problemByTopicResponse?.data?.data::",
+        problemByTopicResponse?.data?.data
+      );
+
+      setproblemByTopic(problemByTopicResponse?.data?.data);
     } catch (err) {}
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (window.scrollY > 20) {
+        setShowBackToTop(true);
+      } else {
+        setShowBackToTop(false);
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
   };
 
   useEffect(() => {
@@ -60,8 +100,8 @@ export default function Topic() {
       method: "GET",
     })
       .then((res) => {
-        if(res.data?.data?.isActive === false){
-          navigate('/notfound')
+        if (res.data?.data?.isActive === false) {
+          navigate("/notfound");
         }
         setTopic(res.data.data || {});
         setLoading(false);
@@ -217,6 +257,20 @@ export default function Topic() {
     return null;
   };
 
+  const scrollToSection = (sectionId) => {
+    const section = document.getElementById(sectionId);
+    if (section) {
+      // Get the height of the fixed header
+      const headerHeight = fixedDivRef.current ? fixedDivRef.current.offsetHeight : 0;
+
+      // Scroll to the section minus the height of the header
+      window.scrollTo({
+        top: section.offsetTop - headerHeight,
+        behavior: "smooth",
+      });
+    }
+  };
+
   return (
     <NotifyProvider>
       <div className="min-h-screen flex flex-col">
@@ -256,7 +310,47 @@ export default function Topic() {
                   </button>
                 </div>
                 <h2 className="text-xl font-bold mb-5">{topic?.title}</h2>
-                <div>
+                {/* Index Section */}
+                <div className="sticky top-0 bg-white border border-gray-200 p-4 mb-4">
+                  <h3 className="text-lg font-semibold mb-2">Mục lục</h3>
+                  <ul>
+                    <li>
+                      <button
+                        className="text-blue-500 hover:underline"
+                        onClick={() => scrollToSection("lesson-content")}
+                      >
+                        Nội dung chủ đề
+                      </button>
+                    </li>
+                    {quizByTopic &&
+                      Array.isArray(quizByTopic) &&
+                      quizByTopic.length > 0 && (
+                        <li>
+                          <button
+                            className="text-blue-500 hover:underline"
+                            onClick={() => scrollToSection("quiz-questions")}
+                          >
+                            Câu hỏi ôn tập
+                          </button>
+                        </li>
+                      )}
+                    {problemByTopic &&
+                      Array.isArray(problemByTopic) &&
+                      problemByTopic.length > 0 && (
+                        <li>
+                          <button
+                            className="text-blue-500 hover:underline"
+                            onClick={() =>
+                              scrollToSection("practice-exercises")
+                            }
+                          >
+                            Bài tập thực hành
+                          </button>
+                        </li>
+                      )}
+                  </ul>
+                </div>
+                <div id="lesson-content">
                   <span className="font-semibold mb-2">Mục tiêu chủ đề :</span>
                   {topic?.objectives}
                 </div>
@@ -268,8 +362,54 @@ export default function Topic() {
                   />
                 </div>
 
+                {/* quiz */}
+                {quizByTopic &&
+                  Array.isArray(quizByTopic) &&
+                  quizByTopic.length > 0 && (
+                    <div id="quiz-questions" className="mt-6">
+                      <span  className="block font-semibold mb-3 text-xl">
+                        Câu hỏi ôn tập cho {topic?.title}
+                      </span>
+                      <div className="flex flex-wrap gap-3">
+                        {quizByTopic.map((quiz) => (
+                          <div
+                            key={quiz.id}
+                            className="bg-green-100 text-green-800 text-sm font-medium px-3 py-3 rounded-full shadow-sm hover:bg-green-200 transition-colors cursor-pointer w-full sm:w-1/2 md:w-1/3 lg:w-1/4"
+                            onClick={() => navigate("/flashcard/" + quiz.id)}
+                          >
+                            <p className="truncate">{quiz.title}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                {/* problem */}
+                {problemByTopic &&
+                  Array.isArray(problemByTopic) &&
+                  problemByTopic.length > 0 && (
+                    <div id="practice-exercises" className="mt-6">
+                      <span className="block font-semibold mb-3 text-xl">
+                        Bài tập thực hành cho {topic?.title}
+                      </span>
+                      <div className="flex flex-wrap gap-3">
+                        {problemByTopic.map((problem) => (
+                          <div
+                            key={problem.id}
+                            className="bg-yellow-100 text-yellow-800 text-sm font-medium px-3 py-3 rounded-full shadow-sm hover:bg-yellow-200 transition-colors cursor-pointer w-full sm:w-1/2 md:w-1/3 lg:w-1/4"
+                            onClick={() =>
+                              navigate("/codeeditor/" + problem.id)
+                            }
+                          >
+                            <p className="truncate">{problem.title}</p>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                 {/* tag */}
-                {tagTopic.length > 0 && (
+                {tagTopic && Array.isArray(tagTopic) && tagTopic.length > 0 && (
                   <div className="mt-6">
                     <span className="block font-semibold mb-3">
                       Các từ khóa liên quan đến chủ đề
@@ -281,7 +421,7 @@ export default function Topic() {
                           className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full shadow-sm hover:bg-blue-200 transition-colors cursor-pointer"
                           onClick={() => navigate("/searchTag/" + tag.id)}
                         >
-                          {tag.title}
+                          <p className="truncate">{tag.title}</p>
                         </div>
                       ))}
                     </div>
@@ -293,7 +433,13 @@ export default function Topic() {
             )}
           </div>
         </div>
-
+        {showBackToTop && (
+          <Button
+            icon="pi pi-arrow-up"
+            className="back-to-top-btn fixed bottom-4 right-4 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg shadow-md z-50"
+            onClick={scrollToTop}
+          />
+        )}
         <Footer ref={displayRef} />
       </div>
     </NotifyProvider>

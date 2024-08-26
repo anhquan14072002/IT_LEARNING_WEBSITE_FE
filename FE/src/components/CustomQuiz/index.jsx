@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "primereact/button";
+import { Tooltip } from "primereact/tooltip";
 
 const CustomQuiz = ({ document }) => {
   const navigate = useNavigate();
@@ -9,10 +10,20 @@ const CustomQuiz = ({ document }) => {
     <div className="w-full md:w-49p lg:w-32p xl:w-24p px-4 mb-6">
       <div
         className="bg-blue-50 border border-gray-300 rounded-lg shadow-md p-6 cursor-pointer transform transition-transform duration-300 hover:scale-105 hover:shadow-lg"
-        onClick={() => navigate(document?.typeId === 1 ? `/flashcard/${document?.id}` : `/testquiz/${document?.id}`)}
+        onClick={() =>
+          navigate(
+            document?.typeId === 1
+              ? `/flashcard/${document?.id}`
+              : `/testquiz/${document?.id}`
+          )
+        }
       >
         <div className="text-center mb-4">
-          <p className="text-black text-2xl font-semibold h-16 overflow-hidden text-ellipsis">
+          <Tooltip target=".document-title" />
+          <p
+            className="text-black text-2xl font-semibold h-16 overflow-hidden text-ellipsis document-title"
+            data-pr-tooltip={document?.title} // Tooltip content for title
+          >
             {document?.title}
           </p>
         </div>

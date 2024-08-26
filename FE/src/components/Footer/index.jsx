@@ -4,7 +4,7 @@ import logo from "../../assets/THV1.svg";
 
 const Footer = forwardRef((props, ref) => {
   return (
-    <div ref={ref} className="bg-[#e0e0e0] text-[#1976D2] p-12 h-auto mt-auto z-50 w-full">
+    <div ref={ref} className="bg-[#e0e0e0] text-[#1976D2] p-12 h-auto mt-auto z-40 w-full">
       <footer class="footer-olm mt-4">
         <div class="footer-top">
           <a href="https://www.facebook.com/people/SIE18/61562449373390/?notif_id=1721581073983834&notif_t=page_user_activity&ref=notif">
