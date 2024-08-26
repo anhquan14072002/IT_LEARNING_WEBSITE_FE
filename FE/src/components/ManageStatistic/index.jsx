@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { Chart } from "primereact/chart"; // PrimeReact chart component
+import { Chart } from "primereact/chart"; // Thành phần biểu đồ PrimeReact
 import restClient from "../../services/restClient";
 
-// Function to generate years from startYear to endYear
+// Hàm để sinh ra các năm từ startYear đến endYear
 const generateYears = (startYear, endYear) => {
   const years = [];
   for (let year = startYear; year <= endYear; year++) {
@@ -14,31 +14,31 @@ const generateYears = (startYear, endYear) => {
 export default function ManageStatistic() {
   const [loading, setLoading] = useState(true);
 
-  // State variables for dropdowns
+  // Biến trạng thái cho các dropdown
   const [documentYear, setDocumentYear] = useState("2024");
   const [topicYear, setTopicYear] = useState("2024");
   const [lessonYear, setLessonYear] = useState("2024");
 
-  // Chart data state
+  // Trạng thái dữ liệu biểu đồ
   const [chartData, setChartData] = useState({
-    line: { labels: [], datasets: [] }, // Line chart data
-    bar: { labels: [], datasets: [] }, // Bar chart data
-    pie: { labels: [], datasets: [] }, // Pie chart data
-    radar: { labels: [], datasets: [] }, // Radar chart data
+    line: { labels: [], datasets: [] }, // Dữ liệu biểu đồ đường
+    bar: { labels: [], datasets: [] }, // Dữ liệu biểu đồ cột
+    pie: { labels: [], datasets: [] }, // Dữ liệu biểu đồ hình tròn
+    radar: { labels: [], datasets: [] }, // Dữ liệu biểu đồ radar
   });
 
-  // Generate years from 2000 to 2024
+  // Sinh ra các năm từ 2000 đến 2024
   const years = generateYears(2000, 2024);
 
   useEffect(() => {
-    restClient({ url: "api/statistic/countuser" }).then((res) => {});
+    restClient({ url: "api/statistic/countuserbyrole" }).then((res) => {});
   }, []);
 
-  // Fetch and update statistics based on the year
+  // Lấy và cập nhật số liệu thống kê dựa trên năm
   const fetchStatistics = async () => {
     setLoading(true);
     try {
-      // Fetch data from APIs based on selected year
+      // Lấy dữ liệu từ API dựa trên năm đã chọn
       const documentRes = await restClient({
         url: `api/statistic/documentstatistic/${documentYear}`,
       });
@@ -48,24 +48,32 @@ export default function ManageStatistic() {
       const lessonRes = await restClient({
         url: `api/statistic/lessonstatistic/${lessonYear}`,
       });
+      const userRes = await restClient({ url: "api/statistic/countuserbyrole" });
 
-      // Process data for chart
+      // Xử lý dữ liệu cho biểu đồ
       const processData = (data) => {
-        const labels = data.map((item) => `Tháng  ${item.month}`);
+        const labels = data.map((item) => `Tháng ${item.month}`);
         const values = data.map((item) => item.count);
+        return { labels, dataValues: values };
+      };
+
+      const processRoleData = (data) => {
+        const labels = data.map((item) => item.name);
+        const values = data.map((item) => item.countUser);
         return { labels, dataValues: values };
       };
 
       const documentData = processData(documentRes.data.data);
       const topicData = processData(topicRes.data.data);
       const lessonData = processData(lessonRes.data.data);
+      const userStatistic = processRoleData(userRes?.data?.data)
 
       setChartData({
         line: {
           labels: lessonData.labels,
           datasets: [
             {
-              label: "Lesson Radar",
+              label: "Radar Bài học",
               data: lessonData.dataValues,
               backgroundColor: "rgba(66, 165, 245, 0.2)",
               borderColor: "#42A5F5",
@@ -78,7 +86,7 @@ export default function ManageStatistic() {
           labels: topicData.labels,
           datasets: [
             {
-              label: "Topics",
+              label: "Chủ đề",
               data: topicData.dataValues,
               backgroundColor: "#42A5F5",
               borderColor: "#1E88E5",
@@ -87,11 +95,11 @@ export default function ManageStatistic() {
           ],
         },
         pie: {
-          labels: lessonData.labels,
+          labels: userStatistic.labels,
           datasets: [
             {
-              label: "Lessons",
-              data: lessonData.dataValues,
+              label: "Bài học",
+              data: userStatistic.dataValues,
               backgroundColor: [
                 "#FF6384",
                 "#36A2EB",
@@ -109,7 +117,7 @@ export default function ManageStatistic() {
           labels: documentData.labels,
           datasets: [
             {
-              label: "Documents",
+              label: "Tài liệu",
               data: documentData.dataValues,
               borderColor: "#42A5F5",
               backgroundColor: "rgba(66, 165, 245, 0.2)",
@@ -120,13 +128,13 @@ export default function ManageStatistic() {
         },
       });
     } catch (error) {
-      console.error("Error fetching or processing statistics:", error);
+      console.error("Lỗi khi lấy hoặc xử lý số liệu thống kê:", error);
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch data on component mount and when any dropdown value changes
+  // Lấy dữ liệu khi component mount và khi giá trị dropdown thay đổi
   useEffect(() => {
     fetchStatistics();
   }, [documentYear, topicYear, lessonYear]);
@@ -135,28 +143,15 @@ export default function ManageStatistic() {
     <div>
       <h1 className="font-bold text-xl mb-10">Thống kê</h1>
 
-      {/* Flex Container for Charts */}
-      <div className="flex flex-wrap">
-        {/* Pie Chart Section */}
+      {/* Container Flex cho các biểu đồ */}
+      <div className="flex justify-center items-center flex-wrap">
+        {/* Phần Biểu đồ hình tròn */}
         <div className="basis-1/2">
-          <div className="select-container">
-            <label htmlFor="lessonYearSelect">Select Lesson Year: </label>
-            <select
-              id="lessonYearSelect"
-              value={lessonYear}
-              onChange={(e) => setLessonYear(e.target.value)}
-            >
-              {years.map((yr) => (
-                <option key={yr} value={yr}>
-                  {yr}
-                </option>
-              ))}
-            </select>
-          </div>
           {loading ? (
-            <p>Loading...</p>
+            <p>Đang tải...</p>
           ) : (
             <Chart
+              className="h-96"
               type="pie"
               data={chartData.pie}
               options={{
@@ -164,7 +159,7 @@ export default function ManageStatistic() {
                 plugins: {
                   title: {
                     display: true,
-                    text: "Lessons Distribution",
+                    text: "Số liệu thống kê người dùng trong hệ thống",
                   },
                   legend: {
                     display: true,
@@ -175,11 +170,12 @@ export default function ManageStatistic() {
           )}
         </div>
 
-        {/* Radar Chart Section */}
+        {/* Phần Biểu đồ đường */}
         <div className="basis-1/2">
           <div className="select-container">
-            <label htmlFor="documentYearSelect">Select Document Year: </label>
+            <label htmlFor="documentYearSelect">Chọn Năm : </label>
             <select
+              className="border-2 border-black rounded-lg"
               id="documentYearSelect"
               value={documentYear}
               onChange={(e) => setDocumentYear(e.target.value)}
@@ -192,64 +188,17 @@ export default function ManageStatistic() {
             </select>
           </div>
           {loading ? (
-            <p>Loading...</p>
+            <p>Đang tải...</p>
           ) : (
             <Chart
-              type="radar"
+              type="line"
               data={chartData.radar}
               options={{
                 responsive: true,
                 plugins: {
                   title: {
                     display: true,
-                    text: "Documents Over Time",
-                  },
-                  legend: {
-                    display: true,
-                  },
-                },
-                scales: {
-                  r: {
-                    angleLines: {
-                      display: true,
-                    },
-                    suggestedMin: 0,
-                    suggestedMax: 100,
-                  },
-                },
-              }}
-            />
-          )}
-        </div>
-
-        {/* Line Chart Section */}
-        <div className="basis-1/2">
-          <div className="select-container mt-28">
-            <label htmlFor="radarYearSelect">Select Radar Year: </label>
-            <select
-              id="radarYearSelect"
-              value={lessonYear} // Assuming you want to use the same year for radar
-              onChange={(e) => setLessonYear(e.target.value)}
-            >
-              {years.map((yr) => (
-                <option key={yr} value={yr}>
-                  {yr}
-                </option>
-              ))}
-            </select>
-          </div>
-          {loading ? (
-            <p>Loading...</p>
-          ) : (
-            <Chart
-              type="line"
-              data={chartData.line}
-              options={{
-                responsive: true,
-                plugins: {
-                  title: {
-                    display: true,
-                    text: "Lesson Statistics Radar",
+                    text: "Số liệu thống kê tài liệu được tạo theo tháng",
                   },
                   legend: {
                     display: true,
@@ -268,11 +217,59 @@ export default function ManageStatistic() {
           )}
         </div>
 
-        {/* Bar Chart Section */}
+        {/* Phần Biểu đồ đường */}
         <div className="basis-1/2">
           <div className="select-container mt-28">
-            <label htmlFor="topicYearSelect">Select Topic Year: </label>
+            <label htmlFor="radarYearSelect">Chọn Năm : </label>
             <select
+              className="border-2 border-black rounded-lg"
+              id="radarYearSelect"
+              value={lessonYear} // Giả sử bạn muốn sử dụng cùng một năm cho radar
+              onChange={(e) => setLessonYear(e.target.value)}
+            >
+              {years.map((yr) => (
+                <option key={yr} value={yr}>
+                  {yr}
+                </option>
+              ))}
+            </select>
+          </div>
+          {loading ? (
+            <p>Đang tải...</p>
+          ) : (
+            <Chart
+              type="line"
+              data={chartData.line}
+              options={{
+                responsive: true,
+                plugins: {
+                  title: {
+                    display: true,
+                    text: "Số liệu thống kê bài học được tạo theo tháng",
+                  },
+                  legend: {
+                    display: true,
+                  },
+                },
+                scales: {
+                  x: {
+                    beginAtZero: true,
+                  },
+                  y: {
+                    beginAtZero: true,
+                  },
+                },
+              }}
+            />
+          )}
+        </div>
+
+        {/* Phần Biểu đồ cột */}
+        <div className="basis-1/2">
+          <div className="select-container mt-28">
+            <label htmlFor="topicYearSelect">Chọn Năm : </label>
+            <select
+              className="border-2 border-black rounded-lg"
               id="topicYearSelect"
               value={topicYear}
               onChange={(e) => setTopicYear(e.target.value)}
@@ -285,7 +282,7 @@ export default function ManageStatistic() {
             </select>
           </div>
           {loading ? (
-            <p>Loading...</p>
+            <p>Đang tải...</p>
           ) : (
             <Chart
               type="bar"
@@ -295,7 +292,7 @@ export default function ManageStatistic() {
                 plugins: {
                   title: {
                     display: true,
-                    text: "Topics Over Time",
+                    text: "Số liệu thống kê chủ đề được tạo theo tháng",
                   },
                   legend: {
                     display: true,

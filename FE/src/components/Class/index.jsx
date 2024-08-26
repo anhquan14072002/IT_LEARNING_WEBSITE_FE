@@ -3,6 +3,7 @@ import arrowDown from "../../assets/img/icons8-arrow-down-50.png";
 import { getDocumentByGradeId } from "../../services/document.api";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { Tooltip } from "primereact/tooltip";
 
 export default function Class({ item, index }) {
   const [toggle, setToggle] = useState(false);
@@ -22,14 +23,15 @@ export default function Class({ item, index }) {
   useEffect(() => {
     if (toggle) {
       setLoading(true);
-      getDocumentByGradeId(item.id, setLoading, (data) => {
-        setDocumentList(data);
-        setContentHeight(`${contentRef.current.scrollHeight}px`);
-      });
+      getDocumentByGradeId(item.id, setLoading, setDocumentList);
     } else {
       setContentHeight("0px");
     }
   }, [toggle, item.id]);
+
+  useEffect(() => {
+    setContentHeight(`${contentRef.current.scrollHeight}px`);
+  }, [documentList]);
 
   useEffect(() => {
     setTimeout(() => {
@@ -138,21 +140,29 @@ export default function Class({ item, index }) {
           opacity: toggle ? 1 : 0,
           transition: "max-height 0.3s ease-out, opacity 0.3s ease-out",
         }}
-        className="flex justify-center gap-5 flex-wrap overflow-hidden"
+        className="flex gap-5 flex-wrap overflow-hidden"
       >
         <div className="flex gap-20 flex-wrap">
           <div>
             <h1 className="font-bold mb-3">Các bộ sách</h1>
             {(documentList?.documents ?? [])
-              .map((d) => (
-                <h1
-                  key={d?.id}
-                  className="cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis"
-                  style={{ width: "200px" }} // Fixed width
-                  onClick={() => navigate(`/document/${d?.id}`)}
-                >
-                  {d?.title}
-                </h1>
+              .map((d, index) => (
+                <>
+                  <Tooltip target={`.tooltip-lesson-${index}`} />
+                  <h1
+                    key={d?.id}
+                    className={`cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis `}
+                    style={{ width: "200px" }} // Fixed width
+                    onClick={() => navigate(`/document/${d?.id}`)}
+                  >
+                    <span
+                      className={`tooltip-lesson-${index}`}
+                      data-pr-tooltip={d?.title}
+                    >
+                      {d?.title}
+                    </span>
+                  </h1>
+                </>
               ))
               .slice(0, 4)}
             {(documentList?.documents ?? []).length > 4 && (
@@ -168,15 +178,23 @@ export default function Class({ item, index }) {
           <div>
             <h1 className="font-bold mb-3">Câu hỏi ôn tập flashcard</h1>
             {practiceQuizzes
-              .map((d) => (
-                <h1
-                  key={d?.id}
-                  className="cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis"
-                  style={{ width: "200px" }} // Fixed width
-                  onClick={() => navigate(`/flashcard/${d?.id}`)}
-                >
-                  {d.title}
-                </h1>
+              .map((d, index) => (
+                <>
+                  <Tooltip target={`.tooltip-flashcard-${index}`} />
+                  <h1
+                    key={d?.id}
+                    className={`cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis tooltip-flashcard-${index}`}
+                    style={{ width: "200px" }} // Fixed width
+                    onClick={() => navigate(`/flashcard/${d?.id}`)}
+                  >
+                    <span
+                      className={`tooltip-flashcard-${index}`}
+                      data-pr-tooltip={d?.title}
+                    >
+                      {d?.title}
+                    </span>
+                  </h1>
+                </>
               ))
               .slice(0, 4)}
             {practiceQuizzes?.length > 4 && (
@@ -195,14 +213,22 @@ export default function Class({ item, index }) {
             <h1 className="font-bold mb-3">Câu hỏi ôn tập trắc nghiệm</h1>
             {testQuizzes
               ?.map((d) => (
-                <h1
-                  key={d?.id}
-                  className="cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis"
-                  style={{ width: "200px" }} // Fixed width
-                  onClick={() => navigate(`/testquiz/${d.id}`)}
-                >
-                  {d.title}
-                </h1>
+                <>
+                  <Tooltip target={`.tooltip-flashcardTest-${index}`} />
+                  <h1
+                    key={d?.id}
+                    className={`cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis tooltip-flashcardTest-${index}`}
+                    style={{ width: "200px" }}
+                    onClick={() => navigate(`/testquiz/${d.id}`)}
+                  >
+                    <span
+                      className={`tooltip-flashcardTest-${index}`}
+                      data-pr-tooltip={d?.title}
+                    >
+                      {d?.title}
+                    </span>
+                  </h1>
+                </>
               ))
               .slice(0, 4)}
             {testQuizzes.length > 4 && (
@@ -220,15 +246,21 @@ export default function Class({ item, index }) {
           <div>
             <h1 className="font-bold mb-3">Đề thi</h1>
             {(documentList?.exams ?? [])
-              .map((exam) => (
-                <h1
-                  key={exam.id}
-                  className="cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis"
-                  style={{ width: "200px" }} // Fixed width
-                  onClick={() => handleExam(exam)}
-                >
-                  {exam.title}
-                </h1>
+              .map((exam, index) => (
+                  <h1
+                    key={exam?.id}
+                    className={`cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis tooltip-exam-${index}`}
+                    style={{ width: "200px" }} // Fixed width
+                    onClick={() => handleExam(exam)}
+                  >
+                  <Tooltip target={`.tooltip-exam-${index}`} />
+                    <span
+                      className={`tooltip-exam-${index}`}
+                      data-pr-tooltip={exam?.title}
+                    >
+                      {exam?.title}
+                    </span>
+                  </h1>
               ))
               .slice(0, 4)}
             {(documentList?.exams ?? []).length > 4 && (
@@ -247,11 +279,14 @@ export default function Class({ item, index }) {
               .map((problem) => (
                 <h1
                   key={problem?.id}
-                  className="cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis"
+                  className={`cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis tooltip-problem-${index}`}
                   style={{ width: "200px" }} // Fixed width
                   onClick={() => navigate(`/codeEditor/${problem?.id}`)}
                 >
+                  <Tooltip target={`.tooltip-problem-${index}`} />
+                  <span className={`tooltip-problem-${index}`} data-pr-tooltip={problem?.title}>
                   {problem?.title}
+                  </span>
                 </h1>
               ))
               .slice(0, 4)}

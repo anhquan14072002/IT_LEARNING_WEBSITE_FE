@@ -25,19 +25,39 @@ const CustomCard = ({ document }) => {
 
         {/* Book Title */}
         <div className="p-4">
-          <p className="text-black text-xl font-semibold h-16 overflow-hidden whitespace-nowrap text-ellipsis">
+          {/* Tooltip for Document Title */}
+          <Tooltip target=".document-title" />
+
+          <p
+            className="text-black text-2xl font-semibold h-16 overflow-hidden whitespace-nowrap text-ellipsis document-title"
+            data-pr-tooltip={document?.title} // Tooltip content for title
+          >
             {document?.title}
           </p>
-          <p className="text-gray-600 text-sm mt-1 truncate">
+
+          {/* Tooltip for Author */}
+          <Tooltip target=".author-tooltip" />
+
+          <p
+            className="text-gray-600 text-sm mt-1 truncate author-tooltip"
+            data-pr-tooltip={document?.author}
+            data-pr-position="top" // Positioning tooltip
+          >
             {document?.author || "Unknown Author"}
           </p>
         </div>
 
         {/* Rating and Reviews */}
         <div className="flex items-center justify-between p-4 border-t border-gray-300">
-          <div className="flex items-center" data-pr-tooltip="Điểm đánh giá và số lượt đánh giá" data-pr-position="top">
+          <div
+            className="flex items-center"
+            data-pr-tooltip="Điểm đánh giá và số lượt đánh giá"
+            data-pr-position="top"
+          >
             <StarRating stars={document?.averageRating} />
-            <span className="ml-2 text-gray-600">{document?.totalReviewer}</span>
+            <span className="ml-2 text-gray-600">
+              {document?.totalReviewer}
+            </span>
           </div>
           <Tooltip target=".flex.items-center" />
         </div>
