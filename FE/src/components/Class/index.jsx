@@ -152,7 +152,7 @@ export default function Class({ item, index }) {
                   <h1
                     key={d?.id}
                     className={`cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis `}
-                    style={{ width: "200px" }} // Fixed width
+                    style={{ width: "350px" }} // Fixed width
                     onClick={() => navigate(`/document/${d?.id}`)}
                   >
                     <span
@@ -185,7 +185,7 @@ export default function Class({ item, index }) {
                   <h1
                     key={d?.id}
                     className={`cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis tooltip-flashcard-${index}`}
-                    style={{ width: "200px" }} // Fixed width
+                    style={{ width: "300px" }} // Fixed width
                     onClick={() => navigate(`/flashcard/${d?.id}`)}
                   >
                     <span
@@ -220,7 +220,7 @@ export default function Class({ item, index }) {
                   <h1
                     key={d?.id}
                     className={`cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis tooltip-flashcardTest-${index}`}
-                    style={{ width: "200px" }}
+                    style={{ width: "300px" }}
                     onClick={() => navigate(`/testquiz/${d.id}`)}
                   >
                     <span
@@ -253,7 +253,7 @@ export default function Class({ item, index }) {
                 <h1
                   key={exam?.id}
                   className={`cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis tooltip-exam-${index}`}
-                  style={{ width: "200px" }} // Fixed width
+                  style={{ width: "300px" }} // Fixed width
                   onClick={() => handleExam(exam)}
                 >
                   <Tooltip target={`.tooltip-exam-${index}`} />
