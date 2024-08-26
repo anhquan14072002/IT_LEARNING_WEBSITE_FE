@@ -202,6 +202,17 @@ export default function UpdateQuizLesson({
         });
         const dataLesson = lessonData.data?.data || {};
         setLessonList(dataLesson);
+
+        try {
+          const tagTopic = await restClient({
+            url: `api/quiz/getquizidbytag/${updateValue?.id}`,
+            method: "GET",
+          });
+          setTag(tagTopic?.data?.data || null);
+        } catch (error) {
+          setTag(null);
+        }
+
       } catch (err) {
         console.error("Error fetching data:", err);
       } finally {
@@ -364,7 +375,7 @@ export default function UpdateQuizLesson({
 
   return (
     <Dialog
-      header="Cập nhật bài quiz"
+      header="Cập nhật bộ câu hỏi theo chủ đề , bài học"
       visible={visibleUpdate}
       style={{ width: "50vw" }}
       onHide={() => {

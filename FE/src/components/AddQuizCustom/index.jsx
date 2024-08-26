@@ -268,9 +268,6 @@ export default function AddQuizLesson({
         url: "api/quiz/createquiz",
         method: "POST",
         data: model,
-        headers: {
-          Authorization: `Bearer ${getTokenFromLocalStorage()}`,
-        },
       })
         .then((res) => {
           // SUCCESS(toast, "Thêm bài quiz thành công");
@@ -278,20 +275,17 @@ export default function AddQuizLesson({
             url: "api/quizquestionrelation/createquizquestionrelationbyquizcustom",
             method: "POST",
             data: generateResponseBody(res?.data?.data?.id),
-            headers: {
-              Authorization: `Bearer ${getTokenFromLocalStorage()}`,
-            },
           })
             .then((res) => {
               ACCEPT(toast, "Thêm thành công");
-              setTag([]);
+              setTag();
             })
             .catch((err) => {
               // REJECT(toast, "Xảy ra lỗi khi thêm 1 ");
             })
             .finally(() => {
               setSelectedProduct([]);
-              setTag([]);
+              setTag();
             });
         })
         .catch((err) => {
@@ -306,7 +300,7 @@ export default function AddQuizLesson({
 
   return (
     <Dialog
-      header="Thêm bộ câu hỏi"
+      header="Thêm bộ đề"
       visible={visible}
       style={{ width: "50vw" }}
       onHide={() => {
