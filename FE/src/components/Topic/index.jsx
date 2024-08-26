@@ -74,6 +74,7 @@ export default function Topic() {
         console.error("Error fetching data:", err);
         setProducts([]);
         setLoading(false);
+        setTotalPage(0)
       });
   };
 
@@ -92,6 +93,7 @@ export default function Topic() {
         .catch((err) => {
           console.error("Error fetching data:", err);
           setProducts([]);
+          setTotalPage(0)
         })
         .finally(() => setLoading(false));
     } else {

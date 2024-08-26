@@ -50,7 +50,11 @@ export default function Quiz() {
         method: "GET",
       });
       if (Array.isArray(quizResponse.data?.data)) {
-        setQuiz(Array.isArray(quizResponse?.data?.data) ? quizResponse?.data?.data : []);
+        setQuiz(
+          Array.isArray(quizResponse?.data?.data)
+            ? quizResponse?.data?.data
+            : []
+        );
       } else {
         setQuiz([]); // Set quiz to null if not found
       }
@@ -90,7 +94,9 @@ export default function Quiz() {
   if (!isLoggedIn()) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
-        <p className="text-xl font-bold mb-4">Bạn phải đăng nhập để xem flashcard này</p>
+        <p className="text-xl font-bold mb-4">
+          Bạn phải đăng nhập để xem flashcard này
+        </p>
         <button
           onClick={() => navigate("/login")}
           className="bg-blue-500 text-white px-4 py-2 rounded"
@@ -116,9 +122,6 @@ export default function Quiz() {
           {quiz.length > 0 && (
             <div className="text-center">
               <p className="mb-3 font-bold text-xl">{quizDetails?.title}</p>
-              <p className="font-semibold">
-                {currentCardIndex + 1}/{quiz?.length}
-              </p>
             </div>
           )}
           <div
@@ -154,13 +157,20 @@ export default function Quiz() {
             )}
           </div>
           {quiz.length > 0 && (
-            <div className="flex justify-center gap-5">
+            <div className="flex items-center justify-center gap-5">
               <Button
                 tooltip="Câu trước"
                 icon="pi pi-chevron-left"
                 className="rounded-full h-10 w-10 bg-blue-500 text-white font-bold"
                 onClick={handlePreviousCard}
               ></Button>
+
+              <div className="text-center">
+                <p className="font-semibold">
+                  {currentCardIndex + 1}/{quiz?.length}
+                </p>
+              </div>
+
               <Button
                 tooltip="Câu tiếp theo"
                 icon="pi pi-chevron-right"

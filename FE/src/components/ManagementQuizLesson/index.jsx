@@ -68,6 +68,7 @@ export default function ManagementQuizLesson() {
         console.error("Error fetching data:", err);
         setProducts([]);
         setLoading(false);
+        setTotalPage(0)
       });
   };
 

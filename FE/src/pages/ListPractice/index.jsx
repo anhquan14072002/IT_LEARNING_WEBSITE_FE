@@ -8,7 +8,7 @@ import { Button } from "primereact/button";
 import { useSearchParams, useNavigate } from "react-router-dom";
 import restClient from "../../services/restClient";
 import NotifyProvider from "../../store/NotificationContext";
-import { removeVietnameseTones } from "../../utils";
+import { isLoggedIn, removeVietnameseTones } from "../../utils";
 import CustomPractice from "../../components/CustomPractice";
 
 export default function ListPractice() {
@@ -70,6 +70,10 @@ export default function ListPractice() {
       params.append("Value", removeVietnameseTones(textSearch.trim()));
     }
 
+    if(isLoggedIn()){
+      params.append("UserId", localStorage.getItem("userId"));
+    }
+
     if (page) {
       params.append("PageIndex", page.toString());
     }
@@ -101,6 +105,7 @@ export default function ListPractice() {
       .catch((err) => {
         console.error("Error fetching data:", err);
         setProducts([]);
+        setTotalPage(0)
       })
       .finally(() => setLoading(false));
   };

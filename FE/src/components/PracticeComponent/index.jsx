@@ -9,7 +9,12 @@ import { useNavigate } from "react-router-dom";
 import debounce from "lodash.debounce";
 import restClient from "../../services/restClient";
 import { InputText } from "primereact/inputtext";
-import { ACCEPT, getTokenFromLocalStorage, REJECT, removeVietnameseTones } from "../../utils";
+import {
+  ACCEPT,
+  getTokenFromLocalStorage,
+  REJECT,
+  removeVietnameseTones,
+} from "../../utils";
 import { confirmDialog } from "primereact/confirmdialog";
 import { Toast } from "primereact/toast";
 import { InputSwitch } from "primereact/inputswitch";
@@ -58,6 +63,7 @@ export default function PracticeComponent() {
         .catch((err) => {
           console.error("Error fetching data:", err);
           setProducts([]);
+          setTotalPage(0);
         })
         .finally(() => setLoading(false));
     } else {
@@ -75,6 +81,7 @@ export default function PracticeComponent() {
         .catch((err) => {
           console.error("Error fetching data:", err);
           setProducts([]);
+          setTotalPage(0);
         })
         .finally(() => {
           setLoading(false);
@@ -94,8 +101,8 @@ export default function PracticeComponent() {
         <Button
           icon="pi pi-pencil"
           className="text-blue-600 p-mr-2 shadow-none"
-          onClick={()=>{
-            navigate(`/dashboard/updateproblem/${rowData?.id}`)
+          onClick={() => {
+            navigate(`/dashboard/updateproblem/${rowData?.id}`);
           }}
         />
         <Button
@@ -161,9 +168,7 @@ export default function PracticeComponent() {
         checked={rowData.isActive}
         onChange={(e) => changeStatusLesson(e.value, rowData.id)}
         tooltip={
-          rowData.isActive
-            ? "Bài này đã được duyệt"
-            : "Bài chưa được duyệt"
+          rowData.isActive ? "Bài này đã được duyệt" : "Bài chưa được duyệt"
         }
       />
     );
