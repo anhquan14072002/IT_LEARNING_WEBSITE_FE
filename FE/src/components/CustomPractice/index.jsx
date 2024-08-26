@@ -12,9 +12,13 @@ const CustomPractice = ({ document }) => {
         onClick={() => navigate(`/codeEditor/${document?.id}`)}
       >
         <div className="text-center mb-4">
-          <p className="text-black hover:text-gray-600 text-2xl font-semibold h-10 overflow-hidden whitespace-nowrap text-ellipsis">
+          <p
+            className="text-black hover:text-gray-600 text-2xl font-semibold h-10 overflow-hidden whitespace-nowrap text-ellipsis title-practice"
+            data-pr-tooltip={document?.title}
+          >
             {document?.title}
           </p>
+          <Tooltip target=".title-practice" position="top" />
         </div>
         <div className="flex justify-center mb-4">
           {document?.difficulty === 1 && (
