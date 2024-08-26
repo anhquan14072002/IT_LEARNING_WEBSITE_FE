@@ -33,6 +33,14 @@ const UpdateSolution = ({
   }, [updateValue]);
 
   const handleSubmit = () => {
+    if (title.trim().length < 5) {
+      REJECT(toast, "Vui lòng nhập tiêu đề lớn hơn 5 kí tự");
+      return;
+    }
+    if (title.trim().length > 250) {
+      REJECT(toast, "Vui lòng nhập tiêu đề nhỏ hơn 250 kí tự");
+      return;
+    }
     if (!title || !description || !code) {
       REJECT(
         toast,
@@ -109,7 +117,7 @@ const UpdateSolution = ({
 
       <div>
         <h1>
-          Mô tả<span className="text-red-500">*</span>
+          Mô tả
         </h1>
         <Editor
           style={{ height: "300px" }}

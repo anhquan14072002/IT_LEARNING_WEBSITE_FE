@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from "react";
 import restClient from "../../services/restClient";
+import { useNavigate } from "react-router-dom";
 
 export default function InstructionComponent({ id }) {
   const [problem, setProblem] = useState(null);
   const [tagTopic, setTagTopic] = useState([]);
+  const navigate = useNavigate()
 
   useEffect(() => {
     restClient({ url: "api/editorial/geteditorialbyproblemid/" + id })

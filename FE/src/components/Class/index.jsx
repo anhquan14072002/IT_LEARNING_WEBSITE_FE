@@ -13,9 +13,21 @@ export default function Class({ item, index }) {
   const navigate = useNavigate();
   const user = useSelector((state) => state.user.value);
 
+  // useEffect(() => {
+  //   if (toggle) {
+  //     getDocumentByGradeId(item.id, setLoading, setDocumentList);
+  //   }
+  // }, [toggle, item.id]);
+
   useEffect(() => {
     if (toggle) {
-      getDocumentByGradeId(item.id, setLoading, setDocumentList);
+      setLoading(true);
+      getDocumentByGradeId(item.id, setLoading, (data) => {
+        setDocumentList(data);
+        setContentHeight(`${contentRef.current.scrollHeight}px`);
+      });
+    } else {
+      setContentHeight("0px");
     }
   }, [toggle, item.id]);
 
@@ -74,25 +86,27 @@ export default function Class({ item, index }) {
   };
 
   const getAllProblems = (data) => {
-    if (!data || typeof data !== 'object') {
-      console.error('Expected data to be an object with an array of documents');
+    if (!data || typeof data !== "object") {
+      console.error("Expected data to be an object with an array of documents");
       return [];
     }
-  
+
     const documents = Array.isArray(data.documents) ? data.documents : [];
-  
-    const problemsCustom = Array.isArray(data.problemsCustom) ? data.problemsCustom : [];
-  
+
+    const problemsCustom = Array.isArray(data.problemsCustom)
+      ? data.problemsCustom
+      : [];
+
     const problemsFromDocuments = documents.flatMap((item) =>
       (Array.isArray(item.topics) ? item.topics : []).flatMap((topic) =>
         (Array.isArray(topic.problems) ? topic.problems : []).concat(
-          (Array.isArray(topic.lessons) ? topic.lessons : []).flatMap((lesson) =>
-            (Array.isArray(lesson.problems) ? lesson.problems : [])
+          (Array.isArray(topic.lessons) ? topic.lessons : []).flatMap(
+            (lesson) => (Array.isArray(lesson.problems) ? lesson.problems : [])
           )
         )
       )
     );
-  
+
     return [...problemsCustom, ...problemsFromDocuments];
   };
 
@@ -124,7 +138,7 @@ export default function Class({ item, index }) {
           opacity: toggle ? 1 : 0,
           transition: "max-height 0.3s ease-out, opacity 0.3s ease-out",
         }}
-        className="flex justify-center gap-5 flex-wrap"
+        className="flex justify-center gap-5 flex-wrap overflow-hidden"
       >
         <div className="flex gap-20 flex-wrap">
           <div>
@@ -134,7 +148,7 @@ export default function Class({ item, index }) {
                 <h1
                   key={d?.id}
                   className="cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis"
-                  style={{ width: '200px' }}  // Fixed width
+                  style={{ width: "200px" }} // Fixed width
                   onClick={() => navigate(`/document/${d?.id}`)}
                 >
                   {d?.title}
@@ -158,7 +172,7 @@ export default function Class({ item, index }) {
                 <h1
                   key={d?.id}
                   className="cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis"
-                  style={{ width: '200px' }}  // Fixed width
+                  style={{ width: "200px" }} // Fixed width
                   onClick={() => navigate(`/flashcard/${d?.id}`)}
                 >
                   {d.title}
@@ -168,7 +182,9 @@ export default function Class({ item, index }) {
             {practiceQuizzes?.length > 4 && (
               <h1
                 className="text-sm text-blue-600 mt-3 cursor-pointer"
-                onClick={() => navigate(`/searchquiz?type=1&classId=${item?.id}`)}
+                onClick={() =>
+                  navigate(`/searchquiz?type=1&classId=${item?.id}`)
+                }
               >
                 Xem tất cả
               </h1>
@@ -182,7 +198,7 @@ export default function Class({ item, index }) {
                 <h1
                   key={d?.id}
                   className="cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis"
-                  style={{ width: '200px' }}  // Fixed width
+                  style={{ width: "200px" }} // Fixed width
                   onClick={() => navigate(`/testquiz/${d.id}`)}
                 >
                   {d.title}
@@ -192,7 +208,9 @@ export default function Class({ item, index }) {
             {testQuizzes.length > 4 && (
               <h1
                 className="text-sm text-blue-600 mt-3 cursor-pointer"
-                onClick={() =>  navigate(`/searchquiz?type=2&classId=${item?.id}`)}
+                onClick={() =>
+                  navigate(`/searchquiz?type=2&classId=${item?.id}`)
+                }
               >
                 Xem tất cả
               </h1>
@@ -206,7 +224,7 @@ export default function Class({ item, index }) {
                 <h1
                   key={exam.id}
                   className="cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis"
-                  style={{ width: '200px' }}  // Fixed width
+                  style={{ width: "200px" }} // Fixed width
                   onClick={() => handleExam(exam)}
                 >
                   {exam.title}
@@ -225,11 +243,12 @@ export default function Class({ item, index }) {
 
           <div>
             <h1 className="font-bold mb-3">Bài tập</h1>
-            {getAllProblems(documentList).map((problem) => (
+            {getAllProblems(documentList)
+              .map((problem) => (
                 <h1
                   key={problem?.id}
                   className="cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis"
-                  style={{ width: '200px' }}  // Fixed width
+                  style={{ width: "200px" }} // Fixed width
                   onClick={() => navigate(`/codeEditor/${problem?.id}`)}
                 >
                   {problem?.title}

@@ -47,6 +47,23 @@ const CodeEditor = () => {
   const [errorList, setErrorList] = useState([]);
   const [typeError, setErrorType] = useState(null);
   const [loading, setLoading] = useState(false); // State to manage loading
+  const [sizes, setSizes] = useState([40, 60]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth <= 768) {
+        // Adjust breakpoint as needed
+        setSizes([100, 100]);
+      } else {
+        setSizes([40, 60]);
+      }
+    };
+
+    window.addEventListener("resize", handleResize);
+    handleResize(); // Call on initial render
+
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   const submit = () => {
     if (!isLoggedIn()) {
@@ -135,7 +152,9 @@ const CodeEditor = () => {
         setExecuteCode(res.data?.data);
         setCode(decodeBase64(res.data?.data[0]?.sampleCode) || "");
         restClient({
-          url: `api/submission/getsubmission?ProblemId=${id}&UserId=${localStorage.getItem('userId')}&LanguageId=${res.data?.data[0]?.languageId}`,
+          url: `api/submission/getsubmission?ProblemId=${id}&UserId=${localStorage.getItem(
+            "userId"
+          )}&LanguageId=${res.data?.data[0]?.languageId}`,
         })
           .then((res) => {
             setCode(decodeBase64(res?.data?.data?.sourceCode));
@@ -188,7 +207,9 @@ const CodeEditor = () => {
   const handleLanguageChange = (event) => {
     const selectedLanguageId = event.target.value;
     restClient({
-      url: `api/submission/getsubmission?ProblemId=${id}&UserId=${localStorage.getItem('userId')}&LanguageId=${selectedLanguageId}`,
+      url: `api/submission/getsubmission?ProblemId=${id}&UserId=${localStorage.getItem(
+        "userId"
+      )}&LanguageId=${selectedLanguageId}`,
     })
       .then((res) => {
         const selectedLanguage = executeCode?.find(
@@ -243,308 +264,319 @@ const CodeEditor = () => {
         </div>
         {loading && <LoadingFull />}
         <>
-        
-        <div className="hidden lg:block">
-          <Split
-            sizes={[40, 60]}
-            minSize={100}
-            expandToMin={false}
-            gutterSize={10}
-            gutterAlign="center"
-            snapOffset={30}
-            dragInterval={1}
-            direction="horizontal"
-            cursor="col-resize"
-            className="flex"
-            style={{ paddingTop: `${fixedDivHeight}px` }}
-          >
-            <div className="p-5 h-screen overflow-y-auto custom-scrollbar min-w-[30%]">
-              <nav className="flex flex-wrap justify-center gap-5 space-x-4 mb-10">
-                <button
-                  onClick={() => setNavIndex(1)}
-                  className={`py-2 px-4 rounded-lg ${
-                    navIndex === 1
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200 text-gray-700"
-                  } hover:bg-blue-600 transition-colors`}
-                >
-                  Chi tiết
-                </button>
-                <button
-                  onClick={() => setNavIndex(2)}
-                  className={`py-2 px-4 rounded-lg ${
-                    navIndex === 2
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200 text-gray-700"
-                  } hover:bg-blue-600 transition-colors`}
-                >
-                  Hướng dẫn
-                </button>
-                <button
-                  onClick={() => setNavIndex(3)}
-                  className={`py-2 px-4 rounded-lg ${
-                    navIndex === 3
-                      ? "bg-blue-500 text-white"
-                      : "bg-gray-200 text-gray-700"
-                  } hover:bg-blue-600 transition-colors`}
-                >
-                  Bình luận
-                </button>
-                {isLoggedIn() && (
+          <div className="">
+            {/* <Split
+              sizes={sizes}
+              minSize={100}
+              expandToMin={false}
+              gutterSize={10}
+              gutterAlign="center"
+              snapOffset={30}
+              dragInterval={1}
+              direction="horizontal"
+              cursor="col-resize"
+              className="flex"
+              style={{ paddingTop: `${fixedDivHeight}px` }}
+            > */}
+            <Split
+              sizes={sizes}
+              minSize={100}
+              expandToMin={false}
+              gutterSize={10}
+              gutterAlign="center"
+              snapOffset={30}
+              dragInterval={1}
+              direction="horizontal"
+              cursor="col-resize"
+              className="flex flex-col md:flex-row"
+              style={{ paddingTop: `${fixedDivHeight}px` }}
+            >
+              <div className="p-5 h-screen overflow-y-auto custom-scrollbar min-w-[30%]">
+                <nav className="flex flex-wrap justify-center gap-5 space-x-4 mb-10">
                   <button
-                    onClick={() => setNavIndex(4)}
+                    onClick={() => setNavIndex(1)}
                     className={`py-2 px-4 rounded-lg ${
-                      navIndex === 4
+                      navIndex === 1
                         ? "bg-blue-500 text-white"
                         : "bg-gray-200 text-gray-700"
                     } hover:bg-blue-600 transition-colors`}
                   >
-                    Bài đã nộp
+                    Chi tiết
                   </button>
-                )}
-              </nav>
-              {navIndex === 1 && <DescriptionComponent id={id} />}
-              {navIndex === 2 && <InstructionComponent id={id} />}
-              {navIndex === 3 && <CommentCoding id={id} />}
-              {isLoggedIn() && navIndex === 4 && <SubmitCoding id={id} />}
-            </div>
-
-            <div className="min-w-[30%] bg-[#182537]">
-              {/* Code Editor */}
-              <div
-                className="h-screen overflow-y-auto custom-scrollbar"
-                style={{ height: "100vh" }}
-              >
-                <div
-                  className="h-full"
-                  style={{ height: "auto", backgroundColor: "#182537" }}
-                >
-                  <div className="flex justify-between flex-wrap p-2 text-white gap-2">
-                    <div className="flex items-center">
-                      <label htmlFor="language-select" className="mr-2">
-                        Ngôn ngữ:
-                      </label>
-                      <select
-                        id="language-select"
-                        value={language?.id || ""}
-                        onChange={handleLanguageChange}
-                        className="bg-gray-700 text-white py-2 px-4 rounded-lg border border-gray-600 hover:bg-gray-700 focus:outline-none"
-                      >
-                        <option value="" disabled>
-                          Chọn ngôn ngữ
-                        </option>
-                        {executeCode?.map((lang) => (
-                          <option key={lang?.id} value={lang?.languageId}>
-                            {lang?.languageName}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div className="flex gap-5 flex-wrap">
-                      <button
-                        onClick={runTestCases}
-                        className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition-colors"
-                      >
-                        Chạy code
-                      </button>
-                      <button
-                        className="bg-green-500 text-white py-2 px-6 rounded-lg hover:bg-green-600 transition-colors"
-                        onClick={submit}
-                      >
-                        Nộp bài
-                      </button>
-                    </div>
-                  </div>
-                </div>
-                <Split
-                  maxSize={700}
-                  expandToMin={true}
-                  gutterSize={10}
-                  gutterAlign="center"
-                  snapOffset={30}
-                  dragInterval={1}
-                  direction="vertical"
-                  cursor="row-resize"
-                  onDrag={(e) => {
-                    if (codeMirrorRef.current) {
-                      codeMirrorRef.current.editor.display.wrapper.style.height = `calc(${e[0]}vh - 5px)`;
-                    }
-                  }}
-                  className="h-[100vh]"
-                >
-                  <div className="border border-gray-300 rounded-lg shadow-md">
-                    <CodeMirror
-                      ref={codeMirrorRef}
-                      value={code}
-                      options={{
-                        theme: "material",
-                        lineNumbers: true,
-                      }}
-                      onBeforeChange={(editor, data, value) => {
-                        setCode(value);
-                      }}
-                      editorDidMount={(editor) => {
-                        editor.setSize(null, "calc(50vh - 5px)");
-                      }}
-                    />
-                  </div>
-
-                  <div
-                    style={{ backgroundColor: "#182537", height: "auto" }}
-                    className="p-2 flex"
+                  <button
+                    onClick={() => setNavIndex(2)}
+                    className={`py-2 px-4 rounded-lg ${
+                      navIndex === 2
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200 text-gray-700"
+                    } hover:bg-blue-600 transition-colors`}
                   >
-                    {/* Test Case Navigation Bar */}
-                    <nav className="flex flex-col gap-2 w-1/6">
-                      {errorResult !== "WrongAnswer" &&
-                        errorResult !== "Accepted" &&
-                        errorResult && (
+                    Hướng dẫn
+                  </button>
+                  <button
+                    onClick={() => setNavIndex(3)}
+                    className={`py-2 px-4 rounded-lg ${
+                      navIndex === 3
+                        ? "bg-blue-500 text-white"
+                        : "bg-gray-200 text-gray-700"
+                    } hover:bg-blue-600 transition-colors`}
+                  >
+                    Bình luận
+                  </button>
+                  {isLoggedIn() && (
+                    <button
+                      onClick={() => setNavIndex(4)}
+                      className={`py-2 px-4 rounded-lg ${
+                        navIndex === 4
+                          ? "bg-blue-500 text-white"
+                          : "bg-gray-200 text-gray-700"
+                      } hover:bg-blue-600 transition-colors`}
+                    >
+                      Bài đã nộp
+                    </button>
+                  )}
+                </nav>
+                {navIndex === 1 && <DescriptionComponent id={id} />}
+                {navIndex === 2 && <InstructionComponent id={id} />}
+                {navIndex === 3 && <CommentCoding id={id} />}
+                {isLoggedIn() && navIndex === 4 && <SubmitCoding id={id} />}
+              </div>
+
+              <div className="min-w-[30%] bg-[#182537]">
+                {/* Code Editor */}
+                <div
+                  className="h-screen overflow-y-auto custom-scrollbar"
+                  style={{ height: "100vh" }}
+                >
+                  <div
+                    className="h-full"
+                    style={{ height: "auto", backgroundColor: "#182537" }}
+                  >
+                    <div className="flex justify-between flex-wrap p-2 text-white gap-2">
+                      <div className="flex items-center">
+                        <label htmlFor="language-select" className="mr-2">
+                          Ngôn ngữ:
+                        </label>
+                        <select
+                          id="language-select"
+                          value={language?.id || ""}
+                          onChange={handleLanguageChange}
+                          className="bg-gray-700 text-white py-2 px-4 rounded-lg border border-gray-600 hover:bg-gray-700 focus:outline-none"
+                        >
+                          <option value="" disabled>
+                            Chọn ngôn ngữ
+                          </option>
+                          {executeCode?.map((lang) => (
+                            <option key={lang?.id} value={lang?.languageId}>
+                              {lang?.languageName}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="flex gap-5 flex-wrap">
+                        <button
+                          onClick={runTestCases}
+                          className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 transition-colors"
+                        >
+                          Chạy code
+                        </button>
+                        <button
+                          className="bg-green-500 text-white py-2 px-6 rounded-lg hover:bg-green-600 transition-colors"
+                          onClick={submit}
+                        >
+                          Nộp bài
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                  <Split
+                    maxSize={700}
+                    expandToMin={true}
+                    gutterSize={10}
+                    gutterAlign="center"
+                    snapOffset={30}
+                    dragInterval={1}
+                    direction="vertical"
+                    cursor="row-resize"
+                    onDrag={(e) => {
+                      if (codeMirrorRef.current) {
+                        codeMirrorRef.current.editor.display.wrapper.style.height = `calc(${e[0]}vh - 5px)`;
+                      }
+                    }}
+                    className="h-[100vh]"
+                  >
+                    <div className="border border-gray-300 rounded-lg shadow-md">
+                      <CodeMirror
+                        ref={codeMirrorRef}
+                        value={code}
+                        options={{
+                          theme: "material",
+                          lineNumbers: true,
+                        }}
+                        onBeforeChange={(editor, data, value) => {
+                          setCode(value);
+                        }}
+                        editorDidMount={(editor) => {
+                          editor.setSize(null, "calc(50vh - 5px)");
+                        }}
+                      />
+                    </div>
+
+                    <div
+                      style={{ backgroundColor: "#182537", height: "auto" }}
+                      className="p-2 flex"
+                    >
+                      {/* Test Case Navigation Bar */}
+                      <nav className="flex flex-col gap-2 w-1/6">
+                        {errorResult !== "WrongAnswer" &&
+                          errorResult !== "Accepted" &&
+                          errorResult && (
+                            <button
+                              onClick={() => setSelectedTestCase(-1)}
+                              className={`py-2 px-4 rounded-lg ${
+                                selectedTestCase === -1
+                                  ? "bg-blue-500 text-white"
+                                  : "bg-gray-200 text-gray-700"
+                              } hover:bg-blue-600 transition-colors`}
+                            >
+                              Console
+                            </button>
+                          )}
+                        {testcaseList?.map((item, index) => (
                           <button
-                            onClick={() => setSelectedTestCase(-1)}
+                            key={item.id} // Use a unique key if available
+                            onClick={() => {
+                              setSelectedTestCase(index);
+                              setTestCase(item);
+                            }}
                             className={`py-2 px-4 rounded-lg ${
-                              selectedTestCase === -1
+                              selectedTestCase === index
                                 ? "bg-blue-500 text-white"
                                 : "bg-gray-200 text-gray-700"
                             } hover:bg-blue-600 transition-colors`}
                           >
-                            Console
+                            {Array?.isArray(result) &&
+                              result[index] &&
+                              result[index]?.status === "Accepted" && (
+                                <>
+                                  <span
+                                    className="pi pi-check-circle text-green-600 font-bold text-xl mr-1"
+                                    data-pr-tooltip="Test case đã pass"
+                                    data-pr-position="top"
+                                  ></span>
+                                  <Tooltip target=".pi-check-circle" />
+                                </>
+                              )}
+                            {Array?.isArray(result) &&
+                              result[index] &&
+                              result[index]?.status === "WrongAnswer" && (
+                                <>
+                                  <span
+                                    className="pi pi-times-circle text-red-600 font-bold text-xl mr-1"
+                                    data-pr-tooltip="Test case chưa pass"
+                                    data-pr-position="top"
+                                  ></span>
+                                  <Tooltip target=".pi-times-circle" />
+                                </>
+                              )}
+                            Test Case {index + 1}
+                            {/* Dynamically label the buttons */}
                           </button>
-                        )}
-                      {testcaseList?.map((item, index) => (
-                        <button
-                          key={item.id} // Use a unique key if available
-                          onClick={() => {
-                            setSelectedTestCase(index);
-                            setTestCase(item);
-                          }}
-                          className={`py-2 px-4 rounded-lg ${
-                            selectedTestCase === index
-                              ? "bg-blue-500 text-white"
-                              : "bg-gray-200 text-gray-700"
-                          } hover:bg-blue-600 transition-colors`}
-                        >
-                          {Array?.isArray(result) &&
-                            result[index] &&
-                            result[index]?.status === "Accepted" && (
-                              <>
-                                <span
-                                  className="pi pi-check-circle text-green-600 font-bold text-xl mr-1"
-                                  data-pr-tooltip="Test case đã pass"
-                                  data-pr-position="top"
-                                ></span>
-                                <Tooltip target=".pi-check-circle" />
-                              </>
-                            )}
-                          {Array?.isArray(result) &&
-                            result[index] &&
-                            result[index]?.status === "WrongAnswer" && (
-                              <>
-                                <span
-                                  className="pi pi-times-circle text-red-600 font-bold text-xl mr-1"
-                                  data-pr-tooltip="Test case chưa pass"
-                                  data-pr-position="top"
-                                ></span>
-                                <Tooltip target=".pi-times-circle" />
-                              </>
-                            )}
-                          Test Case {index + 1}
-                          {/* Dynamically label the buttons */}
-                        </button>
-                      ))}
+                        ))}
+                      </nav>
 
-                      
-                    </nav>
-
-                    {selectedTestCase === -1 && (
-                      <div className="h-auto p-3 bg-transparent text-red-500 font-semibold text-base ml-5 w-5/6 overflow-x-auto">
-                        {errorResult}
-                        <br />
-                        {/* {Array.isArray(result) && result[0]?.compileOutput &&
+                      {selectedTestCase === -1 && (
+                        <div className="h-auto p-3 bg-transparent text-red-500 font-semibold text-base ml-5 w-5/6 overflow-x-auto">
+                          {errorResult}
+                          <br />
+                          {/* {Array.isArray(result) && result[0]?.compileOutput &&
                           decodeBase64(result[0]?.compileOutput)}
                           {Array.isArray(result) && result[0]?.standardError &&
                           decodeBase64(result[0]?.standardError)}
                           {Array.isArray(result) && result[0]?.message &&
                           decodeBase64(result[0]?.message)} */}
 
+                          {result?.map((item, index) => {
+                            const status = item?.status;
 
-                        {result?.map((item, index) => {
-                          const status = item?.status;
-
-                          // Check if status is not "Accepted" or "WrongAnswer"
-                          if (
-                            status !== "Accepted" &&
-                            status !== "WrongAnswer"
-                          ) {
-                            return (
-                              <div key={index} className="result-container flex">
-                               <div>
-                               {item?.compileOutput && (
+                            // Check if status is not "Accepted" or "WrongAnswer"
+                            if (
+                              status !== "Accepted" &&
+                              status !== "WrongAnswer"
+                            ) {
+                              return (
+                                <div
+                                  key={index}
+                                  className="result-container flex"
+                                >
                                   <div>
-                                    <pre>
-                                      {decodeBase64(item?.compileOutput)}
-                                    </pre>
+                                    {item?.compileOutput && (
+                                      <div>
+                                        <pre>
+                                          {decodeBase64(item?.compileOutput)}
+                                        </pre>
+                                      </div>
+                                    )}
                                   </div>
-                                )}
-                               </div>
+                                </div>
+                              );
+                            }
+
+                            return null; // Return null if status is "Accepted" or "WrongAnswer"
+                          })}
+                        </div>
+                      )}
+
+                      {selectedTestCase >= 0 && (
+                        <div
+                          style={{ backgroundColor: "#182537", height: "auto" }}
+                          className="p-2"
+                        >
+                          {testCase?.isHidden === true ? (
+                            <p className="ml-5 text-base text-white font-semibold">
+                              Testcase ẩn
+                            </p>
+                          ) : (
+                            <div className="text-white font-semibold text-base ml-5">
+                              <div className="flex gap-5 mb-5">
+                                <p className="w-40">Đầu vào</p>
+                                <p>{testCase?.inputView}</p>
                               </div>
-                            );
-                          }
-
-                          return null; // Return null if status is "Accepted" or "WrongAnswer"
-                        })}
-                      </div>
-                    )}
-
-                    {selectedTestCase >= 0 && (
-                      <div
-                        style={{ backgroundColor: "#182537", height: "auto" }}
-                        className="p-2"
-                      >
-                        {testCase?.isHidden === true ? (
-                          <p className="ml-5 text-base text-white font-semibold">
-                            Testcase ẩn
-                          </p>
-                        ) : (
-                          <div className="text-white font-semibold text-base ml-5">
-                            <div className="flex gap-5 mb-5">
-                              <p className="w-40">Đầu vào</p>
-                              <p>{testCase?.inputView}</p>
+                              <div className="flex gap-5 mb-5">
+                                <p className="w-40">Đầu ra thực tế</p>
+                                <p>
+                                  {Array?.isArray(result) &&
+                                    result[selectedTestCase]?.output &&
+                                    decodeBase64(
+                                      result[selectedTestCase]?.output
+                                    )}
+                                </p>
+                              </div>
+                              <div className="flex gap-5 mb-5">
+                                <p className="w-40">Đầu ra mong đợi</p>
+                                <p>{testCase?.output}</p>
+                              </div>
+                              <div className="flex gap-5 mb-5">
+                                <p className="w-40">Mô tả</p>
+                                <p>
+                                  {Array?.isArray(result) &&
+                                    result[selectedTestCase]?.output &&
+                                    result[selectedTestCase]?.status}
+                                </p>
+                              </div>
                             </div>
-                            <div className="flex gap-5 mb-5">
-                              <p className="w-40">Đầu ra thực tế</p>
-                              <p>
-                                {Array?.isArray(result) &&
-                                  result[selectedTestCase]?.output &&
-                                  decodeBase64(
-                                    result[selectedTestCase]?.output
-                                  )}
-                              </p>
-                            </div>
-                            <div className="flex gap-5 mb-5">
-                              <p className="w-40">Đầu ra mong đợi</p>
-                              <p>{testCase?.output}</p>
-                            </div>
-                            <div className="flex gap-5 mb-5">
-                              <p className="w-40">Mô tả</p>
-                              <p>
-                                {Array?.isArray(result) &&
-                                  result[selectedTestCase]?.output &&
-                                  result[selectedTestCase]?.status}
-                              </p>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                </Split>
+                          )}
+                        </div>
+                      )}
+                    </div>
+                  </Split>
+                </div>
               </div>
-            </div>
-          </Split>
-          {/* Problem Description */}
-          
-        </div>
+            </Split>
+            {/* Problem Description */}
+          </div>
 
-        <div className="block lg:hidden">
+          {/* <div className="block lg:hidden">
          
             <div className="px-5 pb-5 h-screen overflow-y-auto custom-scrollbar min-w-[30%]" style={{ paddingTop: `${fixedDivHeight+10}px` }}>
               <nav className="flex flex-wrap justify-center gap-5 space-x-4 mb-10">
@@ -733,7 +765,6 @@ const CodeEditor = () => {
                               </>
                             )}
                           Test Case {index + 1}
-                          {/* Dynamically label the buttons */}
                         </button>
                       ))}
 
@@ -818,10 +849,8 @@ const CodeEditor = () => {
               </div>
             </div>
           
-        </div>
-
+        </div> */}
         </>
-            
       </div>
     </NotifyProvider>
   );

@@ -127,7 +127,6 @@ export default function DetailClass() {
               items={testQuizzes}
               navigate={navigate}
               pathPrefix="/testquiz/"
-              showAllLink="/searchquiz"
             />
           )}
 
@@ -136,8 +135,7 @@ export default function DetailClass() {
               title="Đề thi"
               items={documentList.exams}
               navigate={navigate}
-              pathPrefix="/document/"
-              showAllLink={`/search?classId=${id}`}
+              pathPrefix="/examdetail/"
             />
           )}
         </main>
