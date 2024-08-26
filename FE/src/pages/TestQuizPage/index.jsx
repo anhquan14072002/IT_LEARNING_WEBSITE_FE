@@ -69,7 +69,7 @@ export default function TestQuizPage() {
   if (!isLoggedIn()) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
-        <p className="text-xl font-bold mb-4">Bạn phải đăng nhập để làm đề thi này</p>
+        <p className="text-xl font-bold mb-4">Bạn phải đăng nhập để làm bộ câu hỏi ôn tập trắc nghiệm</p>
         <button
           onClick={() => navigate("/login")}
           className="bg-blue-500 text-white px-4 py-2 rounded"
