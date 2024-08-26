@@ -158,6 +158,7 @@ export default function Class({ item, index }) {
                     <span
                       className={`tooltip-lesson-${index}`}
                       data-pr-tooltip={d?.title}
+                      data-pr-position="top" // Positioning tooltip
                     >
                       {d?.title}
                     </span>
@@ -190,6 +191,7 @@ export default function Class({ item, index }) {
                     <span
                       className={`tooltip-flashcard-${index}`}
                       data-pr-tooltip={d?.title}
+                      data-pr-position="top" // Positioning tooltip
                     >
                       {d?.title}
                     </span>
@@ -224,6 +226,7 @@ export default function Class({ item, index }) {
                     <span
                       className={`tooltip-flashcardTest-${index}`}
                       data-pr-tooltip={d?.title}
+                      data-pr-position="top" // Positioning tooltip
                     >
                       {d?.title}
                     </span>
@@ -257,6 +260,7 @@ export default function Class({ item, index }) {
                     <span
                       className={`tooltip-exam-${index}`}
                       data-pr-tooltip={exam?.title}
+                      data-pr-position="top" // Positioning tooltip
                     >
                       {exam?.title}
                     </span>

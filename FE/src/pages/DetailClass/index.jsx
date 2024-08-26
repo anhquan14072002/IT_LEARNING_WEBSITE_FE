@@ -7,6 +7,7 @@ import { getDocumentByGradeId } from "../../services/document.api";
 import Loading from "../../components/Loading";
 import NotifyProvider from "../../store/NotificationContext";
 import CustomCard from "../../components/DocumentCard";
+import { Tooltip } from "primereact/tooltip";
 
 export default function DetailClass() {
   const footerRef = useRef(null);
@@ -153,18 +154,25 @@ const Section = ({ title, items, navigate, pathPrefix, showAllLink }) => (
     </h2>
     <div className="space-y-2 mt-16">
       <div className="flex flex-wrap justify-center text-center">
-        {items.map((item) => (
+        {items.map((item, index) => (
           <div
             key={item.id}
-            className="cursor-pointer text-lg transition text-green-600 hover:text-green-400 underline font-semibold w-full sm:w-1/2 mb-10"
+            className={`cursor-pointer text-lg transition text-green-600 hover:text-green-400 underline font-semibold w-full sm:w-1/2 mb-10`}
             style={{
-              overflow: 'hidden',
-              textOverflow: 'ellipsis',
-              whiteSpace: 'nowrap'
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
             }}
             onClick={() => navigate(`${pathPrefix}${item.id}`)}
           >
-            {item.title}
+            <Tooltip target={`.tooltipView-${item.id}`} />
+            <span
+              className={`tooltipView-${item?.id}`}
+              data-pr-tooltip={item?.title} // PrimeReact Tooltip attribute
+              data-pr-position="top"
+            >
+              {item?.title}
+            </span>
           </div>
         ))}
       </div>
