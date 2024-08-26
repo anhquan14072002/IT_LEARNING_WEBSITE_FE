@@ -149,14 +149,14 @@ function App() {
             user?.role === "ContentManager" ||
             user?.role === "User") && (
             <>
-              <Route path="/testquiz/:id" element={<TestQuizPage />} />
-              <Route path="/flashcard/:id" element={<FlashCard />} />
               <Route path="/examdetail/:id" element={<ExamDetail />} />
               <Route path="/examresult/:id" element={<ExamResult />} />
               <Route path="/examcodedetail/:id" element={<ExamCodeDetail />} />
               <Route path="/historyQuiz" element={<HistoryQuiz />} />
             </>
           )}
+          <Route path="/testquiz/:id" element={<TestQuizPage />} />
+          <Route path="/flashcard/:id" element={<FlashCard />} />
           <Route path="/loginAdmin" element={<LoginAdmin />} />
           <Route path="/question/:quizId" element={<ManageQuestionQuiz />} />
           <Route path="/search" element={<Search />} />

@@ -137,7 +137,7 @@ export default function SearchTag() {
                       <div
                         key={lesson?.id}
                         className="bg-white p-4 shadow-md rounded flex flex-col cursor-pointer"
-                        onClick={()=>navigate('/topic/'+lesson?.id)}
+                        onClick={()=>navigate('/document/lesson/'+lesson?.id)}
                       >
                         <h3 className="text-base truncate">{lesson?.title} </h3>
                         {/* Render topic details here */}
@@ -148,7 +148,7 @@ export default function SearchTag() {
               )}
 
               {/* Display Quizzes */}
-              {data?.quizzes?.length > 0 && (
+              {data?.quizzes?.length > 0 && data?.quizzes.some((quiz)=> quiz?.type === 1) && (
                 <section className="mb-8">
                   <h2 className="text-lg font-semibold mb-4">
                     Bộ câu hỏi ôn tập flashcards
@@ -173,7 +173,7 @@ export default function SearchTag() {
               )}
 
               {/* Display Quizzes */}
-              {data?.quizzes.length > 0 && (
+              {data?.quizzes.length > 0 && data?.quizzes.some((quiz)=> quiz?.type === 2) && (
                 <section className="mb-8">
                   <h2 className="text-lg font-semibold mb-4">
                     Bộ câu hỏi trắc nghiệm

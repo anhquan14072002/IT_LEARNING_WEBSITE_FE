@@ -76,9 +76,6 @@ export default function Topic() {
       url: "api/topic/gettopicidbytag/" + id,
     })
       .then((res) => {
-        if (res?.data?.data?.isActive === false) {
-          navigate("/notfound");
-        }
         setTagTopic(res?.data?.data);
       })
       .catch((err) => {
