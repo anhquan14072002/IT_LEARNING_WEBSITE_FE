@@ -106,7 +106,7 @@ export default function ManagementQuizLesson() {
   const confirmDelete = (id) => {
     setVisibleDelete(true);
     confirmDialog({
-      message: "Bạn có chắc chắn muốn bài quiz này?",
+      message: "Bạn có chắc chắn muốn xóa tag này?",
       header: "Delete Confirmation",
       icon: "pi pi-info-circle",
       defaultFocus: "reject",
@@ -201,7 +201,7 @@ export default function ManagementQuizLesson() {
       />
       <div>
         <div className="flex justify-between pt-1">
-          <h1 className="font-bold text-3xl">Các Tag</h1>
+          <h1 className="font-bold text-3xl">Danh sách các Tag</h1>
           <div>
             <Button
               label="Thêm mới"

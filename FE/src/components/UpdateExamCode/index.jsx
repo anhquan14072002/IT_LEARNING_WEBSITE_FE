@@ -52,7 +52,7 @@ export default function UpdateExamCode({
       fetchData();
     } catch (error) {
       console.error("Error adding exam:", error);
-      REJECT(toast, error.message);
+      REJECT(toast, "Cập nhật đề thi thất bại");
     } finally {
       setLoading(false);
       setVisibleUpdateExamCode(false);
@@ -83,7 +83,7 @@ export default function UpdateExamCode({
               <CustomTextInput
                 label={
                   <>
-                    <span>Code</span>
+                    <span>Mã đề</span>
                
                   </>
                 }
