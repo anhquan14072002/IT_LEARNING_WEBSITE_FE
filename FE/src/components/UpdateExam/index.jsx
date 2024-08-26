@@ -43,8 +43,6 @@ export default function UpdateExam({
   toast,
   fetchData: propFetchData,
 }) {
-  console.log(updateValue);
-  
   const [files, setFiles] = useState([]);
   const [fileSolution, setFileSolution] = useState([]);
   const [provinceList, setProvinceList] = useState([]);
@@ -93,6 +91,7 @@ export default function UpdateExam({
           restClient({ url: `api/grade/getallgradebylevelid?levelId=${updateValue?.levelId}`, method: "GET" }),
           restClient({ url: "api/level/getalllevel", method: "GET" }),
         ]);
+        
 
         setCompetitionList(competitionListResponse?.data?.data || []);
         setTagList(tagResponse?.data?.data || []);
@@ -109,6 +108,17 @@ export default function UpdateExam({
           grade: gradeItem,
           level: levelItem,
         });
+
+        try {
+          const tagTopic = await restClient({
+            url: `api/exam/getexamidbytag/${updateValue?.id}`,
+            method: "GET",
+          });
+          setTag(tagTopic?.data?.data || null);
+        } catch (error) {
+          setTag(null);
+        }
+
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -213,6 +223,7 @@ export default function UpdateExam({
           initialValues={initialValues}
           validationSchema={validationSchema}
           onSubmit={onSubmit}
+          enableReinitialize // Ensures Formik reinitializes when initialValues change
         >
           {(formik) => (
             <Form>
