@@ -50,8 +50,8 @@ function Footer({ Menus }) {
       <Button
         className="border border-[#c5c7c7] py-1 px-3"
         tooltip="1. Tải mẫu excel để nhập khẩu 'Tại file mẫu excel'
-          2. Ấn nút Chọn và chọn tải liệu muốn nhập khẩu
-          3. Ấn nút Thực hiện dưới màn hình 
+          2. Ấn nút 'Upload File' và upload tài liệu muốn nhập khẩu
+          3. Ấn nút Tiếp tục dưới màn hình 
           4. Kiểm tra những dữ liệu muốn nhập khẩu vào hệ thống
           5. Ấn nút Thực hiện dưới màn hình để Nhập khẩu vào hệ thống
           6. Ấn nút Hủy bỏ để Thoát"

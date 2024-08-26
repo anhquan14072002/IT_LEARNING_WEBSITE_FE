@@ -5,6 +5,7 @@ import axios from "axios";
 import FormDataContext from "../../store/FormDataContext";
 import { BASE_URL } from "../../services/restClient";
 import { useParams } from "react-router-dom";
+import { getTokenFromLocalStorage } from "../../utils";
 
 function ImportStepOne(props) {
   const fileInputRef = useRef(null);
@@ -39,6 +40,9 @@ function ImportStepOne(props) {
       let res = await axios.get(`${BASE_URL}/api/quizquestion/exportexcel`, {
         params: { checkData: 1 },
         responseType: "arraybuffer", // Important to handle binary data
+        headers: {
+          Authorization: `Bearer ${getTokenFromLocalStorage()}`,
+        },
       });
       const url = window.URL.createObjectURL(new Blob([res.data]));
       const link = document.createElement("a");
