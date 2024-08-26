@@ -24,6 +24,7 @@ import {
 import { Editor } from "primereact/editor";
 import "./index.css";
 import NotifyProvider from "../../store/NotificationContext";
+import { Tooltip } from "primereact/tooltip";
 
 export default function Lesson() {
   const navigate = useNavigate();
@@ -227,7 +228,9 @@ export default function Lesson() {
     const section = document.getElementById(sectionId);
     if (section) {
       // Get the height of the fixed header
-      const headerHeight = fixedDivRef.current ? fixedDivRef.current.offsetHeight : 0;
+      const headerHeight = fixedDivRef.current
+        ? fixedDivRef.current.offsetHeight
+        : 0;
 
       // Scroll to the section minus the height of the header
       window.scrollTo({
@@ -344,45 +347,45 @@ export default function Lesson() {
                   <h2 className="text-xl font-bold">{lesson?.title}</h2>
 
                   {/* Index Section */}
-                <div className="sticky top-0 bg-white border border-gray-200 p-4 mb-4">
-                  <h3 className="text-lg font-semibold mb-2">Mục lục</h3>
-                  <ul>
-                    <li>
-                      <button
-                        className="text-blue-500 hover:underline"
-                        onClick={() => scrollToSection("lesson-content")}
-                      >
-                        Nội dung chủ đề
-                      </button>
-                    </li>
-                    {quizByTopic &&
-                      Array.isArray(quizByTopic) &&
-                      quizByTopic.length > 0 && (
-                        <li>
-                          <button
-                            className="text-blue-500 hover:underline"
-                            onClick={() => scrollToSection("quiz-questions")}
-                          >
-                            Câu hỏi ôn tập
-                          </button>
-                        </li>
-                      )}
-                    {problemByTopic &&
-                      Array.isArray(problemByTopic) &&
-                      problemByTopic.length > 0 && (
-                        <li>
-                          <button
-                            className="text-blue-500 hover:underline"
-                            onClick={() =>
-                              scrollToSection("practice-exercises")
-                            }
-                          >
-                            Bài tập thực hành
-                          </button>
-                        </li>
-                      )}
-                  </ul>
-                </div>
+                  <div className="sticky top-0 bg-white border border-gray-200 p-4 mb-4">
+                    <h3 className="text-lg font-semibold mb-2">Mục lục</h3>
+                    <ul>
+                      <li>
+                        <button
+                          className="text-blue-500 hover:underline"
+                          onClick={() => scrollToSection("lesson-content")}
+                        >
+                          Nội dung chủ đề
+                        </button>
+                      </li>
+                      {quizByTopic &&
+                        Array.isArray(quizByTopic) &&
+                        quizByTopic.length > 0 && (
+                          <li>
+                            <button
+                              className="text-blue-500 hover:underline"
+                              onClick={() => scrollToSection("quiz-questions")}
+                            >
+                              Câu hỏi ôn tập
+                            </button>
+                          </li>
+                        )}
+                      {problemByTopic &&
+                        Array.isArray(problemByTopic) &&
+                        problemByTopic.length > 0 && (
+                          <li>
+                            <button
+                              className="text-blue-500 hover:underline"
+                              onClick={() =>
+                                scrollToSection("practice-exercises")
+                              }
+                            >
+                              Bài tập thực hành
+                            </button>
+                          </li>
+                        )}
+                    </ul>
+                  </div>
 
                   {/* Add more details based on your lesson object */}
                 </div>
@@ -423,13 +426,20 @@ export default function Lesson() {
                         Câu hỏi ôn tập cho {lesson?.title}
                       </span>
                       <div className="flex flex-wrap gap-3">
-                        {quizByTopic.map((quiz) => (
+                        {quizByTopic.map((quiz, index) => (
                           <div
                             key={quiz.id}
                             className="bg-green-100 text-green-800 text-sm font-medium px-3 py-3 rounded-full shadow-sm hover:bg-green-200 transition-colors cursor-pointer w-full sm:w-1/2 md:w-1/3 lg:w-1/4"
                             onClick={() => navigate("/flashcard/" + quiz.id)}
                           >
-                            <p className="truncate">{quiz.title}</p>
+                            <Tooltip target={`.quiz-${index}`} />
+                            <p
+                              className={`truncate quiz-${index}`}
+                              data-pr-tooltip={quiz.title} // Tooltip content for title
+                              data-pr-position="top"
+                            >
+                              {quiz.title}
+                            </p>
                           </div>
                         ))}
                       </div>
@@ -445,7 +455,7 @@ export default function Lesson() {
                         Bài tập thực hành cho {lesson?.title}
                       </span>
                       <div className="flex flex-wrap gap-3">
-                        {problemByTopic.map((problem) => (
+                        {problemByTopic.map((problem, index) => (
                           <div
                             key={problem.id}
                             className="bg-yellow-100 text-yellow-800 text-sm font-medium px-3 py-3 rounded-full shadow-sm hover:bg-yellow-200 transition-colors cursor-pointer w-full sm:w-1/2 md:w-1/3 lg:w-1/4"
@@ -453,7 +463,14 @@ export default function Lesson() {
                               navigate("/codeeditor/" + problem.id)
                             }
                           >
-                            <p className="truncate">{problem.title}</p>
+                            <Tooltip target={`.problem-${index}`} />
+                            <p
+                              className={`truncate problem-${index}`}
+                              data-pr-tooltip={problem?.title}
+                              data-pr-position="top"
+                            >
+                              {problem.title}
+                            </p>
                           </div>
                         ))}
                       </div>
@@ -467,13 +484,20 @@ export default function Lesson() {
                       Các từ khóa liên quan đến bài học
                     </span>
                     <div className="flex flex-wrap gap-3">
-                      {tagTopic.map((tag) => (
+                      {tagTopic.map((tag, index) => (
                         <div
                           key={tag.id}
                           className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full shadow-sm hover:bg-blue-200 transition-colors cursor-pointer"
                           onClick={() => navigate("/searchTag/" + tag.id)}
                         >
-                          {tag.title}
+                          <Tooltip target={`.tag-${index}`} />
+                          <p
+                            className={`truncate tag-${index}`}
+                            data-pr-tooltip={tag?.title}
+                            data-pr-position="top"
+                          >
+                            {tag.title}
+                          </p>
                         </div>
                       ))}
                     </div>

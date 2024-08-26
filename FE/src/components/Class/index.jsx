@@ -158,6 +158,7 @@ export default function Class({ item, index }) {
                     <span
                       className={`tooltip-lesson-${index}`}
                       data-pr-tooltip={d?.title}
+                      data-pr-position="top" // Positioning tooltip
                     >
                       {d?.title}
                     </span>
@@ -190,6 +191,7 @@ export default function Class({ item, index }) {
                     <span
                       className={`tooltip-flashcard-${index}`}
                       data-pr-tooltip={d?.title}
+                      data-pr-position="top" // Positioning tooltip
                     >
                       {d?.title}
                     </span>
@@ -224,6 +226,7 @@ export default function Class({ item, index }) {
                     <span
                       className={`tooltip-flashcardTest-${index}`}
                       data-pr-tooltip={d?.title}
+                      data-pr-position="top" // Positioning tooltip
                     >
                       {d?.title}
                     </span>
@@ -247,20 +250,21 @@ export default function Class({ item, index }) {
             <h1 className="font-bold mb-3">Đề thi</h1>
             {(documentList?.exams ?? [])
               .map((exam, index) => (
-                  <h1
-                    key={exam?.id}
-                    className={`cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis tooltip-exam-${index}`}
-                    style={{ width: "200px" }} // Fixed width
-                    onClick={() => handleExam(exam)}
-                  >
+                <h1
+                  key={exam?.id}
+                  className={`cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis tooltip-exam-${index}`}
+                  style={{ width: "200px" }} // Fixed width
+                  onClick={() => handleExam(exam)}
+                >
                   <Tooltip target={`.tooltip-exam-${index}`} />
-                    <span
-                      className={`tooltip-exam-${index}`}
-                      data-pr-tooltip={exam?.title}
-                    >
-                      {exam?.title}
-                    </span>
-                  </h1>
+                  <span
+                    className={`tooltip-exam-${index}`}
+                    data-pr-tooltip={exam?.title}
+                    data-pr-position="top" // Positioning tooltip
+                  >
+                    {exam?.title}
+                  </span>
+                </h1>
               ))
               .slice(0, 4)}
             {(documentList?.exams ?? []).length > 4 && (
@@ -284,8 +288,11 @@ export default function Class({ item, index }) {
                   onClick={() => navigate(`/codeEditor/${problem?.id}`)}
                 >
                   <Tooltip target={`.tooltip-problem-${index}`} />
-                  <span className={`tooltip-problem-${index}`} data-pr-tooltip={problem?.title}>
-                  {problem?.title}
+                  <span
+                    className={`tooltip-problem-${index}`}
+                    data-pr-tooltip={problem?.title}
+                  >
+                    {problem?.title}
                   </span>
                 </h1>
               ))

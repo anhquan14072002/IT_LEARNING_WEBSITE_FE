@@ -13,7 +13,14 @@ const CustomPracticeInTag = ({ document }) => {
       >
         <div className="text-center mb-4">
           <p className="text-black hover:text-gray-600 text-2xl font-semibold h-10 overflow-hidden whitespace-nowrap text-ellipsis">
-            {document?.title}
+            <Tooltip target={`.document-${document?.id}`} />
+            <span
+              className={`document-${document?.id}`}
+              data-pr-tooltip={document?.title} // Tooltip content for title
+              data-pr-position="top"
+            >
+              {document?.title}
+            </span>
           </p>
         </div>
         <div className="flex justify-center mb-4">
@@ -29,7 +36,7 @@ const CustomPracticeInTag = ({ document }) => {
           )}
           {document?.difficulty === 3 && (
             <span className="text-red-500 rounded-lg p-2 text-base font-mono bg-red-100 border border-red-200">
-             Khó
+              Khó
             </span>
           )}
         </div>

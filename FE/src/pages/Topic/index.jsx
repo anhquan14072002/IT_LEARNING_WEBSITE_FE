@@ -18,6 +18,7 @@ import restClient from "../../services/restClient";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowLeft, faArrowRight } from "@fortawesome/free-solid-svg-icons";
 import NotifyProvider from "../../store/NotificationContext";
+import { Tooltip } from "primereact/tooltip";
 
 export default function Topic() {
   const navigate = useNavigate();
@@ -261,7 +262,9 @@ export default function Topic() {
     const section = document.getElementById(sectionId);
     if (section) {
       // Get the height of the fixed header
-      const headerHeight = fixedDivRef.current ? fixedDivRef.current.offsetHeight : 0;
+      const headerHeight = fixedDivRef.current
+        ? fixedDivRef.current.offsetHeight
+        : 0;
 
       // Scroll to the section minus the height of the header
       window.scrollTo({
@@ -367,17 +370,24 @@ export default function Topic() {
                   Array.isArray(quizByTopic) &&
                   quizByTopic.length > 0 && (
                     <div id="quiz-questions" className="mt-6">
-                      <span  className="block font-semibold mb-3 text-xl">
+                      <span className="block font-semibold mb-3 text-xl">
                         Câu hỏi ôn tập cho {topic?.title}
                       </span>
                       <div className="flex flex-wrap gap-3">
-                        {quizByTopic.map((quiz) => (
+                        {quizByTopic.map((quiz, index) => (
                           <div
                             key={quiz.id}
                             className="bg-green-100 text-green-800 text-sm font-medium px-3 py-3 rounded-full shadow-sm hover:bg-green-200 transition-colors cursor-pointer w-full sm:w-1/2 md:w-1/3 lg:w-1/4"
                             onClick={() => navigate("/flashcard/" + quiz.id)}
                           >
-                            <p className="truncate">{quiz.title}</p>
+                            <Tooltip target={`.quiz-${index}`} />
+                            <p
+                              className={`truncate quiz-${index}`}
+                              data-pr-tooltip={quiz.title} // Tooltip content for title
+                              data-pr-position="top"
+                            >
+                              {quiz.title}
+                            </p>
                           </div>
                         ))}
                       </div>
@@ -393,7 +403,7 @@ export default function Topic() {
                         Bài tập thực hành cho {topic?.title}
                       </span>
                       <div className="flex flex-wrap gap-3">
-                        {problemByTopic.map((problem) => (
+                        {problemByTopic.map((problem, index) => (
                           <div
                             key={problem.id}
                             className="bg-yellow-100 text-yellow-800 text-sm font-medium px-3 py-3 rounded-full shadow-sm hover:bg-yellow-200 transition-colors cursor-pointer w-full sm:w-1/2 md:w-1/3 lg:w-1/4"
@@ -401,7 +411,14 @@ export default function Topic() {
                               navigate("/codeeditor/" + problem.id)
                             }
                           >
-                            <p className="truncate">{problem.title}</p>
+                            <Tooltip target={`.problem-${index}`} />
+                            <p
+                              className={`truncate problem-${index}`}
+                              data-pr-tooltip={problem?.title}
+                              data-pr-position="top"
+                            >
+                              {problem.title}
+                            </p>
                           </div>
                         ))}
                       </div>
@@ -415,13 +432,20 @@ export default function Topic() {
                       Các từ khóa liên quan đến chủ đề
                     </span>
                     <div className="flex flex-wrap gap-3">
-                      {tagTopic.map((tag) => (
+                      {tagTopic.map((tag, index) => (
                         <div
                           key={tag.id}
                           className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full shadow-sm hover:bg-blue-200 transition-colors cursor-pointer"
                           onClick={() => navigate("/searchTag/" + tag.id)}
                         >
-                          <p className="truncate">{tag.title}</p>
+                          <Tooltip target={`.tag-${index}`} />
+                          <p
+                            className={`truncate tag-${index}`}
+                            data-pr-tooltip={tag?.title}
+                            data-pr-position="top"
+                          >
+                            {tag.title}
+                          </p>
                         </div>
                       ))}
                     </div>

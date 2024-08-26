@@ -10,6 +10,7 @@ import restClient from "../../services/restClient";
 import LoadingFull from "../../components/LoadingFull";
 import CustomPractice from "../../components/CustomPractice";
 import CustomPracticeInTag from "../../components/CustomPracticeInTag";
+import { Tooltip } from "primereact/tooltip";
 
 export default function SearchTag() {
   const fixedDivRef = useRef(null);
@@ -100,13 +101,20 @@ export default function SearchTag() {
                 <section className="mb-8">
                   <h2 className="text-lg font-semibold mb-4">Chủ đề</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {data?.topics?.map((topic) => (
+                    {data?.topics?.map((topic, index) => (
                       <div
                         key={topic?.id}
-                        className="bg-white p-4 shadow-md rounded flex flex-col cursor-pointer"
-                        onClick={()=>navigate('/topic/'+topic?.id)}
+                        className="bg-white hover:bg-gray-200 p-4 shadow-md rounded flex flex-col cursor-pointer"
+                        onClick={() => navigate("/topic/" + topic?.id)}
                       >
-                        <h3 className="text-base truncate">{topic?.title} </h3>
+                        <Tooltip target={`.topic-${index}`} />
+                        <h3
+                          className={`text-base truncate topic-${index}`}
+                          data-pr-tooltip={topic?.title} // Tooltip content for title
+                          data-pr-position="top"
+                        >
+                          {topic?.title}{" "}
+                        </h3>
                         {/* Render topic details here */}
                       </div>
                     ))}
@@ -121,7 +129,7 @@ export default function SearchTag() {
                   {data.lessons.map((lesson) => (
                     <div
                       key={lesson.id}
-                      className="bg-white p-4 mb-4 shadow-md rounded"
+                      className="bg-white hover:bg-gray-200 p-4 mb-4 shadow-md rounded"
                     >
                       <h3 className="text-base">{lesson.title}</h3>
                     
@@ -133,13 +141,22 @@ export default function SearchTag() {
                 <section className="mb-8">
                   <h2 className="text-lg font-semibold mb-4">Bài học</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {data?.lessons?.map((lesson) => (
+                    {data?.lessons?.map((lesson, index) => (
                       <div
                         key={lesson?.id}
-                        className="bg-white p-4 shadow-md rounded flex flex-col cursor-pointer"
-                        onClick={()=>navigate('/document/lesson/'+lesson?.id)}
+                        className="bg-white hover:bg-gray-200 p-4 shadow-md rounded flex flex-col cursor-pointer"
+                        onClick={() =>
+                          navigate("/document/lesson/" + lesson?.id)
+                        }
                       >
-                        <h3 className="text-base truncate">{lesson?.title} </h3>
+                        <Tooltip target={`.lesson-${index}`} />
+                        <h3
+                          className={`text-base truncate lesson-${index}`}
+                          data-pr-tooltip={lesson?.title} // Tooltip content for title
+                          data-pr-position="top"
+                        >
+                          {lesson?.title}{" "}
+                        </h3>
                         {/* Render topic details here */}
                       </div>
                     ))}
@@ -148,51 +165,99 @@ export default function SearchTag() {
               )}
 
               {/* Display Quizzes */}
-              {data?.quizzes?.length > 0 && data?.quizzes.some((quiz)=> quiz?.type === 1) && (
-                <section className="mb-8">
-                  <h2 className="text-lg font-semibold mb-4">
-                    Bộ câu hỏi ôn tập flashcards
-                  </h2>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {data?.quizzes?.map((quiz) => {
-                    if (Number(quiz?.type) === 1) {
-                      return (
-                        <div
-                          key={quiz?.id}
-                          className="bg-white p-4 mb-4 shadow-md rounded cursor-pointer"
-                          onClick={()=>navigate('/flashcard/'+quiz?.id)}
-                        >
-                          <h3 className="text-base truncate">{quiz?.title}</h3>
-                          {/* Render quiz details here */}
-                        </div>
-                      );
-                    }
-                  })}
-                  </div>
-                </section>
-              )}
+              {data?.quizzes?.length > 0 &&
+                data?.quizzes.some((quiz) => quiz?.type === 1) && (
+                  <section className="mb-8">
+                    <h2 className="text-lg font-semibold mb-4">
+                      Bộ câu hỏi ôn tập flashcards
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {data?.quizzes?.map((quiz, index) => {
+                        if (Number(quiz?.type) === 1) {
+                          return (
+                            <div
+                              key={quiz?.id}
+                              className="bg-white hover:bg-gray-200 p-4 mb-4 shadow-md rounded cursor-pointer"
+                              onClick={() => navigate("/flashcard/" + quiz?.id)}
+                            >
+                              <Tooltip target={`.quiz-${index}`} />
+                              <h3
+                                className={`text-base truncate quiz-${index}`}
+                                data-pr-tooltip={quiz?.title} // Tooltip content for title
+                                data-pr-position="top"
+                              >
+                                {quiz?.title}
+                              </h3>
+                              {/* Render quiz details here */}
+                            </div>
+                          );
+                        }
+                      })}
+                    </div>
+                  </section>
+                )}
 
               {/* Display Quizzes */}
-              {data?.quizzes.length > 0 && data?.quizzes.some((quiz)=> quiz?.type === 2) && (
+              {data?.quizzes.length > 0 &&
+                data?.quizzes.some((quiz) => quiz?.type === 2) && (
+                  <section className="mb-8">
+                    <h2 className="text-lg font-semibold mb-4">
+                      Bộ câu hỏi trắc nghiệm
+                    </h2>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {data?.quizzes?.map((quiz, index) => {
+                        if (Number(quiz?.type) === 2) {
+                          return (
+                            <div
+                              key={quiz?.id}
+                              className="bg-white hover:bg-gray-200 p-4 mb-4 shadow-md rounded cursor-pointer"
+                              onClick={() => navigate("/testquiz/" + quiz?.id)}
+                            >
+                              <Tooltip target={`.quiz-${index}`} />
+                              <h3
+                                className={`text-base truncate quiz-${index}`}
+                                data-pr-tooltip={quiz?.title} // Tooltip content for title
+                                data-pr-position="top"
+                              >
+                                {quiz?.title}
+                              </h3>
+                              {/* Render quiz details here */}
+                            </div>
+                          );
+                        }
+                      })}
+                    </div>
+                  </section>
+                )}
+
+              {/* Display Exams */}
+              {data?.exams?.length > 0 && (
                 <section className="mb-8">
-                  <h2 className="text-lg font-semibold mb-4">
-                    Bộ câu hỏi trắc nghiệm
-                  </h2>
+                  <h2 className="text-lg font-semibold mb-4">Đề thi</h2>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {data?.quizzes?.map((quiz) =>{
-                    if (Number(quiz?.type) === 2) {
-                      return (
-                        <div
-                          key={quiz?.id}
-                          className="bg-white p-4 mb-4 shadow-md rounded cursor-pointer"
-                          onClick={()=>navigate('/testquiz/'+quiz?.id)}
+                    {data?.exams?.map((exam, index) => (
+                      <div
+                        key={exam?.id}
+                        className="bg-white hover:bg-gray-200 p-4 shadow-md rounded flex flex-col cursor-pointer"
+                        onClick={() => {
+                          if (exam?.type === 1) {
+                            navigate(`/examdetail/${exam?.id}`);
+                          } else {
+                            navigate(`/examcodedetail/${exam?.id}`);
+                          }
+                        }}
+                      >
+                        <Tooltip target={`.exam-${index}`} />
+                        <h3
+                          className={`text-base truncate exam-${index}`}
+                          data-pr-tooltip={exam?.title} // Tooltip content for title
+                          data-pr-position="top"
                         >
-                          <h3 className="text-base truncate">{quiz?.title}</h3>
-                          {/* Render quiz details here */}
-                        </div>
-                      );
-                    }
-                  })}
+                          {exam?.title}
+                        </h3>
+                        {/* Render topic details here */}
+                      </div>
+                    ))}
                   </div>
                 </section>
               )}
@@ -206,7 +271,7 @@ export default function SearchTag() {
                       <div
                         key={topic?.id}
                         className="bg-white p-4 shadow-md rounded flex flex-col cursor-pointer"
-                        onClick={()=>navigate('/examdetail/'+topic?.id)}
+                        onClick={() => navigate("/examdetail/" + topic?.id)}
                       >
                         <h3 className="text-base truncate">{topic?.title} </h3>
                         {/* Render topic details here */}
