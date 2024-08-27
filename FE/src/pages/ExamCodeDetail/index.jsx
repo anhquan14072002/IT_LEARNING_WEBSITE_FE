@@ -9,7 +9,7 @@ import { highlightPlugin } from "@react-pdf-viewer/highlight";
 import "@react-pdf-viewer/highlight/lib/styles/index.css";
 import { useNavigate, useParams } from "react-router-dom";
 import "./index.css";
-import { REJECT, SUCCESS } from "../../utils";
+import { isLoggedIn, REJECT, SUCCESS } from "../../utils";
 import restClient from "../../services/restClient";
 import { Toast } from "primereact/toast";
 import { Dropdown } from "primereact/dropdown";
@@ -39,13 +39,18 @@ const ExamDetail = () => {
         initializeAnswers(response?.data?.data?.numberQuestion);
         console.log(response?.data?.data[0]?.numberQuestion);
 
-        const tagResponse = await restClient({ url: `api/exam/getexamidbytag/${id}`, method: "GET" });
+        const tagResponse = await restClient({
+          url: `api/exam/getexamidbytag/${id}`,
+          method: "GET",
+        });
         setTagList(tagResponse?.data?.data);
       } catch (error) {
         console.error("Error fetching exam:", error);
       }
     };
-    fetchData();
+    if (isLoggedIn()) {
+      fetchData();
+    }
   }, [id]);
 
   const initializeAnswers = (numberQuestion) => {
@@ -64,32 +69,38 @@ const ExamDetail = () => {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-  
-    
+
     const numberQuestion = data?.numberQuestion;
-    const allQuestions = Array.from({ length: numberQuestion }, (_, index) => `question${index + 1}`);
-  
-    const unansweredQuestions = allQuestions.filter(q => !answers.hasOwnProperty(q));
+    const allQuestions = Array.from(
+      { length: numberQuestion },
+      (_, index) => `question${index + 1}`
+    );
+
+    const unansweredQuestions = allQuestions.filter(
+      (q) => !answers.hasOwnProperty(q)
+    );
     if (unansweredQuestions.length > 0) {
-      const confirmed = window.confirm(`Bạn còn ${unansweredQuestions.length} câu hỏi chưa trả lời. Bạn chắc chắn muốn nộp bài chứ?`);
+      const confirmed = window.confirm(
+        `Bạn còn ${unansweredQuestions.length} câu hỏi chưa trả lời. Bạn chắc chắn muốn nộp bài chứ?`
+      );
       if (!confirmed) return; // If not confirmed, stop the submission
     }
-  
+
     // Initialize answers for all questions, with empty string for unanswered ones
     const formattedAnswers = allQuestions.map((questionKey) => ({
       numberOfQuestion: parseInt(questionKey.replace("question", ""), 10),
       answer: answers[questionKey] || "", // Use empty string if no answer is provided
     }));
-  
+
     console.log("Submitted answers:", formattedAnswers);
-  
+
     // Create payload
     const payload = {
       userId: userId,
       examCodeId: data.id,
       userAnswerDtos: formattedAnswers,
     };
-  
+
     try {
       // Submit the answers
       const response = await restClient({
@@ -107,7 +118,6 @@ const ExamDetail = () => {
       REJECT(toast, "Nộp bài thất bại");
     }
   };
-  
 
   const handleChangeExamCode = async (e) => {
     console.log(e.value);
@@ -118,27 +128,44 @@ const ExamDetail = () => {
       setViewPdf(selectedExamCode.examFile);
     }
   }, [selectedExamCode]);
+
+  if (!isLoggedIn()) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <p className="text-xl font-bold mb-4">
+          Bạn phải đăng nhập để làm đề thi này
+        </p>
+        <button
+          onClick={() => navigate("/login")}
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+        >
+          Đăng nhập
+        </button>
+      </div>
+    );
+  }
+
   return (
     <NotifyProvider>
       <Toast ref={toast} />
-              <Header />
-              <Menu />
+      <Header />
+      <Menu />
       <div className="m-4 ">
         <div className="text-2xl font-semibold mb-4 flex flex-col  ">
           <div className="mb-5"> {data?.examTitle}</div>
           {examList?.length !== 1 && (
             <>
-            <div className="flex gap-3">
-            <span> Mã đề</span>
-            <Dropdown
-              value={selectedExamCode}
-              onChange={handleChangeExamCode}
-              options={examList}
-              optionLabel="code"
-              placeholder={data?.code}
-              className="w-fit h-fit border border-gray-700  "
-            />
-            </div>
+              <div className="flex gap-3">
+                <span> Mã đề</span>
+                <Dropdown
+                  value={selectedExamCode}
+                  onChange={handleChangeExamCode}
+                  options={examList}
+                  optionLabel="code"
+                  placeholder={data?.code}
+                  className="w-fit h-fit border border-gray-700  "
+                />
+              </div>
             </>
           )}
         </div>
@@ -291,23 +318,23 @@ const ExamDetail = () => {
           {/* Right frame containing the answer choices */}
         </div>
         {tagList.length > 0 && (
-                  <div className="mt-6 flex">
-                    <span className="block font-semibold mr-3">
-                      Các từ khóa liên quan:
-                    </span>
-                    <div className="flex flex-wrap gap-3">
-                      {tagList.map((tag) => (
-                        <div
-                          key={tag.id}
-                          className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full shadow-sm hover:bg-blue-200 transition-colors cursor-pointer"
-                          onClick={()=>navigate('/searchTag/' + tag.id)}
-                        >
-                          {tag.title}
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+          <div className="mt-6 flex">
+            <span className="block font-semibold mr-3">
+              Các từ khóa liên quan:
+            </span>
+            <div className="flex flex-wrap gap-3">
+              {tagList.map((tag) => (
+                <div
+                  key={tag.id}
+                  className="bg-blue-100 text-blue-800 text-sm font-medium px-3 py-1 rounded-full shadow-sm hover:bg-blue-200 transition-colors cursor-pointer"
+                  onClick={() => navigate("/searchTag/" + tag.id)}
+                >
+                  {tag.title}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
     </NotifyProvider>
   );

@@ -21,15 +21,15 @@ const CustomQuiz = ({ document }) => {
         <div className="text-center mb-4">
           <Tooltip target=".document-title" />
           <p
-            className="text-black text-2xl font-semibold h-16 overflow-hidden text-ellipsis document-title"
+            className="text-black text-base font-bold h-14 text-ellipsis document-title"
             data-pr-tooltip={document?.title} // Tooltip content for title
             data-pr-position="top" // Positioning tooltip
           >
             {document?.title}
           </p>
         </div>
-        <div className="text-center mb-4">
-          <p className="text-gray-700 text-base font-medium">
+        <div className="text-center mb-4 pt-5 sm:pt-0">
+          <p className="text-gray-700 text-sm font-medium">
             {document?.typeId === 1 ? "Ôn tập" : "Kiểm tra"}
           </p>
         </div>
