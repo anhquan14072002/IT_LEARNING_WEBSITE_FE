@@ -15,7 +15,9 @@ const CustomImage = ({ src, alt, width }) => {
   };
   return (
     <Image
-      onClick={(e)=>{e?.stopPropagation()}}
+      onClick={(e) => {
+        e?.stopPropagation();
+      }}
       src={src}
       zoomSrc={src}
       alt={alt}
@@ -33,7 +35,7 @@ const CustomImage = ({ src, alt, width }) => {
 
 const renderHtmlContent = (content) => {
   // Replace <img> tags with CustomImage components
-  if (!content) return null; 
+  if (!content) return null;
 
   const options = {
     replace: ({ name, attribs, children }) => {
@@ -60,15 +62,13 @@ const Flashcard = ({ flashcard, showAnswer, setShowAnswer }) => {
   );
 
   return (
-    <div className={`max-w-md rounded overflow-hidden bg-white p-6 mb-4`}>
+    <div className={`rounded h-full bg-white mb-4 pt-5`}>
       {!showAnswer ? (
         <>
-          <div className="flex justify-between items-center mb-4">
-            <h2 className="text-xl font-bold text-center w-full mb-5">
-              {renderHtmlContent(flashcard?.content)}
-            </h2>
+          <div className="w-full">
+            <h2>{renderHtmlContent(flashcard?.content)}</h2>
           </div>
-          <div className="flex flex-wrap gap-10">
+          <div className="flex flex-wrap gap-10 pb-5">
             {flashcard?.quizAnswers?.map((answer, index) => (
               <div key={index} style={{ flexBasis: "45%" }}>
                 <strong>{indexToLetter(index)}:</strong> {answer?.content}
@@ -81,10 +81,7 @@ const Flashcard = ({ flashcard, showAnswer, setShowAnswer }) => {
           {correctAnswers?.map((correctAnswer, index) => (
             <div key={index}>
               <strong>
-                {indexToLetter(
-                  flashcard?.quizAnswers?.indexOf(correctAnswer)
-                )}
-                :
+                {indexToLetter(flashcard?.quizAnswers?.indexOf(correctAnswer))}:
               </strong>{" "}
               {correctAnswer?.content}
             </div>

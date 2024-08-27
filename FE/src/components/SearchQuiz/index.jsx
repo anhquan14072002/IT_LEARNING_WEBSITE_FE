@@ -38,7 +38,7 @@ export default function SearchQuiz() {
   //pagination
   const [first, setFirst] = useState(0);
   const [page, setPage] = useState(1);
-  const [rows, setRows] = useState(10);
+  const [rows, setRows] = useState(12);
   const [totalPage, setTotalPage] = useState(0);
 
   const cities = [{ name: "Tài liệu", code: "search" }];
@@ -119,6 +119,8 @@ export default function SearchQuiz() {
 
   //pagination and search
   useEffect(() => {
+    console.log("textSearch::",textSearch);
+    
     fetchData();
   }, [page, rows, textSearch, classId, type]);
 
@@ -155,6 +157,8 @@ export default function SearchQuiz() {
     })
       .then((res) => {
         const paginationData = JSON.parse(res.headers["x-pagination"]);
+        console.log("totalpage::",paginationData.TotalPages);
+        
         setTotalPage(paginationData.TotalPages);
         setProducts(Array.isArray(res.data.data) ? res.data.data : []);
       })
@@ -320,9 +324,9 @@ export default function SearchQuiz() {
               <Paginator
                 first={first}
                 rows={rows}
-                totalRecords={totalPage}
+                totalRecords={totalPage * rows}
                 onPageChange={onPageChange}
-                rowsPerPageOptions={[10, 20, 30]}
+                rowsPerPageOptions={[12, 20, 30]}
                 className="custom-paginator mx-auto"
               />
             )}
