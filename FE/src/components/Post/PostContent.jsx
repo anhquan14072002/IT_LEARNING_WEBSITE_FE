@@ -107,12 +107,11 @@ function PostWrite({ setCompose, compose }) {
       userId: user?.sub,
       gradeId: values.grade?.id,
     };
+
     let postId = compose?.data?.idPost;
     let postIdResponse;
     if (postId) {
       postIdResponse = postId;
-      console.log("postIdResponse");
-      console.log(postId);
       updatePost({ ...descriptionPost, id: postId });
     } else {
       const postIdResponse2 = await createPost(descriptionPost);
@@ -132,9 +131,9 @@ function PostWrite({ setCompose, compose }) {
     const body = {
       notificationType: 1,
       userSendId: user?.sub,
-      userSendName: user?.name,
+      userSendName: `${user?.family_name} ${user?.given_name}`,
       userReceiveId: user?.sub,
-      userReceiveName: user?.name,
+      userReceiveName: `${user?.family_name} ${user?.given_name}`,
       description: `Bạn vừa ${postId ? "sửa" : "tạo"} bài post thành công`,
       notificationTime: new Date(),
       isRead: false,
@@ -241,8 +240,10 @@ function ComposeComment({ ...props }) {
             />
           </span>
         )}
-
-        <span className="font-bold">{isLoggedIn() ? user?.name : "Khách"}</span>
+        {console.log(user)}
+        <span className="font-bold">
+          {isLoggedIn() ? `${user?.family_name} ${user?.given_name}` : "Khách"}
+        </span>
       </p>
       <p className="text-stone-500">Hãy nhập câu hỏi của bạn vào đây</p>
     </header>

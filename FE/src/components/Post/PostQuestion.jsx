@@ -32,7 +32,7 @@ function PostQuestion({ post, isFavoritePost }) {
   const [isFavorite, setIsFavorite] = useState(isFavoritePost);
   const isCheckUser =
     (userId === user?.sub && isLoggedIn()) ||
-    (user?.name === "admin" && isLoggedIn());
+    (user?.role == "Admin" && isLoggedIn());
   let contentJsx = <div dangerouslySetInnerHTML={{ __html: content }} />;
   function responseAnswer() {
     if (checkUser()) {
@@ -46,9 +46,9 @@ function PostQuestion({ post, isFavoritePost }) {
     const body = {
       notificationType: 1,
       userSendId: user?.sub,
-      userSendName: user?.name,
+      userSendName: `${user?.family_name} ${user?.given_name}`,
       userReceiveId: user?.sub,
-      userReceiveName: user?.name,
+      userReceiveName: `${user?.family_name} ${user?.given_name}`,
       description: `Bạn đã thu hồi bài post thành công`,
       notificationTime: new Date(),
       isRead: false,

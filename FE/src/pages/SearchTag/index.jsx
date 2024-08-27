@@ -240,10 +240,10 @@ export default function SearchTag() {
                         key={exam?.id}
                         className="bg-white hover:bg-gray-200 p-4 shadow-md rounded flex flex-col cursor-pointer"
                         onClick={() => {
-                           if(exam?.type === 1) {
-                            navigate(`/examdetail/${exam?.id}`)
-                          } else{
-                            navigate(`/examcodedetail/${exam?.id}`)
+                          if (exam?.type === 1) {
+                            navigate(`/examdetail/${exam?.id}`);
+                          } else {
+                            navigate(`/examcodedetail/${exam?.id}`);
                           }
                         }}
                       >
@@ -255,6 +255,25 @@ export default function SearchTag() {
                         >
                           {exam?.title}
                         </h3>
+                        {/* Render topic details here */}
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              )}
+
+              {/* Display Exams */}
+              {data?.exams?.length > 0 && (
+                <section className="mb-8">
+                  <h2 className="text-lg font-semibold mb-4">Đề thi</h2>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {data?.exams?.map((topic) => (
+                      <div
+                        key={topic?.id}
+                        className="bg-white p-4 shadow-md rounded flex flex-col cursor-pointer"
+                        onClick={() => navigate("/examdetail/" + topic?.id)}
+                      >
+                        <h3 className="text-base truncate">{topic?.title} </h3>
                         {/* Render topic details here */}
                       </div>
                     ))}
