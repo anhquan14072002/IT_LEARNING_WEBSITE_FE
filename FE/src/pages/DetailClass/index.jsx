@@ -137,11 +137,10 @@ export default function DetailClass() {
           )}
 
           {documentList?.exams?.length > 0 && (
-            <Section
+            <SectionExam
               title="Đề thi"
               items={documentList.exams}
               navigate={navigate}
-              pathPrefix="/examdetail/"
             />
           )}
         </main>
@@ -185,3 +184,47 @@ const Section = ({ title, items, navigate, pathPrefix, showAllLink }) => (
     </div>
   </section>
 );
+
+const SectionExam = ({ title, items, navigate }) => {
+  const handleNavigateExam = (item) => {
+    if (item?.type === 1) {
+      navigate(`/examdetail/${item?.id}`);
+    } else {
+      navigate(`/examcodedetail/${item?.id}`);
+    }
+  };
+
+  return (
+    <section className="mb-14">
+      <h2 className="text-2xl font-bold mb-4 text-center text-blue-500">
+        {title}
+      </h2>
+      <div className="space-y-2 mt-16">
+        <div className="flex flex-wrap justify-center text-center">
+          {items.map((item, index) => (
+            <div
+              key={item.id}
+              className={`cursor-pointer text-lg transition text-green-600 hover:text-green-400 underline font-semibold w-full sm:w-1/2 mb-10`}
+              style={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+              onClick={() => handleNavigateExam(item)}
+            >
+              <Tooltip target={`.tooltipView-${item.id}`} />
+              <span
+                className={`tooltipView-${item?.id}`}
+                data-pr-tooltip={item?.title}
+                data-pr-position="top"
+              >
+                {item?.title}
+              </span>
+            </div>
+          ))}
+        </div>
+        <hr />
+      </div>
+    </section>
+  );
+};

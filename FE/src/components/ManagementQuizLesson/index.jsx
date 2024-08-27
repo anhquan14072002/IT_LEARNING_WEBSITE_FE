@@ -139,8 +139,7 @@ export default function ManagementQuizLesson() {
   const confirmDelete = (id) => {
     setVisibleDelete(true);
     confirmDialog({
-      message: "Bạn có chắc chắn muốn bài quiz này?",
-      header: "Delete Confirmation",
+      message: "Bạn có chắc chắn muốn xóa bộ câu hỏi này?",
       icon: "pi pi-info-circle",
       defaultFocus: "reject",
       acceptClassName: "p-button-danger",
@@ -264,7 +263,7 @@ export default function ManagementQuizLesson() {
             <div className="border-2 rounded-md p-2">
               <InputText
                 onChange={(e) => {
-                  handleSearchInput(removeVietnameseTones(e.target.value));
+                  handleSearchInput(e.target.value);
                 }}
                 placeholder="Tìm kiếm"
                 className="flex-1 focus:outline-none w-36 focus:ring-0"

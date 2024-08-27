@@ -6,6 +6,7 @@ import arrows from "../../assets/img/arrows.png";
 import continueImg from "../../assets/img/continue.png";
 import back from "../../assets/img/icons8-back-50.png";
 import cancel from "../../assets/img/icons8-cancel-24.png";
+import correct from "../../assets/img/correct.png";
 import FormDataContext from "../../store/FormDataContext";
 function IconButton({ icon, title, active, ...props }) {
   let cssButton = "border border-[#c5c7c7] py-1 px-3 mt-1";
@@ -19,7 +20,7 @@ function IconButton({ icon, title, active, ...props }) {
     </Button>
   );
 }
-function Footer({ Menus }) {
+function Footer({ Menus, id }) {
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -36,15 +37,18 @@ function Footer({ Menus }) {
     /* solution: Where is the origin of action from ? 
           -  w*/
     let nextRoute =
-      indexRoute === 0 ? "/dashboard/quiz" : Menus[indexRoute - 1].path;
+      indexRoute === 0
+        ? `/dashboard/quiz/managequestionofquizlist/${id}`
+        : Menus[indexRoute - 1].path;
     navigate(nextRoute);
   }
   let labelButton = "Tiếp Tục";
   let imgButton = continueImg;
-  if (step === "stepTwo") {
+  if (step === `stepTwo/${id}`) {
     labelButton = "Thực Hiện";
     imgButton = arrows;
   }
+
   return (
     <footer className="flex justify-between  mt-2">
       <Button
@@ -69,14 +73,28 @@ function Footer({ Menus }) {
             icon={imgButton}
             title={labelButton}
             onClick={implement}
-            disabled={success == 0 && step == "stepTwo"}
+            disabled={success == 0 && step == `stepTwo/${id}`}
           />
         )}
-        <IconButton
-          icon={cancel}
-          title="Hủy bỏ"
-          onClick={() => navigate("/dashboard/quiz")}
-        />
+        {location.pathname === `/importQuiz/stepThree/${id}` ? (
+          <div>
+            <IconButton
+              icon={correct}
+              title="Trở về trang danh sách câu hỏi"
+              onClick={() =>
+                navigate("/dashboard/quiz/managequestionofquizlist/" + id)
+              }
+            />
+          </div>
+        ) : (
+          <IconButton
+            icon={cancel}
+            title="Hủy bỏ"
+            onClick={() =>
+              navigate("/dashboard/quiz/managequestionofquizlist/" + id)
+            }
+          />
+        )}
       </span>
     </footer>
   );

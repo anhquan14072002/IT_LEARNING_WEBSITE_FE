@@ -171,8 +171,7 @@ export default function ManageCodeOnline() {
   const confirm = (id) => {
     setVisibleDelete(true);
     confirmDialog({
-      message: "Do you want to delete this record?",
-      header: "Delete Confirmation",
+      message: "Bạn có chắc chắn muốn xóa bài này ?",
       icon: "pi pi-info-circle",
       defaultFocus: "reject",
       acceptClassName: "p-button-danger",
