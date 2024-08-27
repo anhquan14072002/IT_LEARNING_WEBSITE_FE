@@ -10,13 +10,9 @@ const Index = ({ id, title, type }) => {
   console.log(user?.sub);
   const toast = useRef(null);
   const handleNavigate = () => {
-    if (user?.sub) {
       type === 1
         ? navigate(`/examdetail/${id}`)
         : navigate(`/examcodedetail/${id}`);
-    } else {
-      ACCEPT(toast,"Vui lòng đăng nhập để được xem")
-    }
   };
   return (
     <div
