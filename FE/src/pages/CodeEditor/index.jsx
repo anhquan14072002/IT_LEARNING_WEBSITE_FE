@@ -74,7 +74,7 @@ const CodeEditor = () => {
     setLoading(true); // Show loading spinner
     let model = {
       problemId: id,
-      languageId: language?.id,
+      languageId: language?.languageId,
       sourceCode: encodeBase64(code),
       userId: user?.sub,
       submit: true,
@@ -112,7 +112,7 @@ const CodeEditor = () => {
     setLoading(true); // Show loading spinner
     let model = {
       problemId: id,
-      languageId: language?.id,
+      languageId: language?.languageId,
       sourceCode: encodeBase64(code),
       userId: user?.sub,
       submit: false,
@@ -150,6 +150,13 @@ const CodeEditor = () => {
   useEffect(() => {
     restClient({ url: "api/executecode/getallexecutecodebyproblemid/" + id })
       .then((res) => {
+
+        setLanguage(
+          (res.data?.data &&
+            Array.isArray(res.data?.data) &&
+            res.data?.data[0]) ||
+            null
+        );
         setExecuteCode(res.data?.data);
         setCode(decodeBase64(res.data?.data[0]?.sampleCode) || "");
         restClient({
@@ -167,8 +174,6 @@ const CodeEditor = () => {
             res.data?.data[0]?.languageId,
         })
           .then((res) => {
-            setLanguage(res.data?.data);
-
             restClient({
               url: "api/testcase/getalltestcasebyproblemid/" + id,
             })
@@ -206,6 +211,7 @@ const CodeEditor = () => {
   const codeMirrorRef = useRef(null);
 
   const handleLanguageChange = (event) => {
+
     const selectedLanguageId = event.target.value;
     restClient({
       url: `api/submission/getsubmission?ProblemId=${id}&UserId=${localStorage.getItem(
@@ -213,11 +219,10 @@ const CodeEditor = () => {
       )}&LanguageId=${selectedLanguageId}`,
     })
       .then((res) => {
-        const selectedLanguage = executeCode?.find(
-          (language) => language?.id === parseInt(selectedLanguageId)
-        );
-        console.log("selected language: " + selectedLanguage);
 
+        const selectedLanguage = executeCode?.find(
+          (language) => Number(language?.languageId) === parseInt(selectedLanguageId)
+        );
         setLanguage(selectedLanguage);
         if (res?.data?.data?.sourceCode) {
           setCode(decodeBase64(res?.data?.data?.sourceCode));
@@ -360,7 +365,7 @@ const CodeEditor = () => {
                         </label>
                         <select
                           id="language-select"
-                          value={language?.id || ""}
+                          value={Number(language?.languageId) || ""}
                           onChange={handleLanguageChange}
                           className="bg-gray-700 text-white py-2 px-4 rounded-lg border border-gray-600 hover:bg-gray-700 focus:outline-none"
                         >
