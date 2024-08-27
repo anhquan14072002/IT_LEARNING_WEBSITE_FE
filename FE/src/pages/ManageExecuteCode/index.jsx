@@ -218,7 +218,6 @@ export default function ManageExecuteCode() {
     setVisibleDelete(true);
     confirmDialog({
       message: "Bạn có chắc chắn muốn xóa mã thực thi này?",
-      header: "Delete Confirmation",
       icon: "pi pi-info-circle",
       defaultFocus: "reject",
       acceptClassName: "p-button-danger",

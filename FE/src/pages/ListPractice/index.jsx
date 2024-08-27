@@ -115,9 +115,7 @@ export default function ListPractice() {
     setPage(1);
     setDifficult(newDifficulty);
     navigate(
-      `?text=${removeVietnameseTones(
-        textSearch
-      )}&difficulty=${newDifficulty}&classId=${classId}`
+      `?text=${textSearch}&difficulty=${newDifficulty}&classId=${classId}`
     );
   };
 
@@ -160,9 +158,7 @@ export default function ListPractice() {
                   onChange={(e) => {
                     setTextSearch(e.target.value);
                     navigate(
-                      `?text=${removeVietnameseTones(
-                        e.target.value
-                      )}&difficulty=${difficult}&classId=${classId}`
+                      `?text=${e.target.value}&difficulty=${difficult}&classId=${classId}`
                     );
                   }}
                 />

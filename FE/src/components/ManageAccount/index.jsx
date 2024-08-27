@@ -314,9 +314,7 @@ export default function ManageAccount() {
             <div className="mb-10 flex flex-wrap items-center p-2 gap-4">
               <div className="border-2 rounded-md p-2 flex items-center">
                 <InputText
-                  onChange={(e) =>
-                    handleSearchInput(removeVietnameseTones(e.target.value))
-                  }
+                  onChange={(e) => handleSearchInput(e.target.value)}
                   placeholder="Search"
                   className="flex-1 focus:outline-none w-36 focus:ring-0"
                 />

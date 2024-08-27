@@ -5,7 +5,9 @@ import Loading from "../Loading";
 import axios from "axios";
 import { getTokenFromLocalStorage, REJECT } from "../../utils";
 import { Toast } from "primereact/toast";
+import { useParams } from "react-router-dom";
 function ImportStepThree(props) {
+  const { id } = useParams();
   const [loading, setLoading] = useState(false);
   const { success, fail, idImport, idImportResult, quizId } =
     useContext(FormDataContext);

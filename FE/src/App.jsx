@@ -119,8 +119,8 @@ function App() {
             <>
               <Route path="/importQuiz" element={<ImportQuiz />}>
                 <Route path="stepOne/:id" element={<ImportStepOne />} />
-                <Route path="stepTwo" element={<ImportStepTwo />} />
-                <Route path="stepThree" element={<ImportStepThree />} />
+                <Route path="stepTwo/:id" element={<ImportStepTwo />} />
+                <Route path="stepThree/:id" element={<ImportStepThree />} />
               </Route>
               <Route path="/dashboard/:typeId" element={<Dashboard />} />
               <Route

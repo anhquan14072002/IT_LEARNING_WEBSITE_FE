@@ -20,8 +20,8 @@ function ImportQuizForm() {
   const { quizId } = useContext(FormDataContext);
   const Menus = [
     { title: "1. Chọn tệp nguồn", index: 0, path: `stepOne/${id || quizId}` },
-    { title: "2. Kiểm tra dữ liệu", index: 1, path: "stepTwo" },
-    { title: "3. Kết quả nhập khẩu ", index: 2, path: "stepThree" },
+    { title: "2. Kiểm tra dữ liệu", index: 1, path: `stepTwo/${id || quizId}` },
+    { title: "3. Kết quả nhập khẩu ", index: 2, path: `stepThree/${id || quizId}` },
   ];
   return (
     <>
@@ -34,7 +34,7 @@ function ImportQuizForm() {
             <Outlet />
           </main>
         </div>
-        <Footer Menus={Menus} />
+        <Footer Menus={Menus} id={id}/>
       </div>
     </>
   );
