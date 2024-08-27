@@ -237,7 +237,7 @@ export default function ManagementQuizLesson() {
       />
       <div>
         <div className="flex justify-between pt-1">
-          <h1 className="font-bold text-3xl">Bộ câu hỏi</h1>
+          <h1 className="font-bold text-3xl">Bộ câu hỏi theo chủ đề , bài học</h1>
           <div>
             <Button
               label="Thêm mới"
@@ -266,7 +266,7 @@ export default function ManagementQuizLesson() {
                 onChange={(e) => {
                   handleSearchInput(removeVietnameseTones(e.target.value));
                 }}
-                placeholder="Search"
+                placeholder="Tìm kiếm"
                 className="flex-1 focus:outline-none w-36 focus:ring-0"
               />
               <Button

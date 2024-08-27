@@ -19,7 +19,8 @@ import {
 import { InputSwitch } from "primereact/inputswitch";
 import { Dropdown } from "primereact/dropdown";
 import AddUser from "./AddUser";
-
+import LoadingScreen from "../LoadingScreen";
+import LoadingFull from "../LoadingFull";
 
 export default function ManageAccount() {
   const toast = useRef(null);
@@ -34,11 +35,24 @@ export default function ManageAccount() {
   const [roleList, setRoleList] = useState([]);
   const [role, setRole] = useState(null);
 
+  const [listRole, setListRole] = useState([]);
+
   const [first, setFirst] = useState(0);
   const [page, setPage] = useState(1);
   const [rows, setRows] = useState(10);
   const [totalPage, setTotalPage] = useState(0);
-  const UserId =localStorage.getItem("userId") 
+  const UserId = localStorage.getItem("userId");
+
+  useEffect(() => {
+    restClient({ url: "api/admin/getallroles" })
+      .then((res) => {
+        setListRole(res?.data?.data || []);
+      })
+      .catch((err) => {
+        setListRole([]);
+      });
+  }, []);
+
   useEffect(() => {
     fetchData();
   }, [page, rows, textSearch, role]);
@@ -70,7 +84,6 @@ export default function ManageAccount() {
     })
       .then((res) => {
         setRoleList(res?.data?.data);
-        console.log(res?.data?.data);
       })
       .catch((err) => {
         setRoleList([]);
@@ -109,7 +122,6 @@ export default function ManageAccount() {
     setRole(text);
   };
   const confirmDelete = (id) => {
-   
     setVisibleDelete(true);
     confirmDialog({
       message: "Bạn có chắc chắn muốn xóa tài khoản này?",
@@ -163,7 +175,7 @@ export default function ManageAccount() {
   }, 300);
   const status = (rowData) => {
     const isActive = !rowData.lockOutEnd;
-   
+
     const isDisabled = UserId === rowData.id;
     return (
       <div className="flex">
@@ -208,10 +220,61 @@ export default function ManageAccount() {
       });
   };
 
-  const formatRoles = (roles) => {
-    if (!roles || roles.length === 0) return "N/A";
-    return roles.join(", ");
+  // const roleBody = (rowData, { rowIndex }) => {
+  //   // return <span>{rowData?.roles}</span>;
+  //   return <select name="" id="">
+
+  //   </select>;
+
+  // };
+
+  const handleChangeRole = (event, roleList, rowData) => {
+    const selectedRoleId = event.target.value;
+    const selectedRole = roleList.find((role) => role.id === selectedRoleId);
+    const userId = rowData?.id;
+    setLoading(true);
+    restClient({
+      url: `api/admin/updaterolememberasync/${userId}/${selectedRole?.baseName}`,
+      method: "PUT",
+    })
+      .then((res) => {
+        ACCEPT(toast, "Cập nhật vai trò thành công !!!");
+        fetchData();
+      })
+      .catch((err) => {
+        REJECT(toast, "Cập nhật vai trò không thành công !!!");
+        fetchData();
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   };
+
+  const roleBody = (rowData, { rowIndex }) => {
+    const currentRoles = rowData?.roles || [];
+
+    return (
+      <select
+        name={`role-select-${rowIndex}`}
+        id={`role-select-${rowIndex}`}
+        className="border-2 border-gray-500 p-2 rounded-lg"
+        onChange={(event) => handleChangeRole(event, roleList, rowData)}
+      >
+        {roleList &&
+          Array.isArray(roleList) &&
+          roleList.map((role) => (
+            <option
+              key={role.id}
+              value={role.id}
+              selected={currentRoles.includes(role.name)}
+            >
+              {role.name}
+            </option>
+          ))}
+      </select>
+    );
+  };
+
   return (
     <div>
       <Toast ref={toast} />
@@ -223,124 +286,120 @@ export default function ManageAccount() {
         fetchData={fetchData}
         roleList={roleList}
       />
-      <div>
-        <div className="flex justify-between pt-1">
-          <h1 className="font-bold text-3xl">Quản Lý Tài Khoản</h1>
+      {loading ? (<LoadingFull />) : (
           <div>
-            <Button
-              label="Thêm Nguời Dùng"
-              icon="pi pi-plus-circle"
-              severity="info"
-              className="bg-blue-600 text-white p-2 text-sm font-normal"
-              onClick={() => setVisible(true)}
-            />
-          </div>
-        </div>
-        <div className="border-2 rounded-md mt-2">
-          <div className="mb-10 flex flex-wrap items-center p-2 gap-4">
-            <div className="border-2 rounded-md p-2 flex items-center">
-              <InputText
-                onChange={(e) =>
-                  handleSearchInput(removeVietnameseTones(e.target.value))
-                }
-                placeholder="Search"
-                className="flex-1 focus:outline-none w-36 focus:ring-0"
-              />
+          <div className="flex justify-between pt-1">
+            <h1 className="font-bold text-3xl">Quản Lý Tài Khoản</h1>
+            <div>
               <Button
-                icon="pi pi-search"
-                className="p-button-warning focus:outline-none focus:ring-0 ml-2"
+                label="Thêm Nguời Dùng"
+                icon="pi pi-plus-circle"
+                severity="info"
+                className="bg-blue-600 text-white p-2 text-sm font-normal"
+                onClick={() => setVisible(true)}
               />
             </div>
-            <div className="flex-1 flex items-center justify-end">
-              <div className="border-2 rounded-md p-2">
-                <Dropdown
-                  filter
-                  ref={dropDownRef2}
-                  value={role}
-                  onChange={(e) => handleSearch(e.value)}
-                  options={roleList}
-                  optionLabel="name"
-                  showClear
-                  placeholder="Vai trò"
-                  className="w-full md:w-14rem shadow-none"
+          </div>
+          <div className="border-2 rounded-md mt-2">
+            <div className="mb-10 flex flex-wrap items-center p-2 gap-4">
+              <div className="border-2 rounded-md p-2 flex items-center">
+                <InputText
+                  onChange={(e) =>
+                    handleSearchInput(removeVietnameseTones(e.target.value))
+                  }
+                  placeholder="Search"
+                  className="flex-1 focus:outline-none w-36 focus:ring-0"
+                />
+                <Button
+                  icon="pi pi-search"
+                  className="p-button-warning focus:outline-none focus:ring-0 ml-2"
                 />
               </div>
+              <div className="flex-1 flex items-center justify-end">
+                <div className="border-2 rounded-md p-2">
+                  <Dropdown
+                    filter
+                    ref={dropDownRef2}
+                    value={role}
+                    onChange={(e) => handleSearch(e.value)}
+                    options={roleList}
+                    optionLabel="name"
+                    showClear
+                    placeholder="Vai trò"
+                    className="w-full md:w-14rem shadow-none"
+                  />
+                </div>
+              </div>
             </div>
+  
+                <DataTable
+                  value={products}
+                  loading={loading}
+                  className="border-t-2"
+                  tableStyle={{ minHeight: "30rem" }}
+                  selection={selectedProduct}
+                  onSelectionChange={(e) => setSelectedProduct(e.value)}
+                  scrollable
+                  scrollHeight="30rem"
+                >
+                  <Column
+                    field="#"
+                    header="#"
+                    body={indexBodyTemplate}
+                    className="border-b-2 border-t-2"
+                    style={{ width: "5%" }}
+                  />
+  
+                  <Column
+                    field="userName"
+                    header="Tài Khoản "
+                    className="border-b-2 border-t-2"
+                    style={{ width: "15%" }}
+                  />
+  
+                  <Column
+                    field="email"
+                    header="Email "
+                    className="border-b-2 border-t-2"
+                    style={{ width: "15%" }}
+                  />
+                  <Column
+                    field="phoneNumber"
+                    header="SĐT "
+                    className="border-b-2 border-t-2"
+                    style={{ width: "15%" }}
+                  />
+                  <Column
+                    body={status}
+                    header="Trạng Thái "
+                    className="border-b-2 border-t-2"
+                    style={{ width: "15%" }}
+                  />
+                  <Column
+                    field="roles"
+                    header="Vai Trò"
+                    className="border-b-2 border-t-2"
+                    style={{ width: "15%" }}
+                    body={roleBody} // Use the custom renderer
+                  />
+  
+                  <Column
+                    className="border-b-2 border-t-2"
+                    body={actionBodyTemplate}
+                    style={{ width: "5%" }}
+                  />
+                </DataTable>
+                <Paginator
+                  first={first}
+                  rows={rows}
+                  rowsPerPageOptions={[10, 20, 30]}
+                  totalRecords={totalPage * rows}
+                  onPageChange={onPageChange}
+                  className="custom-paginator mx-auto"
+                />
           </div>
-
-          {loading ? (
-            <Loading />
-          ) : (
-            <>
-              <DataTable
-                value={products}
-                loading={loading}
-                className="border-t-2"
-                tableStyle={{ minHeight: "30rem" }}
-                selection={selectedProduct}
-                onSelectionChange={(e) => setSelectedProduct(e.value)}
-                scrollable
-                scrollHeight="30rem"
-              >
-                <Column
-                  field="#"
-                  header="#"
-                  body={indexBodyTemplate}
-                  className="border-b-2 border-t-2"
-                  style={{ width: "5%" }}
-                />
-
-                <Column
-                  field="userName"
-                  header="Tài Khoản "
-                  className="border-b-2 border-t-2"
-                  style={{ width: "15%" }}
-                />
-
-                <Column
-                  field="email"
-                  header="Email "
-                  className="border-b-2 border-t-2"
-                  style={{ width: "15%" }}
-                />
-                <Column
-                  field="phoneNumber"
-                  header="SĐT "
-                  className="border-b-2 border-t-2"
-                  style={{ width: "15%" }}
-                />
-                <Column
-                  body={status}
-                  header="Trạng Thái "
-                  className="border-b-2 border-t-2"
-                  style={{ width: "15%" }}
-                />
-                <Column
-                  field="roles"
-                  header="Vai Trò"
-                  className="border-b-2 border-t-2"
-                  style={{ width: "15%" }}
-                  body={(rowData) => formatRoles(rowData.roles)} // Use the custom renderer
-                />
-
-                <Column
-                  className="border-b-2 border-t-2"
-                  body={actionBodyTemplate}
-                  style={{ width: "5%" }}
-                />
-              </DataTable>
-              <Paginator
-                first={first}
-                rows={rows}
-                rowsPerPageOptions={[10, 20, 30]}
-                totalRecords={totalPage * rows}
-                onPageChange={onPageChange}
-                className="custom-paginator mx-auto"
-              />
-            </>
-          )}
         </div>
-      </div>
+      )}
     </div>
   );
 }
