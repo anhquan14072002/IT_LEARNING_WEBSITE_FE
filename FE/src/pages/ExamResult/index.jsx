@@ -4,6 +4,7 @@ import { useParams } from "react-router-dom";
 import Header from "../../components/Header";
 import NotifyProvider from "../../store/NotificationContext";
 import Menu from "../../components/Menu";
+import { isLoggedIn } from "../../utils";
 
 const Index = () => {
   const [score, setScore] = useState(null);
@@ -27,8 +28,26 @@ const Index = () => {
       }
     };
 
-    fetchData();
+    if (isLoggedIn()) {
+      fetchData();
+    }
   }, [id]);
+
+  if (!isLoggedIn()) {
+    return (
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <p className="text-xl font-bold mb-4">
+          Bạn phải đăng nhập để xem kết quả đề thi đã làm
+        </p>
+        <button
+          onClick={() => navigate("/login")}
+          className="bg-blue-500 text-white px-4 py-2 rounded"
+        >
+          Đăng nhập
+        </button>
+      </div>
+    );
+  }
 
   return (
     <NotifyProvider>
@@ -46,12 +65,13 @@ const Index = () => {
           </button>
         ) : (
           <div>
-            <h1 className="text-2xl text-gray-800 mb-4">Chi tiết kết quả</h1><button
-            className="bg-blue-600 text-white p-2 text-sm font-normal mb-2"
-            onClick={() => setOpenResult(true)}
-          >
-            Ẩn Kết Quả
-          </button>
+            <h1 className="text-2xl text-gray-800 mb-4">Chi tiết kết quả</h1>
+            <button
+              className="bg-blue-600 text-white p-2 text-sm font-normal mb-2"
+              onClick={() => setOpenResult(true)}
+            >
+              Ẩn Kết Quả
+            </button>
             <div className="max-h-96 flex justify-center border-black">
               <div
                 className="overflow-y-auto"

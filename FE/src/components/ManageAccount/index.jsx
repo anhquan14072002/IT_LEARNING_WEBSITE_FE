@@ -42,6 +42,7 @@ export default function ManageAccount() {
   const [rows, setRows] = useState(10);
   const [totalPage, setTotalPage] = useState(0);
   const UserId = localStorage.getItem("userId");
+  const [loadingSearch, setLoadingSearch] = useState(false);
 
   useEffect(() => {
     restClient({ url: "api/admin/getallroles" })
@@ -58,22 +59,27 @@ export default function ManageAccount() {
   }, [page, rows, textSearch, role]);
 
   const fetchData = () => {
-    setLoading(true);
+    setLoadingSearch(true);
     const selectedRole = role ? role?.name : "";
     restClient({
-      url: `api/admin/getallmemberbyrolepagination?PageIndex=${page}&PageSize=${rows}&Value=${textSearch}&Role=${selectedRole}&OrderBy=id&IsAscending=false`,
+      url: `api/admin/getallmemberbyrolepagination?PageIndex=${page}&PageSize=${rows}${
+        textSearch &&
+        typeof textSearch === "string" &&
+        textSearch.trim() !== "" &&
+        `&Value=${textSearch}`
+      }&Role=${selectedRole}&OrderBy=id&IsAscending=false`,
       method: "GET",
     })
       .then((res) => {
         const paginationData = JSON.parse(res.headers["x-pagination"]);
         setTotalPage(paginationData.TotalPages);
         setProducts(Array.isArray(res.data.data) ? res.data.data : []);
-        setLoading(false);
+        setLoadingSearch(false);
       })
       .catch((err) => {
         console.error("Error fetching data:", err);
         setProducts([]);
-        setLoading(false);
+        setLoadingSearch(false);
       });
   };
 
@@ -253,7 +259,9 @@ export default function ManageAccount() {
   const roleBody = (rowData, { rowIndex }) => {
     const currentRoles = rowData?.roles || [];
 
-    return (
+    return rowData?.id === localStorage.getItem("userId") ? (
+      <> {rowData?.roles}</>
+    ) : (
       <select
         name={`role-select-${rowIndex}`}
         id={`role-select-${rowIndex}`}
@@ -286,8 +294,10 @@ export default function ManageAccount() {
         fetchData={fetchData}
         roleList={roleList}
       />
-      {loading ? (<LoadingFull />) : (
-          <div>
+      {loading ? (
+        <LoadingFull />
+      ) : (
+        <div>
           <div className="flex justify-between pt-1">
             <h1 className="font-bold text-3xl">Quản Lý Tài Khoản</h1>
             <div>
@@ -331,7 +341,10 @@ export default function ManageAccount() {
                 </div>
               </div>
             </div>
-  
+            {loadingSearch ? (
+              <Loading />
+            ) : (
+              <>
                 <DataTable
                   value={products}
                   loading={loading}
@@ -349,14 +362,14 @@ export default function ManageAccount() {
                     className="border-b-2 border-t-2"
                     style={{ width: "5%" }}
                   />
-  
+
                   <Column
                     field="userName"
                     header="Tài Khoản "
                     className="border-b-2 border-t-2"
                     style={{ width: "15%" }}
                   />
-  
+
                   <Column
                     field="email"
                     header="Email "
@@ -382,7 +395,7 @@ export default function ManageAccount() {
                     style={{ width: "15%" }}
                     body={roleBody} // Use the custom renderer
                   />
-  
+
                   <Column
                     className="border-b-2 border-t-2"
                     body={actionBodyTemplate}
@@ -397,6 +410,8 @@ export default function ManageAccount() {
                   onPageChange={onPageChange}
                   className="custom-paginator mx-auto"
                 />
+              </>
+            )}
           </div>
         </div>
       )}
