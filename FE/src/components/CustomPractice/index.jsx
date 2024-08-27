@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { Tooltip } from "primereact/tooltip";
+import { isLoggedIn } from "../../utils";
 
 const CustomPractice = ({ document }) => {
   const navigate = useNavigate();
@@ -38,11 +39,19 @@ const CustomPractice = ({ document }) => {
             </span>
           )}
         </div>
-        <div className="flex justify-center">
-          <div className="bg-green-500 hover:bg-green-400 text-white rounded-lg p-2 text-base font-semibold cursor-pointer transition-colors duration-300">
-            Vào làm
+        {isLoggedIn() && document?.status === 2 ? (
+          <div className="flex justify-center">
+            <div className="bg-green-500 hover:bg-green-400 text-white rounded-lg p-2 text-base font-semibold cursor-pointer transition-colors duration-300">
+              <span className="pi pi-check-circle font-bold"></span> Làm lại
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex justify-center">
+            <div className="bg-blue-500 hover:bg-blue-400 text-white rounded-lg p-2 text-base font-semibold cursor-pointer transition-colors duration-300">
+              Vào làm
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -86,7 +86,7 @@ export default function HistoryQuiz() {
   }, [navigate, user.id]);
 
   const indexBodyTemplate = (rowData, { rowIndex }) => {
-    return <span>{rowIndex}</span>;
+    return <span>{rowIndex+1}</span>;
   };
 
   const indexBodyTemplateV2 = (rowData, { rowIndex }) => {
@@ -113,9 +113,7 @@ export default function HistoryQuiz() {
     return <span>{formattedDate}</span>;
   };
   
-  const historyExam = (rowData , {rowIndex})=>{
-    return <button className="bg-blue-600 text-white p-2 rounded-md hover:bg-blue-400" onClick={()=>navigate('/examresult/'+rowData?.examCodeId)}>Xem lịch sử làm bài</button>
-  }
+
 
   useEffect(()=>{
     console.log("quizResults::",quizResults);
@@ -232,11 +230,7 @@ export default function HistoryQuiz() {
         style={{ minWidth: "10rem" }}
         className="border-b-2 border-t-2"
       />
-      <Column 
-      style={{ minWidth: "15rem" }}
-      className="border-b-2 border-t-2"
-      body={historyExam}
-      />
+     
       <Column
         body={formatDate}
         header="Thời gian làm"

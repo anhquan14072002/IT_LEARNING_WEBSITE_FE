@@ -77,6 +77,7 @@ export default function Lesson() {
         .catch((err) => {
           console.error("Error fetching data:", err);
           setProducts([]);
+          setTotalPage(0)
         })
         .finally(() => setLoading(false));
     } else {
@@ -94,6 +95,7 @@ export default function Lesson() {
         .catch((err) => {
           console.error("Error fetching data:", err);
           setProducts([]);
+          setTotalPage(0)
         })
         .finally(() => {
           setLoading(false);
@@ -494,6 +496,7 @@ export default function Lesson() {
               />
             </DataTable>
           )}
+          {products.length > 0 && totalPage > 1 && (
           <Paginator
             first={first}
             rows={rows}
@@ -501,7 +504,7 @@ export default function Lesson() {
             totalRecords={totalPage * rows}
             onPageChange={onPageChange}
             className="custom-paginator mx-auto"
-          />
+          />)}
         </div>
       </div>
     </div>
