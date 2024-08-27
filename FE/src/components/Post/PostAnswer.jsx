@@ -103,10 +103,10 @@ const PostAnswer = ({ post }) => {
     const body = {
       notificationType: 1,
       userSendId: user?.sub,
-      userSendName: user?.name,
+      userSendName: `${user?.family_name} ${user?.given_name}`,
       userReceiveId: userId,
       userReceiveName: fullName,
-      description: `${user?.name} đã phản hồi bài viết của bạn`,
+      description: `${`${user?.family_name} ${user?.given_name}`} đã phản hồi bài viết của bạn`,
       notificationTime: new Date(),
       isRead: false,
       link: `${BASE_URL_FE}/post/${id}`,
@@ -216,7 +216,7 @@ const Answer = ({
   const user = useSelector((state) => state.user.value);
   const isCheckUser =
     (userId === user?.sub && isLoggedIn()) ||
-    (user?.name === "admin" && isLoggedIn());
+    (`${user?.family_name} ${user?.given_name}` === "admin" && isLoggedIn());
   console.log("isCheckUser");
   console.log(isCheckUser);
 
@@ -285,10 +285,10 @@ const Answer = ({
     const body = {
       notificationType: 2,
       userSendId: user?.sub,
-      userSendName: user?.name,
+      userSendName: `${user?.family_name} ${user?.given_name}`,
       userReceiveId: userId,
       userReceiveName: fullName,
-      description: `${user?.name} ${msg}`,
+      description: `${`${user?.family_name} ${user?.given_name}`} ${msg}`,
       notificationTime: new Date(),
       isRead: false,
       link: `${BASE_URL_FE}/post/${id}`,
@@ -301,10 +301,13 @@ const Answer = ({
     const body = {
       notificationType: 1,
       userSendId: user?.sub,
-      userSendName: user?.name,
+      userSendName: `${user?.family_name} ${user?.given_name}`,
       userReceiveId: userId,
       userReceiveName: fullName,
-      description: deleteResponse === 1 ? `${user?.name} ${msg}` : `${msg}`,
+      description:
+        deleteResponse === 1
+          ? `${`${user?.family_name} ${user?.given_name}`} ${msg}`
+          : `${msg}`,
       notificationTime: new Date(),
       isRead: false,
       link: `${BASE_URL_FE}/post/${id}`,

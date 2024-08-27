@@ -6,7 +6,13 @@ import CustomTextInput from "../../shared/CustomTextInput";
 import CustomEditor from "../../shared/CustomEditor";
 import { Button } from "primereact/button";
 import Loading from "../Loading";
-import { getProvinceByName, getYearByYear, REJECT, SUCCESS, TYPE } from "../../utils";
+import {
+  getProvinceByName,
+  getYearByYear,
+  REJECT,
+  SUCCESS,
+  TYPE,
+} from "../../utils";
 import { FileUpload } from "primereact/fileupload";
 import CustomDropdown from "../../shared/CustomDropdown";
 import restClient from "../../services/restClient";
@@ -18,7 +24,11 @@ import CustomDropdownInSearch from "../../shared/CustomDropdownInSearch";
 
 const baseValidationSchema = Yup.object({
   competition: Yup.object()
-    .test("is-not-empty", "Không được để trống trường này", (value) => Object.keys(value).length !== 0)
+    .test(
+      "is-not-empty",
+      "Không được để trống trường này",
+      (value) => Object.keys(value).length !== 0
+    )
     .required("Không bỏ trống trường này"),
   title: Yup.string()
     .required("Tiêu đề không được bỏ trống")
@@ -26,10 +36,18 @@ const baseValidationSchema = Yup.object({
     .max(50, "Tiêu đề không được vượt quá 50 ký tự"),
   description: Yup.string().required("Mô tả không được bỏ trống"),
   province: Yup.object()
-    .test("is-not-empty", "Không được để trống trường này", (value) => Object.keys(value).length !== 0)
+    .test(
+      "is-not-empty",
+      "Không được để trống trường này",
+      (value) => Object.keys(value).length !== 0
+    )
     .required("Không bỏ trống trường này"),
   year: Yup.object()
-    .test("is-not-empty", "Không được để trống trường này", (value) => Object.keys(value).length !== 0)
+    .test(
+      "is-not-empty",
+      "Không được để trống trường này",
+      (value) => Object.keys(value).length !== 0
+    )
     .required("Không bỏ trống trường này"),
   grade: Yup.object().nullable(),
   level:  Yup.object().test("is-not-empty", "Không được để trống trường này", (value) => Object.keys(value).length !== 0)
@@ -62,23 +80,33 @@ export default function UpdateExam({
     year: {},
     numberQuestion: "",
     grade: {},
-    level: {}
+    level: {},
   });
 
   useEffect(() => {
     const fetchDataFromApi = async () => {
       try {
-        const [competitionResponse, gradeResponse, levelResponse] = await Promise.all([
-          updateValue?.competitionId
-            ? restClient({ url: `api/competition/getcompetitionbyid?id=${updateValue.competitionId}`, method: "GET" })
-            : Promise.resolve(null),
-          updateValue?.gradeId
-            ? restClient({ url: `api/grade/getgradebyid/${updateValue.gradeId}?isInclude=false`, method: "GET" })
-            : Promise.resolve(null),
-          updateValue?.levelId
-            ? restClient({ url: `api/level/getlevelbyid?id=${updateValue.levelId}`, method: "GET" })
-            : Promise.resolve(null),
-        ]);
+        const [competitionResponse, gradeResponse, levelResponse] =
+          await Promise.all([
+            updateValue?.competitionId
+              ? restClient({
+                  url: `api/competition/getcompetitionbyid?id=${updateValue.competitionId}`,
+                  method: "GET",
+                })
+              : Promise.resolve(null),
+            updateValue?.gradeId
+              ? restClient({
+                  url: `api/grade/getgradebyid/${updateValue.gradeId}?isInclude=false`,
+                  method: "GET",
+                })
+              : Promise.resolve(null),
+            updateValue?.levelId
+              ? restClient({
+                  url: `api/level/getlevelbyid?id=${updateValue.levelId}`,
+                  method: "GET",
+                })
+              : Promise.resolve(null),
+          ]);
 
         const competitionItem = competitionResponse?.data?.data || {};
         const gradeItem = gradeResponse?.data?.data || {};
@@ -86,13 +114,23 @@ export default function UpdateExam({
         const provinceItem = getProvinceByName(updateValue?.province) || {};
         const yearItem = getYearByYear(updateValue?.year) || {};
 
-        const [competitionListResponse, tagResponse, gradeListResponse, levelListResponse] = await Promise.all([
-          restClient({ url: "api/competition/getallcompetition?status=true", method: "GET" }),
+        const [
+          competitionListResponse,
+          tagResponse,
+          gradeListResponse,
+          levelListResponse,
+        ] = await Promise.all([
+          restClient({
+            url: "api/competition/getallcompetition?status=true",
+            method: "GET",
+          }),
           restClient({ url: "api/tag/getalltag?status=true", method: "GET" }),
-          restClient({ url: `api/grade/getallgradebylevelid?levelId=${updateValue?.levelId}`, method: "GET" }),
+          restClient({
+            url: `api/grade/getallgradebylevelid?levelId=${updateValue?.levelId}`,
+            method: "GET",
+          }),
           restClient({ url: "api/level/getalllevel", method: "GET" }),
         ]);
-        
 
         setCompetitionList(competitionListResponse?.data?.data || []);
         setTagList(tagResponse?.data?.data || []);
@@ -119,7 +157,6 @@ export default function UpdateExam({
         } catch (error) {
           setTag(null);
         }
-
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -176,10 +213,13 @@ export default function UpdateExam({
     } else if (values.level && values.level.id) {
       formData.append("LevelId", values.level.id);
     }
-    tag.forEach((item, index) => formData.append(`tagValues[${index}]`, item.keyWord));
+    tag.forEach((item, index) =>
+      formData.append(`tagValues[${index}]`, item.keyWord)
+    );
 
     if (files.length > 0) formData.append("ExamEssayFileUpload", files[0]);
-    if (fileSolution.length > 0) formData.append("ExamSolutionFileUpload", fileSolution[0]);
+    if (fileSolution.length > 0)
+      formData.append("ExamSolutionFileUpload", fileSolution[0]);
 
     try {
       await restClient({
@@ -204,18 +244,22 @@ export default function UpdateExam({
   const onFileSelect = (e) => setFiles(e.files);
   const onFileSolutionSelect = (e) => setFileSolution(e.files);
 
-  const validationSchema = types === 2
-    ? baseValidationSchema.shape({
-        numberQuestion: Yup.number().required("Không được bỏ trống"),
-      })
-    : baseValidationSchema;
+  const validationSchema =
+    types === 2
+      ? baseValidationSchema.shape({
+          numberQuestion: Yup.number().required("Không được bỏ trống"),
+        })
+      : baseValidationSchema;
 
   return (
     <Dialog
       header="Sửa Đề Thi"
       visible={visibleUpdate}
       style={{ width: "50vw" }}
-      onHide={() => { setVisibleUpdate(false); setTag([]); }}
+      onHide={() => {
+        setVisibleUpdate(false);
+        setTag([]);
+      }}
     >
       {loading ? (
         <Loading />
@@ -313,7 +357,9 @@ export default function UpdateExam({
                     url="/api/upload"
                     accept=".pdf, application/pdf"
                     maxFileSize={10485760}
-                    emptyTemplate={<p className="m-0">Drag and drop files here to upload.</p>}
+                    emptyTemplate={
+                      <p className="m-0">Drag and drop files here to upload.</p>
+                    }
                     className="custom-file-upload mb-2"
                     onSelect={onFileSelect}
                   />
@@ -323,7 +369,9 @@ export default function UpdateExam({
                     url="/api/upload"
                     accept=".pdf, application/pdf"
                     maxFileSize={10485760}
-                    emptyTemplate={<p className="m-0">Drag and drop files here to upload.</p>}
+                    emptyTemplate={
+                      <p className="m-0">Drag and drop files here to upload.</p>
+                    }
                     className="custom-file-upload mb-2"
                     onSelect={onFileSolutionSelect}
                   />
@@ -333,7 +381,10 @@ export default function UpdateExam({
                 <Button
                   className="p-2 bg-red-500 text-white"
                   type="button"
-                  onClick={() => { setVisibleUpdate(false); setTag([]); }}
+                  onClick={() => {
+                    setVisibleUpdate(false);
+                    setTag([]);
+                  }}
                 >
                   Hủy
                 </Button>

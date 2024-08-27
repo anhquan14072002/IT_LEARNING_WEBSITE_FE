@@ -21,6 +21,7 @@ function ImportStepTwo() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const toast = useRef(null);
+  console.log(quizId);
 
   useEffect(() => {
     const handleUpload = async () => {
@@ -217,7 +218,7 @@ function ImportStepTwo() {
           {excelValidateResponse.countSuccess ?? 0} /{" "}
           {(excelValidateResponse.countSuccess ?? 0) +
             (excelValidateResponse.countFail ?? 0)}
-          dòng hợp lệ
+          &nbsp; dòng hợp lệ
         </span>
         <span className="font-bold ">
           {excelValidateResponse.countFail ?? 0} /{" "}
@@ -248,7 +249,7 @@ function ImportStepTwo() {
           />
           <Column
             field="quizAnswers"
-            header="Quiz Answers"
+            header="Câu trả lời"
             body={renderQuizAnswers}
             className="border-b-2 border-t-2"
           />
@@ -279,7 +280,10 @@ function ImportStepTwo() {
 
       <p className="pt-2">
         Tải về tập tin chứa các dòng nhập liệu không thành công
-        <a className="text-blue-700 font-medium" onClick={exportToExcel}>
+        <a
+          className="text-blue-700 font-medium cursor-pointer"
+          onClick={exportToExcel}
+        >
           &nbsp; Tại đây
         </a>
       </p>
