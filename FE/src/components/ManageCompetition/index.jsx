@@ -109,7 +109,6 @@ export default function ManageExam() {
     setVisibleDelete(true);
     confirmDialog({
       message: "Bạn có chắc chắn muốn xóa đề thi này?",
-      header: "Delete Confirmation",
       icon: "pi pi-info-circle",
       defaultFocus: "reject",
       acceptClassName: "p-button-danger",
