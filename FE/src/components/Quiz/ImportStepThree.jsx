@@ -83,7 +83,7 @@ function ImportStepThree(props) {
             Tải về tập tin chứa kết quả nhập khẩu &nbsp;
             <a
               href="#"
-              className="text-blue-700 font-medium"
+              className="text-blue-700 font-medium cursor-pointer"
               onClick={exportToExcel}
             >
               Tại đây
