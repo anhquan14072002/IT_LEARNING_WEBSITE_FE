@@ -70,7 +70,7 @@ export default function ListPractice() {
       params.append("Value", removeVietnameseTones(textSearch.trim()));
     }
 
-    if(isLoggedIn()){
+    if (isLoggedIn()) {
       params.append("UserId", localStorage.getItem("userId"));
     }
 
@@ -105,14 +105,14 @@ export default function ListPractice() {
       .catch((err) => {
         console.error("Error fetching data:", err);
         setProducts([]);
-        setTotalPage(0)
+        setTotalPage(0);
       })
       .finally(() => setLoading(false));
   };
 
   const handleChange = (e) => {
     const newDifficulty = e.target.value;
-    setPage(1)
+    setPage(1);
     setDifficult(newDifficulty);
     navigate(
       `?text=${removeVietnameseTones(
@@ -124,7 +124,7 @@ export default function ListPractice() {
   const handleGradeChange = (e) => {
     const newClassId = e.target.value;
     setClassId(newClassId);
-    setPage(1)
+    setPage(1);
     navigate(
       `?text=${removeVietnameseTones(
         textSearch
@@ -152,7 +152,7 @@ export default function ListPractice() {
         >
           <div className="flex-1 w-[98%] pt-5">
             <div className="m-4 mb-10 flex flex-wrap items-center gap-3 justify-center sm:justify-between">
-              <div className="border-2 border-gray-600 rounded-md p-2">
+              <div className="border-2 border-gray-300 rounded-md p-2">
                 <InputText
                   value={textSearch}
                   placeholder="Tìm kiếm"
@@ -172,7 +172,7 @@ export default function ListPractice() {
                 />
               </div>
               <div className="flex gap-2 flex-wrap">
-                <div className="border-2 border-gray-600 rounded-md p-2">
+                <div className="border-2 border-gray-300 rounded-md p-2">
                   <select
                     name="difficulty"
                     id="difficulty"
@@ -186,7 +186,7 @@ export default function ListPractice() {
                     <option value={3}>Khó</option>
                   </select>
                 </div>
-                <div className="border-2 border-gray-600 rounded-md p-2">
+                <div className="border-2 rounded-md p-2">
                   <select
                     name="grade"
                     id="grade"

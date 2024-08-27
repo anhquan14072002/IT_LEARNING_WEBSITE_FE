@@ -372,7 +372,7 @@ export default function Comment({
                       />
                     </div>
                     <div className="border border-solid border-gray-300 p-4 rounded-xl flex-1">
-                      <div className="flex justify-between">
+                      <div className="flex justify-between flex-wrap">
                         <div>
                           <p className="font-bold">{comment.fullName}</p>
                         </div>

@@ -16,12 +16,12 @@ const validationSchema = Yup.object({
     .trim()
     .required("Tiêu đề không được bỏ trống")
     .min(5, "Tiêu đề phải có ít nhất 5 ký tự")
-    .max(250, "Tiêu đề không được vượt quá 250 ký tự"),
+    .max(50, "Tiêu đề không được vượt quá 50 ký tự"),
   author: Yup.string()
     .trim()
     .required("Tên tác giả không được bỏ trống")
     .min(5, "Tên tác giả phải có ít nhất 5 ký tự")
-    .max(100, "Tên tác giả không được vượt quá 250 ký tự"),
+    .max(50, "Tên tác giả không được vượt quá 50 ký tự"),
   edition: Yup.number()
     .required("Tái bản không được bỏ trống")
     .positive("Tái bản phải lớn hơn 0")

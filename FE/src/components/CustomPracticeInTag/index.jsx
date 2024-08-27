@@ -12,7 +12,7 @@ const CustomPracticeInTag = ({ document }) => {
         onClick={() => navigate(`/codeEditor/${document?.id}`)}
       >
         <div className="text-center mb-4">
-          <p className="text-black hover:text-gray-600 text-2xl font-semibold h-10 overflow-hidden whitespace-nowrap text-ellipsis">
+          <p className="text-black hover:text-gray-600 text-2xl font-semibold h-10 truncate px-3">
             <Tooltip target={`.document-${document?.id}`} />
             <span
               className={`document-${document?.id}`}

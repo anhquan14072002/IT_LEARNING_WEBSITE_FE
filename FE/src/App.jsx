@@ -58,7 +58,7 @@ function App() {
           window.location.href = "/login";
         }
       }
-    }, 5000);
+    }, 1000);
 
     return () => clearInterval(checkToken);
   }, []);
@@ -111,7 +111,7 @@ function App() {
     //       </Routes>
     //     </Router>
 
-    <> 
+    <>
       <Router>
         <Routes>
           <Route path="/" element={<Home />} />
