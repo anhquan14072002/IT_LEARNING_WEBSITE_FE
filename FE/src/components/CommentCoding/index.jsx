@@ -5,7 +5,7 @@ import "codemirror/lib/codemirror.css";
 import "codemirror/theme/material.css";
 import { Button } from "primereact/button";
 import React, { useRef, useState, useEffect } from "react";
-import { isLoggedIn, REJECT, SUCCESS } from "../../utils";
+import { formatDate, isLoggedIn, REJECT, SUCCESS } from "../../utils";
 import { useNavigate } from "react-router-dom";
 import AddSolution from "../AddSolution";
 import { Toast } from "primereact/toast";
@@ -175,6 +175,16 @@ export default function CommentCoding({ id }) {
                       }}
                     />
                   </pre>
+
+                  <div className="p-5 text-end">
+                    <p>
+                      <span className="pi pi-clock font-bold text-blue-600 mr-2"></span>
+                      {solution &&
+                        solution?.createdDate &&
+                        formatDate(solution?.createdDate)}
+                    </p>
+                  </div>
+
                   {isLoggedIn() && user?.sub === solution?.userId && (
                     <div className="mt-3 flex justify-end gap-2 flex-wrap">
                       <button
