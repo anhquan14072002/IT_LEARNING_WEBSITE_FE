@@ -404,7 +404,7 @@ export default function ManageQuestionOfQuizlist() {
                     <InputText
                       onChange={(e) => {
                         handleSearchInput(
-                          removeVietnameseTones(e.target.value)
+                          e.target.value
                         );
                       }}
                       placeholder="Tìm kiếm"

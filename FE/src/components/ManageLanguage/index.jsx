@@ -83,7 +83,7 @@ export default function ManageLanguage() {
           className="text-red-600 shadow-none"
           onClick={() => {
             const userConfirmed = window.confirm(
-              "Are you sure you want to delete this item?"
+              "Bạn có chắc chắn muốn xóa ngôn ngữ này?"
             );
 
             if (userConfirmed) {
@@ -102,8 +102,7 @@ export default function ManageLanguage() {
   const confirmDelete = (id) => {
     setVisibleDelete(true);
     confirmDialog({
-      message: "Bạn có chắc chắn muốn chủ đề này?",
-      header: "Delete Confirmation",
+      message: "Bạn có chắc chắn muốn xóa ngôn ngữ này?",
       icon: "pi pi-info-circle",
       defaultFocus: "reject",
       acceptClassName: "p-button-danger",

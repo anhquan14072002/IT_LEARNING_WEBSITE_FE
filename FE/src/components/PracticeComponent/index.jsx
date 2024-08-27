@@ -91,7 +91,7 @@ export default function PracticeComponent() {
 
   const actionBodyTemplate = (rowData) => {
     const handleDelete = (id) => {
-      if (window.confirm("Are you sure you want to delete this record?")) {
+      if (window.confirm("Bạn có chắc chắn muốn xóa bài này?")) {
         deleteLesson(id); // Call the delete function here
       }
     };
@@ -220,7 +220,7 @@ export default function PracticeComponent() {
           <div className="border-2 rounded-md p-2">
             <InputText
               onChange={(e) => {
-                handleSearchInput(removeVietnameseTones(e.target.value));
+                handleSearchInput(e.target.value);
               }}
               placeholder="Tìm kiếm"
               className="flex-1 focus:outline-none w-36 focus:ring-0"

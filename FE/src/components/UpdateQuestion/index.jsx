@@ -118,7 +118,7 @@ const UpdateQuestion = ({
               );
 
               setInitialValues({
-                content: updateValue.keyWord || "",
+                content: updateValue.content || "",
                 type: typeObject || {},
                 questionLevel:
                   questionLevelData.find(

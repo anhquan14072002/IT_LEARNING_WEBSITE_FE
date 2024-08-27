@@ -136,24 +136,19 @@ export default function Quiz() {
             {loading ? (
               <Loading />
             ) : (
-              <div className="w-full">
+              <>
                 {quiz.length === 0 ? (
                   <p className="text-center">Quiz rỗng.</p>
                 ) : (
                   <>
-                    {/* Flashcard Display */}
-                    <div className="flex items-center justify-center">
-                      <div>
-                        <Flashcard
-                          flashcard={quiz[currentCardIndex]}
-                          showAnswer={showAnswer}
-                          setShowAnswer={setShowAnswer}
-                        />
-                      </div>
-                    </div>
+                    <Flashcard
+                      flashcard={quiz[currentCardIndex]}
+                      showAnswer={showAnswer}
+                      setShowAnswer={setShowAnswer}
+                    />
                   </>
                 )}
-              </div>
+              </>
             )}
           </div>
           {quiz.length > 0 && (

@@ -109,7 +109,6 @@ export default function ManageExam() {
     setVisibleDelete(true);
     confirmDialog({
       message: "Bạn có chắc chắn muốn xóa đề thi này?",
-      header: "Delete Confirmation",
       icon: "pi pi-info-circle",
       defaultFocus: "reject",
       acceptClassName: "p-button-danger",
@@ -229,7 +228,7 @@ export default function ManageExam() {
             <div className="border-2 rounded-md p-2">
               <InputText
                 onChange={(e) => {
-                  handleSearchInput(removeVietnameseTones(e.target.value));
+                  handleSearchInput(e.target.value);
                 }}
                 placeholder="Tìm Kiếm"
                 className="flex-1 focus:outline-none w-36 focus:ring-0"

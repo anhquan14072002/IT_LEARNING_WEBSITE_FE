@@ -6,13 +6,14 @@ import axios from "axios";
 import { BASE_URL } from "../../services/restClient";
 import { ConfirmDialog, confirmDialog } from "primereact/confirmdialog";
 import { Button } from "primereact/button";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Loading from "../Loading";
 import { getTokenFromLocalStorage, REJECT } from "../../utils";
 import { Toast } from "primereact/toast";
 
 import { Dialog } from "primereact/dialog";
 function ImportStepTwo() {
+  const {id} = useParams();
   const [excelValidateResponse, setExcelValidateResponse] = useState([]);
   const { formData, file, checkRecord, idImportResult, quizId } =
     useContext(FormDataContext);
