@@ -21,7 +21,7 @@ const CustomQuiz = ({ document }) => {
         <div className="text-center mb-4">
           <Tooltip target=".document-title" />
           <p
-            className="text-black text-2xl font-semibold h-16 overflow-hidden text-ellipsis document-title"
+            className="text-black text-2xl font-semibold h-16 document-title"
             data-pr-tooltip={document?.title} // Tooltip content for title
             data-pr-position="top" // Positioning tooltip
           >

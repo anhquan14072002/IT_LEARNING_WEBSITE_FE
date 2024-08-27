@@ -222,7 +222,7 @@ export default function PracticeComponent() {
               onChange={(e) => {
                 handleSearchInput(removeVietnameseTones(e.target.value));
               }}
-              placeholder="Search"
+              placeholder="Tìm kiếm"
               className="flex-1 focus:outline-none w-36 focus:ring-0"
             />
             <Button
