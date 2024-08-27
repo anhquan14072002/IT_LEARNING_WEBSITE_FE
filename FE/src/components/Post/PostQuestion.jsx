@@ -49,7 +49,7 @@ function PostQuestion({ post, isFavoritePost }) {
       userSendName: `${user?.family_name} ${user?.given_name}`,
       userReceiveId: user?.sub,
       userReceiveName: `${user?.family_name} ${user?.given_name}`,
-      description: `Bạn đã thu hồi bài post thành công`,
+      description: `Bạn đã thu hồi bài viết thành công`,
       notificationTime: new Date(),
       isRead: false,
       link: `${BASE_URL_FE}/post/${-1}`,
@@ -173,7 +173,7 @@ function PostQuestion({ post, isFavoritePost }) {
           {userId === user?.sub && isLoggedIn() && (
             <span>
               <a className="cursor-pointer" onClick={editPost}>
-                Chỉnh sửa bài post
+                Chỉnh sửa bài viết
               </a>
             </span>
           )}

@@ -90,7 +90,7 @@ function PostWrite({ setCompose, compose }) {
 
   const onSubmit = async (values) => {
     if (description.trim() === "") {
-      ACCEPT(toast, "Bạn cần nhập thêm nội dung bài post ? ");
+      ACCEPT(toast, "Bạn cần nhập thêm nội dung bài viết ? ");
       return;
     }
     if (containsRudeWords(description)) {
@@ -134,7 +134,7 @@ function PostWrite({ setCompose, compose }) {
       userSendName: `${user?.family_name} ${user?.given_name}`,
       userReceiveId: user?.sub,
       userReceiveName: `${user?.family_name} ${user?.given_name}`,
-      description: `Bạn vừa ${postId ? "sửa" : "tạo"} bài post thành công`,
+      description: `Bạn vừa ${postId ? "sửa" : "tạo"} bài viết thành công`,
       notificationTime: new Date(),
       isRead: false,
       link: `${BASE_URL_FE}/post/${id}`,
