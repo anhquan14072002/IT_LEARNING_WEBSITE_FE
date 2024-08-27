@@ -97,7 +97,7 @@ const ExamDetail = () => {
     // Create payload
     const payload = {
       userId: userId,
-      examCodeId: data.id,
+      examCodeId:selectedExamCode?.id ?selectedExamCode?.id : data?.id,
       userAnswerDtos: formattedAnswers,
     };
 
