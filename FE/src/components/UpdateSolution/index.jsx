@@ -10,6 +10,7 @@ import "codemirror/theme/material.css";
 import { Editor } from "primereact/editor";
 import { useSelector } from "react-redux";
 import restClient from "../../services/restClient";
+import Loading from "../Loading";
 
 const UpdateSolution = ({
   visible,
@@ -23,6 +24,7 @@ const UpdateSolution = ({
   const [description, setDescription] = useState("");
   const [code, setCode] = useState("");
   const user = useSelector((state) => state.user.value);
+  const [loading ,setLoading] = useState(false)
 
   useEffect(() => {
     if (visible) {
@@ -33,6 +35,7 @@ const UpdateSolution = ({
   }, [updateValue]);
 
   const handleSubmit = () => {
+    
     if (title.trim().length < 5) {
       REJECT(toast, "Vui lòng nhập tiêu đề lớn hơn 5 kí tự");
       return;
@@ -41,31 +44,16 @@ const UpdateSolution = ({
       REJECT(toast, "Vui lòng nhập tiêu đề nhỏ hơn 250 kí tự");
       return;
     }
-    if (!title || !description || !code) {
+    if (!title.trim() || !description || ( typeof(description) === "string" && !description.trim() ) || !code.trim() ) {
       REJECT(
         toast,
         "Vui lòng không để trống các trường đánh dấu bắt buộc nhập"
       );
       return;
-    }
-    if (!title.trim() || !description.trim() || !code.trim()) {
-      REJECT(
-        toast,
-        "Vui lòng không để trống các trường đánh dấu bắt buộc nhập"
-      );
-      return;
-    }
-    if (
-      title.trim() === "" ||
-      description.trim() === "" ||
-      code.trim() === ""
-    ) {
-      REJECT(
-        toast,
-        "Vui lòng không để trống các trường đánh dấu bắt buộc nhập"
-      );
-      return;
-    }
+    } 
+
+    setLoading(true)
+
     restClient({
       url: "api/solution/updatesolution",
       method: "PUT",
@@ -91,19 +79,22 @@ const UpdateSolution = ({
         setTitle("");
         setDescription("");
         setCode("");
+        setLoading(false);
       });
   };
 
   return (
     <Dialog
-      header="Cập nhật lời giải"
+      header="Cập nhật bình luận"
       visible={visible}
       style={{ width: "50vw" }}
       onHide={() => {
         setVisible(false);
       }}
     >
-      <div className="mb-5">
+      {loading ? (<Loading />) : (
+        <>
+        <div className="mb-5">
         <h1>
           Tiêu đề<span className="text-red-500">*</span>
         </h1>
@@ -117,7 +108,7 @@ const UpdateSolution = ({
 
       <div>
         <h1>
-          Mô tả
+          Mô tả<span className="text-red-500">*</span>
         </h1>
         <Editor
           style={{ height: "300px" }}
@@ -168,6 +159,8 @@ const UpdateSolution = ({
           Cập nhật
         </Button>
       </div>
+        </>
+      )}
     </Dialog>
   );
 };
