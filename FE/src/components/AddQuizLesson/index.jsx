@@ -22,9 +22,6 @@ const validationSchema = Yup.object({
     .min(5, "Tiêu đề phải có ít nhất 5 ký tự")
     .max(50, "Tiêu đề không được vượt quá 50 ký tự"),
   description: Yup.string().required("Mô tả không được bỏ trống"),
-  score: Yup.number()
-    .required("Điểm không được bỏ trống và lớn hơn 0")
-    .min(0, "Điểm phải lớn hơn hoặc bằng 0"),
   grade: Yup.object()
     .test("is-not-empty", "Không được để trống trường này", (value) => {
       return Object.keys(value).length !== 0; // Check if object is not empty
@@ -54,7 +51,6 @@ export default function AddQuizLesson({
     grade: {},
     description: "",
     document: {},
-    score: null,
     topic: {},
     lesson: {},
   });
@@ -128,7 +124,7 @@ export default function AddQuizLesson({
       type: 1,
       gradeId: values?.grade?.id,
       description: values?.description,
-      score: values?.score,
+      score: 10,
       topicId: values?.topic?.id || null, // Default to null if topic.id is not present
       isActive: true,
     };
@@ -347,12 +343,6 @@ export default function AddQuizLesson({
                   filter
                 />
               </div>
-              <CustomTextInput
-                label="Điểm"
-                name="score"
-                type="number"
-                id="score"
-              />
 
               <div>
                 <CustomEditor

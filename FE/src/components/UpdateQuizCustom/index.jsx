@@ -24,9 +24,6 @@ const validationSchema = Yup.object({
     .min(5, "Tiêu đề phải có ít nhất 5 ký tự")
     .max(50, "Tiêu đề không được vượt quá 50 ký tự"),
   description: Yup.string().required("Mô tả không được bỏ trống"),
-  score: Yup.number()
-    .required("Điểm không được bỏ trống và lớn hơn 0")
-    .min(0, "Điểm phải lớn hơn hoặc bằng 0"),
   type: Yup.object()
     .test("is-not-empty", "Không được để trống trường này", (value) => {
       return Object.keys(value).length !== 0; // Check if object is not empty
@@ -49,7 +46,6 @@ export default function UpdateQuizCustom({
   const [initialValues, setInitialValues] = useState({
     title: "",
     description: "",
-    score: null,
     type: {},
     grade: {},
   });
@@ -347,7 +343,7 @@ export default function UpdateQuizCustom({
       title: values?.title,
       type: values?.type?.id,
       description: values.description,
-      score: values.score,
+      score: 10,
       isActive: true,
       tagValues: tagValues,
       gradeId: values?.grade?.id,
@@ -384,6 +380,7 @@ export default function UpdateQuizCustom({
       })
       .finally(() => {
         setVisibleUpdate(false);
+        setTag();
       });
   };
 
@@ -426,13 +423,6 @@ export default function UpdateQuizCustom({
                 name="type"
                 id="type"
                 options={typeList}
-              />
-
-              <CustomTextInput
-                label="Điểm"
-                name="score"
-                type="number"
-                id="score"
               />
 
               <div>
