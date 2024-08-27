@@ -280,7 +280,10 @@ function ImportStepTwo() {
 
       <p className="pt-2">
         Tải về tập tin chứa các dòng nhập liệu không thành công
-        <a className="text-blue-700 font-medium" onClick={exportToExcel}>
+        <a
+          className="text-blue-700 font-medium cursor-pointer"
+          onClick={exportToExcel}
+        >
           &nbsp; Tại đây
         </a>
       </p>
