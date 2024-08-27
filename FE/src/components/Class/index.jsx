@@ -4,6 +4,7 @@ import { getDocumentByGradeId } from "../../services/document.api";
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Tooltip } from "primereact/tooltip";
+import { ThreeDots } from "react-loader-spinner";
 
 export default function Class({ item, index }) {
   const [toggle, setToggle] = useState(false);
@@ -142,171 +143,186 @@ export default function Class({ item, index }) {
         }}
         className="flex gap-5 flex-wrap overflow-hidden"
       >
-        <div className="flex gap-20 flex-wrap">
-          <div>
-            <h1 className="font-bold mb-3">Các bộ sách</h1>
-            {(documentList?.documents ?? [])
-              .map((d, index) => (
-                <>
-                  <Tooltip target={`.tooltip-lesson-${index}`} />
-                  <h1
-                    key={d?.id}
-                    className={`cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis `}
-                    style={{ width: "350px" }} // Fixed width
-                    onClick={() => navigate(`/document/${d?.id}`)}
-                  >
-                    <span
-                      className={`tooltip-lesson-${index}`}
-                      data-pr-tooltip={d?.title}
-                      data-pr-position="top" // Positioning tooltip
-                    >
-                      {d?.title}
-                    </span>
-                  </h1>
-                </>
-              ))
-              .slice(0, 4)}
-            {(documentList?.documents ?? []).length > 4 && (
-              <h1
-                className="text-sm text-blue-600 mt-3 cursor-pointer"
-                onClick={() => navigate(`/search?classId=${item?.id}`)}
-              >
-                Xem tất cả
-              </h1>
-            )}
+        {loading ? (
+          <div className="flex justify-center w-full gap-20 flex-wrap">
+            <ThreeDots
+              visible={true}
+              height="80"
+              width="80"
+              color="#4fa94d"
+              radius="9"
+              ariaLabel="three-dots-loading"
+              wrapperStyle={{}}
+              wrapperClass=""
+            />
           </div>
+        ) : (
+          <div className="flex gap-20 flex-wrap">
+            <div>
+              <h1 className="font-bold mb-3">Các bộ sách</h1>
+              {(documentList?.documents ?? [])
+                .map((d, index) => (
+                  <>
+                    <Tooltip target={`.tooltip-lesson-${index}`} />
+                    <h1
+                      key={d?.id}
+                      className={`cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis `}
+                      style={{ width: "350px" }} // Fixed width
+                      onClick={() => navigate(`/document/${d?.id}`)}
+                    >
+                      <span
+                        className={`tooltip-lesson-${index}`}
+                        data-pr-tooltip={d?.title}
+                        data-pr-position="top" // Positioning tooltip
+                      >
+                        {d?.title}
+                      </span>
+                    </h1>
+                  </>
+                ))
+                .slice(0, 4)}
+              {(documentList?.documents ?? []).length > 4 && (
+                <h1
+                  className="text-sm text-blue-600 mt-3 cursor-pointer"
+                  onClick={() => navigate(`/search?classId=${item?.id}`)}
+                >
+                  Xem tất cả
+                </h1>
+              )}
+            </div>
 
-          <div>
-            <h1 className="font-bold mb-3">Câu hỏi ôn tập flashcard</h1>
-            {practiceQuizzes
-              .map((d, index) => (
-                <>
-                  <Tooltip target={`.tooltip-flashcard-${index}`} />
+            <div>
+              <h1 className="font-bold mb-3">Câu hỏi ôn tập flashcard</h1>
+              {practiceQuizzes
+                .map((d, index) => (
+                  <>
+                    <Tooltip target={`.tooltip-flashcard-${index}`} />
+                    <h1
+                      key={d?.id}
+                      className={`cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis tooltip-flashcard-${index}`}
+                      style={{ width: "300px" }} // Fixed width
+                      onClick={() => navigate(`/flashcard/${d?.id}`)}
+                    >
+                      <span
+                        className={`tooltip-flashcard-${index}`}
+                        data-pr-tooltip={d?.title}
+                        data-pr-position="top" // Positioning tooltip
+                      >
+                        {d?.title}
+                      </span>
+                    </h1>
+                  </>
+                ))
+                .slice(0, 4)}
+              {practiceQuizzes?.length > 4 && (
+                <h1
+                  className="text-sm text-blue-600 mt-3 cursor-pointer"
+                  onClick={() =>
+                    navigate(`/searchquiz?type=1&classId=${item?.id}`)
+                  }
+                >
+                  Xem tất cả
+                </h1>
+              )}
+            </div>
+
+            <div>
+              <h1 className="font-bold mb-3">Câu hỏi ôn tập trắc nghiệm</h1>
+              {testQuizzes
+                ?.map((d) => (
+                  <>
+                    <Tooltip target={`.tooltip-flashcardTest-${index}`} />
+                    <h1
+                      key={d?.id}
+                      className={`cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis tooltip-flashcardTest-${index}`}
+                      style={{ width: "300px" }}
+                      onClick={() => navigate(`/testquiz/${d.id}`)}
+                    >
+                      <span
+                        className={`tooltip-flashcardTest-${index}`}
+                        data-pr-tooltip={d?.title}
+                        data-pr-position="top" // Positioning tooltip
+                      >
+                        {d?.title}
+                      </span>
+                    </h1>
+                  </>
+                ))
+                .slice(0, 4)}
+              {testQuizzes.length > 4 && (
+                <h1
+                  className="text-sm text-blue-600 mt-3 cursor-pointer"
+                  onClick={() =>
+                    navigate(`/searchquiz?type=2&classId=${item?.id}`)
+                  }
+                >
+                  Xem tất cả
+                </h1>
+              )}
+            </div>
+
+            <div>
+              <h1 className="font-bold mb-3">Đề thi</h1>
+              {(documentList?.exams ?? [])
+                .map((exam, index) => (
                   <h1
-                    key={d?.id}
-                    className={`cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis tooltip-flashcard-${index}`}
+                    key={exam?.id}
+                    className={`cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis tooltip-exam-${index}`}
                     style={{ width: "300px" }} // Fixed width
-                    onClick={() => navigate(`/flashcard/${d?.id}`)}
+                    onClick={() => handleExam(exam)}
                   >
+                    <Tooltip target={`.tooltip-exam-${index}`} />
                     <span
-                      className={`tooltip-flashcard-${index}`}
-                      data-pr-tooltip={d?.title}
+                      className={`tooltip-exam-${index}`}
+                      data-pr-tooltip={exam?.title}
                       data-pr-position="top" // Positioning tooltip
                     >
-                      {d?.title}
+                      {exam?.title}
                     </span>
                   </h1>
-                </>
-              ))
-              .slice(0, 4)}
-            {practiceQuizzes?.length > 4 && (
-              <h1
-                className="text-sm text-blue-600 mt-3 cursor-pointer"
-                onClick={() =>
-                  navigate(`/searchquiz?type=1&classId=${item?.id}`)
-                }
-              >
-                Xem tất cả
-              </h1>
-            )}
-          </div>
+                ))
+                .slice(0, 4)}
+              {(documentList?.exams ?? []).length > 4 && (
+                <h1
+                  className="text-sm text-blue-600 mt-3 cursor-pointer"
+                  onClick={() => navigate(`/viewexam`)}
+                >
+                  Xem tất cả
+                </h1>
+              )}
+            </div>
 
-          <div>
-            <h1 className="font-bold mb-3">Câu hỏi ôn tập trắc nghiệm</h1>
-            {testQuizzes
-              ?.map((d) => (
-                <>
-                  <Tooltip target={`.tooltip-flashcardTest-${index}`} />
+            <div>
+              <h1 className="font-bold mb-3">Bài tập</h1>
+              {getAllProblems(documentList)
+                .map((problem) => (
                   <h1
-                    key={d?.id}
-                    className={`cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis tooltip-flashcardTest-${index}`}
-                    style={{ width: "300px" }}
-                    onClick={() => navigate(`/testquiz/${d.id}`)}
+                    key={problem?.id}
+                    className={`cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis tooltip-problem-${index}`}
+                    style={{ width: "200px" }} // Fixed width
+                    onClick={() => navigate(`/codeEditor/${problem?.id}`)}
                   >
+                    <Tooltip target={`.tooltip-problem-${index}`} />
                     <span
-                      className={`tooltip-flashcardTest-${index}`}
-                      data-pr-tooltip={d?.title}
-                      data-pr-position="top" // Positioning tooltip
+                      className={`tooltip-problem-${index}`}
+                      data-pr-tooltip={problem?.title}
                     >
-                      {d?.title}
+                      {problem?.title}
                     </span>
                   </h1>
-                </>
-              ))
-              .slice(0, 4)}
-            {testQuizzes.length > 4 && (
-              <h1
-                className="text-sm text-blue-600 mt-3 cursor-pointer"
-                onClick={() =>
-                  navigate(`/searchquiz?type=2&classId=${item?.id}`)
-                }
-              >
-                Xem tất cả
-              </h1>
-            )}
-          </div>
-
-          <div>
-            <h1 className="font-bold mb-3">Đề thi</h1>
-            {(documentList?.exams ?? [])
-              .map((exam, index) => (
+                ))
+                .slice(0, 4)}
+              {getAllProblems(documentList).length > 4 && (
                 <h1
-                  key={exam?.id}
-                  className={`cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis tooltip-exam-${index}`}
-                  style={{ width: "300px" }} // Fixed width
-                  onClick={() => handleExam(exam)}
+                  className="text-sm text-blue-600 mt-3 cursor-pointer"
+                  onClick={() => navigate(`/listpractice?classId=${item?.id}`)}
                 >
-                  <Tooltip target={`.tooltip-exam-${index}`} />
-                  <span
-                    className={`tooltip-exam-${index}`}
-                    data-pr-tooltip={exam?.title}
-                    data-pr-position="top" // Positioning tooltip
-                  >
-                    {exam?.title}
-                  </span>
+                  Xem tất cả
                 </h1>
-              ))
-              .slice(0, 4)}
-            {(documentList?.exams ?? []).length > 4 && (
-              <h1
-                className="text-sm text-blue-600 mt-3 cursor-pointer"
-                onClick={() => navigate(`/viewexam`)}
-              >
-                Xem tất cả
-              </h1>
-            )}
+              )}
+            </div>
           </div>
-
-          <div>
-            <h1 className="font-bold mb-3">Bài tập</h1>
-            {getAllProblems(documentList)
-              .map((problem) => (
-                <h1
-                  key={problem?.id}
-                  className={`cursor-pointer hover:opacity-85 overflow-hidden whitespace-nowrap text-ellipsis tooltip-problem-${index}`}
-                  style={{ width: "200px" }} // Fixed width
-                  onClick={() => navigate(`/codeEditor/${problem?.id}`)}
-                >
-                  <Tooltip target={`.tooltip-problem-${index}`} />
-                  <span
-                    className={`tooltip-problem-${index}`}
-                    data-pr-tooltip={problem?.title}
-                  >
-                    {problem?.title}
-                  </span>
-                </h1>
-              ))
-              .slice(0, 4)}
-            {getAllProblems(documentList).length > 4 && (
-              <h1
-                className="text-sm text-blue-600 mt-3 cursor-pointer"
-                onClick={() => navigate(`/listpractice?classId=${item?.id}`)}
-              >
-                Xem tất cả
-              </h1>
-            )}
-          </div>
-        </div>
+        )}
       </div>
     </div>
   );

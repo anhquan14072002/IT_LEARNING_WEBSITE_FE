@@ -50,7 +50,7 @@ const CustomCard = ({ document }) => {
           <Tooltip target=".document-title" />
 
           <p
-            className="text-black text-base font-semibold h-10 overflow-hidden whitespace-nowrap text-ellipsis document-title"
+            className="text-black text-base font-semibold h-10 document-title mb-5" 
             data-pr-tooltip={document?.title} // Tooltip content for title
             data-pr-position="top" // Positioning tooltip
           >
@@ -61,7 +61,7 @@ const CustomCard = ({ document }) => {
           <Tooltip target=".author-tooltip" />
 
           <p
-            className="text-gray-600 text-sm mt-1 truncate author-tooltip"
+            className="text-gray-600 text-sm mt-1 author-tooltip"
             data-pr-tooltip={document?.author}
             data-pr-position="top" // Positioning tooltip
           >

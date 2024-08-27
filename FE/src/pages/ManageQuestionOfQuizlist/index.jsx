@@ -379,7 +379,7 @@ export default function ManageQuestionOfQuizlist() {
             />
             <div>
               <div className="flex justify-between pt-1">
-                <h1 className="font-bold text-3xl">Câu hỏi quiz</h1>
+                <h1 className="font-bold text-3xl">Danh sách câu hỏi trong bộ</h1>
                 <div className="flex gap-5">
                   <Button
                     label="Import câu hỏi"
