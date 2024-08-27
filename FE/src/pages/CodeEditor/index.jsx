@@ -26,7 +26,7 @@ import { useSelector } from "react-redux";
 import { Tooltip } from "primereact/tooltip";
 import { ProgressSpinner } from "primereact/progressspinner";
 import CommentCoding from "../../components/CommentCoding";
-import SubmitCoding from "../../components/SubmitCoding";
+import SubmitCCommentoding from "../../components/SubmitCoding";
 import NotifyProvider from "../../store/NotificationContext";
 
 const CodeEditor = () => {
