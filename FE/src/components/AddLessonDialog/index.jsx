@@ -40,7 +40,7 @@ export default function AddLessonDialog({
       .trim()
       .required("Tiêu đề không được bỏ trống")
       .min(5, "Tiêu đề phải có ít nhất 5 ký tự")
-      .max(250, "Tiêu đề không được vượt quá 250 ký tự"),
+      .max(50, "Tiêu đề không được vượt quá 50 ký tự"),
     ...(inputContet && {
       content: Yup.string().required("Mô tả không được bỏ trống"),
     }),

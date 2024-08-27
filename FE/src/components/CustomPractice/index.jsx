@@ -14,7 +14,7 @@ const CustomPractice = ({ document }) => {
       >
         <div className="text-center mb-4">
           <p
-            className="text-black hover:text-gray-600 text-2xl font-semibold h-10 title-practice"
+            className="text-black hover:text-gray-600 text-2xl font-semibold h-10 overflow-hidden whitespace-nowrap text-ellipsis title-practice px-5"
             data-pr-tooltip={document?.title}
             data-pr-position="top"
           >

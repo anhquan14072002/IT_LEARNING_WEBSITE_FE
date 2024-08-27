@@ -28,6 +28,7 @@ import { ProgressSpinner } from "primereact/progressspinner";
 import CommentCoding from "../../components/CommentCoding";
 import SubmitCCommentoding from "../../components/SubmitCoding";
 import NotifyProvider from "../../store/NotificationContext";
+import SubmitCoding from "../../components/SubmitCoding";
 
 const CodeEditor = () => {
   const toast = useRef(null);
