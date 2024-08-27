@@ -377,7 +377,7 @@ export default function Topic() {
                         {quizByTopic.map((quiz, index) => (
                           <div
                             key={quiz.id}
-                            className="bg-green-100 text-green-800 text-sm font-medium px-3 py-3 rounded-full shadow-sm hover:bg-green-200 transition-colors cursor-pointer w-full sm:w-1/2 md:w-1/3 lg:w-1/4"
+                            className="bg-green-100 text-green-800 text-sm font-medium px-3 py-3 rounded-full shadow-sm hover:bg-green-200 transition-colors cursor-pointer w-full sm:w-1/2"
                             onClick={() => navigate("/flashcard/" + quiz.id)}
                           >
                             <Tooltip target={`.quiz-${index}`} />
@@ -406,7 +406,7 @@ export default function Topic() {
                         {problemByTopic.map((problem, index) => (
                           <div
                             key={problem.id}
-                            className="bg-yellow-100 text-yellow-800 text-sm font-medium px-3 py-3 rounded-full shadow-sm hover:bg-yellow-200 transition-colors cursor-pointer w-full sm:w-1/2 md:w-1/3 lg:w-1/4"
+                            className="bg-yellow-100 text-yellow-800 text-sm font-medium px-3 py-3 rounded-full shadow-sm hover:bg-yellow-200 transition-colors cursor-pointer w-full sm:w-1/2"
                             onClick={() =>
                               navigate("/codeeditor/" + problem.id)
                             }
