@@ -306,6 +306,7 @@ export default function Class({ item, index }) {
                     <span
                       className={`tooltip-problem-${index}`}
                       data-pr-tooltip={problem?.title}
+                      data-pr-position="top" // Positioning tooltip
                     >
                       {problem?.title}
                     </span>
