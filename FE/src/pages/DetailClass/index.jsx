@@ -67,7 +67,12 @@ export default function DetailClass() {
   const problemExtract = extractProblems(documentList);
   const testQuizzes = extractQuizzesByType(2);
 
-  if (loading) return <Loading />;
+  if (loading)
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <Loading />
+      </div>
+    );
 
   return (
     <NotifyProvider>
