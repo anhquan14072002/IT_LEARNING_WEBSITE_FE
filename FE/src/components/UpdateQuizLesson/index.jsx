@@ -22,9 +22,6 @@ const validationSchema = Yup.object({
     .min(5, "Tiêu đề phải có ít nhất 5 ký tự")
     .max(50, "Tiêu đề không được vượt quá 50 ký tự"),
   description: Yup.string().required("Mô tả không được bỏ trống"),
-  score: Yup.number()
-    .required("Điểm không được bỏ trống và lớn hơn 0")
-    .min(0, "Điểm phải lớn hơn hoặc bằng 0"),
   grade: Yup.object()
     .test("is-not-empty", "Không được để trống trường này", (value) => {
       return Object.keys(value).length !== 0; // Check if object is not empty
@@ -55,7 +52,6 @@ export default function UpdateQuizLesson({
     grade: {},
     description: "",
     document: {},
-    score: null,
     topic: {},
     lesson: {},
   });
@@ -212,7 +208,6 @@ export default function UpdateQuizLesson({
         } catch (error) {
           setTag(null);
         }
-
       } catch (err) {
         console.error("Error fetching data:", err);
       } finally {
@@ -243,7 +238,7 @@ export default function UpdateQuizLesson({
       title: values.title,
       type: 1,
       description: values.description,
-      score: values.score,
+      score: 10,
       gradeId: values?.grade?.id,
       topicId: values.topic.id,
       tagValues,
@@ -256,7 +251,7 @@ export default function UpdateQuizLesson({
         type: 1,
         description: values.description,
         gradeId: values?.grade?.id,
-        score: values.score,
+        score: 10,
         topicId: null,
         lessonId: values.lesson.id,
         isActive: true,
@@ -267,9 +262,6 @@ export default function UpdateQuizLesson({
       url: "api/quiz/updatequiz",
       method: "PUT",
       data: model,
-      headers: {
-        Authorization: `Bearer ${getTokenFromLocalStorage()}`,
-      },
     })
       .then((res) => {
         SUCCESS(toast, "Cập nhật bài quiz thành công");
@@ -448,13 +440,6 @@ export default function UpdateQuizLesson({
                 name="title"
                 type="text"
                 id="title"
-              />
-
-              <CustomTextInput
-                label="Điểm"
-                name="score"
-                type="number"
-                id="score"
               />
 
               <div>

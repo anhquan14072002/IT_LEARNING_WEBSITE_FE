@@ -24,9 +24,6 @@ const validationSchema = Yup.object({
     .min(5, "Tiêu đề phải có ít nhất 5 ký tự")
     .max(50, "Tiêu đề không được vượt quá 50 ký tự"),
   description: Yup.string().required("Mô tả không được bỏ trống"),
-  score: Yup.number()
-    .required("Điểm không được bỏ trống và lớn hơn 0")
-    .min(0, "Điểm phải lớn hơn hoặc bằng 0"),
   type: Yup.object()
     .test("is-not-empty", "Không được để trống trường này", (value) => {
       return Object.keys(value).length !== 0; // Check if object is not empty
@@ -48,7 +45,6 @@ export default function AddQuizLesson({
   const [initialValues, setInitialValues] = useState({
     title: "",
     description: "",
-    score: null,
     type: {},
     grade: {},
   });
@@ -247,7 +243,7 @@ export default function AddQuizLesson({
       if (tagValues.length === 0) {
         model = {
           title: values?.title,
-          score: values?.score,
+          score: 10,
           type: values?.type?.id,
           description: values?.description,
           isActive: true,
@@ -256,7 +252,7 @@ export default function AddQuizLesson({
       } else if (tagValues.length > 0) {
         model = {
           title: values?.title,
-          score: values?.score,
+          score: 10,
           type: values?.type?.id,
           description: values?.description,
           tagValues: tagValues,
@@ -292,6 +288,7 @@ export default function AddQuizLesson({
           REJECT(toast, "Xảy ra lỗi khi thêm");
         })
         .finally(() => {
+          setTag();
           setVisible(false);
           fetchData();
         });
@@ -339,12 +336,6 @@ export default function AddQuizLesson({
                 options={typeQuiz}
               />
 
-              <CustomTextInput
-                label="Điểm"
-                name="score"
-                type="number"
-                id="score"
-              />
               <div>
                 <>
                   <span>Tag</span>
