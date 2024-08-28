@@ -326,9 +326,11 @@ const UpdateQuestion = ({
           toast,
           "Vui lòng nhập đủ đáp án và không được nhập đáp án là khoảng trắng"
         );
+        return;
       } else if (handleMultipleCorrect(multipleAnswer)) {
         REJECT(toast, "Vui lòng chọn hai đáp án đúng trở lên cho câu hỏi");
-      } else {
+        return;
+      }
         // Create a new FormData object
         let formData = new FormData();
 
@@ -363,13 +365,21 @@ const UpdateQuestion = ({
             fetchData();
           })
           .catch((err) => {
-            REJECT(toast, err.message);
+            if (err.response && err.response.data) {
+              const { message } = err.response.data;
+              if (message === "Question is six answer and more than 1 correct answer !!!") {
+                REJECT(toast, "Câu hỏi có sáu câu trả lời và cần có nhiều hơn 1 câu trả lời đúng !!!");
+              } else {
+                REJECT(toast, "Xảy ra lỗi khi cập nhật câu hỏi");
+              }
+            } else {
+              REJECT(toast, "Xảy ra lỗi khi cập nhật câu hỏi");
+            }
           })
           .finally(() => {
             setVisibleUpdate(false);
             setLoading(false);
           });
-      }
     }
   };
 
