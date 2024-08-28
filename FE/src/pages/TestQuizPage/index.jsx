@@ -10,6 +10,7 @@ import Menu from "../../components/Menu";
 import Footer from "../../components/Footer";
 import { isLoggedIn } from "../../utils";
 import NotifyProvider from "../../store/NotificationContext";
+import LoadingFull from "../../components/LoadingFull";
 
 export default function TestQuizPage() {
   const [quizData, setQuizData] = useState([]);
@@ -69,7 +70,9 @@ export default function TestQuizPage() {
   if (!isLoggedIn()) {
     return (
       <div className="flex flex-col items-center justify-center min-h-screen">
-        <p className="text-xl font-bold mb-4">Bạn phải đăng nhập để làm bộ câu hỏi ôn tập trắc nghiệm</p>
+        <p className="text-xl font-bold mb-4">
+          Bạn phải đăng nhập để làm bộ câu hỏi ôn tập trắc nghiệm
+        </p>
         <button
           onClick={() => navigate("/login")}
           className="bg-blue-500 text-white px-4 py-2 rounded"
@@ -93,14 +96,20 @@ export default function TestQuizPage() {
             style={{ paddingTop: `${fixedDivHeight}px` }}
             className="min-h-screen"
           >
-            <div className="text-center mt-16 text-2xl font-bold text-gray-500">Đề thi không có câu hỏi sẵn có</div>
+            <div className="text-center mt-16 text-2xl font-bold text-gray-500">
+              Đề thi không có câu hỏi sẵn có
+            </div>
           </div>
         ) : (
           <div
             style={{ paddingTop: `${fixedDivHeight}px` }}
             className="min-h-screen"
           >
-            <ViewQuestionInTest quizData={quizData} quizDetail={quizDetail} />
+            {loading ? (
+              <LoadingFull />
+            ) : (
+              <ViewQuestionInTest quizData={quizData} quizDetail={quizDetail} />
+            )}
           </div>
         )}
 
