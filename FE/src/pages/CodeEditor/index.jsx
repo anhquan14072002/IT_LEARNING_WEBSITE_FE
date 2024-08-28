@@ -150,7 +150,6 @@ const CodeEditor = () => {
   useEffect(() => {
     restClient({ url: "api/executecode/getallexecutecodebyproblemid/" + id })
       .then((res) => {
-
         setLanguage(
           (res.data?.data &&
             Array.isArray(res.data?.data) &&
@@ -211,7 +210,6 @@ const CodeEditor = () => {
   const codeMirrorRef = useRef(null);
 
   const handleLanguageChange = (event) => {
-
     const selectedLanguageId = event.target.value;
     restClient({
       url: `api/submission/getsubmission?ProblemId=${id}&UserId=${localStorage.getItem(
@@ -219,9 +217,9 @@ const CodeEditor = () => {
       )}&LanguageId=${selectedLanguageId}`,
     })
       .then((res) => {
-
         const selectedLanguage = executeCode?.find(
-          (language) => Number(language?.languageId) === parseInt(selectedLanguageId)
+          (language) =>
+            Number(language?.languageId) === parseInt(selectedLanguageId)
         );
         setLanguage(selectedLanguage);
         if (res?.data?.data?.sourceCode) {
@@ -239,23 +237,16 @@ const CodeEditor = () => {
           url: "api/executecode/getallexecutecodebyproblemid/" + id,
         })
           .then((res) => {
-            // setExecuteCode(res.data?.data?.find((item,index)=> item.languageId === selectedLanguageId));
+            const selectedLanguage = executeCode?.find(
+              (language) =>
+                Number(language?.languageId) === parseInt(selectedLanguageId)
+            );
+            setLanguage(selectedLanguage);
             const codeChange = res.data?.data?.find(
               (item, index) =>
                 Number(item?.languageId) === Number(selectedLanguageId)
             );
             setCode(decodeBase64(codeChange?.sampleCode) || "");
-            restClient({
-              url:
-                "api/programlanguage/getprogramlanguagebyid/" +
-                selectedLanguageId,
-            })
-              .then((res) => {
-                setLanguage(res?.data?.data);
-              })
-              .catch((err) => {
-                setLanguage(null);
-              });
           })
           .catch((err) => {});
       });
